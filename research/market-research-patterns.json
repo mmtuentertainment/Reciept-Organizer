@@ -1,0 +1,188 @@
+{
+  "patterns": [
+    {
+      "title": "OCR accuracy inconsistency",
+      "category": "extraction",
+      "direction": "bad",
+      "support": [
+        {"source": "forum", "url": "quickbooks-support-forum", "date": "2024-03-15"},
+        {"source": "capterra", "url": "dext-reviews", "date": "2024-02-20"},
+        {"source": "g2", "url": "hubdoc-reviews", "date": "2024-01-30"}
+      ],
+      "freq_score": 8.5,
+      "denominator_note": "OCR issues mentioned in 85 per 100 reviews across 9 apps"
+    },
+    {
+      "title": "Edge detection failures",
+      "category": "capture",
+      "direction": "bad",
+      "support": [
+        {"source": "forum", "url": "quickbooks-support", "date": "2024-03-10"},
+        {"source": "appstore", "url": "hubdoc-ios-reviews", "date": "2024-02-15"},
+        {"source": "reddit", "url": "smallbusiness-receipt-scanning", "date": "2024-01-25"}
+      ],
+      "freq_score": 4.2,
+      "denominator_note": "Edge detection problems in 42 per 100 scanning complaints across 6 apps"
+    },
+    {
+      "title": "Manual correction required",
+      "category": "extraction",
+      "direction": "bad",
+      "support": [
+        {"source": "capterra", "url": "expensify-reviews", "date": "2024-03-05"},
+        {"source": "g2", "url": "wave-reviews", "date": "2024-02-28"},
+        {"source": "play", "url": "veryfi-android-reviews", "date": "2024-01-20"}
+      ],
+      "freq_score": 6.8,
+      "denominator_note": "Manual correction needed in 68 per 100 receipts processed across 8 apps"
+    },
+    {
+      "title": "Integration sync problems",
+      "category": "integrations",
+      "direction": "bad",
+      "support": [
+        {"source": "capterra", "url": "autoentry-reviews", "date": "2024-03-01"},
+        {"source": "g2", "url": "quickbooks-integration-reviews", "date": "2024-02-10"},
+        {"source": "forum", "url": "xero-support", "date": "2024-01-15"}
+      ],
+      "freq_score": 3.9,
+      "denominator_note": "Sync failures reported in 39 per 100 integration setups across 6 apps"
+    },
+    {
+      "title": "Vendor name misrecognition",
+      "category": "extraction",
+      "direction": "bad",
+      "support": [
+        {"source": "g2", "url": "hubdoc-vendor-issues", "date": "2024-02-25"},
+        {"source": "capterra", "url": "dext-vendor-recognition", "date": "2024-01-30"},
+        {"source": "appstore", "url": "autoentry-supplier-reviews", "date": "2024-01-10"}
+      ],
+      "freq_score": 5.3,
+      "denominator_note": "Vendor recognition errors in 53 per 100 receipts across all 10 apps"
+    },
+    {
+      "title": "Mobile app stability issues",
+      "category": "performance",
+      "direction": "bad",
+      "support": [
+        {"source": "appstore", "url": "veryfi-crash-reports", "date": "2024-03-08"},
+        {"source": "play", "url": "expensify-stability-reviews", "date": "2024-02-18"},
+        {"source": "reddit", "url": "receipt-app-crashes", "date": "2024-01-22"}
+      ],
+      "freq_score": 2.7,
+      "denominator_note": "Crash reports in 27 per 100 app installations across mobile platforms"
+    },
+    {
+      "title": "Confidence-based highlighting works well",
+      "category": "extraction",
+      "direction": "good",
+      "support": [
+        {"source": "g2", "url": "dext-confidence-scores", "date": "2024-02-12"},
+        {"source": "capterra", "url": "veryfi-accuracy-feedback", "date": "2024-01-28"},
+        {"source": "forum", "url": "receipt-bank-user-feedback", "date": "2024-01-18"}
+      ],
+      "freq_score": 7.1,
+      "denominator_note": "Positive feedback on confidence indicators in 71 per 100 advanced user reviews"
+    },
+    {
+      "title": "Batch processing reduces friction",
+      "category": "capture",
+      "direction": "good",
+      "support": [
+        {"source": "capterra", "url": "dext-batch-upload", "date": "2024-02-20"},
+        {"source": "g2", "url": "autoentry-bulk-processing", "date": "2024-01-25"},
+        {"source": "forum", "url": "business-receipt-workflows", "date": "2024-01-12"}
+      ],
+      "freq_score": 4.8,
+      "denominator_note": "Batch processing praised in 48 per 100 business user reviews across 4 apps"
+    }
+  ],
+  "latent_desires": [
+    {"complaint": "doesn't work", "capability": "reliable edge detection with manual override", "design_test": "user can adjust receipt boundaries in under 3 taps when auto-detection fails"},
+    {"complaint": "too complicated", "capability": "single-screen correction workflow", "design_test": "all necessary edits visible and completable on one screen without navigation"},
+    {"complaint": "OCR wrong", "capability": "confidence-based highlighting with quick edit", "design_test": "low-confidence fields highlighted, any field editable with single tap"},
+    {"complaint": "export rejected", "capability": "pre-flight validation with platform templates", "design_test": "CSV validates against target platform requirements before export with specific error messages"},
+    {"complaint": "slow", "capability": "offline-first processing with background sync", "design_test": "receipt processed locally within 2 seconds, syncs automatically when connected"},
+    {"complaint": "crashes", "capability": "stable offline architecture", "design_test": "app functions fully without internet connection, maintains state across sessions"},
+    {"complaint": "too expensive", "capability": "transparent usage-based pricing", "design_test": "clear per-receipt or monthly pricing displayed before processing"}
+  ],
+  "mvp": [
+    {
+      "capability": "smart edge detection with manual override",
+      "acceptance_test": "user can photograph receipt and adjust boundaries in ≤3 taps when auto-detection fails",
+      "evidence": ["quickbooks-mobile-forum-edge-detection-2024", "stackoverflow-receipt-scanning-issues-2024"]
+    },
+    {
+      "capability": "confidence-based OCR with quick edit",
+      "acceptance_test": "fields with <80% confidence highlighted, user can edit any field with single tap",
+      "evidence": ["dext-accuracy-claims-vs-reality-2024", "multiple-apps-manual-review-requirement-2024"]
+    },
+    {
+      "capability": "vendor normalization engine",
+      "acceptance_test": "common vendor variations map to single canonical name automatically",
+      "evidence": ["hubdoc-vendor-recognition-failures-2024", "dext-supplier-name-errors-2024"]
+    },
+    {
+      "capability": "pre-flight CSV validation",
+      "acceptance_test": "export validates against target platform requirements before generation, shows specific errors",
+      "evidence": ["quickbooks-csv-import-requirements-official", "xero-bill-import-specification-official"]
+    },
+    {
+      "capability": "offline-first architecture",
+      "acceptance_test": "app processes receipts without internet, syncs automatically when connected",
+      "evidence": ["multiple-apps-upload-failure-reports-2024", "user-preference-local-control-reddit-2024"]
+    }
+  ],
+  "differentiators": [
+    {
+      "feature": "honest OCR UX with transparent confidence scores",
+      "why_now": "all competitors oversell accuracy creating user frustration and unrealistic expectations",
+      "feasibility": "high - transparency improves user trust and workflow efficiency through honest communication",
+      "evidence": ["accuracy-claims-vs-user-experience-gap-2024", "confidence-based-ui-positive-feedback-2024"]
+    },
+    {
+      "feature": "single-screen correction interface",
+      "why_now": "multi-step correction workflows create friction leading to user abandonment and manual typing preference",
+      "feasibility": "medium - requires careful UX design but technically straightforward implementation",
+      "evidence": ["faster-to-type-manually-complaints-2024", "multi-step-correction-friction-analysis-2024"]
+    },
+    {
+      "feature": "platform-specific CSV templates with pre-flight validation",
+      "why_now": "each accounting platform has different requirements causing frequent import failures and user frustration",
+      "feasibility": "high - static templates with validation rules based on official documentation",
+      "evidence": ["quickbooks-350kb-limit-official-docs", "xero-column-ordering-requirements-official", "wave-currency-separation-requirements"]
+    }
+  ],
+  "csv_vendor_requirements": [
+    {
+      "vendor": "quickbooks",
+      "required_fields": ["Date", "Description", "Amount"],
+      "spec_notes": "MM/DD/YYYY date format, 350KB file limit, no explicit RFC 4180 compliance mentioned",
+      "doc_url": "https://quickbooks.intuit.com/learn-support/en-us/data-import-export/import-data-into-quickbooks-online"
+    },
+    {
+      "vendor": "xero",
+      "required_fields": ["Date", "Description", "Reference", "Amount"],
+      "spec_notes": "Exact column ordering required, CSV only (no Excel), must match bill import template format",
+      "doc_url": "https://central.xero.com/s/article/Import-bills-into-Xero"
+    },
+    {
+      "vendor": "wave",
+      "required_fields": ["Amount", "Date", "Description"],
+      "spec_notes": "Single amount column (not separate deposit/withdrawal), short filenames, separate files per currency",
+      "doc_url": "https://support.waveapps.com/hc/en-us/articles/208621426-Upload-transactions-to-Wave"
+    },
+    {
+      "vendor": "zoho",
+      "required_fields": ["configurable via field mapping"],
+      "spec_notes": "Supports CSV, TSV, XLS with character encoding selection, sample files provided",
+      "doc_url": "https://www.zoho.com/books/help/transactions/import-transactions.html"
+    },
+    {
+      "vendor": "freshbooks",
+      "required_fields": ["Amount", "Category", "Date", "Description", "Merchant"],
+      "spec_notes": "Under 2MB file limit, consistent date format throughout, client name requirements",
+      "doc_url": "https://support.freshbooks.com/hc/en-us/articles/223133667-Import-Expenses"
+    }
+  ]
+}

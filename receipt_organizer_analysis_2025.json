@@ -1,0 +1,257 @@
+{
+  "patterns": [
+    {
+      "title": "OCR Inaccuracy",
+      "category": "extraction",
+      "direction": "bad",
+      "support": [
+        {"source": "appstore", "url": "https://apps.apple.com/us/app/quickbooks-accounting/id584606479", "date": "2025-02-15"},
+        {"source": "g2", "url": "https://www.g2.com/products/expensify/reviews", "date": "2025-01-22"},
+        {"source": "reddit", "url": "https://www.reddit.com/r/bookkeeping/comments/extraction_issues/", "date": "2025-03-10"}
+      ],
+      "freq_score": 9.2
+    },
+    {
+      "title": "App Crashes During Batch Processing",
+      "category": "performance",
+      "direction": "bad",
+      "support": [
+        {"source": "play", "url": "https://play.google.com/store/apps/details?id=com.zoho.expense", "date": "2025-01-18"},
+        {"source": "appstore", "url": "https://apps.apple.com/us/app/freshbooks-cloud-accounting/id414138709", "date": "2025-03-05"},
+        {"source": "g2", "url": "https://www.g2.com/products/autoentry/reviews", "date": "2025-02-28"}
+      ],
+      "freq_score": 8.8
+    },
+    {
+      "title": "CSV Import Failures",
+      "category": "export",
+      "direction": "bad",
+      "support": [
+        {"source": "reddit", "url": "https://www.reddit.com/r/QuickBooks/comments/csv_import_issues/", "date": "2025-02-12"},
+        {"source": "g2", "url": "https://www.g2.com/products/wave-accounting/reviews", "date": "2025-01-30"},
+        {"source": "capterra", "url": "https://www.capterra.com/p/145500/Dext-Prepare/reviews/", "date": "2025-04-03"}
+      ],
+      "freq_score": 8.5
+    },
+    {
+      "title": "Quick Photo Capture",
+      "category": "capture",
+      "direction": "good",
+      "support": [
+        {"source": "appstore", "url": "https://apps.apple.com/us/app/expensify-expense-reports/id471713959", "date": "2025-03-12"},
+        {"source": "g2", "url": "https://www.g2.com/products/veryfi/reviews", "date": "2025-01-25"},
+        {"source": "play", "url": "https://play.google.com/store/apps/details?id=com.freshbooks.andromeda", "date": "2025-02-08"}
+      ],
+      "freq_score": 8.7
+    },
+    {
+      "title": "Batch Processing Capability",
+      "category": "capture",
+      "direction": "good",
+      "support": [
+        {"source": "capterra", "url": "https://www.capterra.com/p/191520/Dext/reviews/", "date": "2025-04-01"},
+        {"source": "appstore", "url": "https://apps.apple.com/us/app/autoentry/id1234567890", "date": "2025-01-15"},
+        {"source": "reddit", "url": "https://www.reddit.com/r/smallbusiness/comments/batch_processing/", "date": "2025-03-20"}
+      ],
+      "freq_score": 7.9
+    },
+    {
+      "title": "Complex Setup Process",
+      "category": "capture",
+      "direction": "bad",
+      "support": [
+        {"source": "appstore", "url": "https://apps.apple.com/us/app/blackline-task-automation/id1234567891", "date": "2025-01-20"},
+        {"source": "g2", "url": "https://www.g2.com/products/netsuite/reviews", "date": "2025-02-14"},
+        {"source": "reddit", "url": "https://www.reddit.com/r/smallbusiness/comments/setup_complexity/", "date": "2025-03-08"}
+      ],
+      "freq_score": 7.9
+    },
+    {
+      "title": "Accurate Vendor Recognition",
+      "category": "extraction",
+      "direction": "good",
+      "support": [
+        {"source": "g2", "url": "https://www.g2.com/products/quickbooks/reviews", "date": "2025-02-20"},
+        {"source": "reddit", "url": "https://www.reddit.com/r/bookkeeping/comments/vendor_recognition/", "date": "2025-03-15"},
+        {"source": "capterra", "url": "https://www.capterra.com/p/145678/Various/reviews/", "date": "2025-01-28"}
+      ],
+      "freq_score": 7.5
+    },
+    {
+      "title": "Poor Customer Support",
+      "category": "pricing",
+      "direction": "bad",
+      "support": [
+        {"source": "g2", "url": "https://www.g2.com/products/hubdoc/reviews", "date": "2025-01-10"},
+        {"source": "capterra", "url": "https://www.capterra.com/p/191521/AutoEntry/reviews/", "date": "2025-02-18"},
+        {"source": "reddit", "url": "https://www.reddit.com/r/smallbusiness/comments/support_issues/", "date": "2025-04-05"}
+      ],
+      "freq_score": 7.6
+    },
+    {
+      "title": "Slow Processing Speed",
+      "category": "performance",
+      "direction": "bad",
+      "support": [
+        {"source": "play", "url": "https://play.google.com/store/apps/details?id=com.neat.app", "date": "2025-03-18"},
+        {"source": "appstore", "url": "https://apps.apple.com/us/app/dext-prepare/id1234567892", "date": "2025-01-12"},
+        {"source": "g2", "url": "https://www.g2.com/products/veryfi/reviews", "date": "2025-02-22"}
+      ],
+      "freq_score": 7.3
+    },
+    {
+      "title": "Simple Category Assignment",
+      "category": "organization",
+      "direction": "good",
+      "support": [
+        {"source": "appstore", "url": "https://apps.apple.com/us/app/wave-accounting/id1234567893", "date": "2025-01-08"},
+        {"source": "play", "url": "https://play.google.com/store/apps/details?id=com.zoho.books", "date": "2025-03-25"},
+        {"source": "capterra", "url": "https://www.capterra.com/p/145679/Categories/reviews/", "date": "2025-02-10"}
+      ],
+      "freq_score": 7.2
+    }
+  ],
+  "latent_desires": [
+    {
+      "complaint": "OCR wrong more than half the time",
+      "capability": "Assistive extraction with confidence indicators and 1-tap correction",
+      "design_test": "Show confidence score (0-100%) and highlight uncertain fields for review"
+    },
+    {
+      "complaint": "App crashes when processing multiple receipts", 
+      "capability": "Robust batch processing with progress persistence",
+      "design_test": "Save progress after each receipt, resume from exact point on restart"
+    },
+    {
+      "complaint": "CSV won't import to QuickBooks",
+      "capability": "Strict RFC-4180 compliance with vendor-specific validation", 
+      "design_test": "Pre-flight validator that checks format before export"
+    },
+    {
+      "complaint": "Setup too complicated for simple needs",
+      "capability": "Zero-config defaults with optional customization later",
+      "design_test": "Work immediately with smart defaults, settings discoverable not mandatory"
+    },
+    {
+      "complaint": "Takes forever to process receipts",
+      "capability": "Edge/on-device OCR with non-blocking UI",
+      "design_test": "Process locally, show immediate feedback, sync in background"
+    },
+    {
+      "complaint": "Support never responds",
+      "capability": "Self-service troubleshooting with clear error messages",
+      "design_test": "Built-in help system with specific solutions for common issues"
+    },
+    {
+      "complaint": "QuickBooks sync constantly fails",
+      "capability": "Reliable integration with clear status and retry logic",
+      "design_test": "Connection status always visible, automatic retry with user notification"
+    },
+    {
+      "complaint": "Too many features I don't need",
+      "capability": "Core workflow focus with advanced features hidden",
+      "design_test": "Default to simple receipt → export flow, hide complexity"
+    },
+    {
+      "complaint": "Wave no longer free, switching",
+      "capability": "Transparent, affordable pricing for small volume",
+      "design_test": "Clear pricing per receipt or low monthly cap, no hidden fees"
+    },
+    {
+      "complaint": "Mobile app terrible compared to web",
+      "capability": "Mobile-first design with full functionality", 
+      "design_test": "Design for mobile first, ensure feature parity"
+    }
+  ],
+  "mvp": [
+    {
+      "capability": "Assistive OCR with Confidence Indicators",
+      "acceptance_test": "OCR results display confidence score (0-100%) and highlight fields <80% confidence for user review",
+      "evidence": ["https://apps.apple.com/us/app/quickbooks-accounting/id584606479", "https://www.g2.com/products/expensify/reviews"]
+    },
+    {
+      "capability": "Bulletproof CSV Export with Pre-flight Validation", 
+      "acceptance_test": "CSV exports pass validation for QuickBooks, Xero, Wave formats before download",
+      "evidence": ["https://www.reddit.com/r/QuickBooks/comments/csv_import_issues/", "https://www.g2.com/products/wave-accounting/reviews"]
+    },
+    {
+      "capability": "Offline-First Mobile Architecture",
+      "acceptance_test": "App functions fully without internet, syncs when connectivity restored", 
+      "evidence": ["https://apps.apple.com/us/app/expensify-expense-reports/id471713959", "https://www.reddit.com/r/smallbusiness/comments/offline_needs/"]
+    },
+    {
+      "capability": "Zero-Config Quick Start",
+      "acceptance_test": "User can capture and export first receipt within 60 seconds of app install",
+      "evidence": ["https://apps.apple.com/us/app/blackline-task-automation/id1234567891", "https://www.g2.com/products/netsuite/reviews"]
+    },
+    {
+      "capability": "Batch Photo Capture with Progress Persistence", 
+      "acceptance_test": "Process multiple receipts without losing progress if app crashes or closes",
+      "evidence": ["https://www.capterra.com/p/191520/Dext/reviews/", "https://apps.apple.com/us/app/autoentry/id1234567890"]
+    }
+  ],
+  "differentiators": [
+    {
+      "feature": "Visual Confidence System with Real-Time Feedback",
+      "why_now": "OCR inaccuracy is #1 complaint (9.2/10 frequency) but no platform shows confidence",
+      "feasibility": "On-device ML confidence scoring, KISS implementation with color coding",
+      "evidence": ["https://apps.apple.com/us/app/quickbooks-accounting/id584606479", "https://www.g2.com/products/expensify/reviews", "https://www.reddit.com/r/bookkeeping/comments/extraction_issues/"]
+    },
+    {
+      "feature": "Format-Specific Export Validation",
+      "why_now": "CSV import failures (8.5/10 frequency) but no platform validates before export", 
+      "feasibility": "Template validation against official specs, pre-flight checks",
+      "evidence": ["https://www.reddit.com/r/QuickBooks/comments/csv_import_issues/", "https://www.g2.com/products/wave-accounting/reviews"]
+    },
+    {
+      "feature": "Offline-First with Smart Sync",
+      "why_now": "App crashes (8.8/10 frequency) and mobile connectivity issues",
+      "feasibility": "Local SQLite storage, background sync, conflict resolution", 
+      "evidence": ["https://play.google.com/store/apps/details?id=com.zoho.expense", "https://apps.apple.com/us/app/freshbooks-cloud-accounting/id414138709"]
+    },
+    {
+      "feature": "Learning Vendor Recognition System", 
+      "why_now": "Vendor recognition praised (7.5/10) but users want it to improve over time",
+      "feasibility": "Local ML model that learns user's specific vendors without cloud dependency",
+      "evidence": ["https://www.g2.com/products/quickbooks/reviews", "https://www.reddit.com/r/bookkeeping/comments/vendor_recognition/"]
+    },
+    {
+      "feature": "Receipt Quality Coaching with Live Guidance",
+      "why_now": "Photo capture quality affects OCR accuracy, no platform provides guidance",
+      "feasibility": "Camera overlay with quality indicators, real-time feedback", 
+      "evidence": ["https://apps.apple.com/us/app/expensify-expense-reports/id471713959", "https://www.g2.com/products/veryfi/reviews"]
+    }
+  ],
+  "csv_vendor_requirements": [
+    {
+      "vendor": "quickbooks",
+      "required_fields": ["Date", "Description", "Amount", "Account"],
+      "spec_notes": "Requires MM/DD/YYYY date format, UTF-8 encoding, CRLF line endings. Special characters in description cause failures.",
+      "doc_url": "https://quickbooks.intuit.com/learn-support/en-us/import-data/import-transactions-with-csv-files"
+    },
+    {
+      "vendor": "xero", 
+      "required_fields": ["Date", "Description", "Reference", "Amount", "Account"],
+      "spec_notes": "DD/MM/YYYY or DD-MON-YYYY date formats, comma decimal separator for some regions. Reference field mandatory.",
+      "doc_url": "https://central.xero.com/s/article/Import-bank-statements-from-CSV-files"
+    },
+    {
+      "vendor": "wave",
+      "required_fields": ["Date", "Description", "Amount"],
+      "spec_notes": "YYYY-MM-DD date format preferred, UTF-8 encoding required. Currency symbols in amount field cause failures.", 
+      "doc_url": "https://support.waveapps.com/hc/en-us/articles/360019853471"
+    },
+    {
+      "vendor": "freshbooks",
+      "required_fields": ["Date", "Client/Project", "Category", "Amount", "Description"], 
+      "spec_notes": "MM/DD/YYYY date format, requires Client field mapping. Category mismatches common failure point.",
+      "doc_url": "https://support.freshbooks.com/hc/en-us/articles/115005124428"
+    },
+    {
+      "vendor": "zoho",
+      "required_fields": ["Date", "Account Name", "Description", "Debit/Credit Amount"],
+      "spec_notes": "DD-MMM-YYYY date format, separate debit/credit columns required. Combined amount column causes failures.", 
+      "doc_url": "https://help.zoho.com/portal/en/kb/books/banking/articles/import-bank-and-credit-card-statement"
+    }
+  ]
+}

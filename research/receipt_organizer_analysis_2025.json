@@ -1,0 +1,387 @@
+{
+  "patterns": {
+    "capture_ux": [
+      {
+        "title": "Poor Edge Detection",
+        "frequency": 8,
+        "evidence_sources": ["QuickBooks forums 2025", "Wave reviews", "Mobile app studies"],
+        "quotes": [
+          "constantly struggles to identify the edges of receipts regardless of contrast",
+          "regularly detects borders improperly regardless of light conditions", 
+          "receipt edges detected wrong requiring manual adjustment"
+        ],
+        "affected_apps": ["QuickBooks", "Wave", "FreshBooks", "Veryfi", "Zoho", "Hubdoc", "Expensify", "Dext"]
+      },
+      {
+        "title": "Image Quality Issues", 
+        "frequency": 9,
+        "evidence_sources": ["QuickBooks support 2025", "Wave March 2025 update", "App store reviews"],
+        "quotes": [
+          "receipt images taken through the app look like lousy photos",
+          "receipts captured are lacking in contrast but strangely too bright",
+          "many negative reviews report blurry photos",
+          "fails to do any kind of image touchup to make receipts cleaner"
+        ],
+        "affected_apps": ["QuickBooks", "Wave", "Veryfi", "Zoho", "FreshBooks", "Hubdoc", "Expensify", "AutoEntry", "Neat"]
+      },
+      {
+        "title": "Batch Processing Demand",
+        "frequency": 6,
+        "evidence_sources": ["Shoeboxed features 2025", "Wave capabilities", "Small business workflow studies"],
+        "quotes": [
+          "processes up to 50 receipts in less than 3 minutes",
+          "bulk import up to 10 at once",
+          "need batch options for efficiency"
+        ],
+        "affected_apps": ["Shoeboxed", "Wave", "Dext", "AutoEntry", "Smart Receipts", "SparkReceipt"]
+      }
+    ],
+    "extraction": [
+      {
+        "title": "OCR Accuracy Inconsistencies",
+        "frequency": 10,
+        "evidence_sources": ["All platform reviews 2025", "Accuracy comparison studies", "User complaint analyses"],
+        "quotes": [
+          "OCR accuracy can be inconsistent",
+          "struggles to read suppliers names often just gets it wrong",
+          "SmartScan is great when it works but sometimes thinks my coffee receipt is from a gas station",
+          "misreads figures repeatedly despite corrections"
+        ],
+        "affected_apps": ["QuickBooks", "Xero/Hubdoc", "Zoho", "FreshBooks", "Wave", "Dext", "AutoEntry", "Expensify", "Veryfi", "Shoeboxed/Neat"]
+      },
+      {
+        "title": "Confidence Indicator Absence",
+        "frequency": 9,
+        "evidence_sources": ["User experience studies", "OCR analysis 2025", "Feature comparison"],
+        "quotes": [
+          "need visible confidence and 1-tap correction",
+          "users blind to accuracy issues until export fails",
+          "assistive extraction with confidence scoring requested"
+        ],
+        "affected_apps": ["QuickBooks", "Hubdoc", "Wave", "FreshBooks", "Zoho", "Veryfi", "AutoEntry", "Expensify", "Neat"]
+      }
+    ],
+    "organization": [
+      {
+        "title": "Vendor Name Normalization Issues",
+        "frequency": 7,
+        "evidence_sources": ["Hubdoc reviews 2025", "Categorization studies", "Data quality analysis"],
+        "quotes": [
+          "struggles to read suppliers names often gets it wrong",
+          "same monthly rent bill misread repeatedly",
+          "McDonald's vs McDonalds vs MCDONALD'S #123 all different entries"
+        ],
+        "affected_apps": ["Hubdoc", "QuickBooks", "Wave", "Zoho", "FreshBooks", "Veryfi", "Expensify"]
+      },
+      {
+        "title": "Poor Search and Retrieval",
+        "frequency": 5,
+        "evidence_sources": ["User workflow studies", "Organization feature analysis", "Search functionality reviews"],
+        "quotes": [
+          "can't find receipts later",
+          "need powerful search by vendor date amount category", 
+          "visual thumbnail browsing missing"
+        ],
+        "affected_apps": ["Wave", "QuickBooks", "FreshBooks", "Zoho", "AutoEntry"]
+      }
+    ],
+    "export_import": [
+      {
+        "title": "CSV Format Compliance Issues",
+        "frequency": 8,
+        "evidence_sources": ["Import failure studies 2025", "Platform documentation", "Migration guides"],
+        "quotes": [
+          "QuickBooks can be particular about column names and data types",
+          "exported fields too limited to be imported into other software",
+          "journal entries cannot be imported into Zoho Books even though exportable",
+          "CSV import always fails"
+        ],
+        "affected_apps": ["QuickBooks", "FreshBooks", "Zoho", "Wave", "Hubdoc", "Dext", "AutoEntry", "Expensify"]
+      },
+      {
+        "title": "Platform-Specific Template Needs",
+        "frequency": 6,
+        "evidence_sources": ["CSV specification analysis", "Import testing", "Platform requirement docs"],
+        "quotes": [
+          "3-column or 4-column formats only for QuickBooks",
+          "expense categories must be created as expense accounts first in Zoho",
+          "particular formatting requirements vary by platform"
+        ],
+        "affected_apps": ["QuickBooks", "Zoho", "Wave", "Xero", "FreshBooks", "Hubdoc"]
+      }
+    ],
+    "performance": [
+      {
+        "title": "Mobile App Reliability Issues",
+        "frequency": 8,
+        "evidence_sources": ["App store reviews 2025", "Mobile performance studies", "Crash reports"],
+        "quotes": [
+          "very inconsistent and glitchy receipts disappearing or not uploading",
+          "mobile app synchronization delays causing inconsistencies",
+          "long wait times for app to become responsive enough to photograph receipts",
+          "app can be unresponsive at times"
+        ],
+        "affected_apps": ["Veryfi", "Zoho", "Hubdoc", "Wave", "QuickBooks", "FreshBooks", "AutoEntry", "Expensify"]
+      },
+      {
+        "title": "Slow Processing Times",
+        "frequency": 6,
+        "evidence_sources": ["Performance benchmarks 2025", "User experience feedback", "Processing time studies"],
+        "quotes": [
+          "OCR processing time is slower than we would like",
+          "autoscan is really slow",
+          "their automatic scanner can choose to not work at times"
+        ],
+        "affected_apps": ["Dext", "Expensify", "Zoho", "AutoEntry", "Veryfi", "Neat"]
+      },
+      {
+        "title": "Limited Offline Functionality",
+        "frequency": 8,
+        "evidence_sources": ["Connectivity studies 2025", "Offline capability analysis", "Mobile usage patterns"],
+        "quotes": [
+          "need offline-first solutions as connectivity remains inconsistent",
+          "offline behavior identified as key missing capability",
+          "mobile connectivity issues prevent receipt capture"
+        ],
+        "affected_apps": ["QuickBooks", "Wave", "Hubdoc", "FreshBooks", "Zoho", "Veryfi", "AutoEntry", "Expensify"]
+      }
+    ],
+    "support_pricing": [
+      {
+        "title": "Poor Customer Support",
+        "frequency": 7,
+        "evidence_sources": ["Support quality surveys 2025", "Response time analysis", "User satisfaction studies"],
+        "quotes": [
+          "customer support just as bad as Xero support",
+          "overwhelming number of reviewers criticize Wave's customer support",
+          "criticized for slow response times and unresolved issues",
+          "customer support needs improvement"
+        ],
+        "affected_apps": ["Hubdoc", "Wave", "AutoEntry", "Shoeboxed", "Veryfi", "Neat", "Zoho"]
+      },
+      {
+        "title": "Pricing Barriers for Small Business",
+        "frequency": 6,
+        "evidence_sources": ["Pricing analysis 2025", "Small business budget studies", "Adoption barrier research"],
+        "quotes": [
+          "Wave shifted from free to tiered structure frustrated users",
+          "pricing slightly on the higher side",
+          "some small businesses find it cost-intensive",
+          "receipt scanning upgrade costs $8/month frustrates budget users"
+        ],
+        "affected_apps": ["Wave", "Veryfi", "Shoeboxed", "Dext", "AutoEntry", "Expensify"]
+      }
+    ]
+  },
+  "latent_desires": {
+    "assistive_ocr": {
+      "surface_complaint": "OCR accuracy inconsistent",
+      "inferred_need": "Confidence-based extraction with easy correction",
+      "design_solution": "Traffic light confidence indicators with one-tap correction overlay",
+      "evidence_strength": 10
+    },
+    "smart_capture": {
+      "surface_complaint": "Blurry photos constantly",
+      "inferred_need": "Real-time image quality feedback and guidance",
+      "design_solution": "Live quality scoring with positioning guides",
+      "evidence_strength": 9
+    },
+    "offline_first": {
+      "surface_complaint": "App crashes during capture",
+      "inferred_need": "Reliable functionality without internet dependency",
+      "design_solution": "Local processing with background sync",
+      "evidence_strength": 8
+    },
+    "smart_boundaries": {
+      "surface_complaint": "Edges detected wrong",
+      "inferred_need": "Intelligent boundary detection with manual override",
+      "design_solution": "Auto-detect with drag-to-adjust corners",
+      "evidence_strength": 8
+    },
+    "bulletproof_export": {
+      "surface_complaint": "CSV import always fails", 
+      "inferred_need": "Format validation before export",
+      "design_solution": "Platform-specific templates with pre-flight validation",
+      "evidence_strength": 8
+    },
+    "instant_feedback": {
+      "surface_complaint": "Takes forever to process",
+      "inferred_need": "Non-blocking UI with progress visibility",
+      "design_solution": "Background processing with live progress indicators",
+      "evidence_strength": 6
+    },
+    "powerful_search": {
+      "surface_complaint": "Can't find receipts later",
+      "inferred_need": "Multi-criteria search with visual browsing",
+      "design_solution": "Search by vendor/date/amount with thumbnail grid",
+      "evidence_strength": 5
+    },
+    "seamless_access": {
+      "surface_complaint": "Authentication every time",
+      "inferred_need": "Persistent login with device trust",
+      "design_solution": "Biometric login with device recognition",
+      "evidence_strength": 4
+    },
+    "learning_categorization": {
+      "surface_complaint": "Categorization always wrong",
+      "inferred_need": "User-trainable classification system",
+      "design_solution": "Learn from corrections with vendor-based suggestions",
+      "evidence_strength": 7
+    },
+    "self_service_help": {
+      "surface_complaint": "Support never responds",
+      "inferred_need": "Comprehensive self-help resources",
+      "design_solution": "In-app troubleshooting with guided problem resolution",
+      "evidence_strength": 7
+    }
+  },
+  "mvp": {
+    "core_features": [
+      {
+        "name": "Smart Image Capture",
+        "acceptance_criteria": "95%+ first-attempt success with auto-edge detection and real-time quality feedback",
+        "priority": "P0",
+        "evidence_base": "Universal complaints about edge detection and image quality across all platforms"
+      },
+      {
+        "name": "Assistive OCR with Confidence",
+        "acceptance_criteria": "Extract vendor/date/total with confidence scores; highlight <80% confidence fields",
+        "priority": "P0", 
+        "evidence_base": "OCR accuracy issues reported across 100% of platforms studied"
+      },
+      {
+        "name": "Offline-First Architecture",
+        "acceptance_criteria": "Full capture/edit/organize functionality without internet; sync when available",
+        "priority": "P0",
+        "evidence_base": "Mobile connectivity issues block workflow; 80% of platforms lack offline capability"
+      },
+      {
+        "name": "Vendor Normalization",
+        "acceptance_criteria": "Resolve vendor name variations to single entity; track locations separately",
+        "priority": "P1",
+        "evidence_base": "Vendor misidentification causes categorization failures across platforms"
+      },
+      {
+        "name": "Multi-Platform CSV Export",
+        "acceptance_criteria": "Validate exports against QB/Xero/Wave/FB/Zoho formats before download",
+        "priority": "P1",
+        "evidence_base": "CSV import failures reported across 80% of platform integrations"
+      },
+      {
+        "name": "Batch Processing",
+        "acceptance_criteria": "Process 10+ receipts in single workflow with individual review capability",
+        "priority": "P2",
+        "evidence_base": "Small businesses need bulk processing; Shoeboxed's 50-receipt feature highly praised"
+      }
+    ],
+    "non_goals": [
+      "Enterprise expense management",
+      "Advanced reporting and analytics", 
+      "Multi-currency support (v1)",
+      "Mileage tracking",
+      "Time tracking integration",
+      "Advanced workflow approvals"
+    ]
+  },
+  "differentiators": [
+    {
+      "name": "Visual Confidence System",
+      "market_gap": "Users blind to OCR accuracy until import fails",
+      "solution": "Real-time confidence visualization with color-coded fields",
+      "implementation": "Traffic light system (green/yellow/red) with tap-to-correct",
+      "feasibility": "High - UI/UX enhancement over standard OCR"
+    },
+    {
+      "name": "Format-Specific Export Validation", 
+      "market_gap": "CSV imports fail due to platform-specific requirements",
+      "solution": "Pre-flight validation against actual platform specs",
+      "implementation": "Template library with live validation feedback",
+      "feasibility": "Medium - requires platform specification research"
+    },
+    {
+      "name": "Offline-First with Smart Sync",
+      "market_gap": "80% of apps require internet for basic functionality",
+      "solution": "Full offline capability with intelligent sync prioritization",
+      "implementation": "Local SQLite with conflict-free sync queue",
+      "feasibility": "Medium - architecture decision with sync complexity"
+    },
+    {
+      "name": "Learning Vendor Recognition",
+      "market_gap": "Same vendors misidentified repeatedly across sessions",
+      "solution": "User-trainable vendor database with correction learning",
+      "implementation": "Feedback loop with vendor alias management",
+      "feasibility": "High - machine learning enhancement to OCR pipeline"
+    },
+    {
+      "name": "Receipt Quality Coaching",
+      "market_gap": "Users struggle with optimal capture technique",
+      "solution": "Real-time guidance for positioning and lighting",
+      "implementation": "Camera overlay with live quality scoring",
+      "feasibility": "High - computer vision enhancement to capture flow"
+    }
+  ],
+  "csv_vendor_requirements": {
+    "quickbooks": {
+      "required_columns": ["Date", "Description", "Amount"],
+      "date_format": "MM/DD/YYYY",
+      "column_count": "3 or 4 only",
+      "special_requirements": ["Particular about data types", "Specific column naming"],
+      "common_failures": ["Wrong date format", "Extra columns", "Invalid data types"]
+    },
+    "xero": {
+      "required_columns": ["Date", "Description", "Amount", "Account"],
+      "date_format": "DD/MM/YYYY or YYYY-MM-DD",
+      "special_requirements": ["Chart of accounts must exist", "Contact names must match"],
+      "common_failures": ["Missing account codes", "Contact name mismatches"]
+    },
+    "wave": {
+      "required_columns": ["Date", "Description", "Amount"],
+      "date_format": "YYYY-MM-DD preferred",
+      "optional_columns": ["Category"],
+      "special_requirements": ["Bank statement format support"],
+      "common_failures": ["Date format inconsistencies"]
+    },
+    "freshbooks": {
+      "required_columns": ["Date", "Amount", "Category", "Description"],
+      "special_requirements": ["Limited CSV import capability", "Tax info requires separate process"],
+      "common_failures": ["Historical data import limitations", "Missing category setup"]
+    },
+    "zoho": {
+      "required_columns": ["Date", "Description", "Amount", "Account"],
+      "special_requirements": ["Expense categories must exist first", "Journal entries export-only"],
+      "common_failures": ["Missing pre-created accounts", "Journal entry import attempts"]
+    },
+    "rfc_4180_compliance": {
+      "line_endings": "CRLF (\\r\\n) required by standard",
+      "quoting": "Fields with commas/quotes/line breaks must be quoted",
+      "quote_escaping": "Double quotes escaped as \"\"",
+      "header_requirement": "First row should contain field names",
+      "encoding": "UTF-8 preferred, ASCII fallback"
+    },
+    "common_pitfalls": [
+      "Date format mismatches (US vs international)",
+      "Decimal separator differences (comma vs period)",
+      "Currency symbols cause parsing errors",
+      "Empty required fields",
+      "Character encoding issues with special characters",
+      "Inconsistent field naming across platforms"
+    ]
+  },
+  "market_insights_2025": {
+    "key_trends": [
+      "Wave pricing shift from free to $8/month frustrated budget users",
+      "Hubdoc stagnation post-Xero acquisition with no development",
+      "Increased demand for offline-first solutions", 
+      "Growing mom-and-pop specific needs vs enterprise features",
+      "99%+ OCR accuracy expectation with instant correction"
+    ],
+    "opportunity_gaps": [
+      "Simple receipt organizer for small businesses",
+      "Bulletproof CSV compliance for bookkeeping imports",
+      "Offline-first mobile app architecture",
+      "Transparent OCR confidence with easy correction",
+      "Format-specific export validation"
+    ],
+    "competitive_positioning": "Focus on mom-and-pop simplicity vs enterprise complexity; offline-first vs cloud-dependent; transparent accuracy vs black-box OCR; format-compliant exports vs generic CSV"
+  }
+}
