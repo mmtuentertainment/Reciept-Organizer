@@ -187,7 +187,7 @@ class CSVExportService implements ICSVExportService {
 
   String _generateQuickBooksCSV(List<Receipt> receipts) {
     // QuickBooks format: Date, Amount, Payee, Category, Memo
-    final headers = ['Date', 'Amount', 'Payee', 'Category', 'Memo', 'Tax'];
+    final headers = ['Date', 'Amount', 'Payee', 'Category', 'Memo', 'Tax', 'Notes'];
     final rows = <List<String>>[headers];
     
     for (final receipt in receipts) {
@@ -198,6 +198,7 @@ class CSVExportService implements ICSVExportService {
         'Business Expenses', // Default category
         'Receipt #${receipt.id.substring(0, 8)}',
         _formatAmount(receipt.taxAmount) ?? '0.00',
+        receipt.notes ?? '',
       ]);
     }
     
@@ -206,7 +207,7 @@ class CSVExportService implements ICSVExportService {
 
   String _generateXeroCSV(List<Receipt> receipts) {
     // Xero format: Date, Amount, Payee, Description, Account Code
-    final headers = ['Date', 'Amount', 'Payee', 'Description', 'Account Code', 'Tax Amount'];
+    final headers = ['Date', 'Amount', 'Payee', 'Description', 'Account Code', 'Tax Amount', 'Notes'];
     final rows = <List<String>>[headers];
     
     for (final receipt in receipts) {
@@ -217,6 +218,7 @@ class CSVExportService implements ICSVExportService {
         'Business expense - Receipt #${receipt.id.substring(0, 8)}',
         '400', // Default expense account code
         _formatAmount(receipt.taxAmount) ?? '0.00',
+        receipt.notes ?? '',
       ]);
     }
     
@@ -234,7 +236,8 @@ class CSVExportService implements ICSVExportService {
       'Captured Date',
       'Batch ID',
       'OCR Confidence',
-      'Status'
+      'Status',
+      'Notes'
     ];
     final rows = <List<String>>[headers];
     
@@ -249,6 +252,7 @@ class CSVExportService implements ICSVExportService {
         receipt.batchId ?? '',
         receipt.overallConfidence.toStringAsFixed(1),
         receipt.status.name,
+        receipt.notes ?? '',
       ]);
     }
     
