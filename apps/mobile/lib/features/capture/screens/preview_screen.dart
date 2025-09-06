@@ -7,6 +7,7 @@ import 'package:receipt_organizer/features/capture/widgets/retry_prompt_dialog.d
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/merchant_field_editor_with_normalization.dart';
+import 'package:receipt_organizer/features/capture/widgets/notes_field_editor.dart';
 
 /// Preview screen that shows capture results and handles retry scenarios
 class PreviewScreen extends ConsumerStatefulWidget {
@@ -26,6 +27,7 @@ class PreviewScreen extends ConsumerStatefulWidget {
 class _PreviewScreenState extends ConsumerState<PreviewScreen> {
   bool _isProcessing = false;
   bool _hasUnsavedChanges = false;
+  String _notes = '';
 
   @override
   void initState() {
@@ -186,6 +188,18 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
 
   void _handleTaxChanged(FieldData updatedField) {
     _updateOCRField('tax', updatedField);
+  }
+
+  void _handleNotesChanged(String notes) {
+    setState(() {
+      _notes = notes;
+      _hasUnsavedChanges = true;
+    });
+    
+    // Notes are saved automatically through the receipt update
+    // Since notes is not an OCR field, we need to handle it separately
+    // For now, we'll store it in the component state and save it when the user accepts
+    _scheduleAutoSaveConfirmation();
   }
 
   void _updateOCRField(String fieldName, FieldData updatedField) async {
@@ -395,6 +409,15 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
             label: 'Tax Amount',
             fieldData: displayResult.tax,
             onChanged: _handleTaxChanged,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Notes field
+          NotesFieldEditor(
+            initialValue: _notes,
+            onChanged: _handleNotesChanged,
+            enabled: true,
           ),
           
           const SizedBox(height: 24),

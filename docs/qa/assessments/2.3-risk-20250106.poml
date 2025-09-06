@@ -1,0 +1,267 @@
+```poml
+risk_profile:
+  story: "2.3"
+  title: "Add Notes to Receipts"
+  date: "2025-01-06"
+  reviewer: "Quinn (Test Architect)"
+  
+  executive_summary:
+    total_risks: 8
+    critical: 0
+    high: 0
+    medium: 2
+    low: 6
+    risk_score: 84  # out of 100 (Low risk story)
+    summary: |
+      This is a low-risk story as it primarily involves UI implementation for a field 
+      that already exists in the data model and database schema. The main risks relate 
+      to search performance and data handling.
+  
+  risk_distribution:
+    by_category:
+      data: 
+        count: 3
+        critical: 0
+      performance: 
+        count: 2
+        critical: 0
+      technical: 
+        count: 1
+        critical: 0
+      security: 
+        count: 1
+        critical: 0
+      business: 
+        count: 1
+        critical: 0
+      operational: 
+        count: 0
+        critical: 0
+    
+    by_component:
+      frontend: 5
+      backend: 2
+      database: 1
+  
+  risks:
+    - id: "PERF-001"
+      category: "performance"
+      title: "Search performance degradation with large datasets"
+      description: "SQL LIKE queries on TEXT fields can be slow with 1000+ receipts"
+      probability: 2  # Medium
+      impact: 2       # Medium
+      score: 4        # Medium Risk
+      affected_components: 
+        - "ReceiptRepository.queryReceipts"
+        - "SQL query performance"
+      detection_method: "Identified from performance requirements"
+      
+    - id: "DATA-001"
+      category: "data"
+      title: "Character encoding issues with special characters"
+      description: "Users may paste content with emojis or special characters causing display/storage issues"
+      probability: 2  # Medium
+      impact: 2       # Medium
+      score: 4        # Medium Risk
+      affected_components:
+        - "NotesFieldEditor"
+        - "Database storage"
+        - "CSV export"
+      detection_method: "Common issue with text fields"
+      
+    - id: "SEC-001"
+      category: "security"
+      title: "XSS vulnerability if notes not properly escaped"
+      description: "Malicious scripts could be injected via notes field"
+      probability: 1  # Low
+      impact: 3       # High
+      score: 3        # Low Risk
+      affected_components:
+        - "NotesFieldEditor"
+        - "ReceiptNotesDisplay"
+      detection_method: "Standard security consideration"
+      
+    - id: "DATA-002"
+      category: "data"
+      title: "Notes truncation in CSV export"
+      description: "Long notes may be truncated or cause CSV formatting issues"
+      probability: 1  # Low
+      impact: 1       # Low
+      score: 1        # Minimal Risk
+      affected_components:
+        - "ExportService"
+      detection_method: "CSV format limitations"
+      
+    - id: "DATA-003"
+      category: "data"
+      title: "Loss of unsaved notes on app crash"
+      description: "Notes could be lost if app crashes before auto-save"
+      probability: 1  # Low
+      impact: 2       # Medium
+      score: 2        # Low Risk
+      affected_components:
+        - "Auto-save mechanism"
+        - "State management"
+      detection_method: "Mobile app consideration"
+      
+    - id: "TECH-001"
+      category: "technical"
+      title: "Keyboard overlap on small screens"
+      description: "Virtual keyboard may obscure notes field on small devices"
+      probability: 1  # Low
+      impact: 1       # Low
+      score: 1        # Minimal Risk
+      affected_components:
+        - "PreviewScreen"
+        - "ReceiptDetailScreen"
+      detection_method: "Common mobile UI issue"
+      
+    - id: "PERF-002"
+      category: "performance"
+      title: "UI lag during rapid typing"
+      description: "Debounced auto-save might cause perceived lag"
+      probability: 1  # Low
+      impact: 1       # Low
+      score: 1        # Minimal Risk
+      affected_components:
+        - "NotesFieldEditor"
+        - "Auto-save debouncing"
+      detection_method: "User experience consideration"
+      
+    - id: "BUS-001"
+      category: "business"
+      title: "Users expect rich text formatting"
+      description: "Users might expect bold, lists, etc. in notes"
+      probability: 1  # Low
+      impact: 1       # Low
+      score: 1        # Minimal Risk
+      affected_components:
+        - "NotesFieldEditor"
+      detection_method: "Feature expectation mismatch"
+  
+  mitigations:
+    - risk_id: "PERF-001"
+      strategy: "preventive"
+      actions:
+        - "Implement proper SQL indexing for the notes field"
+        - "Consider adding a full-text search index if performance issues arise"
+        - "Add performance monitoring for search queries"
+        - "Implement search result pagination"
+      testing_requirements:
+        - "Performance test with 1000+ receipts containing varied note lengths"
+        - "Measure query response times"
+        - "Test with concurrent searches"
+      residual_risk: "Low - Some performance impact expected with very large datasets"
+      owner: "dev"
+      timeline: "Before deployment"
+      
+    - risk_id: "DATA-001"
+      strategy: "preventive"
+      actions:
+        - "Ensure UTF-8 encoding throughout the stack"
+        - "Test with international characters, emojis, and special symbols"
+        - "Implement proper character validation"
+        - "Add encoding tests to the test suite"
+      testing_requirements:
+        - "Edge case testing with various character sets"
+        - "Test CSV export with special characters"
+        - "Verify database storage and retrieval"
+      residual_risk: "Low - Framework handles most encoding issues"
+      owner: "dev"
+      timeline: "During implementation"
+      
+    - risk_id: "SEC-001"
+      strategy: "preventive"
+      actions:
+        - "Rely on Flutter's automatic text escaping"
+        - "Never use raw HTML rendering for notes"
+        - "Include XSS test cases in security testing"
+      testing_requirements:
+        - "Attempt to inject script tags in notes field"
+        - "Verify output escaping in all display contexts"
+      residual_risk: "Very Low - Flutter provides built-in protection"
+      owner: "dev"
+      timeline: "During implementation"
+      
+    - risk_id: "DATA-003"
+      strategy: "detective"
+      actions:
+        - "Implement debounced auto-save (already planned)"
+        - "Consider local draft storage"
+        - "Add save indicator UI"
+      testing_requirements:
+        - "Test auto-save under various conditions"
+        - "Simulate app crashes during editing"
+      residual_risk: "Low - 500ms debounce minimizes data loss"
+      owner: "dev"
+      timeline: "During implementation"
+  
+  risk_based_testing_strategy:
+    priority_1:
+      title: "Performance Tests (Medium Risk)"
+      tests:
+        - "Test search with 1000+ receipts"
+        - "Measure search response times"
+        - "Test with long notes (near 500 char limit)"
+        - "Verify SQL query optimization"
+      
+    priority_2:
+      title: "Data Integrity Tests (Medium Risk)"
+      tests:
+        - "Test special characters, emojis, Unicode"
+        - "Verify CSV export handles all characters"
+        - "Test character limit enforcement"
+        - "Verify data persistence"
+      
+    priority_3:
+      title: "UI/UX Tests (Low Risk)"
+      tests:
+        - "Test keyboard handling on various devices"
+        - "Verify auto-save functionality"
+        - "Test empty states and placeholders"
+        - "Cross-platform UI consistency"
+  
+  risk_acceptance_criteria:
+    must_fix_before_production: []  # No critical or high risks
+    
+    should_fix_before_production:
+      - risk: "PERF-001"
+        action: "Implement proper indexing for notes search"
+      - risk: "DATA-001"
+        action: "Verify character encoding throughout stack"
+    
+    can_deploy_with_mitigation:
+      - "All other risks can be accepted with monitoring"
+  
+  monitoring_requirements:
+    post_deployment:
+      - "Search query performance metrics"
+      - "Auto-save success rates"
+      - "Character encoding errors"
+      - "User engagement with notes feature"
+  
+  risk_review_triggers:
+    - "Search performance issues are reported"
+    - "Character encoding problems occur"
+    - "User feedback indicates missing functionality"
+    - "Notes field usage exceeds expectations"
+
+# risk_summary (for gate file):
+risk_summary:
+  totals:
+    critical: 0
+    high: 0
+    medium: 2
+    low: 6
+  highest:
+    id: "PERF-001"
+    score: 4
+    title: "Search performance degradation with large datasets"
+  recommendations:
+    must_fix:
+      - "Implement proper SQL indexing for notes search"
+      - "Verify UTF-8 encoding throughout the stack"
+    monitor:
+      - "Search query performance after deployment"
+      - "Character encoding issues in production"
+```

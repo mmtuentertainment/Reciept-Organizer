@@ -12,6 +12,7 @@ class Receipt {
   final String? batchId;
   final ProcessingResult? ocrResults;
   final DateTime lastModified;
+  final String? notes;
 
   Receipt({
     String? id,
@@ -22,6 +23,7 @@ class Receipt {
     this.batchId,
     this.ocrResults,
     DateTime? lastModified,
+    this.notes,
   }) : 
     id = id ?? const Uuid().v4(),
     capturedAt = capturedAt ?? DateTime.now(),
@@ -36,6 +38,7 @@ class Receipt {
     String? batchId,
     ProcessingResult? ocrResults,
     DateTime? lastModified,
+    String? notes,
   }) {
     return Receipt(
       id: id ?? this.id,
@@ -46,6 +49,7 @@ class Receipt {
       batchId: batchId ?? this.batchId,
       ocrResults: ocrResults ?? this.ocrResults,
       lastModified: lastModified ?? this.lastModified,
+      notes: notes ?? this.notes,
     );
   }
 
@@ -73,6 +77,7 @@ class Receipt {
       'status': status.name,
       'batchId': batchId,
       'lastModified': lastModified.toIso8601String(),
+      'notes': notes,
       // OCR results would need custom serialization for complex objects
       'merchantName': merchantName,
       'receiptDate': receiptDate,
@@ -96,6 +101,7 @@ class Receipt {
       lastModified: json['lastModified'] != null 
           ? DateTime.parse(json['lastModified'])
           : DateTime.now(),
+      notes: json['notes'],
       // OCR results would need to be reconstructed from individual fields
     );
   }

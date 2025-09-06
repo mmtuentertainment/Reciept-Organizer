@@ -3,6 +3,7 @@ import '../../../../data/models/receipt.dart';
 import '../../../../domain/services/ocr_service.dart';
 import '../../../../shared/widgets/confidence_score_widget.dart';
 import '../widgets/field_editor.dart';
+import '../../../capture/widgets/notes_field_editor.dart';
 
 /// Receipt detail screen for viewing and editing receipt data
 /// 
@@ -25,11 +26,13 @@ class ReceiptDetailScreen extends StatefulWidget {
 class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
   late Receipt _currentReceipt;
   bool _hasUnsavedChanges = false;
+  String? _notes;
 
   @override
   void initState() {
     super.initState();
     _currentReceipt = widget.receipt;
+    _notes = widget.receipt.notes;
   }
 
   @override
@@ -227,6 +230,23 @@ class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
           fieldData: ocrResults.tax,
           onChanged: _handleTaxChanged,
         ),
+        
+        const SizedBox(height: 16),
+        
+        // Notes section
+        Text(
+          'Notes',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        
+        NotesFieldEditor(
+          initialValue: _notes,
+          onChanged: _handleNotesChanged,
+          enabled: true,
+        ),
       ],
     );
   }
@@ -332,6 +352,13 @@ class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
 
   void _handleTaxChanged(FieldData updatedField) {
     _updateOCRField('tax', updatedField);
+  }
+
+  void _handleNotesChanged(String notes) {
+    setState(() {
+      _notes = notes;
+      _hasUnsavedChanges = true;
+    });
   }
 
   void _updateOCRField(String fieldName, FieldData updatedField) {
@@ -458,10 +485,17 @@ class _ReceiptDetailScreenState extends State<ReceiptDetailScreen> {
   }
 
   void _saveChanges() {
+    // Update the receipt with the new notes
+    final updatedReceipt = _currentReceipt.copyWith(
+      notes: _notes,
+      lastModified: DateTime.now(),
+    );
+    
     // TODO: Implement actual save logic with repository
-    widget.onReceiptUpdated?.call(_currentReceipt);
+    widget.onReceiptUpdated?.call(updatedReceipt);
     
     setState(() {
+      _currentReceipt = updatedReceipt;
       _hasUnsavedChanges = false;
     });
     
