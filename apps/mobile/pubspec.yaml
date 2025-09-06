@@ -41,6 +41,7 @@ dependencies:
   
   # OCR and ML
   google_ml_kit: ^0.16.0
+  # OpenCV removed for now - will implement basic edge detection without it
   
   # Database and Storage
   sqflite: ^2.3.0
