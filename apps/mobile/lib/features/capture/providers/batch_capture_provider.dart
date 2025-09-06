@@ -67,8 +67,10 @@ class BatchCaptureNotifier extends StateNotifier<BatchCaptureState> {
       if (result.success && result.imageUri != null) {
         final receipt = Receipt(
           imageUri: result.imageUri!,
+          thumbnailUri: result.thumbnailUri,
           batchId: state.currentBatchId,
-          status: ReceiptStatus.captured,
+          status: result.ocrResults != null ? ReceiptStatus.ready : ReceiptStatus.captured,
+          ocrResults: result.ocrResults,
         );
 
         final updatedReceipts = [...state.receipts, receipt];

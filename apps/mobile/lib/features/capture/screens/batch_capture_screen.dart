@@ -17,6 +17,9 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
     with TickerProviderStateMixin {
   late AnimationController _flashController;
   late AnimationController _thumbnailController;
+  late AnimationController _autoAdvanceController;
+  bool _autoAdvanceEnabled = true;
+  int _autoAdvanceCountdown = 0;
 
   @override
   void initState() {
@@ -29,6 +32,10 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
+    _autoAdvanceController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(batchCaptureProvider.notifier).startBatchMode();
@@ -39,6 +46,7 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
   void dispose() {
     _flashController.dispose();
     _thumbnailController.dispose();
+    _autoAdvanceController.dispose();
     super.dispose();
   }
 
@@ -68,7 +76,51 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
           backgroundColor: Colors.green,
         ),
       );
+
+      // Auto-advance to next capture after a short delay
+      if (_autoAdvanceEnabled && mounted) {
+        _startAutoAdvanceCountdown();
+      }
     }
+  }
+
+  void _startAutoAdvanceCountdown() async {
+    setState(() {
+      _autoAdvanceCountdown = 3;
+    });
+    
+    _autoAdvanceController.reset();
+    _autoAdvanceController.forward();
+    
+    // Use async/await pattern for cleaner countdown logic
+    for (int countdown = 3; countdown > 0; countdown--) {
+      if (!mounted || !_autoAdvanceEnabled) break;
+      
+      setState(() {
+        _autoAdvanceCountdown = countdown;
+      });
+      
+      await Future.delayed(const Duration(milliseconds: 1000));
+      
+      // Auto-advance on final countdown
+      if (countdown == 1 && mounted && _autoAdvanceEnabled) {
+        _captureReceipt();
+      }
+    }
+    
+    if (mounted) {
+      setState(() {
+        _autoAdvanceCountdown = 0;
+      });
+    }
+  }
+
+  void _cancelAutoAdvance() {
+    setState(() {
+      _autoAdvanceEnabled = false;
+      _autoAdvanceCountdown = 0;
+    });
+    _autoAdvanceController.reset();
   }
 
   void _finishBatch() {
@@ -122,6 +174,63 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
             child: CaptureCounterWidget(count: batchState.batchSize),
           ),
           
+          // Auto-advance countdown
+          if (_autoAdvanceCountdown > 0)
+            Positioned(
+              top: 100,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: AnimatedBuilder(
+                  animation: _autoAdvanceController,
+                  builder: (context, child) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Next capture in $_autoAdvanceCountdown',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: 100,
+                            height: 4,
+                            child: LinearProgressIndicator(
+                              value: _autoAdvanceController.value,
+                              backgroundColor: Colors.white.withOpacity(0.3),
+                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: _cancelAutoAdvance,
+                            child: const Text(
+                              'Tap to cancel',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          
           if (batchState.receipts.isNotEmpty)
             Positioned(
               top: 20,
@@ -173,10 +282,41 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
                 ],
                 
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    // Auto-advance toggle
+                    if (batchState.receipts.isNotEmpty)
+                      Column(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _autoAdvanceEnabled = !_autoAdvanceEnabled;
+                              });
+                              if (!_autoAdvanceEnabled) {
+                                _cancelAutoAdvance();
+                              }
+                            },
+                            icon: Icon(
+                              _autoAdvanceEnabled ? Icons.autorenew : Icons.pause,
+                              color: _autoAdvanceEnabled ? Colors.orange : Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            _autoAdvanceEnabled ? 'Auto' : 'Manual',
+                            style: TextStyle(
+                              color: _autoAdvanceEnabled ? Colors.orange : Colors.grey,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    
+                    // Main capture button
                     ElevatedButton(
-                      onPressed: batchState.isCapturing ? null : _captureReceipt,
+                      onPressed: (batchState.isCapturing || _autoAdvanceCountdown > 0) 
+                          ? null 
+                          : _captureReceipt,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
@@ -189,8 +329,20 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
                               height: 24,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Icon(Icons.camera_alt, size: 30),
+                          : _autoAdvanceCountdown > 0
+                              ? Text(
+                                  _autoAdvanceCountdown.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : const Icon(Icons.camera_alt, size: 30),
                     ),
+                    
+                    // Spacer to balance layout
+                    if (batchState.receipts.isNotEmpty)
+                      const SizedBox(width: 48),
                   ],
                 ),
               ],
