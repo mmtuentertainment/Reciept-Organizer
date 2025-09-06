@@ -1,33 +1,62 @@
 import 'dart:typed_data';
+import 'package:camera/camera.dart';
 import 'package:receipt_organizer/data/models/camera_frame.dart';
 import 'package:receipt_organizer/data/models/capture_result.dart';
 import 'package:receipt_organizer/data/models/edge_detection_result.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
+import 'package:receipt_organizer/infrastructure/services/edge_detection_service.dart';
 
 abstract class ICameraService {
   Future<CaptureResult> captureReceipt({bool batchMode = false});
   Stream<CameraFrame> getPreviewStream();
   Future<EdgeDetectionResult> detectEdges(CameraFrame frame);
+  Future<CameraController?> getCameraController();
   Future<void> initialize();
   Future<void> dispose();
 }
 
 class CameraService implements ICameraService {
   bool _isInitialized = false;
+  CameraController? _controller;
   final IOCRService _ocrService = OCRService();
+  final EdgeDetectionService _edgeDetectionService = EdgeDetectionService();
 
   @override
   Future<void> initialize() async {
     if (_isInitialized) return;
     
-    // Initialize OCR service
-    await _ocrService.initialize();
-    _isInitialized = true;
+    try {
+      // Get available cameras
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) {
+        throw Exception('No cameras available');
+      }
+      
+      // Initialize camera controller with back camera (first camera)
+      _controller = CameraController(
+        cameras.first,
+        ResolutionPreset.high,
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.yuv420,
+      );
+      
+      await _controller!.initialize();
+      
+      // Initialize OCR service
+      await _ocrService.initialize();
+      _isInitialized = true;
+    } catch (e) {
+      _isInitialized = false;
+      rethrow;
+    }
   }
 
   @override
   Future<void> dispose() async {
+    await _controller?.dispose();
+    _controller = null;
     await _ocrService.dispose();
+    _edgeDetectionService.dispose();
     _isInitialized = false;
   }
 
@@ -74,18 +103,16 @@ class CameraService implements ICameraService {
 
   @override
   Future<EdgeDetectionResult> detectEdges(CameraFrame frame) async {
-    await Future.delayed(const Duration(milliseconds: 100));
+    if (!_isInitialized) {
+      return EdgeDetectionResult(success: false, confidence: 0.0);
+    }
     
-    return EdgeDetectionResult(
-      success: true,
-      confidence: 0.85,
-      corners: const [
-        Point(10, 10),
-        Point(200, 10),
-        Point(200, 300),
-        Point(10, 300),
-      ],
-    );
+    return await _edgeDetectionService.detectEdges(frame);
+  }
+
+  @override
+  Future<CameraController?> getCameraController() async {
+    return _controller;
   }
 
   @override
@@ -93,13 +120,14 @@ class CameraService implements ICameraService {
     while (_isInitialized) {
       await Future.delayed(const Duration(milliseconds: 33));
       yield CameraFrame(
-        image: _createDummyCameraImage(),
+        imageData: _createDummyImageData(),
         timestamp: DateTime.now(),
       );
     }
   }
 
-  dynamic _createDummyCameraImage() {
-    return null;
+  Uint8List _createDummyImageData() {
+    // Generate dummy image data for preview
+    return Uint8List.fromList(List.generate(1000, (index) => index % 256));
   }
 }
