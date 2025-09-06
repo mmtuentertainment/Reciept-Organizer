@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:receipt_organizer/features/capture/screens/capture_screen.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
 
 void main() {
@@ -72,12 +73,12 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => const BatchCaptureScreen(),
+                    builder: (context) => const CaptureScreen(),
                   ),
                 );
               },
               icon: const Icon(Icons.camera_alt),
-              label: const Text('Start Batch Capture'),
+              label: const Text('Capture Receipt'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
