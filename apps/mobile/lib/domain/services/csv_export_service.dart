@@ -67,7 +67,7 @@ class CSVExportService implements ICSVExportService {
     final warnings = <String>[];
     int validCount = 0;
     
-    final requiredFields = getRequiredFields(format);
+    // final requiredFields = getRequiredFields(format); // TODO: Implement field validation
     
     for (int i = 0; i < receipts.length; i++) {
       final receipt = receipts[i];

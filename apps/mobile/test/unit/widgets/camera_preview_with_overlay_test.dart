@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:camera/camera.dart';
 import 'package:receipt_organizer/presentation/widgets/camera_preview_with_overlay.dart';
 import 'package:receipt_organizer/domain/services/camera_service.dart';
 import 'package:receipt_organizer/data/models/camera_frame.dart';

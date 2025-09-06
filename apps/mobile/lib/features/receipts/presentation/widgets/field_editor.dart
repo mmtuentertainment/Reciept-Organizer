@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/models/confidence_level.dart';
 import '../../../../domain/services/ocr_service.dart';
-import '../../../../shared/widgets/confidence_score_widget.dart';
 import 'confidence_indicator.dart';
 
 /// Field editor widget for editing OCR-extracted receipt fields

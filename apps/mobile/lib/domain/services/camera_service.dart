@@ -104,7 +104,7 @@ class CameraService implements ICameraService {
   @override
   Future<EdgeDetectionResult> detectEdges(CameraFrame frame) async {
     if (!_isInitialized) {
-      return EdgeDetectionResult(success: false, confidence: 0.0);
+      return const EdgeDetectionResult(success: false, confidence: 0.0);
     }
     
     return await _edgeDetectionService.detectEdges(frame);

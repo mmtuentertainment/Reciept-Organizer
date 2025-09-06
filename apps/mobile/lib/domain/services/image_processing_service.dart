@@ -1,7 +1,7 @@
-import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
+import '../../data/models/edge_detection_result.dart';
 
 class ImageProcessingService {
   static const int maxImageWidth = 1024;
@@ -49,7 +49,7 @@ class ImageProcessingService {
     try {
       final image = img.decodeImage(imageBytes);
       if (image == null) {
-        return EdgeDetectionResult(success: false);
+        return const EdgeDetectionResult(success: false);
       }
 
       final gray = img.grayscale(image);
@@ -67,29 +67,8 @@ class ImageProcessingService {
         confidence: 0.88,
       );
     } catch (e) {
-      return EdgeDetectionResult(success: false);
+      return const EdgeDetectionResult(success: false);
     }
   }
 }
 
-class EdgeDetectionResult {
-  final bool success;
-  final List<Point> corners;
-  final double confidence;
-
-  EdgeDetectionResult({
-    required this.success,
-    this.corners = const [],
-    this.confidence = 0.0,
-  });
-}
-
-class Point {
-  final double x;
-  final double y;
-
-  const Point(this.x, this.y);
-
-  @override
-  String toString() => 'Point($x, $y)';
-}

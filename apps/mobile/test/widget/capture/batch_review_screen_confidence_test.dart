@@ -8,6 +8,7 @@ import 'package:receipt_organizer/features/capture/screens/batch_review_screen.d
 import 'package:receipt_organizer/features/receipts/presentation/widgets/confidence_badge.dart';
 import 'package:receipt_organizer/shared/widgets/confidence_score_widget.dart';
 import 'package:receipt_organizer/features/capture/widgets/ocr_results_widget.dart';
+import '../../mocks/mock_camera_service.dart';
 
 void main() {
   group('BatchReviewScreen Confidence Display', () {
@@ -82,7 +83,7 @@ void main() {
       return ProviderScope(
         overrides: [
           batchCaptureProvider.overrideWith((ref) {
-            return BatchCaptureNotifier()..state = BatchCaptureState(receipts: receipts);
+            return BatchCaptureNotifier(MockCameraService())..state = BatchCaptureState(receipts: receipts);
           }),
         ],
         child: const MaterialApp(

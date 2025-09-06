@@ -73,13 +73,13 @@ class ImageOptimizationService {
     // Adjust brightness if too dark
     final brightness = _calculateBrightness(optimized);
     if (brightness < 120) {
-      optimized = img.brightness(optimized, brightness: 0.1);
+      optimized = img.adjustColor(optimized, brightness: 0.1);
     }
 
     // Apply sharpening for text clarity
     optimized = img.convolution(
       optimized,
-      kernel: [
+      filter: [
         -0.5, -1.0, -0.5,
         -1.0,  6.0, -1.0,
         -0.5, -1.0, -0.5,

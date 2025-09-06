@@ -271,7 +271,7 @@ class _CameraPreviewWithOverlayState
             ),
           ),
           if (widget.enableManualAdjustment && isSuccessful)
-            Icon(
+            const Icon(
               Icons.touch_app,
               color: Colors.white70,
               size: 16,

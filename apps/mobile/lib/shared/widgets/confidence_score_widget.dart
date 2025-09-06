@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/models/confidence_level.dart';
+
 /// Reusable confidence score widget with percentage display and color coding
 /// 
 /// Displays OCR confidence scores with visual feedback using color coding:
@@ -34,7 +36,7 @@ class ConfidenceScoreWidget extends StatelessWidget {
       return _buildProcessingState(context);
     }
 
-    final confidenceLevel = _getConfidenceLevel(confidence!);
+    final confidenceLevel = confidence!.confidenceLevel;
     final color = _getConfidenceColor(confidenceLevel);
     final icon = _getConfidenceIcon(confidenceLevel);
 
@@ -167,7 +169,7 @@ class ConfidenceScoreWidget extends StatelessWidget {
           color: color.withOpacity(0.1),
           border: Border.all(color: color.withOpacity(0.3)),
         ),
-        child: Row(
+        child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
@@ -175,11 +177,11 @@ class ConfidenceScoreWidget extends StatelessWidget {
               height: 16,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(color),
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
               ),
             ),
-            const SizedBox(width: 8),
-            const Text(
+            SizedBox(width: 8),
+            Text(
               'Processing...',
               style: TextStyle(
                 color: color,
@@ -214,11 +216,6 @@ class ConfidenceScoreWidget extends StatelessWidget {
     );
   }
 
-  ConfidenceLevel _getConfidenceLevel(double confidence) {
-    if (confidence < 75) return ConfidenceLevel.low;
-    if (confidence < 85) return ConfidenceLevel.medium;
-    return ConfidenceLevel.high;
-  }
 
   Color _getConfidenceColor(ConfidenceLevel level) {
     switch (level) {
@@ -255,23 +252,3 @@ enum ConfidenceDisplayVariant {
   inline,
 }
 
-/// Confidence level thresholds for color coding
-enum ConfidenceLevel {
-  /// Less than 75% - requires attention
-  low,
-  
-  /// 75-85% - medium confidence
-  medium,
-  
-  /// Greater than 85% - high confidence
-  high,
-}
-
-/// Extension to get confidence level from percentage
-extension ConfidenceLevelExtension on double {
-  ConfidenceLevel get confidenceLevel {
-    if (this < 75) return ConfidenceLevel.low;
-    if (this < 85) return ConfidenceLevel.medium;
-    return ConfidenceLevel.high;
-  }
-}

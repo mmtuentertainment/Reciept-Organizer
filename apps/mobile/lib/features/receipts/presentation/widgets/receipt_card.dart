@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/models/confidence_level.dart';
 import '../../../../data/models/receipt.dart';
-import '../../../../domain/services/ocr_service.dart';
 import '../../../../shared/widgets/confidence_score_widget.dart';
 import 'confidence_badge.dart';
 

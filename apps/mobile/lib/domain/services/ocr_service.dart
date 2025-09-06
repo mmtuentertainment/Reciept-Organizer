@@ -4,6 +4,8 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 
+// Note: ConfidenceLevel import removed as not directly used in this service
+
 // Core models for OCR processing
 class FieldData {
   final dynamic value;
@@ -729,25 +731,6 @@ class OCRService implements IOCRService {
   }
 }
 
-/// Enum representing confidence levels for OCR results
-enum ConfidenceLevel {
-  low,    // <75%
-  medium, // 75-85% 
-  high,   // >85%
-}
-
-/// Extension to convert confidence percentages to confidence levels
-extension ConfidenceLevelExtension on double {
-  ConfidenceLevel get confidenceLevel {
-    if (this >= 85.0) {
-      return ConfidenceLevel.high;
-    } else if (this >= 75.0) {
-      return ConfidenceLevel.medium;
-    } else {
-      return ConfidenceLevel.low;
-    }
-  }
-}
 
 /// Enum representing different reasons for capture failure
 enum FailureReason {

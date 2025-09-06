@@ -5,6 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i5;
 
+import 'package:camera/camera.dart' as _i7;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:receipt_organizer/data/models/camera_frame.dart' as _i6;
 import 'package:receipt_organizer/data/models/capture_result.dart' as _i2;
@@ -97,6 +98,16 @@ class MockICameraService extends _i1.Mock implements _i4.ICameraService {
           ),
         )),
       ) as _i5.Future<_i3.EdgeDetectionResult>);
+
+  @override
+  _i5.Future<_i7.CameraController?> getCameraController() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getCameraController,
+          [],
+        ),
+        returnValue: _i5.Future<_i7.CameraController?>.value(),
+      ) as _i5.Future<_i7.CameraController?>);
 
   @override
   _i5.Future<void> initialize() => (super.noSuchMethod(

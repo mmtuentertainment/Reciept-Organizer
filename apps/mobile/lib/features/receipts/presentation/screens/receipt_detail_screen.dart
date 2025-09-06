@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../data/models/receipt.dart';
 import '../../../../domain/services/ocr_service.dart';
 import '../../../../shared/widgets/confidence_score_widget.dart';
-import '../widgets/confidence_indicator.dart';
 import '../widgets/field_editor.dart';
 
 /// Receipt detail screen for viewing and editing receipt data
