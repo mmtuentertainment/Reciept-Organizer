@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:receipt_organizer/core/models/confidence_level.dart';
 import 'package:receipt_organizer/shared/widgets/confidence_score_widget.dart';
 
 void main() {
@@ -83,17 +84,14 @@ void main() {
     });
 
     testWidgets('displays processing state when confidence is null', (WidgetTester tester) async {
-      // Given
-      const ConfidenceScoreWidget? nullConfidenceWidget = ConfidenceScoreWidget(
-        confidence: null,
-        variant: ConfidenceDisplayVariant.compact,
-      );
-
       // When
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: nullConfidenceWidget!,
+            body: ConfidenceScoreWidget(
+              confidence: null,
+              variant: ConfidenceDisplayVariant.compact,
+            ),
           ),
         ),
       );

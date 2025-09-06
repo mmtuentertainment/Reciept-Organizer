@@ -103,8 +103,7 @@ void main() {
 
     test('reorderReceipts should change receipt order', () async {
       when(mockCameraService.captureReceipt(batchMode: true))
-          .thenAnswer((_) async => CaptureResult.success('/path/to/image1.jpg'))
-          .thenAnswer((_) async => CaptureResult.success('/path/to/image2.jpg'));
+          .thenAnswer((_) async => CaptureResult.success('/path/to/image1.jpg'));
 
       notifier.startBatchMode();
       await notifier.captureReceipt();

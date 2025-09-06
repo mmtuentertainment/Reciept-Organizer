@@ -4,8 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/capture/widgets/camera_preview_widget.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
-import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
-import 'package:receipt_organizer/features/capture/widgets/retry_prompt_dialog.dart';
 import 'package:receipt_organizer/features/capture/screens/preview_screen.dart';
 
 class CaptureScreen extends ConsumerStatefulWidget {

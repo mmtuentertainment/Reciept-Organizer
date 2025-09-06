@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/confidence_score_widget.dart';
+import '../../../../core/models/confidence_level.dart';
 
 /// Compact circular confidence indicator for receipt list views
 /// 

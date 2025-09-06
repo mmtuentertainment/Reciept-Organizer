@@ -97,6 +97,11 @@ class BatchCaptureNotifier extends StateNotifier<BatchCaptureState> {
     state = state.copyWith(receipts: updatedReceipts);
   }
 
+  void restoreReceipt(Receipt receipt) {
+    final updatedReceipts = [...state.receipts, receipt];
+    state = state.copyWith(receipts: updatedReceipts);
+  }
+
   void reorderReceipts(int oldIndex, int newIndex) {
     final receipts = List<Receipt>.from(state.receipts);
     if (newIndex > oldIndex) {

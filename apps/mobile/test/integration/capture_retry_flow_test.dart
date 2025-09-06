@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:math' show Point;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,33 +43,79 @@ void main() {
         callCount++;
         if (callCount == 1) {
           // First attempt: return very low confidence result
-          return RecognizedText([
-            TextBlock(
-              text: 'blurry text',
-              rect: const Rect.fromLTWH(0, 0, 100, 20),
-              lines: [
-                TextLine(
-                  text: 'blurry text',
-                  rect: const Rect.fromLTWH(0, 0, 100, 20),
-                  elements: [],
-                ),
-              ],
-            ),
-          ]);
+          return RecognizedText(
+            text: 'blurry text',
+            blocks: [
+              TextBlock(
+                text: 'blurry text',
+                boundingBox: const Rect.fromLTWH(0, 0, 100, 20),
+                cornerPoints: [const Point<int>(0, 0), const Point<int>(100, 0), const Point<int>(100, 20), const Point<int>(0, 20)],
+                recognizedLanguages: ['en'],
+                lines: [
+                  TextLine(
+                    text: 'blurry text',
+                    boundingBox: const Rect.fromLTWH(0, 0, 100, 20),
+                    cornerPoints: [const Point<int>(0, 0), const Point<int>(100, 0), const Point<int>(100, 20), const Point<int>(0, 20)],
+                    recognizedLanguages: ['en'],
+                    angle: 0.0,
+                    confidence: 0.3,
+                    elements: [],
+                  ),
+                ],
+              ),
+            ],
+          );
         } else {
           // Second attempt: return good result
-          return RecognizedText([
-            TextBlock(
-              text: 'Costco\n2024-01-15\nTotal: \$45.67\nTax: \$3.42',
-              rect: const Rect.fromLTWH(0, 0, 200, 100),
-              lines: [
-                TextLine(text: 'Costco', rect: const Rect.fromLTWH(0, 0, 100, 20), elements: []),
-                TextLine(text: '2024-01-15', rect: const Rect.fromLTWH(0, 20, 100, 20), elements: []),
-                TextLine(text: 'Total: \$45.67', rect: const Rect.fromLTWH(0, 40, 100, 20), elements: []),
-                TextLine(text: 'Tax: \$3.42', rect: const Rect.fromLTWH(0, 60, 100, 20), elements: []),
-              ],
-            ),
-          ]);
+          return RecognizedText(
+            text: 'Costco\n2024-01-15\nTotal: \$45.67\nTax: \$3.42',
+            blocks: [
+              TextBlock(
+                text: 'Costco\n2024-01-15\nTotal: \$45.67\nTax: \$3.42',
+                boundingBox: const Rect.fromLTWH(0, 0, 200, 100),
+                cornerPoints: [const Point<int>(0, 0), const Point<int>(200, 0), const Point<int>(200, 100), const Point<int>(0, 100)],
+                recognizedLanguages: ['en'],
+                lines: [
+                  TextLine(
+                    text: 'Costco',
+                    boundingBox: const Rect.fromLTWH(0, 0, 100, 20),
+                    cornerPoints: [const Point<int>(0, 0), const Point<int>(100, 0), const Point<int>(100, 20), const Point<int>(0, 20)],
+                    recognizedLanguages: ['en'],
+                    angle: 0.0,
+                    confidence: 0.95,
+                    elements: [],
+                  ),
+                  TextLine(
+                    text: '2024-01-15',
+                    boundingBox: const Rect.fromLTWH(0, 20, 100, 20),
+                    cornerPoints: [const Point<int>(0, 20), const Point<int>(100, 20), const Point<int>(100, 40), const Point<int>(0, 40)],
+                    recognizedLanguages: ['en'],
+                    angle: 0.0,
+                    confidence: 0.92,
+                    elements: [],
+                  ),
+                  TextLine(
+                    text: 'Total: \$45.67',
+                    boundingBox: const Rect.fromLTWH(0, 40, 100, 20),
+                    cornerPoints: [const Point<int>(0, 40), const Point<int>(100, 40), const Point<int>(100, 60), const Point<int>(0, 60)],
+                    recognizedLanguages: ['en'],
+                    angle: 0.0,
+                    confidence: 0.88,
+                    elements: [],
+                  ),
+                  TextLine(
+                    text: 'Tax: \$3.42',
+                    boundingBox: const Rect.fromLTWH(0, 60, 100, 20),
+                    cornerPoints: [const Point<int>(0, 60), const Point<int>(100, 60), const Point<int>(100, 80), const Point<int>(0, 80)],
+                    recognizedLanguages: ['en'],
+                    angle: 0.0,
+                    confidence: 0.90,
+                    elements: [],
+                  ),
+                ],
+              ),
+            ],
+          );
         }
       });
 
@@ -110,19 +157,28 @@ void main() {
     testWidgets('should handle retry dialog flow correctly', (tester) async {
       // Arrange - Mock OCR to always fail with low confidence
       when(mockTextRecognizer.processImage(any)).thenAnswer((_) async {
-        return RecognizedText([
-          TextBlock(
-            text: 'unclear text',
-            rect: const Rect.fromLTWH(0, 0, 50, 10),
-            lines: [
-              TextLine(
-                text: 'unclear text',
-                rect: const Rect.fromLTWH(0, 0, 50, 10),
-                elements: [],
-              ),
-            ],
-          ),
-        ]);
+        return RecognizedText(
+          text: 'unclear text',
+          blocks: [
+            TextBlock(
+              text: 'unclear text',
+              boundingBox: const Rect.fromLTWH(0, 0, 50, 10),
+              cornerPoints: [const Point<int>(0, 0), const Point<int>(50, 0), const Point<int>(50, 10), const Point<int>(0, 10)],
+              recognizedLanguages: ['en'],
+              lines: [
+                TextLine(
+                  text: 'unclear text',
+                  boundingBox: const Rect.fromLTWH(0, 0, 50, 10),
+                  cornerPoints: [const Point<int>(0, 0), const Point<int>(50, 0), const Point<int>(50, 10), const Point<int>(0, 10)],
+                  recognizedLanguages: ['en'],
+                  angle: 0.0,
+                  confidence: 0.2,
+                  elements: [],
+                ),
+              ],
+            ),
+          ],
+        );
       });
 
       final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);
@@ -174,7 +230,10 @@ void main() {
     testWidgets('should handle maximum retry attempts reached', (tester) async {
       // Arrange - Mock OCR to always fail
       when(mockTextRecognizer.processImage(any)).thenAnswer((_) async {
-        return RecognizedText([]);
+        return RecognizedText(
+          text: '',
+          blocks: [],
+        );
       });
 
       final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);

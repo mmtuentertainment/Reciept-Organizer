@@ -89,7 +89,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           parent: container,
-          child: MaterialApp(
+          child: const MaterialApp(
             home: const BatchCaptureScreen(),
           ),
         ),

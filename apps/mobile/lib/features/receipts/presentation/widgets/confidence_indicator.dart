@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/confidence_score_widget.dart';
+import '../../../../core/models/confidence_level.dart';
 import '../../../../domain/services/ocr_service.dart';
 
 /// Comprehensive confidence indicator for field-level confidence display
@@ -131,7 +131,7 @@ class _ConfidenceIndicatorState extends State<ConfidenceIndicator>
                     ),
                     if (fieldData.isManuallyEdited) ...[
                       const SizedBox(width: 6),
-                      Icon(
+                      const Icon(
                         Icons.edit,
                         color: Colors.blue,
                         size: 12,

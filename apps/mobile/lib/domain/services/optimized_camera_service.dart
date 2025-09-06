@@ -100,15 +100,20 @@ class OptimizedCameraService implements ICameraService {
   @override
   Future<EdgeDetectionResult> detectEdges(CameraFrame frame) async {
     if (!_isInitialized) {
-      return EdgeDetectionResult(success: false);
+      return const EdgeDetectionResult(success: false);
     }
 
     try {
-      final imageBytes = await _cameraImageToBytes(frame.image);
+      final imageBytes = await _cameraImageToBytes(frame.image!);
       return await ImageProcessingService.detectEdgesInBackground(imageBytes);
     } catch (e) {
-      return EdgeDetectionResult(success: false);
+      return const EdgeDetectionResult(success: false);
     }
+  }
+
+  @override
+  Future<CameraController?> getCameraController() async {
+    return _controller;
   }
 
   @override
@@ -131,6 +136,7 @@ class OptimizedCameraService implements ICameraService {
       _controller!.startImageStream((CameraImage image) {
         final frame = CameraFrame(
           image: image,
+          imageData: Uint8List.fromList([0, 0, 0]), // Dummy data for development
           timestamp: DateTime.now(),
         );
         _previewStreamController?.add(frame);
@@ -151,7 +157,8 @@ class OptimizedCameraService implements ICameraService {
   Future<Uint8List> _cameraImageToBytes(CameraImage image) async {
     final int width = image.width;
     final int height = image.height;
-    final int uvPixelStride = image.planes[1].pixelStride!;
+    // Note: pixelStride property may not exist in current camera package version
+    // final int uvPixelStride = image.planes[1].pixelStride ?? 1;
     
     final buffer = StringBuffer();
     

@@ -263,6 +263,158 @@ class CaptureNotifier extends StateNotifier<CaptureState> {
     await saveSession();
   }
 
+  /// Updates a specific field in the processing result with auto-save
+  Future<bool> updateField(String fieldName, FieldData updatedField) async {
+    final currentResult = state.lastProcessingResult;
+    if (currentResult == null) return false;
+
+    ProcessingResult updatedResult;
+
+    switch (fieldName.toLowerCase()) {
+      case 'merchant':
+        updatedResult = currentResult.copyWith(
+          merchant: updatedField,
+          overallConfidence: _calculateOverallConfidence(
+            updatedField,
+            currentResult.date,
+            currentResult.total,
+            currentResult.tax,
+          ),
+        );
+        break;
+      case 'date':
+        updatedResult = currentResult.copyWith(
+          date: updatedField,
+          overallConfidence: _calculateOverallConfidence(
+            currentResult.merchant,
+            updatedField,
+            currentResult.total,
+            currentResult.tax,
+          ),
+        );
+        break;
+      case 'total':
+        updatedResult = currentResult.copyWith(
+          total: updatedField,
+          overallConfidence: _calculateOverallConfidence(
+            currentResult.merchant,
+            currentResult.date,
+            updatedField,
+            currentResult.tax,
+          ),
+        );
+        break;
+      case 'tax':
+        updatedResult = currentResult.copyWith(
+          tax: updatedField,
+          overallConfidence: _calculateOverallConfidence(
+            currentResult.merchant,
+            currentResult.date,
+            currentResult.total,
+            updatedField,
+          ),
+        );
+        break;
+      default:
+        return false; // Unknown field name
+    }
+
+    // Update state with modified processing result
+    state = state.copyWith(lastProcessingResult: updatedResult);
+
+    // Auto-save session if in retry mode
+    if (state.isRetryMode) {
+      await saveSession();
+    }
+
+    return true;
+  }
+
+  /// Updates multiple fields at once with batch processing
+  Future<bool> updateFields(Map<String, FieldData> fieldUpdates) async {
+    final currentResult = state.lastProcessingResult;
+    if (currentResult == null || fieldUpdates.isEmpty) return false;
+
+    var updatedResult = currentResult;
+
+    // Apply all field updates
+    for (final entry in fieldUpdates.entries) {
+      final fieldName = entry.key.toLowerCase();
+      final fieldData = entry.value;
+
+      switch (fieldName) {
+        case 'merchant':
+          updatedResult = updatedResult.copyWith(merchant: fieldData);
+          break;
+        case 'date':
+          updatedResult = updatedResult.copyWith(date: fieldData);
+          break;
+        case 'total':
+          updatedResult = updatedResult.copyWith(total: fieldData);
+          break;
+        case 'tax':
+          updatedResult = updatedResult.copyWith(tax: fieldData);
+          break;
+      }
+    }
+
+    // Recalculate overall confidence
+    final finalResult = updatedResult.copyWith(
+      overallConfidence: _calculateOverallConfidence(
+        updatedResult.merchant,
+        updatedResult.date,
+        updatedResult.total,
+        updatedResult.tax,
+      ),
+    );
+
+    // Update state
+    state = state.copyWith(lastProcessingResult: finalResult);
+
+    // Auto-save session if in retry mode
+    if (state.isRetryMode) {
+      await saveSession();
+    }
+
+    return true;
+  }
+
+  /// Calculates overall confidence based on field confidences with weighting
+  double _calculateOverallConfidence(
+    FieldData? merchant,
+    FieldData? date,
+    FieldData? total,
+    FieldData? tax,
+  ) {
+    final fields = [merchant, date, total, tax];
+    final validFields = fields.where((f) => f != null).toList();
+
+    if (validFields.isEmpty) return 0.0;
+
+    // Weighted average: Total 40%, Date 30%, Merchant 20%, Tax 10%
+    double weightedSum = 0.0;
+    double totalWeight = 0.0;
+
+    if (total != null) {
+      weightedSum += total.confidence * 0.4;
+      totalWeight += 0.4;
+    }
+    if (date != null) {
+      weightedSum += date.confidence * 0.3;
+      totalWeight += 0.3;
+    }
+    if (merchant != null) {
+      weightedSum += merchant.confidence * 0.2;
+      totalWeight += 0.2;
+    }
+    if (tax != null) {
+      weightedSum += tax.confidence * 0.1;
+      totalWeight += 0.1;
+    }
+
+    return totalWeight > 0 ? weightedSum / totalWeight : 0.0;
+  }
+
   /// Gets list of active retry sessions
   Future<List<String>> getActiveSessions() async {
     return await _sessionManager.getActiveSessions();

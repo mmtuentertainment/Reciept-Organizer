@@ -5,6 +5,7 @@ import 'package:receipt_organizer/features/capture/providers/capture_provider.da
 import 'package:receipt_organizer/features/capture/widgets/capture_failed_state.dart';
 import 'package:receipt_organizer/features/capture/widgets/retry_prompt_dialog.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
+import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
 
 /// Preview screen that shows capture results and handles retry scenarios
 class PreviewScreen extends ConsumerStatefulWidget {
@@ -23,6 +24,7 @@ class PreviewScreen extends ConsumerStatefulWidget {
 
 class _PreviewScreenState extends ConsumerState<PreviewScreen> {
   bool _isProcessing = false;
+  bool _hasUnsavedChanges = false;
 
   @override
   void initState() {
@@ -169,6 +171,63 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
     Navigator.of(context).pop();
   }
 
+  void _handleMerchantChanged(FieldData updatedField) {
+    _updateOCRField('merchant', updatedField);
+  }
+
+  void _handleDateChanged(FieldData updatedField) {
+    _updateOCRField('date', updatedField);
+  }
+
+  void _handleTotalChanged(FieldData updatedField) {
+    _updateOCRField('total', updatedField);
+  }
+
+  void _handleTaxChanged(FieldData updatedField) {
+    _updateOCRField('tax', updatedField);
+  }
+
+  void _updateOCRField(String fieldName, FieldData updatedField) async {
+    // Use CaptureProvider to handle field updates with proper auto-save
+    final captureNotifier = ref.read(captureProvider.notifier);
+    final success = await captureNotifier.updateField(fieldName, updatedField);
+    
+    if (success) {
+      setState(() {
+        _hasUnsavedChanges = true;
+      });
+
+      // Schedule auto-save confirmation
+      _scheduleAutoSaveConfirmation();
+    }
+  }
+
+  void _scheduleAutoSaveConfirmation() {
+    // Show brief save confirmation after successful update
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          _hasUnsavedChanges = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle, color: Colors.white, size: 16),
+                SizedBox(width: 8),
+                Text('Changes saved'),
+              ],
+            ),
+            duration: Duration(milliseconds: 1500),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final captureState = ref.watch(captureProvider);
@@ -232,6 +291,10 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
   }
 
   Widget _buildSuccessState(ProcessingResult result) {
+    // Use the current result from CaptureProvider state
+    final captureState = ref.watch(captureProvider);
+    final displayResult = captureState.lastProcessingResult ?? result;
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -257,27 +320,80 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
           const SizedBox(height: 24),
           
           // Success header
-          const Row(
+          Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 24),
-              SizedBox(width: 8),
-              Text(
+              const Icon(Icons.check_circle, color: Colors.green, size: 24),
+              const SizedBox(width: 8),
+              const Text(
                 'Receipt Processed Successfully',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              if (_hasUnsavedChanges) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[100],
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.orange[300]!),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.edit, size: 12, color: Colors.orange[700]),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Edited',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.orange[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
           
           const SizedBox(height: 16),
           
-          // Extracted fields
-          _buildFieldCard('Merchant', result.merchant),
-          _buildFieldCard('Date', result.date),
-          _buildFieldCard('Total', result.total),
-          _buildFieldCard('Tax', result.tax),
+          // Editable fields using FieldEditor components
+          Text(
+            'Receipt Information',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          MerchantFieldEditor(
+            fieldData: displayResult.merchant,
+            onChanged: _handleMerchantChanged,
+          ),
+          
+          DateFieldEditor(
+            fieldData: displayResult.date,
+            onChanged: _handleDateChanged,
+          ),
+          
+          AmountFieldEditor(
+            fieldName: 'Total',
+            label: 'Total Amount',
+            fieldData: displayResult.total,
+            onChanged: _handleTotalChanged,
+          ),
+          
+          AmountFieldEditor(
+            fieldName: 'Tax',
+            label: 'Tax Amount',
+            fieldData: displayResult.tax,
+            onChanged: _handleTaxChanged,
+          ),
           
           const SizedBox(height: 24),
           
@@ -290,7 +406,7 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
                   const Icon(Icons.insights),
                   const SizedBox(width: 12),
                   Text(
-                    'Overall Confidence: ${result.overallConfidence.toStringAsFixed(1)}%',
+                    'Overall Confidence: ${displayResult.overallConfidence.toStringAsFixed(1)}%',
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ],
@@ -305,7 +421,7 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // Navigate to edit screen or save receipt
+                // Changes are auto-saved through CaptureProvider
                 Navigator.of(context).pop();
               },
               child: const Text('Accept & Continue'),
@@ -316,69 +432,6 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
     );
   }
 
-  Widget _buildFieldCard(String label, FieldData? field) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 80,
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    field?.value?.toString() ?? 'Not detected',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  if (field != null) ...[
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: _getConfidenceColor(field.confidence),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${field.confidence.toStringAsFixed(0)}% confidence',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _getConfidenceColor(double confidence) {
-    if (confidence >= 85) return Colors.green;
-    if (confidence >= 75) return Colors.orange;
-    return Colors.red;
-  }
 
   Widget _buildImagePreview() {
     return Center(

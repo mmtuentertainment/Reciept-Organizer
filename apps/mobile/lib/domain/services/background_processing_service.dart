@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:collection';
-import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:receipt_organizer/data/models/receipt.dart';
-import 'package:receipt_organizer/domain/services/ocr_service.dart';
+import 'package:receipt_organizer/domain/services/ocr_service.dart' as ocr;
 import 'package:receipt_organizer/domain/services/image_optimization_service.dart';
 
 enum ProcessingTaskType { ocr, imageOptimization, both }
@@ -32,7 +29,7 @@ class ProcessingResult {
   final String receiptId;
   final ProcessingTaskType type;
   final bool success;
-  final ProcessingResult? ocrResult;
+  final ocr.ProcessingResult? ocrResult;
   final String? imagePath;
   final String? thumbnailPath;
   final String? error;
@@ -66,7 +63,7 @@ class BackgroundProcessingService {
   final Map<String, ProcessingResult> _completedResults = {};
   
   // Services
-  final IOCRService _ocrService = OCRService();
+  final ocr.IOCRService _ocrService = ocr.OCRService();
   final ImageOptimizationService _imageOptimizationService = ImageOptimizationService();
   
   // Processing control

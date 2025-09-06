@@ -92,7 +92,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
       // In a real implementation, this would capture the image using the detected edges
       final captureResult = await _cameraService.captureReceipt();
       
-      if (mounted && captureResult.isSuccess) {
+      if (mounted && captureResult.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Receipt captured successfully!'),
@@ -103,7 +103,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
         // Navigate to processing or editing screen
         // Navigator.push(context, MaterialPageRoute(builder: (_) => ProcessingScreen()));
       } else {
-        throw Exception(captureResult.error ?? 'Capture failed');
+        throw Exception(captureResult.errorMessage ?? 'Capture failed');
       }
     } catch (e) {
       if (mounted) {
