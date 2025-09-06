@@ -4,6 +4,8 @@ import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/features/capture/providers/batch_capture_provider.dart';
 import 'package:receipt_organizer/features/capture/widgets/receipt_thumbnail_widget.dart';
 import 'package:receipt_organizer/features/capture/widgets/ocr_results_widget.dart';
+import 'package:receipt_organizer/features/receipts/presentation/widgets/confidence_badge.dart';
+import 'package:receipt_organizer/shared/widgets/confidence_score_widget.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
 
 class BatchReviewScreen extends ConsumerStatefulWidget {
@@ -176,58 +178,24 @@ class _BatchReviewScreenState extends ConsumerState<BatchReviewScreen> {
                           child: Column(
                             children: [
                               ListTile(
-                                leading: Stack(
-                                  children: [
-                                    ReceiptThumbnailWidget(
-                                      imageUri: receipt.imageUri,
-                                      size: 48,
-                                    ),
-                                    if (receipt.hasOCRResults)
-                                      Positioned(
-                                        right: -2,
-                                        top: -2,
-                                        child: Container(
-                                          width: 16,
-                                          height: 16,
-                                          decoration: BoxDecoration(
-                                            color: _getConfidenceColor(receipt.overallConfidence),
-                                            shape: BoxShape.circle,
-                                            border: Border.all(color: Colors.white, width: 1),
-                                          ),
-                                          child: Icon(
-                                            receipt.overallConfidence >= 85 
-                                                ? Icons.check 
-                                                : Icons.warning,
-                                            size: 10,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
+                                leading: PositionedConfidenceBadge(
+                                  confidence: receipt.hasOCRResults ? receipt.overallConfidence : null,
+                                  size: 16,
+                                  margin: const EdgeInsets.all(1),
+                                  child: ReceiptThumbnailWidget(
+                                    imageUri: receipt.imageUri,
+                                    size: 48,
+                                  ),
                                 ),
                                 title: Row(
                                   children: [
                                     Text('Receipt ${index + 1}'),
                                     const SizedBox(width: 8),
                                     if (receipt.hasOCRResults) ...[
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: _getConfidenceColor(receipt.overallConfidence).withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(
-                                            color: _getConfidenceColor(receipt.overallConfidence),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${receipt.overallConfidence.toStringAsFixed(0)}%',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: _getConfidenceColor(receipt.overallConfidence),
-                                          ),
-                                        ),
+                                      ConfidenceScoreWidget(
+                                        confidence: receipt.overallConfidence,
+                                        variant: ConfidenceDisplayVariant.inline,
+                                        size: 20,
                                       ),
                                     ],
                                   ],
@@ -335,15 +303,6 @@ class _BatchReviewScreenState extends ConsumerState<BatchReviewScreen> {
     });
   }
 
-  Color _getConfidenceColor(double confidence) {
-    if (confidence >= 85) {
-      return Colors.green;
-    } else if (confidence >= 70) {
-      return Colors.orange;
-    } else {
-      return Colors.red;
-    }
-  }
 
   Future<ExportFormat?> _showExportFormatDialog() async {
     return showDialog<ExportFormat>(

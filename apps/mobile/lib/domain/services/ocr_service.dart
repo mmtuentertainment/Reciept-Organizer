@@ -56,6 +56,28 @@ class ProcessingResult {
     required this.processingDurationMs,
     this.allText = const [],
   });
+
+  ProcessingResult copyWith({
+    FieldData? merchant,
+    FieldData? date,
+    FieldData? total,
+    FieldData? tax,
+    double? overallConfidence,
+    String? processingEngine,
+    int? processingDurationMs,
+    List<String>? allText,
+  }) {
+    return ProcessingResult(
+      merchant: merchant ?? this.merchant,
+      date: date ?? this.date,
+      total: total ?? this.total,
+      tax: tax ?? this.tax,
+      overallConfidence: overallConfidence ?? this.overallConfidence,
+      processingEngine: processingEngine ?? this.processingEngine,
+      processingDurationMs: processingDurationMs ?? this.processingDurationMs,
+      allText: allText ?? this.allText,
+    );
+  }
 }
 
 abstract class IOCRService {
@@ -418,5 +440,25 @@ class OCRService implements IOCRService {
       processingDurationMs: durationMs,
       allText: ['Sample Store', '123 Main St', '12/06/2024', 'Total: \$25.47', 'Tax: \$2.04'],
     );
+  }
+}
+
+/// Enum representing confidence levels for OCR results
+enum ConfidenceLevel {
+  low,    // <75%
+  medium, // 75-85% 
+  high,   // >85%
+}
+
+/// Extension to convert confidence percentages to confidence levels
+extension ConfidenceLevelExtension on double {
+  ConfidenceLevel get confidenceLevel {
+    if (this >= 85.0) {
+      return ConfidenceLevel.high;
+    } else if (this >= 75.0) {
+      return ConfidenceLevel.medium;
+    } else {
+      return ConfidenceLevel.low;
+    }
   }
 }
