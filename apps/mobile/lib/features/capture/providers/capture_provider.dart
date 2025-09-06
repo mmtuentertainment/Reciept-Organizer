@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/data/models/edge_detection_result.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/domain/services/camera_service.dart';
+import 'package:receipt_organizer/domain/services/merchant_normalization_service.dart';
 import 'package:receipt_organizer/features/capture/services/retry_session_manager.dart';
+import 'package:receipt_organizer/features/settings/providers/settings_provider.dart';
 
 /// Current state of the capture process including retry tracking
 class CaptureState {
@@ -433,7 +435,13 @@ class CaptureNotifier extends StateNotifier<CaptureState> {
 
 // Provider definitions
 final ocrServiceProvider = Provider<OCRService>((ref) {
-  return OCRService();
+  final merchantNormalizationService = ref.read(merchantNormalizationServiceProvider);
+  final merchantNormalizationEnabled = ref.watch(merchantNormalizationEnabledProvider);
+  
+  return OCRService(
+    merchantNormalizationService: merchantNormalizationService,
+    enableMerchantNormalization: merchantNormalizationEnabled,
+  );
 });
 
 final cameraServiceProvider = Provider<ICameraService>((ref) {

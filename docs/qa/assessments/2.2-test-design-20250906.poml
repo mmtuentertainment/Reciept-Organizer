@@ -1,0 +1,485 @@
+test_design:
+  story_id: "2.2"
+  story_title: "Merchant Name Normalization"
+  test_design_version: "1.0"
+  created_date: "2025-09-06"
+  created_by: "QA Agent"
+
+  test_approach:
+    overview: |
+      The test strategy for merchant name normalization focuses on ensuring accurate cleaning
+      and standardization of merchant names extracted by OCR. Testing covers the normalization
+      service itself, integration with OCR workflow, UI display of normalized values, and
+      settings management. Special emphasis on preserving original values for audit trails
+      and maintaining performance targets.
+
+    test_levels:
+      - level: "Unit Testing"
+        scope: "MerchantNormalizationService, normalization rules, merchant dictionary"
+        focus: "Rule accuracy, edge cases, performance"
+        
+      - level: "Component Testing"
+        scope: "OCR service integration, UI components, settings persistence"
+        focus: "Integration points, data flow, UI behavior"
+        
+      - level: "Integration Testing"
+        scope: "End-to-end OCR to normalization to display workflow"
+        focus: "Complete workflow, performance impact, offline functionality"
+        
+      - level: "Acceptance Testing"
+        scope: "User flows for viewing and editing normalized merchants"
+        focus: "User experience, manual override capability"
+
+    test_types:
+      - type: "Functional Testing"
+        description: "Verify normalization rules work correctly for all merchant patterns"
+        
+      - type: "Performance Testing"
+        description: "Ensure <50ms normalization time and no impact on 5s OCR target"
+        
+      - type: "Usability Testing"
+        description: "Verify normalized values are clear and original values accessible"
+        
+      - type: "Compatibility Testing"
+        description: "Test across different merchant name formats and languages"
+        
+      - type: "Configuration Testing"
+        description: "Verify settings toggles work correctly"
+
+  test_scenarios:
+    - id: "TS-2.2-001"
+      title: "Basic Merchant Name Normalization"
+      priority: "High"
+      test_level: "Unit"
+      prerequisites:
+        - "MerchantNormalizationService initialized"
+        - "Default normalization rules loaded"
+      
+      test_cases:
+        - id: "TC-2.2-001-01"
+          description: "Normalize franchise with store number"
+          steps:
+            - step: "Input 'MCDONALDS #4521' to normalization service"
+            - step: "Verify normalized output is 'McDonalds'"
+            - step: "Verify original value preserved as 'MCDONALDS #4521'"
+          expected_result: "Store number removed, case corrected"
+          
+        - id: "TC-2.2-001-02"
+          description: "Normalize all caps merchant name"
+          steps:
+            - step: "Input 'WALMART SUPERCENTER' to normalization service"
+            - step: "Verify normalized output is 'Walmart Supercenter'"
+            - step: "Verify original value preserved"
+          expected_result: "Proper case applied correctly"
+          
+        - id: "TC-2.2-001-03"
+          description: "Normalize merchant with location suffix"
+          steps:
+            - step: "Input 'Starbucks - Main St' to normalization service"
+            - step: "Verify normalized output is 'Starbucks'"
+            - step: "Verify location suffix removed"
+          expected_result: "Location information stripped"
+          
+        - id: "TC-2.2-001-04"
+          description: "Normalize merchant with special characters"
+          steps:
+            - step: "Input '7-ELEVEN!!!!' to normalization service"
+            - step: "Verify normalized output is '7-Eleven'"
+            - step: "Verify excessive punctuation removed"
+          expected_result: "Special characters handled correctly"
+
+    - id: "TS-2.2-002"
+      title: "Merchant Dictionary Lookups"
+      priority: "High"
+      test_level: "Unit"
+      prerequisites:
+        - "Merchant dictionary loaded with common variations"
+      
+      test_cases:
+        - id: "TC-2.2-002-01"
+          description: "Match common abbreviation"
+          steps:
+            - step: "Input 'MCD' to normalization service"
+            - step: "Verify dictionary lookup occurs"
+            - step: "Verify normalized output is 'McDonald's'"
+          expected_result: "Abbreviation expanded correctly"
+          
+        - id: "TC-2.2-002-02"
+          description: "Match merchant variant spelling"
+          steps:
+            - step: "Input 'Wal-Mart' to normalization service"
+            - step: "Verify normalized to standard 'Walmart'"
+            - step: "Test other variants: 'WalMart', 'WAL*MART'"
+          expected_result: "All variants normalize to standard form"
+          
+        - id: "TC-2.2-002-03"
+          description: "Handle unknown merchant"
+          steps:
+            - step: "Input 'Joe's Local Shop' to normalization service"
+            - step: "Verify basic cleaning applied (case correction)"
+            - step: "Verify no dictionary match forces fallback rules"
+          expected_result: "Unknown merchants get basic normalization only"
+
+    - id: "TS-2.2-003"
+      title: "Edge Cases and Error Handling"
+      priority: "Medium"
+      test_level: "Unit"
+      prerequisites:
+        - "Test data including edge cases prepared"
+      
+      test_cases:
+        - id: "TC-2.2-003-01"
+          description: "Handle empty or null input"
+          steps:
+            - step: "Input empty string to normalization service"
+            - step: "Verify returns empty string without error"
+            - step: "Input null value"
+            - step: "Verify handles gracefully"
+          expected_result: "No exceptions thrown, returns appropriate default"
+          
+        - id: "TC-2.2-003-02"
+          description: "Handle very long merchant names"
+          steps:
+            - step: "Input 100+ character merchant name"
+            - step: "Verify normalization completes"
+            - step: "Verify performance still <50ms"
+            - step: "Verify output appropriately truncated if needed"
+          expected_result: "Long names handled without performance impact"
+          
+        - id: "TC-2.2-003-03"
+          description: "Handle non-ASCII characters"
+          steps:
+            - step: "Input 'Café Français' to normalization"
+            - step: "Verify accented characters preserved"
+            - step: "Test with emoji and special unicode"
+          expected_result: "International characters handled correctly"
+          
+        - id: "TC-2.2-003-04"
+          description: "Handle already normalized names"
+          steps:
+            - step: "Input 'Starbucks' (already clean)"
+            - step: "Verify no unnecessary changes made"
+            - step: "Verify originalValue still set for audit"
+          expected_result: "Clean names pass through unchanged"
+
+    - id: "TS-2.2-004"
+      title: "OCR Service Integration"
+      priority: "High"
+      test_level: "Component"
+      prerequisites:
+        - "OCR service configured"
+        - "Sample receipts with various merchant formats"
+        - "MerchantNormalizationService registered"
+      
+      test_cases:
+        - id: "TC-2.2-004-01"
+          description: "Normalize merchant after OCR extraction"
+          steps:
+            - step: "Process receipt with 'WALMART #1234' merchant"
+            - step: "Verify OCR extracts raw value"
+            - step: "Verify normalization service called"
+            - step: "Verify ProcessingResult contains normalized 'Walmart'"
+            - step: "Verify originalValue preserved as 'WALMART #1234'"
+          expected_result: "Integration point works correctly"
+          
+        - id: "TC-2.2-004-02"
+          description: "Maintain OCR confidence scores"
+          steps:
+            - step: "Process receipt with low confidence merchant"
+            - step: "Note original confidence score (e.g., 0.65)"
+            - step: "Verify confidence unchanged after normalization"
+            - step: "Verify isManuallyEdited remains false"
+          expected_result: "Normalization doesn't affect confidence"
+          
+        - id: "TC-2.2-004-03"
+          description: "Performance impact on OCR workflow"
+          steps:
+            - step: "Measure OCR processing time without normalization"
+            - step: "Enable merchant normalization"
+            - step: "Process same receipt"
+            - step: "Verify total time still <5s"
+            - step: "Verify normalization adds <50ms"
+          expected_result: "Performance targets maintained"
+          
+        - id: "TC-2.2-004-04"
+          description: "Feature flag controls normalization"
+          steps:
+            - step: "Disable ENABLE_MERCHANT_NORMALIZATION flag"
+            - step: "Process receipt"
+            - step: "Verify no normalization occurs"
+            - step: "Enable flag and reprocess"
+            - step: "Verify normalization now occurs"
+          expected_result: "Feature flag properly gates functionality"
+
+    - id: "TS-2.2-005"
+      title: "UI Display of Normalized Values"
+      priority: "High"
+      test_level: "Component"
+      prerequisites:
+        - "Preview screen loaded with normalized merchant"
+        - "Various test receipts processed"
+      
+      test_cases:
+        - id: "TC-2.2-005-01"
+          description: "Display normalized merchant name"
+          steps:
+            - step: "Process receipt with 'TARGET #0234'"
+            - step: "Navigate to preview screen"
+            - step: "Verify merchant field shows 'Target'"
+            - step: "Verify info icon appears next to field"
+          expected_result: "Normalized value displayed correctly"
+          
+        - id: "TC-2.2-005-02"
+          description: "Show original value on interaction"
+          steps:
+            - step: "Tap/hover on normalization info icon"
+            - step: "Verify tooltip/dialog appears"
+            - step: "Verify shows 'Original: TARGET #0234'"
+            - step: "Verify shows 'Normalized: Target'"
+          expected_result: "Original value accessible to user"
+          
+        - id: "TC-2.2-005-03"
+          description: "Manual edit overrides normalization"
+          steps:
+            - step: "Tap merchant field to edit"
+            - step: "Change 'Target' to 'Target Store'"
+            - step: "Save changes"
+            - step: "Verify isManuallyEdited set to true"
+            - step: "Verify info icon indicates manual edit"
+          expected_result: "Manual edits tracked properly"
+          
+        - id: "TC-2.2-005-04"
+          description: "Visual indicator consistency"
+          steps:
+            - step: "Verify normalization indicator style"
+            - step: "Compare with confidence score indicators"
+            - step: "Verify consistent Material 3 design"
+            - step: "Test on different screen sizes"
+          expected_result: "UI elements consistent and accessible"
+
+    - id: "TS-2.2-006"
+      title: "Settings Management"
+      priority: "Medium"
+      test_level: "Component"
+      prerequisites:
+        - "Settings screen accessible"
+        - "Default normalization enabled"
+      
+      test_cases:
+        - id: "TC-2.2-006-01"
+          description: "Toggle merchant normalization setting"
+          steps:
+            - step: "Navigate to Settings"
+            - step: "Find 'Merchant Normalization' toggle"
+            - step: "Verify default state is ON"
+            - step: "Toggle to OFF"
+            - step: "Verify setting persisted immediately"
+          expected_result: "Setting toggles correctly"
+          
+        - id: "TC-2.2-006-02"
+          description: "Setting affects new captures"
+          steps:
+            - step: "Disable merchant normalization"
+            - step: "Capture new receipt"
+            - step: "Verify raw merchant name displayed"
+            - step: "Enable normalization"
+            - step: "Capture another receipt"
+            - step: "Verify normalized name displayed"
+          expected_result: "Setting controls feature behavior"
+          
+        - id: "TC-2.2-006-03"
+          description: "Setting persistence across restarts"
+          steps:
+            - step: "Set normalization to OFF"
+            - step: "Close app completely"
+            - step: "Restart app"
+            - step: "Verify setting remains OFF"
+            - step: "Process receipt to confirm behavior"
+          expected_result: "Setting persists correctly"
+
+    - id: "TS-2.2-007"
+      title: "End-to-End Normalization Flow"
+      priority: "High"
+      test_level: "Integration"
+      prerequisites:
+        - "App configured with normalization enabled"
+        - "Various test receipts available"
+      
+      test_cases:
+        - id: "TC-2.2-007-01"
+          description: "Complete capture to export flow"
+          steps:
+            - step: "Capture receipt from 'MCDONALDS #4521'"
+            - step: "Verify preview shows 'McDonalds'"
+            - step: "Export to CSV"
+            - step: "Verify CSV contains normalized 'McDonalds'"
+            - step: "Verify audit log has original value"
+          expected_result: "Normalization applied throughout workflow"
+          
+        - id: "TC-2.2-007-02"
+          description: "Batch processing with normalization"
+          steps:
+            - step: "Capture 5 receipts with different merchants"
+            - step: "Include: WALMART, Target #123, MCD, 7-ELEVEN!!"
+            - step: "Verify all normalized in batch view"
+            - step: "Export batch to CSV"
+            - step: "Verify all merchants normalized consistently"
+          expected_result: "Batch processing handles normalization"
+          
+        - id: "TC-2.2-007-03"
+          description: "Offline normalization"
+          steps:
+            - step: "Enable airplane mode"
+            - step: "Capture receipt with merchant needing normalization"
+            - step: "Verify normalization works offline"
+            - step: "Verify dictionary lookups work offline"
+          expected_result: "Full functionality without network"
+
+    - id: "TS-2.2-008"
+      title: "Performance Testing"
+      priority: "High"
+      test_level: "Integration"
+      prerequisites:
+        - "Performance monitoring tools configured"
+        - "Large set of test merchants"
+      
+      test_cases:
+        - id: "TC-2.2-008-01"
+          description: "Single merchant normalization speed"
+          steps:
+            - step: "Create performance test with 1000 merchants"
+            - step: "Time normalization for each"
+            - step: "Verify p95 < 50ms"
+            - step: "Verify p99 < 100ms"
+            - step: "Check memory usage remains stable"
+          expected_result: "Performance targets met"
+          
+        - id: "TC-2.2-008-02"
+          description: "Dictionary lookup performance"
+          steps:
+            - step: "Load full merchant dictionary"
+            - step: "Perform 10,000 random lookups"
+            - step: "Verify average lookup time < 5ms"
+            - step: "Verify dictionary cached efficiently"
+          expected_result: "Dictionary operations fast"
+          
+        - id: "TC-2.2-008-03"
+          description: "OCR workflow performance impact"
+          steps:
+            - step: "Baseline: Process 50 receipts without normalization"
+            - step: "Enable normalization"
+            - step: "Process same 50 receipts"
+            - step: "Compare total processing times"
+            - step: "Verify <5% impact on total time"
+          expected_result: "Minimal impact on OCR performance"
+
+    - id: "TS-2.2-009"
+      title: "Acceptance Testing"
+      priority: "High"
+      test_level: "Acceptance"
+      prerequisites:
+        - "Complete feature implemented"
+        - "Test users available (Mike persona)"
+      
+      test_cases:
+        - id: "TC-2.2-009-01"
+          description: "User satisfaction with normalization"
+          steps:
+            - step: "User captures typical receipts"
+            - step: "Observe normalized merchant names"
+            - step: "User exports to accounting software"
+            - step: "Verify merchants recognized correctly"
+            - step: "Gather user feedback on accuracy"
+          expected_result: "Users find normalization helpful"
+          
+        - id: "TC-2.2-009-02"
+          description: "Manual override workflow"
+          steps:
+            - step: "User reviews normalized merchant"
+            - step: "User disagrees with normalization"
+            - step: "User edits to preferred value"
+            - step: "Verify edit persists through export"
+            - step: "Verify smooth editing experience"
+          expected_result: "Users can easily override when needed"
+
+  test_data:
+    merchant_samples:
+      - category: "Franchise with numbers"
+        samples:
+          - input: "MCDONALDS #4521"
+            expected: "McDonalds"
+          - input: "SUBWAY #10293"
+            expected: "Subway"
+          - input: "STARBUCKS STORE #1234"
+            expected: "Starbucks"
+            
+      - category: "All caps variations"
+        samples:
+          - input: "WALMART SUPERCENTER"
+            expected: "Walmart Supercenter"
+          - input: "TARGET"
+            expected: "Target"
+          - input: "HOME DEPOT"
+            expected: "Home Depot"
+            
+      - category: "Special characters"
+        samples:
+          - input: "7-ELEVEN!!!!"
+            expected: "7-Eleven"
+          - input: "TOYS\"R\"US"
+            expected: "Toys R Us"
+          - input: "AT&T STORE"
+            expected: "AT&T Store"
+            
+      - category: "Abbreviations"
+        samples:
+          - input: "MCD"
+            expected: "McDonald's"
+          - input: "BK"
+            expected: "Burger King"
+          - input: "CVS/PHARMACY"
+            expected: "CVS Pharmacy"
+            
+      - category: "Location suffixes"
+        samples:
+          - input: "Walmart - Main St"
+            expected: "Walmart"
+          - input: "Target Minneapolis MN"
+            expected: "Target"
+          - input: "Best Buy #423 Rochester"
+            expected: "Best Buy"
+
+    performance_baselines:
+      normalization_time:
+        p50: "10ms"
+        p95: "50ms"
+        p99: "100ms"
+      ocr_impact:
+        baseline: "4.2s"
+        with_normalization: "4.25s"
+        max_allowed_increase: "5%"
+
+  risks:
+    - risk: "Over-normalization removes important merchant distinctions"
+      mitigation: "Preserve original value, allow manual override"
+      
+    - risk: "Performance degradation with large merchant dictionary"
+      mitigation: "Lazy loading, efficient data structures, caching"
+      
+    - risk: "Incorrect normalization for non-English merchants"
+      mitigation: "Detect language, apply appropriate rules"
+      
+    - risk: "User confusion about which value is exported"
+      mitigation: "Clear UI indicators, consistent behavior"
+
+  dependencies:
+    - "MerchantNormalizationService implementation complete"
+    - "OCR service integration points available"
+    - "Settings repository supports new merchant_normalization flag"
+    - "UI components for normalization indicators designed"
+
+  notes:
+    - "Focus on common US merchants for MVP"
+    - "Consider ML-based normalization for future versions"
+    - "Monitor user feedback on normalization accuracy"
+    - "Track most common manual corrections for rule improvements"

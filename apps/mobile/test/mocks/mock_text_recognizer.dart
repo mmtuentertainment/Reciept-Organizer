@@ -77,4 +77,19 @@ class TestOCRData {
     when(line.text).thenReturn(text);
     return line;
   }
+  
+  /// Create recognized text from list of strings
+  static RecognizedText createRecognizedText(List<String> textLines) {
+    final lines = textLines.map((text) => _createMockLine(text)).toList();
+    
+    final block = MockTextBlock();
+    when(block.text).thenReturn(lines.map((l) => l.text).join('\n'));
+    when(block.lines).thenReturn(lines);
+    
+    final recognized = MockRecognizedText();
+    when(recognized.text).thenReturn(lines.map((l) => l.text).join(' '));
+    when(recognized.blocks).thenReturn([block]);
+    
+    return recognized;
+  }
 }

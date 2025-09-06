@@ -6,6 +6,7 @@ import 'package:receipt_organizer/features/capture/widgets/capture_failed_state.
 import 'package:receipt_organizer/features/capture/widgets/retry_prompt_dialog.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
+import 'package:receipt_organizer/features/receipts/presentation/widgets/merchant_field_editor_with_normalization.dart';
 
 /// Preview screen that shows capture results and handles retry scenarios
 class PreviewScreen extends ConsumerStatefulWidget {
@@ -371,9 +372,10 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
           ),
           const SizedBox(height: 12),
           
-          MerchantFieldEditor(
+          MerchantFieldEditorWithNormalization(
             fieldData: displayResult.merchant,
             onChanged: _handleMerchantChanged,
+            showNormalizationIndicator: true,
           ),
           
           DateFieldEditor(

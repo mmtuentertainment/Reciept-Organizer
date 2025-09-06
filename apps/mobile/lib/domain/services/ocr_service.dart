@@ -4,6 +4,8 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 
+import 'merchant_normalization_service.dart';
+
 // Note: ConfidenceLevel import removed as not directly used in this service
 
 // Core models for OCR processing
@@ -36,6 +38,11 @@ class FieldData {
       isManuallyEdited: isManuallyEdited ?? this.isManuallyEdited,
       validationStatus: validationStatus ?? this.validationStatus,
     );
+  }
+
+  /// Updates the value while preserving the original text
+  FieldData withNormalizedValue(dynamic normalizedValue) {
+    return copyWith(value: normalizedValue);
   }
 
   /// Serializes FieldData to JSON for session persistence
@@ -146,6 +153,8 @@ class OCRService implements IOCRService {
   late TextRecognizer _textRecognizer;
   bool _isInitialized = false;
   final TextRecognizer? _customRecognizer;
+  final MerchantNormalizationService? _merchantNormalizationService;
+  final bool _enableMerchantNormalization;
 
   /// Create OCR service with optional TextRecognizer for testing
   /// 
@@ -169,7 +178,13 @@ class OCRService implements IOCRService {
   /// **Review Screen Integration:**
   /// - Fields with confidence <75% should be highlighted for quick editing (AC6)
   /// - Display confidence indicators: ●●● (≥75%), ●●○ (50-74%), ●○○ (<50%)
-  OCRService({TextRecognizer? textRecognizer}) : _customRecognizer = textRecognizer;
+  OCRService({
+    TextRecognizer? textRecognizer,
+    MerchantNormalizationService? merchantNormalizationService,
+    bool enableMerchantNormalization = true,
+  }) : _customRecognizer = textRecognizer,
+       _merchantNormalizationService = merchantNormalizationService,
+       _enableMerchantNormalization = enableMerchantNormalization;
 
   @override
   Future<void> initialize() async {
@@ -248,7 +263,22 @@ class OCRService implements IOCRService {
     final allText = allTextLines.join(' ');
 
     // Extract merchant (usually at the top)
-    final merchant = _extractMerchant(allTextLines);
+    var merchant = _extractMerchant(allTextLines);
+    
+    // Apply merchant normalization if enabled and merchant was extracted
+    if (merchant != null && _enableMerchantNormalization && _merchantNormalizationService != null) {
+      final normalizedName = _merchantNormalizationService!.normalize(merchant.value as String);
+      if (normalizedName != merchant.value) {
+        // Update the merchant field with normalized value, preserving original
+        merchant = FieldData(
+          value: normalizedName,
+          confidence: merchant.confidence,
+          originalText: merchant.originalText,
+          isManuallyEdited: false,
+          validationStatus: merchant.validationStatus,
+        );
+      }
+    }
     
     // Extract date
     final date = _extractDate(allText);
