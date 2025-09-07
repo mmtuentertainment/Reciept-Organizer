@@ -1,0 +1,97 @@
+<document>
+  <meta>
+    <title>Competitive Analysis</title>
+    <type>prd-section</type>
+    <version>1.0</version>
+  </meta>
+  
+  <section id="competitive-analysis">
+    <h1>Competitive Analysis</h1>
+    
+    <section id="direct-competitors">
+      <h2>Direct Competitors</h2>
+      
+      <competitor id="expensify">
+        <h3>Expensify</h3>
+        <strengths>
+          <item>SmartScan</item>
+          <item>Bank integration</item>
+          <item>Enterprise features</item>
+        </strengths>
+        <weaknesses>
+          <item>Overkill for SMBs</item>
+          <item>$5-9/user/month</item>
+          <item>Online-required</item>
+        </weaknesses>
+        <our-advantage>Simpler, cheaper, works offline</our-advantage>
+      </competitor>
+      
+      <competitor id="receipt-bank">
+        <h3>Receipt Bank (Dext)</h3>
+        <strengths>
+          <item>Accurate OCR</item>
+          <item>Accountant integration</item>
+        </strengths>
+        <weaknesses>
+          <item>£20+/month</item>
+          <item>Complex onboarding</item>
+        </weaknesses>
+        <our-advantage>Self-serve, transparent pricing</our-advantage>
+      </competitor>
+      
+      <competitor id="shoeboxed">
+        <h3>Shoeboxed</h3>
+        <strengths>
+          <item>Mail-in scanning service</item>
+        </strengths>
+        <weaknesses>
+          <item>$18-58/month</item>
+          <item>Slow turnaround</item>
+        </weaknesses>
+        <our-advantage>Instant processing, no recurring cost (MVP)</our-advantage>
+      </competitor>
+    </section>
+    
+    <section id="indirect-competitors">
+      <h2>Indirect Competitors</h2>
+      
+      <competitor id="quickbooks-mobile">
+        <h3>QuickBooks Mobile</h3>
+        <strengths>
+          <item>Integrated with accounting</item>
+        </strengths>
+        <weaknesses>
+          <item>Requires QuickBooks subscription</item>
+        </weaknesses>
+        <our-advantage>Platform-agnostic</our-advantage>
+      </competitor>
+      
+      <competitor id="google-drive-lens">
+        <h3>Google Drive + Lens</h3>
+        <strengths>
+          <item>Free</item>
+          <item>Powerful OCR</item>
+        </strengths>
+        <weaknesses>
+          <item>Manual process</item>
+          <item>No receipt optimization</item>
+        </weaknesses>
+        <our-advantage>Purpose-built workflow</our-advantage>
+      </competitor>
+    </section>
+    
+    <section id="competitive-positioning">
+      <h2>Competitive Positioning</h2>
+      
+      <positioning>
+        <tagline>The honest receipt app that just works</tagline>
+        
+        <differentiation>
+          <point>Where others promise AI magic, we deliver reliable basics</point>
+          <point>Where others require subscriptions, we work out-of-the-box</point>
+          <point>Where others need training, we're intuitive from tap one</point>
+        </differentiation>
+      </positioning>
+    </section>
+  </section>
+</document>

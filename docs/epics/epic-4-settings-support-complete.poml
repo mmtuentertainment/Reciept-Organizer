@@ -1,0 +1,408 @@
+<poml>
+  <role>Product Manager creating comprehensive epic documentation</role>
+  <task>Define Epic 4: Settings & Support functionality for Receipt Organizer MVP</task>
+  
+  <metadata>
+    <version>1.0</version>
+    <date>2025-01-12</date>
+    <status>Ready for Development</status>
+    <author>John (Product Manager)</author>
+    <epic-type>Core Functionality</epic-type>
+  </metadata>
+
+  <epic-header>
+    <title>Settings &amp; Support - Core Epic</title>
+    <epic-number>4</epic-number>
+    <priority>P2</priority>
+    <status>Ready for Development</status>
+  </epic-header>
+
+  <epic-goal>
+    Empower users with control over their Receipt Organizer experience through customizable settings, storage management, and data portability, ensuring they are never locked into the app while optimizing their personal workflow.
+  </epic-goal>
+
+  <epic-description>
+    <vision>
+      Provide users with comprehensive control over application behavior, visibility into resource usage, and complete data ownership through export capabilities, creating trust and enabling personalized workflows.
+    </vision>
+    
+    <scope>
+      - Application preferences and default settings
+      - Storage usage monitoring and management  
+      - OCR confidence threshold customization
+      - Complete data export for backup and portability
+      - Settings UI with Material 3 design
+    </scope>
+    
+    <success-metrics>
+      - Settings persistence: 100% reliability across restarts
+      - Storage calculation: &lt;1s for 1000 receipts
+      - Threshold adjustment: Immediate effect on new scans
+      - Data export: Complete JSON with all receipt data
+      - User satisfaction: Reduced support requests by 30%
+    </success-metrics>
+  </epic-description>
+
+  <user-personas>
+    <persona name="Mike" type="Freelance Contractor">
+      <pain-points>
+        - Repeatedly selects same export format
+        - Unsure when phone storage getting full
+        - Wants his data backed up regularly
+        - Concerned about vendor lock-in
+      </pain-points>
+    </persona>
+    
+    <persona name="Sarah" type="Restaurant Owner">
+      <pain-points>
+        - Device storage fills up quickly with photos
+        - Doesn't know what's using space
+        - Worried about losing receipt data
+        - Wants simple backup solution
+      </pain-points>
+    </persona>
+    
+    <persona name="Linda" type="Bookkeeper">
+      <pain-points>
+        - Needs to tune OCR for her workflow
+        - Some clients need higher accuracy than others
+        - Wants full data exports for archival
+        - Requires audit trail preservation
+      </pain-points>
+    </persona>
+  </user-personas>
+
+  <stories>
+    <story number="14" priority="P2" status="pending">
+      <title>Default Export Format Setting</title>
+      <persona>Mike</persona>
+      <narrative>
+        As Mike (Freelance Contractor), I want to set my default export format, 
+        so I don't have to select it every time.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">Export format setting added to SettingsRepository</criterion>
+        <criterion id="2">Settings UI section for export preferences</criterion>
+        <criterion id="3">Persist selection (QuickBooks/Xero/Generic)</criterion>
+        <criterion id="4">Apply default on export screen initialization</criterion>
+        <criterion id="5">Visual confirmation of saved preference</criterion>
+        <criterion id="6">Setting survives app updates</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Extend SettingsRepository with export_format key
+        - Create SettingsScreen with ListTile components
+        - Use SharedPreferences for persistence
+        - Integrate with existing CSVExportService
+        - Follow Material 3 design patterns
+      </technical-details>
+      
+      <ui-specifications>
+        - Radio button group for format selection
+        - Description text for each format
+        - Save happens automatically on selection
+        - Toast confirmation "Default export format saved"
+        - Located under "Export Settings" section
+      </ui-specifications>
+      
+      <estimated-effort>2 points</estimated-effort>
+    </story>
+    
+    <story number="15" priority="P2" status="pending">
+      <title>Storage Usage Monitor</title>
+      <persona>Sarah</persona>
+      <narrative>
+        As Sarah (Restaurant Owner), I want to see my storage usage, 
+        so I know when to clean up old receipts.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">Calculate total storage (images + database)</criterion>
+        <criterion id="2">Visual storage indicator (progress bar)</criterion>
+        <criterion id="3">Show breakdown by receipt age</criterion>
+        <criterion id="4">Add "Clean up old receipts" option</criterion>
+        <criterion id="5">Storage calculation updates on-demand</criterion>
+        <criterion id="6">Performance: &lt;1s for 1000 receipts</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Create StorageCalculatorService
+        - Use path_provider for directory access
+        - Calculate image sizes and database size
+        - Implement caching for performance
+        - Create cleanup workflow UI
+      </technical-details>
+      
+      <storage-breakdown>
+        - Images: Sum of receipt + thumbnail sizes
+        - Database: SQLite file size
+        - Age buckets: This month, Last 3 months, Older
+        - Display format: "234 MB used (180 MB images, 54 MB data)"
+        - Cleanup options: By age or by export status
+      </storage-breakdown>
+      
+      <ui-specifications>
+        - Circular progress indicator with percentage
+        - Expandable section for breakdown
+        - "Clean up" button launches selection dialog
+        - Confirmation required before deletion
+        - Success message shows space freed
+      </ui-specifications>
+      
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="16" priority="P3" status="pending">
+      <title>OCR Confidence Threshold Adjustment</title>
+      <persona>Linda</persona>
+      <narrative>
+        As Linda (Bookkeeper), I want to adjust OCR confidence thresholds, 
+        so I can balance accuracy vs speed for my workflow.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">Slider UI for confidence threshold (50-90%)</criterion>
+        <criterion id="2">Show impact preview (estimated fields needing review)</criterion>
+        <criterion id="3">Update OCRService to use dynamic threshold</criterion>
+        <criterion id="4">Persist threshold preference</criterion>
+        <criterion id="5">Tooltip explaining threshold impact</criterion>
+        <criterion id="6">Reset to default option</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Add confidence_threshold to SettingsRepository
+        - Create ThresholdSlider widget
+        - Calculate impact based on historical data
+        - Update OCRService.isLowConfidence() method
+        - Show live preview of affected fields
+      </technical-details>
+      
+      <threshold-impacts>
+        - 50%: Maximum fields flagged, highest accuracy
+        - 75%: Balanced approach (default)
+        - 90%: Minimum flagging, trust OCR more
+        - Preview: "With 60% threshold: ~12 fields per receipt need review"
+        - Historical calculation from last 100 receipts
+      </threshold-impacts>
+      
+      <ui-specifications>
+        - Material slider with tick marks
+        - Current value displayed above slider
+        - Impact preview updates as slider moves
+        - Info icon with detailed explanation
+        - "Reset to default (75%)" button
+      </ui-specifications>
+      
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="17" priority="P3" status="pending">
+      <title>Full Data Export</title>
+      <persona>Mike</persona>
+      <narrative>
+        As Mike, I want to export all my data for backup, 
+        so I'm not locked into the app.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">Export all receipt data as JSON</criterion>
+        <criterion id="2">Include Base64 encoded images (optional)</criterion>
+        <criterion id="3">Generate export timestamp and metadata</criterion>
+        <criterion id="4">Progress indicator for large exports</criterion>
+        <criterion id="5">Use share functionality for file export</criterion>
+        <criterion id="6">Validate export can be re-imported</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Create DataExportService
+        - Generate comprehensive JSON structure
+        - Option to include/exclude images
+        - Compress output with gzip
+        - Stream generation for memory efficiency
+      </technical-details>
+      
+      <export-structure>
+        ```json
+        {
+          "version": "1.0",
+          "exportDate": "2025-01-12T10:30:00Z",
+          "app": {
+            "version": "1.0.0",
+            "platform": "iOS"
+          },
+          "settings": {
+            "exportFormat": "quickbooks",
+            "confidenceThreshold": 75
+          },
+          "receipts": [
+            {
+              "id": "uuid",
+              "capturedAt": "2025-01-10T14:20:00Z",
+              "status": "ready",
+              "ocrResults": {
+                "merchant": {"value": "Starbucks", "confidence": 92},
+                "date": {"value": "2025-01-10", "confidence": 98},
+                "total": {"value": 12.45, "confidence": 99},
+                "tax": {"value": 1.08, "confidence": 95}
+              },
+              "notes": "Client meeting",
+              "image": "data:image/jpeg;base64,..." // optional
+            }
+          ]
+        }
+        ```
+      </export-structure>
+      
+      <ui-specifications>
+        - Export button in settings
+        - Checkbox: "Include images (larger file)"
+        - Progress dialog during generation
+        - File size estimate shown
+        - Share sheet for export options
+      </ui-specifications>
+      
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+  </stories>
+
+  <technical-architecture>
+    <settings-infrastructure>
+      - SettingsRepository with SharedPreferences
+      - SettingsProvider (Riverpod) for state
+      - SettingsScreen with sections
+      - Preference keys properly namespaced
+    </settings-infrastructure>
+    
+    <new-services>
+      - StorageCalculatorService
+      - DataExportService  
+      - ThresholdImpactCalculator
+      - CleanupService
+    </new-services>
+    
+    <ui-components>
+      - SettingsScreen (main container)
+      - ExportFormatSelector
+      - StorageUsageCard
+      - ThresholdSlider
+      - ExportOptionsDialog
+    </ui-components>
+    
+    <integration-patterns>
+      - Settings changes trigger provider updates
+      - Reactive UI updates via Riverpod
+      - Background calculation for storage
+      - Streaming for large exports
+    </integration-patterns>
+  </technical-architecture>
+
+  <settings-organization>
+    <screen-sections>
+      <section name="Export Settings">
+        - Default format selection
+        - CSV preview options
+      </section>
+      
+      <section name="Storage">
+        - Usage indicator
+        - Cleanup tools
+        - Auto-cleanup rules (future)
+      </section>
+      
+      <section name="OCR Settings">
+        - Confidence threshold
+        - Processing engine selection (future)
+      </section>
+      
+      <section name="Data Management">
+        - Export all data
+        - Import data (future)
+        - Delete all data
+      </section>
+      
+      <section name="About">
+        - Version information
+        - Privacy policy
+        - Terms of service
+      </section>
+    </screen-sections>
+  </settings-organization>
+
+  <data-privacy-considerations>
+    <principles>
+      - User owns all their data
+      - No data leaves device without explicit action
+      - Export includes everything user has entered
+      - Clear data deletion options
+      - No hidden analytics or tracking
+    </principles>
+    
+    <implementation>
+      - JSON export is complete and parseable
+      - Images included only with consent
+      - Deletion is immediate and permanent
+      - No cloud backup without user action
+      - Privacy policy clearly states offline-first
+    </implementation>
+  </data-privacy-considerations>
+
+  <quality-requirements>
+    <test-scenarios>
+      - Settings persist across app updates
+      - Storage calculation accuracy
+      - Export completeness verification
+      - Import/export round trip
+      - Performance under load
+    </test-scenarios>
+    
+    <performance-benchmarks>
+      - Settings screen load: &lt;100ms
+      - Storage calculation: &lt;1s (1000 receipts)
+      - Preference save: &lt;50ms
+      - Export generation: &lt;10ms per receipt
+      - UI remains responsive during exports
+    </performance-benchmarks>
+  </quality-requirements>
+
+  <future-enhancements>
+    <planned-features>
+      - Auto-cleanup rules based on age/status
+      - Cloud backup integration (optional)
+      - Import functionality for migrations
+      - Advanced OCR engine selection
+      - Theming and appearance settings
+    </planned-features>
+    
+    <user-requests>
+      - Scheduled exports
+      - Selective data export
+      - Backup reminders
+      - Storage warnings
+      - Multiple preference profiles
+    </user-requests>
+  </future-enhancements>
+
+  <definition-of-done>
+    <criterion status="pending">All 4 stories implemented and tested</criterion>
+    <criterion status="pending">Settings persist across app lifecycle</criterion>
+    <criterion status="pending">Storage calculation accurate within 5%</criterion>
+    <criterion status="pending">Export includes all user data</criterion>
+    <criterion status="pending">Performance targets achieved</criterion>
+    <criterion status="pending">Settings UI follows Material 3</criterion>
+    <criterion status="pending">No regression in existing features</criterion>
+    <criterion status="pending">Privacy compliance verified</criterion>
+  </definition-of-done>
+
+  <epic-status>
+    <current-state>Ready for Sprint Planning</current-state>
+    <estimated-effort>11 story points total</estimated-effort>
+    <target-completion>2 sprints</target-completion>
+    <dependencies>
+      - SettingsRepository from Epic 2
+      - CSVExportService from Epic 3
+      - Material 3 theming established
+    </dependencies>
+    <team-assignment>TBD</team-assignment>
+  </epic-status>
+</poml>

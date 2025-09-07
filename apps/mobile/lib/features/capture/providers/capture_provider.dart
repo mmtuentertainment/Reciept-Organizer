@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/data/models/edge_detection_result.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
@@ -83,10 +84,7 @@ class CaptureNotifier extends StateNotifier<CaptureState> {
   }) : _ocrService = ocrService, 
        _cameraService = cameraService,
        _sessionManager = sessionManager,
-       super(const CaptureState()) {
-    // Clean up expired sessions on initialization
-    _cleanupExpiredSessions();
-  }
+       super(const CaptureState());
 
   /// Starts a new capture session
   void startCaptureSession({String? sessionId}) {
@@ -430,6 +428,17 @@ class CaptureNotifier extends StateNotifier<CaptureState> {
   /// Internal method to clean up expired sessions
   Future<void> _cleanupExpiredSessions() async {
     await _sessionManager.cleanupExpiredSessions();
+  }
+  
+  /// Initialize the notifier - should be called after provider is mounted
+  /// This is separate from the constructor to avoid side effects during provider creation
+  Future<void> initialize() async {
+    try {
+      await _cleanupExpiredSessions();
+    } catch (e) {
+      // Log error but don't fail initialization
+      debugPrint('Failed to cleanup expired sessions: $e');
+    }
   }
 }
 

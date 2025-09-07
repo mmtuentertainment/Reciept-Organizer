@@ -79,6 +79,11 @@ class SettingsRepository {
           dateFormat: value as String,
         );
         break;
+      case 'dateRangePreset':
+        updatedSettings = currentSettings.copyWith(
+          dateRangePreset: value as String,
+        );
+        break;
       default:
         return false;
     }

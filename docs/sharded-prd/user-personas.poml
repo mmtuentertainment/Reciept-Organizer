@@ -1,0 +1,56 @@
+<document>
+  <meta>
+    <title>User Personas</title>
+    <type>prd-section</type>
+    <version>1.0</version>
+  </meta>
+  
+  <section id="user-personas">
+    <h1>User Personas</h1>
+    
+    <persona id="sarah-restaurant-owner" type="primary">
+      <h2>Sarah - Restaurant Owner (Primary)</h2>
+      <demographics>
+        <age>42</age>
+        <business>Owns 2 cafes, 10 employees</business>
+      </demographics>
+      <tech-level>Comfortable with smartphones, basic apps</tech-level>
+      <pain-points>
+        <point>Shoebox of receipts for accountant</point>
+        <point>QuickBooks rejects her manual CSVs</point>
+        <point>No time for complex software</point>
+      </pain-points>
+      <success-criteria>Export month's receipts in &lt;10min</success-criteria>
+    </persona>
+    
+    <persona id="mike-freelance-contractor" type="secondary">
+      <h2>Mike - Freelance Contractor (Secondary)</h2>
+      <demographics>
+        <age>35</age>
+        <business>Solo operation, project-based work</business>
+      </demographics>
+      <tech-level>Power user, efficiency-focused</tech-level>
+      <pain-points>
+        <point>Loses receipts between job sites</point>
+        <point>Needs categorization for tax deductions</point>
+        <point>Wants to avoid subscription services</point>
+      </pain-points>
+      <success-criteria>Capture receipt and move on in &lt;30s</success-criteria>
+    </persona>
+    
+    <persona id="linda-bookkeeper" type="tertiary">
+      <h2>Linda - Bookkeeper (Tertiary)</h2>
+      <demographics>
+        <age>58</age>
+        <business>Manages books for 5 small businesses</business>
+      </demographics>
+      <tech-level>Expert in QuickBooks, learning mobile</tech-level>
+      <pain-points>
+        <point>Clients provide crumpled, faded receipts</point>
+        <point>Needs consistent CSV formatting</point>
+        <point>Must verify every transaction</point>
+      </pain-points>
+      <success-criteria>Batch process 50 receipts with &lt;5 corrections</success-criteria>
+    </persona>
+  </section>
+</document>

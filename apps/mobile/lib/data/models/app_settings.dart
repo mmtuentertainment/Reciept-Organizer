@@ -8,6 +8,7 @@ class AppSettings {
   final int maxRetryAttempts;
   final String csvExportFormat;
   final String dateFormat;
+  final String dateRangePreset;
 
   const AppSettings({
     this.merchantNormalization = true,
@@ -16,6 +17,7 @@ class AppSettings {
     this.maxRetryAttempts = 3,
     this.csvExportFormat = 'quickbooks',
     this.dateFormat = 'MM/dd/yyyy',
+    this.dateRangePreset = 'last30Days',
   });
 
   AppSettings copyWith({
@@ -25,6 +27,7 @@ class AppSettings {
     int? maxRetryAttempts,
     String? csvExportFormat,
     String? dateFormat,
+    String? dateRangePreset,
   }) {
     return AppSettings(
       merchantNormalization: merchantNormalization ?? this.merchantNormalization,
@@ -33,6 +36,7 @@ class AppSettings {
       maxRetryAttempts: maxRetryAttempts ?? this.maxRetryAttempts,
       csvExportFormat: csvExportFormat ?? this.csvExportFormat,
       dateFormat: dateFormat ?? this.dateFormat,
+      dateRangePreset: dateRangePreset ?? this.dateRangePreset,
     );
   }
 
@@ -44,6 +48,7 @@ class AppSettings {
       'maxRetryAttempts': maxRetryAttempts,
       'csvExportFormat': csvExportFormat,
       'dateFormat': dateFormat,
+      'dateRangePreset': dateRangePreset,
     };
   }
 
@@ -55,6 +60,7 @@ class AppSettings {
       maxRetryAttempts: json['maxRetryAttempts'] ?? 3,
       csvExportFormat: json['csvExportFormat'] ?? 'quickbooks',
       dateFormat: json['dateFormat'] ?? 'MM/dd/yyyy',
+      dateRangePreset: json['dateRangePreset'] ?? 'last30Days',
     );
   }
 
@@ -68,7 +74,8 @@ class AppSettings {
       other.enableBatchCapture == enableBatchCapture &&
       other.maxRetryAttempts == maxRetryAttempts &&
       other.csvExportFormat == csvExportFormat &&
-      other.dateFormat == dateFormat;
+      other.dateFormat == dateFormat &&
+      other.dateRangePreset == dateRangePreset;
   }
 
   @override
@@ -78,6 +85,7 @@ class AppSettings {
       enableBatchCapture.hashCode ^
       maxRetryAttempts.hashCode ^
       csvExportFormat.hashCode ^
-      dateFormat.hashCode;
+      dateFormat.hashCode ^
+      dateRangePreset.hashCode;
   }
 }

@@ -1,0 +1,410 @@
+<poml>
+  <role>Product Manager creating comprehensive epic documentation</role>
+  <task>Define Epic 3: Organize & Export functionality for Receipt Organizer MVP</task>
+  
+  <metadata>
+    <version>1.0</version>
+    <date>2025-01-12</date>
+    <status>Ready for Development</status>
+    <author>John (Product Manager)</author>
+    <epic-type>Core Functionality</epic-type>
+  </metadata>
+
+  <epic-header>
+    <title>Organize &amp; Export - Core Epic</title>
+    <epic-number>3</epic-number>
+    <priority>P0</priority>
+    <status>Ready for Development</status>
+  </epic-header>
+
+  <epic-goal>
+    Provide zero-friction data export capabilities that enable users to select receipts by date range, export in accounting software-compatible formats, preview before export, validate data integrity, and manage storage through bulk operations.
+  </epic-goal>
+
+  <epic-description>
+    <vision>
+      Complete the receipt capture-to-accounting workflow by providing seamless export functionality that ensures first-try success with QuickBooks and Xero, while giving users full control over their data organization and storage management.
+    </vision>
+    
+    <scope>
+      - Date range selection with preset options
+      - CSV format templates for major accounting software
+      - Export preview with validation
+      - Pre-flight checks for compatibility
+      - Bulk receipt management operations
+    </scope>
+    
+    <success-metrics>
+      - Export success rate: 98%+ first-try imports
+      - Performance: &lt;3s for 100 receipt export
+      - Date filtering: &lt;200ms query response
+      - Preview generation: &lt;100ms render time
+      - Bulk operations: Multi-select with confirmation
+    </success-metrics>
+  </epic-description>
+
+  <user-personas>
+    <persona name="Sarah" type="Restaurant Owner">
+      <pain-points>
+        - Needs exports to match accounting periods
+        - Wants confidence exports will work in QuickBooks
+        - Storage fills up with old receipts
+      </pain-points>
+    </persona>
+    
+    <persona name="Linda" type="Bookkeeper">
+      <pain-points>
+        - Different clients use different accounting software
+        - Must ensure CSV formats are compatible
+        - Needs to manage receipts for multiple businesses
+      </pain-points>
+    </persona>
+    
+    <persona name="Mike" type="Freelance Contractor">
+      <pain-points>
+        - Wants to preview exports before sending to accountant
+        - Needs project-based date filtering
+        - Storage management for tax compliance
+      </pain-points>
+    </persona>
+  </user-personas>
+
+  <stories>
+    <story number="9" priority="P0" status="pending">
+      <title>Date Range Selection for Export</title>
+      <persona>Sarah</persona>
+      <narrative>
+        As Sarah (Restaurant Owner), I want to select date ranges for export, 
+        so I can match my accounting periods.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">Calendar picker with preset options (This Month, Last Month, Custom)</criterion>
+        <criterion id="2">Display receipt count for selected range</criterion>
+        <criterion id="3">Persist last selected range for convenience</criterion>
+        <criterion id="4">Date range applied to export query</criterion>
+        <criterion id="5">Clear visual feedback for selected range</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Implement date range picker UI component
+        - Add date filtering to ReceiptRepository queries
+        - Create preset date range calculations
+        - Store last used range in SharedPreferences
+        - Update receipt count reactively
+      </technical-details>
+      
+      <ui-specifications>
+        - Material 3 date picker dialog
+        - Preset chips: This Month, Last Month, Last Quarter, Custom
+        - Receipt count badge updates dynamically
+        - Selected range shown in header
+      </ui-specifications>
+      
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="10" priority="P0" status="pending">
+      <title>CSV Format Options</title>
+      <persona>Linda</persona>
+      <narrative>
+        As Linda (Bookkeeper), I want CSV format options,
+        so I can match each client's accounting system.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">QuickBooks &amp; Xero templates included</criterion>
+        <criterion id="2">Format selection dropdown/radio buttons</criterion>
+        <criterion id="3">Format persistence in app settings</criterion>
+        <criterion id="4">Format-specific field mapping</criterion>
+        <criterion id="5">Clear format descriptions</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Create CSV format templates
+        - Implement field mapping for each format
+        - Add format selection to ExportScreen
+        - Store preference in SettingsRepository
+        - Create format-specific validators
+      </technical-details>
+      
+      <format-specifications>
+        <quickbooks-format>
+          - Headers: Date, Vendor, Amount, Tax, Category, Notes
+          - Date format: MM/DD/YYYY
+          - Amount format: 1234.56 (no currency symbol)
+        </quickbooks-format>
+        
+        <xero-format>
+          - Headers: *Date, *ContactName, *Total, Tax, Description
+          - Date format: DD/MM/YYYY
+          - Required fields marked with *
+        </xero-format>
+        
+        <generic-format>
+          - Headers: Date, Merchant, Total, Tax, Notes
+          - Flexible date format
+          - All fields included
+        </generic-format>
+      </format-specifications>
+      
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="11" priority="P1" status="pending">
+      <title>Preview CSV Before Export</title>
+      <persona>Mike</persona>
+      <narrative>
+        As Mike (Freelance Contractor), I want to preview CSV before export,
+        so I can catch issues before sending to my accountant.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">Show first 5 rows with headers</criterion>
+        <criterion id="2">Display total row count</criterion>
+        <criterion id="3">Highlight any validation warnings</criterion>
+        <criterion id="4">Scrollable preview table</criterion>
+        <criterion id="5">Format applied to preview</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Create CSV preview generator
+        - Implement preview table widget
+        - Add validation highlighting
+        - Limit preview to 5 rows for performance
+        - Show total count separately
+      </technical-details>
+      
+      <preview-features>
+        - Responsive table with horizontal scroll
+        - Warning icons for validation issues
+        - Row numbers for reference
+        - "... X more rows" indicator
+      </preview-features>
+      
+      <estimated-effort>2 points</estimated-effort>
+    </story>
+    
+    <story number="12" priority="P0" status="pending">
+      <title>Export Validation</title>
+      <persona>Sarah</persona>
+      <narrative>
+        As Sarah, I want export validation before generating the file,
+        so I know it will import successfully into QuickBooks.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">Pre-flight validation check with specific warnings</criterion>
+        <criterion id="2">Field format validation (dates, amounts)</criterion>
+        <criterion id="3">Required field verification</criterion>
+        <criterion id="4">Success confirmation with file location</criterion>
+        <criterion id="5">Error handling for edge cases</criterion>
+        <criterion id="6">Validation report before export</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Create format-specific validators
+        - Implement validation rule engine
+        - Add pre-export validation step
+        - Generate validation report
+        - Handle validation failures gracefully
+      </technical-details>
+      
+      <validation-rules>
+        <date-validation>
+          - Valid date format for target system
+          - Reasonable date range (not future, not too old)
+        </date-validation>
+        
+        <amount-validation>
+          - Positive numbers only
+          - Two decimal places
+          - No currency symbols
+          - Tax less than or equal to total
+        </amount-validation>
+        
+        <merchant-validation>
+          - Non-empty merchant names
+          - No special characters that break CSV
+          - Reasonable length (&lt;100 chars)
+        </merchant-validation>
+      </validation-rules>
+      
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="13" priority="P2" status="pending">
+      <title>Bulk Delete Processed Receipts</title>
+      <persona>Linda</persona>
+      <narrative>
+        As Linda (Bookkeeper), I want to bulk delete processed receipts,
+        so storage doesn't fill up with old client data.
+      </narrative>
+      
+      <acceptance-criteria>
+        <criterion id="1">Multi-select mode in receipt list</criterion>
+        <criterion id="2">Select all/none/date range options</criterion>
+        <criterion id="3">Confirmation dialog with receipt count</criterion>
+        <criterion id="4">Progress indicator for deletion</criterion>
+        <criterion id="5">Undo option for 30 seconds</criterion>
+        <criterion id="6">Only delete exported receipts option</criterion>
+      </acceptance-criteria>
+      
+      <technical-details>
+        - Add multi-select mode to ReceiptListScreen
+        - Implement bulk delete in ReceiptRepository
+        - Create confirmation dialog with count
+        - Add progress indicator for large batches
+        - Implement soft delete with undo capability
+      </technical-details>
+      
+      <bulk-operations>
+        - Long-press to enter selection mode
+        - Checkbox appears on each receipt card
+        - Selection toolbar with actions
+        - Smart filters (exported only, date range)
+        - Batch size limit (100 at a time)
+      </bulk-operations>
+      
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+  </stories>
+
+  <technical-architecture>
+    <core-services>
+      - CSVExportService (enhanced with formats)
+      - ExportValidator with rule engine
+      - BulkOperationService for deletions
+      - DateRangeSelector component
+      - PreviewGenerator service
+    </core-services>
+    
+    <data-flow>
+      - Date selection → Query receipts → Preview → Validate → Export
+      - Format selection → Field mapping → CSV generation
+      - Bulk select → Confirmation → Soft delete → Undo window
+    </data-flow>
+    
+    <integration-points>
+      - ReceiptRepository: Date range queries
+      - SettingsRepository: Format preferences
+      - CSVExportService: Multiple formats
+      - FileService: Export file handling
+      - ShareService: File sharing
+    </integration-points>
+    
+    <performance-considerations>
+      - Indexed date queries for fast filtering
+      - Streaming CSV generation for large exports
+      - Pagination for preview display
+      - Batch processing for bulk deletes
+      - Memory-efficient file handling
+    </performance-considerations>
+  </technical-architecture>
+
+  <export-format-details>
+    <quickbooks-compatibility>
+      - File encoding: UTF-8 without BOM
+      - Line endings: CRLF (Windows)
+      - Field delimiter: Comma
+      - Text qualifier: Double quotes when needed
+      - Header row: Required
+      - Special characters: Escaped properly
+    </quickbooks-compatibility>
+    
+    <xero-compatibility>
+      - Required fields: Date, ContactName, Total
+      - Date format: DD/MM/YYYY strictly
+      - Decimal separator: Period
+      - No trailing commas
+      - UTF-8 encoding required
+    </xero-compatibility>
+    
+    <validation-matrix>
+      - Empty fields: Warning for optional, error for required
+      - Date formats: Auto-convert when possible
+      - Special characters: Escape or warn
+      - Field lengths: Truncate with warning
+      - Numeric formats: Standardize decimal places
+    </validation-matrix>
+  </export-format-details>
+
+  <ui-specifications>
+    <export-screen-layout>
+      - Top: Date range selector bar
+      - Middle: Format selection cards
+      - Preview section: Collapsible table
+      - Bottom: Export button with validation status
+      - Navigation: Back to receipt list
+    </export-screen-layout>
+    
+    <visual-design>
+      - Material 3 components throughout
+      - Success: Green checkmarks and borders
+      - Warnings: Amber with icon
+      - Errors: Red with clear messaging
+      - Loading states for all async operations
+    </visual-design>
+    
+    <interaction-patterns>
+      - Progressive disclosure for options
+      - Clear CTAs at each step
+      - Inline help for format selection
+      - Toast messages for success/error
+      - Share sheet for exported file
+    </interaction-patterns>
+  </ui-specifications>
+
+  <quality-requirements>
+    <test-coverage>
+      - Unit tests: All validators and services
+      - Widget tests: UI components
+      - Integration tests: Full export flow
+      - Format tests: Sample imports in QB/Xero
+    </test-coverage>
+    
+    <acceptance-criteria>
+      - 98%+ successful imports
+      - No data loss during export
+      - All edge cases handled
+      - Performance targets met
+      - Accessibility compliant
+    </acceptance-criteria>
+  </quality-requirements>
+
+  <risks-and-mitigations>
+    <technical-risks>
+      - CSV format changes in accounting software
+      - Large dataset performance issues
+      - File system permissions on different devices
+    </technical-risks>
+    
+    <mitigation-strategies>
+      - Version format templates
+      - Implement streaming for large exports
+      - Comprehensive permission handling
+      - Regular compatibility testing
+    </mitigation-strategies>
+  </risks-and-mitigations>
+
+  <definition-of-done>
+    <criterion status="pending">All 5 stories implemented and tested</criterion>
+    <criterion status="pending">Export success rate ≥98% verified</criterion>
+    <criterion status="pending">Performance targets achieved</criterion>
+    <criterion status="pending">Format compatibility confirmed</criterion>
+    <criterion status="pending">Bulk operations working smoothly</criterion>
+    <criterion status="pending">User documentation complete</criterion>
+    <criterion status="pending">No regressions in existing features</criterion>
+  </definition-of-done>
+
+  <epic-status>
+    <current-state>Ready for Sprint Planning</current-state>
+    <estimated-effort>14 story points total</estimated-effort>
+    <target-completion>2 sprints</target-completion>
+    <dependencies>
+      - Epic 1 & 2 completed
+      - CSVExportService exists
+      - SettingsRepository available
+    </dependencies>
+  </epic-status>
+</poml>

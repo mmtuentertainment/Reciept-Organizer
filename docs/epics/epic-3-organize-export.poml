@@ -1,0 +1,260 @@
+<poml>
+  <role>Product Manager creating comprehensive epic documentation</role>
+  <task>Define Epic 3: Organize & Export functionality for Receipt Organizer MVP</task>
+  
+  <metadata>
+    <version>1.0</version>
+    <date>2025-01-12</date>
+    <status>Ready for Development</status>
+    <author>John (Product Manager)</author>
+    <epic-type>Core Functionality</epic-type>
+  </metadata>
+
+  <epic-header>
+    <title>Organize &amp; Export - Core Epic</title>
+    <epic-number>3</epic-number>
+    <priority>P0</priority>
+    <status>Ready for Development</status>
+  </epic-header>
+
+  <epic-goal>
+    Provide zero-friction data export capabilities that enable users to select receipts by date range, export in accounting software-compatible formats, preview before export, validate data integrity, and manage storage through bulk operations.
+  </epic-goal>
+
+  <epic-description>
+    <existing-system-context>
+      <current-functionality>
+        - Receipt capture with OCR extraction of 4 fields (merchant, date, total, tax)
+        - Batch capture mode for processing multiple receipts
+        - Confidence scoring and inline field editing
+        - Merchant name normalization
+        - Notes field for additional context
+        - Local SQLite/RxDB storage with offline-first architecture
+      </current-functionality>
+      
+      <technology-stack>
+        - Flutter 3.24+ mobile application
+        - Riverpod 2.4+ state management
+        - RxDB/SQLite for local storage
+        - Material 3 design system
+        - Existing CSVExportService with basic implementation
+      </technology-stack>
+      
+      <integration-points>
+        - ReceiptRepository for querying receipts by date range
+        - ProcessingResult model contains all extractable fields
+        - Existing Receipt model with all necessary data
+        - CSVExportService already exists but needs enhancement
+      </integration-points>
+    </existing-system-context>
+    
+    <enhancement-details>
+      <what-is-being-added>
+        - Date range selection UI with preset options (This Month, Last Month, Custom)
+        - CSV format selection (QuickBooks, Xero, Generic)
+        - Export preview functionality showing first 5 rows
+        - Pre-export validation ensuring data compatibility
+        - Export completion feedback with file location
+      </what-is-being-added>
+      
+      <integration-approach>
+        - Extend existing ReceiptListProvider with date filtering
+        - Enhance CSVExportService with format templates
+        - Create new ExportScreen following established navigation patterns
+        - Use existing ReceiptCard patterns for preview display
+        - Leverage established validation patterns from field editing
+      </integration-approach>
+      
+      <success-criteria>
+        - Users can export receipts for specific date ranges
+        - CSV files pass QuickBooks/Xero validators (98%+ success rate)
+        - Export completes in &lt;3s for 100 receipts
+        - Clear feedback on validation issues before export
+        - Files downloadable to device storage
+      </success-criteria>
+    </enhancement-details>
+  </epic-description>
+
+  <stories>
+    <story number="9" priority="P0">
+      <title>Date Range Selection for Export</title>
+      <description>
+        As Sarah (Restaurant Owner), I want to select date ranges for export, 
+        so I can match my accounting periods.
+        
+        - Calendar picker with preset options (This Month, Last Month, Custom)
+        - Display receipt count for selected range
+        - Persist last selected range for convenience
+      </description>
+      <acceptance-criteria>Calendar picker with preset options</acceptance-criteria>
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="10" priority="P0">
+      <title>CSV Format Options</title>
+      <description>
+        As Linda (Bookkeeper), I want CSV format options,
+        so I can match each client's system.
+        
+        - QuickBooks &amp; Xero templates included
+        - Format selection dropdown/radio buttons
+        - Format persistence in app settings
+      </description>
+      <acceptance-criteria>QuickBooks &amp; Xero templates included</acceptance-criteria>
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="11" priority="P1">
+      <title>Preview CSV Before Export</title>
+      <description>
+        As Mike (Freelance Contractor), I want to preview CSV before export,
+        so I can catch issues.
+        
+        - Show first 5 rows with headers
+        - Display total row count
+        - Highlight any validation warnings
+      </description>
+      <acceptance-criteria>Show first 5 rows with headers</acceptance-criteria>
+      <estimated-effort>2 points</estimated-effort>
+    </story>
+    
+    <story number="12" priority="P0">
+      <title>Export Validation</title>
+      <description>
+        As Sarah, I want export validation,
+        so I know it will import successfully.
+        
+        - Pre-flight validation check with specific warnings
+        - Field format validation (dates, amounts)
+        - Success confirmation with file location
+        - Error handling for edge cases
+      </description>
+      <acceptance-criteria>Pre-flight check with specific warnings</acceptance-criteria>
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="13" priority="P2">
+      <title>Bulk Delete Processed Receipts</title>
+      <description>
+        As Linda (Bookkeeper), I want to bulk delete processed receipts,
+        so storage doesn't fill up.
+        
+        - Multi-select mode in receipt list
+        - Select all/none/date range options
+        - Confirmation dialog with receipt count
+        - Progress indicator for deletion
+      </description>
+      <acceptance-criteria>Multi-select with confirmation</acceptance-criteria>
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+  </stories>
+
+  <compatibility-requirements>
+    <requirement status="required" checked="false">
+      Existing Receipt model and repository APIs remain unchanged
+    </requirement>
+    <requirement status="required" checked="false">
+      No database schema changes required (query existing data)
+    </requirement>
+    <requirement status="required" checked="false">
+      Export screen follows established navigation patterns
+    </requirement>
+    <requirement status="required" checked="false">
+      CSV generation maintains existing field mappings
+    </requirement>
+    <requirement status="required" checked="false">
+      Settings integration uses existing SettingsRepository patterns
+    </requirement>
+  </compatibility-requirements>
+
+  <risk-mitigation>
+    <primary-risk>
+      <description>CSV format incompatibility with QuickBooks/Xero causing import failures</description>
+      <mitigation>Pre-export validation against known format requirements, extensive testing with actual imports</mitigation>
+    </primary-risk>
+    
+    <secondary-risk>
+      <description>Performance degradation when exporting large datasets (1000+ receipts)</description>
+      <mitigation>Implement pagination for preview, streaming CSV generation, progress indicators</mitigation>
+    </secondary-risk>
+    
+    <rollback-plan>
+      Feature is additive with no changes to existing functionality. Can be disabled via feature flag if issues arise. No data migration or schema changes to rollback.
+    </rollback-plan>
+  </risk-mitigation>
+
+  <definition-of-done>
+    <criterion status="pending">All 5 stories completed with acceptance criteria met</criterion>
+    <criterion status="pending">Existing receipt capture and editing functionality verified working</criterion>
+    <criterion status="pending">CSV exports successfully import into QuickBooks and Xero</criterion>
+    <criterion status="pending">Performance target met (&lt;3s for 100 receipts)</criterion>
+    <criterion status="pending">Export feature accessible from receipt list screen</criterion>
+    <criterion status="pending">Settings integration for format preference persistence</criterion>
+    <criterion status="pending">Comprehensive test coverage (unit, widget, integration)</criterion>
+    <criterion status="pending">No regression in existing features</criterion>
+  </definition-of-done>
+
+  <technical-considerations>
+    <existing-patterns>
+      - Use established Riverpod patterns for state management
+      - Follow Material 3 design system for date picker and format selection
+      - Extend existing navigation with go_router patterns
+      - Leverage existing validation patterns from field editing
+    </existing-patterns>
+    
+    <dependencies>
+      - Existing ReceiptRepository with date range query support
+      - CSVExportService requiring enhancement for multiple formats
+      - File system access for saving generated CSV files
+      - Existing app settings infrastructure for preference storage
+    </dependencies>
+    
+    <performance-targets>
+      - Date range query: &lt;200ms for 1000 receipts
+      - CSV generation: &lt;30ms per receipt
+      - Export preview render: &lt;100ms
+      - Total export time: &lt;3s for 100 receipts
+    </performance-targets>
+  </technical-considerations>
+
+  <handoff-to-story-manager>
+    <message>
+      Please develop detailed user stories for this brownfield CSV export epic. Key considerations:
+
+      - This is an enhancement to an existing Flutter receipt capture system
+      - Integration points: ReceiptRepository queries, CSVExportService, Settings persistence
+      - Existing patterns to follow: Riverpod state management, Material 3 UI, go_router navigation
+      - Critical compatibility requirements: QuickBooks/Xero CSV format compliance
+      - Each story must include verification that existing receipt functionality remains intact
+      
+      The epic should maintain system integrity while delivering seamless CSV export functionality with &gt;98% import success rate for accounting software.
+    </message>
+  </handoff-to-story-manager>
+
+  <validation-checklist>
+    <scope-validation>
+      <item checked="true">Epic can be completed in 5 stories (expanded scope per user request)</item>
+      <item checked="true">No architectural documentation required</item>
+      <item checked="true">Enhancement follows existing patterns</item>
+      <item checked="true">Integration complexity is manageable</item>
+    </scope-validation>
+    
+    <risk-assessment>
+      <item checked="true">Risk to existing system is low</item>
+      <item checked="true">Rollback plan is feasible (feature flag)</item>
+      <item checked="true">Testing approach covers existing functionality</item>
+      <item checked="true">Team has sufficient knowledge of integration points</item>
+    </risk-assessment>
+    
+    <completeness-check>
+      <item checked="true">Epic goal is clear and achievable</item>
+      <item checked="true">Stories are properly scoped (3-5 points each)</item>
+      <item checked="true">Success criteria are measurable</item>
+      <item checked="true">Dependencies are identified</item>
+    </completeness-check>
+  </validation-checklist>
+
+  <output-format>
+    POML-formatted brownfield epic document for Receipt Organizer CSV export functionality
+  </output-format>
+</poml>
