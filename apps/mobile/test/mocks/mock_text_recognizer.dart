@@ -79,7 +79,7 @@ class TestOCRData {
   }
   
   /// Create recognized text from list of strings
-  static RecognizedText createRecognizedText(List<String> textLines) {
+  static MockRecognizedText createRecognizedText(List<String> textLines) {
     final lines = textLines.map((text) => _createMockLine(text)).toList();
     
     final block = MockTextBlock();
@@ -91,5 +91,70 @@ class TestOCRData {
     when(recognized.blocks).thenReturn([block]);
     
     return recognized;
+  }
+}
+
+/// Test data factory for merchant normalization tests
+class MerchantTestData {
+  /// Receipt with merchant name that should be normalized
+  static MockRecognizedText receiptWithNormalizableMerchant() {
+    return TestOCRData.createRecognizedText([
+      'MCDONALDS #4521',
+      '123 Main Street',
+      '12/06/2024 14:30',
+      'Big Mac Meal        $10.99',
+      'Medium Fries        $2.50',
+      'Subtotal            $13.49',
+      'Tax                 $1.50',
+      'Total               $14.99',
+    ]);
+  }
+
+  /// Receipt with custom merchant name for testing normalization
+  static MockRecognizedText customMerchantReceipt(String merchantName) {
+    return TestOCRData.createRecognizedText([
+      merchantName,
+      '123 Main Street',
+      '12/06/2024 14:30',
+      'Item                $10.00',
+      'Subtotal            $10.00',
+      'Tax                 $0.80',
+      'Total               $10.80',
+    ]);
+  }
+
+  /// Receipt with clean merchant name (doesn't need normalization)
+  static MockRecognizedText receiptWithCleanMerchant() {
+    return TestOCRData.createRecognizedText([
+      'Target',
+      '456 Elm Street',
+      '12/06/2024 15:45',
+      'Electronics         $99.99',
+      'Subtotal            $99.99',
+      'Tax                 $8.00',
+      'Total               $107.99',
+    ]);
+  }
+
+  /// Receipt with missing merchant for testing edge cases
+  static MockRecognizedText receiptWithMissingMerchant() {
+    return TestOCRData.createRecognizedText([
+      '12/06/2024 16:00',
+      'Item                $15.00',
+      'Subtotal            $15.00',
+      'Tax                 $1.20',
+      'Total               $16.20',
+    ]);
+  }
+
+  /// Receipt with corrupted data for normalization error testing
+  static MockRecognizedText receiptWithCorruptedData() {
+    return TestOCRData.createRecognizedText([
+      '@#$%^&*',  // Corrupted merchant
+      '!@#$%^',
+      '99/99/9999',
+      'ERROR               $?.??',
+      'Total               $?.??',
+    ]);
   }
 }

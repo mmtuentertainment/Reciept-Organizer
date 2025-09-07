@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:google_ml_kit/google_ml_kit.dart' hide RecognizedText;
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/domain/services/merchant_normalization_service.dart';
 import '../mocks/mock_text_recognizer.dart';
@@ -33,7 +34,7 @@ void main() {
     test('should normalize merchant names from OCR extraction', () async {
       // Arrange
       when(mockTextRecognizer.processImage(any))
-          .thenAnswer((_) async => TestOCRData.receiptWithNormalizableMerchant());
+          .thenAnswer((_) async => MerchantTestData.receiptWithNormalizableMerchant());
       
       await ocrService.initialize();
       
@@ -59,7 +60,7 @@ void main() {
       );
       
       when(mockTextRecognizer.processImage(any))
-          .thenAnswer((_) async => TestOCRData.receiptWithNormalizableMerchant());
+          .thenAnswer((_) async => MerchantTestData.receiptWithNormalizableMerchant());
       
       await ocrService.initialize();
       
@@ -80,7 +81,7 @@ void main() {
       );
       
       when(mockTextRecognizer.processImage(any))
-          .thenAnswer((_) async => TestOCRData.receiptWithNormalizableMerchant());
+          .thenAnswer((_) async => MerchantTestData.receiptWithNormalizableMerchant());
       
       await ocrService.initialize();
       
@@ -94,7 +95,7 @@ void main() {
     test('should preserve original value when normalization returns same value', () async {
       // Arrange
       when(mockTextRecognizer.processImage(any))
-          .thenAnswer((_) async => TestOCRData.receiptWithCleanMerchant());
+          .thenAnswer((_) async => MerchantTestData.receiptWithCleanMerchant());
       
       await ocrService.initialize();
       
@@ -119,7 +120,7 @@ void main() {
       for (final testCase in testCases) {
         // Arrange
         when(mockTextRecognizer.processImage(any))
-            .thenAnswer((_) async => TestOCRData.customMerchantReceipt(testCase.$1));
+            .thenAnswer((_) async => MerchantTestData.customMerchantReceipt(testCase.$1));
         
         // Act
         final result = await ocrService.processReceipt(mockImageData);
@@ -134,7 +135,7 @@ void main() {
     test('should maintain performance with normalization enabled', () async {
       // Arrange
       when(mockTextRecognizer.processImage(any))
-          .thenAnswer((_) async => TestOCRData.receiptWithNormalizableMerchant());
+          .thenAnswer((_) async => MerchantTestData.receiptWithNormalizableMerchant());
       
       await ocrService.initialize();
       
@@ -170,52 +171,3 @@ void main() {
   });
 }
 
-// Extension to TestOCRData for merchant normalization test scenarios
-extension on TestOCRData {
-  static RecognizedText receiptWithNormalizableMerchant() {
-    return createRecognizedText([
-      'MCDONALDS #4521',
-      '123 Main Street',
-      'City, State 12345',
-      '',
-      'Date: 12/06/2024  Time: 14:32',
-      '',
-      'Order #1234',
-      'Cashier: John',
-      '',
-      'Big Mac Meal      \$9.99',
-      'Large Fries       \$2.99',
-      'Large Coke        \$1.59',
-      '',
-      'Subtotal         \$14.57',
-      'Tax               \$0.42',
-      'Total            \$14.99',
-      '',
-      'Thank you for your visit!',
-    ]);
-  }
-
-  static RecognizedText receiptWithCleanMerchant() {
-    return createRecognizedText([
-      'Target',
-      '456 Shopping Blvd',
-      'Mall City, ST 67890',
-      '',
-      'Date: 12/06/2024',
-      '',
-      'Items: 3',
-      'Total: \$25.99',
-    ]);
-  }
-
-  static RecognizedText customMerchantReceipt(String merchantName) {
-    return createRecognizedText([
-      merchantName,
-      '789 Store Ave',
-      'City, State 54321',
-      '',
-      'Date: 12/06/2024',
-      'Total: \$35.00',
-    ]);
-  }
-}

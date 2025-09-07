@@ -29,9 +29,10 @@ class CaptureFailedState extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
           // Failure icon
           Container(
             width: 80,
@@ -167,6 +168,7 @@ class CaptureFailedState extends StatelessWidget {
             ),
           ],
         ],
+        ),
       ),
     );
   }

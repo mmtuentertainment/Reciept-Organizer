@@ -92,6 +92,15 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
     return success;
   }
 
+  Future<bool> updateDateRangePreset(String preset) async {
+    if (_repository == null) return false;
+
+    final success = await _repository!.updateSetting('dateRangePreset', preset);
+    if (success) {
+      state = state.copyWith(dateRangePreset: preset);
+    }
+    return success;
+  }
   Future<bool> resetSettings() async {
     if (_repository == null) return false;
 

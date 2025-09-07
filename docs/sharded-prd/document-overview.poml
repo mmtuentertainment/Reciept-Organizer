@@ -1,0 +1,12 @@
+<document>
+  <meta>
+    <title>Document Overview</title>
+    <type>prd-section</type>
+    <version>1.0</version>
+  </meta>
+  
+  <section id="document-overview">
+    <h1>Document Overview</h1>
+    <p>Comprehensive product requirements for a pragmatic receipt capture and export tool targeting mom-and-pop businesses.</p>
+  </section>
+</document>

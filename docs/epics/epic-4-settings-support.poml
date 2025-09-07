@@ -1,0 +1,295 @@
+<poml>
+  <role>Product Manager creating brownfield epic for Receipt Organizer settings functionality</role>
+  <task>Create focused epic for Settings & Support features including preferences, storage monitoring, and data export</task>
+  
+  <metadata>
+    <version>1.0</version>
+    <date>2025-01-12</date>
+    <status>Ready for Development</status>
+    <author>John (Product Manager)</author>
+    <epic-type>Brownfield Enhancement</epic-type>
+  </metadata>
+
+  <epic-header>
+    <title>Settings &amp; Support - Brownfield Enhancement</title>
+    <epic-number>4</epic-number>
+    <priority>P2</priority>
+  </epic-header>
+
+  <epic-goal>
+    Enable users to customize application behavior, monitor storage usage, and export their data for backup, enhancing user control and preventing data lock-in while maintaining the offline-first architecture.
+  </epic-goal>
+
+  <epic-description>
+    <vision>
+      Empower users with control over their Receipt Organizer experience through customizable settings, storage management, and data portability, ensuring they are never locked into the app while optimizing their personal workflow.
+    </vision>
+    
+    <scope>
+      - Application preferences and default settings
+      - Storage usage monitoring and management
+      - OCR confidence threshold customization
+      - Complete data export for backup and portability
+    </scope>
+    
+    <success-metrics>
+      - Settings persistence: 100% reliability
+      - Storage calculation: &lt;1s for 1000 receipts
+      - Threshold adjustment: Immediate effect on new scans
+      - Data export: Complete JSON with all receipt data
+      - User satisfaction: Reduced support requests by 30%
+    </success-metrics>
+  </epic-description>
+
+  <user-personas>
+    <persona name="Mike" type="Freelance Contractor">
+      <pain-points>
+        - Repeatedly selects same export format
+        - Unsure when phone storage getting full
+        - Wants his data backed up regularly
+      </pain-points>
+    </persona>
+    
+    <persona name="Sarah" type="Restaurant Owner">
+      <pain-points>
+        - Device storage fills up quickly
+        - Doesn't know what's using space
+        - Worried about losing receipt data
+      </pain-points>
+    </persona>
+    
+    <persona name="Linda" type="Bookkeeper">
+      <pain-points>
+        - Needs to tune OCR for her workflow
+        - Some clients need higher accuracy
+        - Wants full data exports for backup
+      </pain-points>
+    </persona>
+  </user-personas>
+
+  <existing-system-context>
+      <current-functionality>
+        - Basic settings infrastructure exists (SettingsRepository from Story 2.2)
+        - Merchant normalization toggle already implemented
+        - Local SQLite/RxDB storage with offline-first design
+        - CSV export functionality for receipts
+        - Confidence scoring system with fixed thresholds
+        - Material 3 design system with established UI patterns
+      </current-functionality>
+      
+      <technology-stack>
+        - Flutter 3.24+ with Material 3 design
+        - Riverpod 2.4+ for state management
+        - SQLite via sqflite for persistence
+        - Existing SettingsRepository pattern
+        - Path provider for file system access
+        - Share Plus for file export
+      </technology-stack>
+      
+      <integration-points>
+        - SettingsRepository for preference persistence
+        - CSVExportService for data export infrastructure
+        - OCRService for confidence threshold configuration
+        - StorageService/path_provider for usage calculation
+        - Share Plus for export file sharing
+      </integration-points>
+    </existing-system-context>
+    
+    <enhancement-details>
+      <what-is-being-added>
+        - Comprehensive settings screen with expandable sections
+        - Default export format preference (QuickBooks/Xero/Generic)
+        - Visual storage usage indicator with cleanup options
+        - Adjustable OCR confidence thresholds with impact preview
+        - Full data export in JSON format for backup/portability
+      </what-is-being-added>
+      
+      <integration-approach>
+        - Extend existing SettingsRepository with new preference keys
+        - Create SettingsScreen following Material 3 patterns
+        - Use established Riverpod patterns for state management
+        - Leverage existing export infrastructure for JSON generation
+        - Integrate with OCRService configuration for dynamic thresholds
+      </integration-approach>
+      
+      <success-criteria>
+        - Settings persist correctly across app restarts
+        - Storage usage calculation completes in &lt;1s for 1000 receipts
+        - Export format preference automatically applies to all exports
+        - Confidence threshold changes affect new scans immediately
+        - JSON export includes all receipt data with optional image encoding
+      </success-criteria>
+    </enhancement-details>
+  </epic-description>
+
+  <stories>
+    <story number="14" priority="P2" status="pending">
+      <title>Default Export Format Setting</title>
+      <description>
+        As Mike (Freelance Contractor), I want to set my default export format, 
+        so I don't have to select it every time.
+        
+        - Add export format setting to SettingsRepository
+        - Create settings UI section for export preferences
+        - Persist selection (QuickBooks/Xero/Generic)
+        - Apply default on export screen initialization
+      </description>
+      <acceptance-criteria>Sticky preference in settings</acceptance-criteria>
+      <estimated-effort>2 points</estimated-effort>
+    </story>
+    
+    <story number="15" priority="P2" status="pending">
+      <title>Storage Usage Monitor</title>
+      <description>
+        As Sarah (Restaurant Owner), I want to see my storage usage, 
+        so I know when to clean up old receipts.
+        
+        - Calculate total storage (images + database)
+        - Create visual storage indicator (progress bar)
+        - Add "Clean up old receipts" option
+        - Show breakdown by receipt age
+      </description>
+      <acceptance-criteria>Visual indicator with management options</acceptance-criteria>
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="16" priority="P3" status="pending">
+      <title>OCR Confidence Threshold Adjustment</title>
+      <description>
+        As Linda (Bookkeeper), I want to adjust OCR confidence thresholds, 
+        so I can balance accuracy vs speed for my workflow.
+        
+        - Create slider UI for confidence threshold (50-90%)
+        - Show impact preview (estimated fields needing review)
+        - Update OCRService to use dynamic threshold
+        - Persist threshold preference
+      </description>
+      <acceptance-criteria>Slider with preview of impact</acceptance-criteria>
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+    
+    <story number="17" priority="P3" status="pending">
+      <title>Full Data Export</title>
+      <description>
+        As Mike, I want to export all my data for backup, 
+        so I'm not locked into the app.
+        
+        - Create JSON export format including all receipt data
+        - Include Base64 encoded images (optional)
+        - Generate export timestamp and metadata
+        - Use existing share functionality for file export
+      </description>
+      <acceptance-criteria>Full JSON export option</acceptance-criteria>
+      <estimated-effort>3 points</estimated-effort>
+    </story>
+  </stories>
+
+  <compatibility-requirements>
+    <requirement status="required" checked="true">
+      Existing SettingsRepository API extended, not changed
+    </requirement>
+    <requirement status="required" checked="true">
+      No database schema changes required
+    </requirement>
+    <requirement status="required" checked="true">
+      UI follows established Material 3 patterns
+    </requirement>
+    <requirement status="required" checked="true">
+      Performance targets maintained (&lt;100ms UI response)
+    </requirement>
+    <requirement status="required" checked="true">
+      Offline-first architecture preserved
+    </requirement>
+  </compatibility-requirements>
+
+  <risk-mitigation>
+    <primary-risk>
+      <description>Storage calculation performance impact on large datasets (1000+ receipts)</description>
+      <mitigation>Calculate storage asynchronously with caching, update only on demand, show progress indicator</mitigation>
+    </primary-risk>
+    
+    <secondary-risk>
+      <description>JSON export file size with embedded images could exceed device storage</description>
+      <mitigation>Make image inclusion optional, compress images, warn user of estimated size</mitigation>
+    </secondary-risk>
+    
+    <rollback-plan>
+      Settings are additive features that can be disabled via feature flags without affecting core functionality. All new preferences have sensible defaults that maintain current behavior.
+    </rollback-plan>
+  </risk-mitigation>
+
+  <definition-of-done>
+    <criterion status="pending">All 4 stories completed with acceptance criteria met</criterion>
+    <criterion status="pending">Settings persist correctly across app lifecycle</criterion>
+    <criterion status="pending">Existing receipt functionality unaffected</criterion>
+    <criterion status="pending">Performance targets met (storage calc &lt;1s, UI &lt;100ms)</criterion>
+    <criterion status="pending">Settings accessible from main navigation</criterion>
+    <criterion status="pending">Comprehensive test coverage for preference persistence</criterion>
+    <criterion status="pending">User can successfully export and re-import their data</criterion>
+    <criterion status="pending">No regression in existing features</criterion>
+  </definition-of-done>
+
+  <technical-considerations>
+    <existing-patterns>
+      - Use established Riverpod AsyncNotifier for settings state
+      - Follow Material 3 ListTile patterns for settings UI
+      - Extend existing navigation drawer with settings option
+      - Leverage existing validation patterns for threshold limits
+    </existing-patterns>
+    
+    <dependencies>
+      - Existing SettingsRepository with SharedPreferences
+      - Path provider package for storage calculations
+      - File picker for potential import functionality
+      - Share Plus package for export file sharing
+    </dependencies>
+    
+    <performance-targets>
+      - Settings screen load: &lt;100ms
+      - Storage calculation: &lt;1s for 1000 receipts
+      - Preference persistence: &lt;50ms
+      - JSON export generation: &lt;10ms per receipt
+    </performance-targets>
+  </technical-considerations>
+
+  <handoff-to-story-manager>
+    <message>
+      Please develop detailed user stories for this brownfield Settings & Support epic. Key considerations:
+
+      - This is an enhancement to an existing Flutter receipt capture system
+      - Integration points: SettingsRepository, CSVExportService, OCRService, StorageService
+      - Existing patterns to follow: Riverpod state management, Material 3 settings UI, existing preference persistence
+      - Critical compatibility requirements: All settings must be optional with sensible defaults
+      - Each story must include verification that existing functionality remains intact
+      
+      The epic should maintain system integrity while delivering user control features that enhance the overall experience without compromising the offline-first architecture.
+    </message>
+  </handoff-to-story-manager>
+
+  <validation-checklist>
+    <scope-validation>
+      <item checked="true">Epic can be completed in 4 small stories (11 total points)</item>
+      <item checked="true">No architectural documentation required</item>
+      <item checked="true">Enhancement follows existing patterns</item>
+      <item checked="true">Integration complexity is minimal</item>
+    </scope-validation>
+    
+    <risk-assessment>
+      <item checked="true">Risk to existing system is low</item>
+      <item checked="true">Rollback plan is feasible (feature flags)</item>
+      <item checked="true">Testing approach covers existing functionality</item>
+      <item checked="true">Team familiar with settings implementation</item>
+    </risk-assessment>
+    
+    <completeness-check>
+      <item checked="true">Epic goal is clear and achievable</item>
+      <item checked="true">Stories are properly scoped (2-3 points each)</item>
+      <item checked="true">Success criteria are measurable</item>
+      <item checked="true">Dependencies are identified</item>
+    </completeness-check>
+  </validation-checklist>
+
+  <output-format>
+    POML-formatted brownfield epic document for Receipt Organizer Settings & Support functionality
+  </output-format>
+</poml>

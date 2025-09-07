@@ -71,6 +71,7 @@ void main() {
     test('should handle null notes', () {
       // Given
       final receipt = Receipt(
+        id: 'test-receipt-1',
         imageUri: 'path/to/image.jpg',
       );
 
@@ -89,11 +90,13 @@ void main() {
     test('should handle empty notes differently from null', () {
       // Given
       final receiptWithEmpty = Receipt(
+        id: 'test-receipt-4',
         imageUri: 'path/to/image.jpg',
         notes: '',
       );
       
       final receiptWithNull = Receipt(
+        id: 'test-receipt-5',
         imageUri: 'path/to/image.jpg',
         notes: null,
       );
@@ -107,6 +110,7 @@ void main() {
     test('should preserve notes through multiple updates', () {
       // Given
       var receipt = Receipt(
+        id: 'test-receipt-6',
         imageUri: 'path/to/image.jpg',
         notes: 'Original notes',
       );
@@ -131,13 +135,32 @@ void main() {
       // This is a placeholder test that would require CSVExportService integration
       // Given
       final receipt = Receipt(
+        id: 'test-receipt-7',
         imageUri: 'path/to/image.jpg',
         notes: 'Important context for accounting',
         ocrResults: ProcessingResult(
-          merchant: FieldData(value: 'Test Store', confidence: 95),
-          date: FieldData(value: '2024-01-15', confidence: 98),
-          total: FieldData(value: 100.50, confidence: 92),
-          tax: FieldData(value: 8.50, confidence: 90),
+          merchant: FieldData(
+            value: 'Test Store', 
+            confidence: 95,
+            originalText: 'Test Store',
+          ),
+          date: FieldData(
+            value: '2024-01-15', 
+            confidence: 98,
+            originalText: '2024-01-15',
+          ),
+          total: FieldData(
+            value: 100.50, 
+            confidence: 92,
+            originalText: '\$100.50',
+          ),
+          tax: FieldData(
+            value: 8.50, 
+            confidence: 90,
+            originalText: '\$8.50',
+          ),
+          overallConfidence: 93.75,
+          processingDurationMs: 1500,
         ),
       );
 

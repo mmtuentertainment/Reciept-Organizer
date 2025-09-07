@@ -1,0 +1,62 @@
+schema: 1
+story: '3.9'
+gate: CONCERNS
+status_reason: 'Two high-risk areas require attention: query performance optimization and comprehensive date format handling.'
+reviewer: 'Quinn'
+updated: '2025-01-07T15:30:00Z'
+top_issues:
+  - id: 'PERF-001'
+    severity: high
+    finding: 'No database index on receiptDate field for date range queries'
+    suggested_action: 'Add index on receiptDate column before deployment to ensure <200ms query performance'
+  - id: 'TEST-001'
+    severity: medium
+    finding: 'Performance tests not yet implemented for 1000+ receipt scenarios'
+    suggested_action: 'Add performance benchmarks to CI pipeline with realistic data volumes'
+  - id: 'ARCH-001'
+    severity: medium
+    finding: 'Date parsing logic scattered between repository and service layers'
+    suggested_action: 'Consolidate date parsing using existing CSVExportService utilities'
+waiver: { active: false }
+
+# Additional Review Context
+risk_summary:
+  totals:
+    critical: 0
+    high: 2
+    medium: 2
+    low: 7
+  highest:
+    id: PERF-001
+    score: 6
+    title: 'Query performance with large datasets'
+  recommendations:
+    must_fix:
+      - 'Add database index on receiptDate before deployment'
+      - 'Implement comprehensive date format testing'
+    monitor:
+      - 'Query response times (target <200ms)'
+      - 'Date parsing error rates'
+      - 'Memory usage during large queries'
+
+test_design:
+  scenarios_total: 32
+  by_level:
+    unit: 18
+    widget: 5
+    integration: 10
+    e2e: 4
+    performance: 2
+  by_priority:
+    p0: 12
+    p1: 14
+    p2: 6
+  coverage_gaps: []
+  risk_coverage:
+    high: ['PERF-001', 'DATA-001']
+    medium: ['TECH-001', 'TECH-002', 'DATA-002']
+
+# Assessment References
+assessments:
+  risk_profile: 'docs/qa/assessments/3.9-risk-20250107.md'
+  test_design: 'docs/qa/assessments/3.9-test-design-20250107.md'

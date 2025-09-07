@@ -1,0 +1,28 @@
+<document>
+  <meta>
+    <title>Product Requirements Document - Receipt Organizer MVP</title>
+    <type>prd-index</type>
+    <version>1.0</version>
+  </meta>
+  
+  <section id="table-of-contents">
+    <h1>Product Requirements Document - Receipt Organizer MVP</h1>
+    
+    <toc>
+      <h2>Table of Contents</h2>
+      <nav>
+        <link href="#document-overview">Document Overview</link>
+        <link href="#executive-summary">Executive Summary</link>
+        <link href="#goals">Goals</link>
+        <link href="#requirements">Requirements</link>
+        <link href="#user-personas">User Personas</link>
+        <link href="#epics">Epics</link>
+        <link href="#acceptance-criteria">Acceptance Criteria</link>
+        <link href="#competitive-analysis">Competitive Analysis</link>
+        <link href="#release-criteria">Release Criteria</link>
+        <link href="#appendices">Appendices</link>
+        <link href="#document-control">Document Control</link>
+      </nav>
+    </toc>
+  </section>
+</document>

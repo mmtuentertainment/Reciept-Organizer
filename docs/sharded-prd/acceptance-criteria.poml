@@ -1,0 +1,91 @@
+<document>
+  <meta>
+    <title>Acceptance Criteria</title>
+    <type>prd-section</type>
+    <version>1.0</version>
+  </meta>
+  
+  <section id="acceptance-criteria">
+    <h1>Acceptance Criteria</h1>
+    
+    <section id="feature-level-criteria">
+      <h2>Feature-Level Criteria</h2>
+      
+      <section id="camera-capture">
+        <h3>Camera Capture</h3>
+        <criteria priority="required">
+          <item>Auto-focuses on receipt within 2s</item>
+          <item>Edge detection highlights receipt boundaries</item>
+          <item>Manual adjustment handles visible and responsive</item>
+          <item>Capture button provides haptic feedback</item>
+          <item>Processing indicator shows during OCR</item>
+        </criteria>
+      </section>
+      
+      <section id="ocr-extraction">
+        <h3>OCR Extraction</h3>
+        <criteria priority="required">
+          <item>Merchant name extracted with 90%+ accuracy on clear photos</item>
+          <item>Date extracted with 95%+ accuracy</item>
+          <item>Total amount extracted with 95%+ accuracy</item>
+          <item>Tax amount extracted with 85%+ accuracy</item>
+          <item>Confidence scores displayed as percentages</item>
+        </criteria>
+      </section>
+      
+      <section id="field-editing">
+        <h3>Field Editing</h3>
+        <criteria priority="required">
+          <item>Tap field to focus with appropriate keyboard</item>
+          <item>Real-time validation (e.g., date format)</item>
+          <item>Auto-save on field blur</item>
+          <item>Visual confirmation of save</item>
+        </criteria>
+      </section>
+      
+      <section id="csv-export">
+        <h3>CSV Export</h3>
+        <criteria priority="required">
+          <item>QuickBooks format passes their validator</item>
+          <item>Xero format passes their validator</item>
+          <item>Export completes in &lt;3s for 100 receipts</item>
+          <item>File downloadable to device storage</item>
+        </criteria>
+      </section>
+    </section>
+    
+    <section id="system-level-criteria">
+      <h2>System-Level Criteria</h2>
+      
+      <section id="performance">
+        <h3>Performance</h3>
+        <criteria priority="required">
+          <item>Cold start to camera: &lt;3s</item>
+          <item>Memory usage: &lt;50MB average, &lt;75MB peak</item>
+          <item>Battery drain: &lt;5% for 30min session</item>
+          <item>Storage: &lt;10MB + photos</item>
+        </criteria>
+      </section>
+      
+      <section id="reliability">
+        <h3>Reliability</h3>
+        <criteria priority="required">
+          <item>Crash rate: &lt;0.5% of sessions</item>
+          <item>Data integrity: Zero corruption in 10,000 operations</item>
+          <item>Offline mode: All features functional</item>
+          <item>Error messages: User-actionable</item>
+        </criteria>
+      </section>
+      
+      <section id="compatibility">
+        <h3>Compatibility</h3>
+        <criteria priority="required">
+          <item>iOS: iPhone 12+ with iOS 16+</item>
+          <item>Android: Pixel 5+ with Android 13+</item>
+          <item>Tablets: Graceful scaling (not optimized)</item>
+          <item>Orientation: Portrait primary, landscape functional</item>
+        </criteria>
+      </section>
+    </section>
+  </section>
+</document>

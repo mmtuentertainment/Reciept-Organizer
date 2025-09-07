@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/data/models/edge_detection_result.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';

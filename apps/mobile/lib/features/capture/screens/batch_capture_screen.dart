@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +22,7 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
   late AnimationController _autoAdvanceController;
   bool _autoAdvanceEnabled = true;
   int _autoAdvanceCountdown = 0;
+  Timer? _countdownTimer;
 
   @override
   void initState() {
@@ -44,6 +47,7 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     _flashController.dispose();
     _thumbnailController.dispose();
     _autoAdvanceController.dispose();
@@ -84,7 +88,10 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
     }
   }
 
-  void _startAutoAdvanceCountdown() async {
+  void _startAutoAdvanceCountdown() {
+    // Cancel any existing timer
+    _countdownTimer?.cancel();
+    
     setState(() {
       _autoAdvanceCountdown = 3;
     });
@@ -92,30 +99,30 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
     _autoAdvanceController.reset();
     _autoAdvanceController.forward();
     
-    // Use async/await pattern for cleaner countdown logic
-    for (int countdown = 3; countdown > 0; countdown--) {
-      if (!mounted || !_autoAdvanceEnabled) break;
-      
-      setState(() {
-        _autoAdvanceCountdown = countdown;
-      });
-      
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
-      // Auto-advance on final countdown
-      if (countdown == 1 && mounted && _autoAdvanceEnabled) {
-        _captureReceipt();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted || !_autoAdvanceEnabled) {
+        timer.cancel();
+        return;
       }
-    }
-    
-    if (mounted) {
+      
       setState(() {
-        _autoAdvanceCountdown = 0;
+        _autoAdvanceCountdown--;
       });
-    }
+      
+      if (_autoAdvanceCountdown <= 0) {
+        timer.cancel();
+        if (mounted && _autoAdvanceEnabled) {
+          _captureReceipt();
+        }
+        setState(() {
+          _autoAdvanceCountdown = 0;
+        });
+      }
+    });
   }
 
   void _cancelAutoAdvance() {
+    _countdownTimer?.cancel();
     setState(() {
       _autoAdvanceEnabled = false;
       _autoAdvanceCountdown = 0;
