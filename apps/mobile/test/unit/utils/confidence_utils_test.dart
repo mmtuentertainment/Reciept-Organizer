@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:receipt_organizer/core/models/confidence_level.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 
 void main() {

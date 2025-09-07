@@ -1,0 +1,338 @@
+```poml
+risk_profile:
+  story_id: "2.2"
+  title: "Merchant Name Normalization"
+  date: 2025-09-06
+  reviewer: "Quinn (Test Architect)"
+  epic: 2
+  
+  summary:
+    total_risks: 14
+    critical_risks: 0
+    high_risks: 4
+    medium_risks: 5
+    low_risks: 5
+    risk_score: 25
+    max_score: 100
+    assessment: "MODERATE - Story presents manageable technical risks requiring standard mitigation strategies"
+    
+high_risks:
+  - id: DATA-001
+    category: Data
+    title: "Original Merchant Value Loss"
+    probability: 3  # High - Common during normalization
+    impact: 2      # Medium - Recoverable but impacts audit trail
+    score: 6
+    description: |
+      Normalization could permanently overwrite original OCR values if not properly 
+      preserved, losing audit trail and rollback capability required by AC.
+    mitigation:
+      - "Ensure ProcessingResult.merchant.originalValue is always preserved"
+      - "Implement database schema to store both original and normalized values"
+      - "Add validation to prevent original value overwrites"
+      - "Create automated tests verifying original value preservation"
+    testing_focus:
+      - "Original value preservation across all normalization patterns"
+      - "Database integrity checks for dual value storage"
+      - "Rollback capability from normalized to original"
+      
+  - id: PERF-001
+    category: Performance  
+    title: "OCR Processing Time Impact"
+    probability: 2  # Medium - Depends on implementation
+    impact: 3      # High - Violates <5s requirement
+    score: 6
+    description: |
+      Complex normalization rules or inefficient pattern matching could push OCR 
+      processing time beyond the 5-second target, degrading user experience.
+    mitigation:
+      - "Use efficient string operations over regex where possible"
+      - "Implement caching for common merchant patterns"
+      - "Lazy load merchant dictionary on first use"
+      - "Add performance benchmarks to CI pipeline"
+    testing_focus:
+      - "End-to-end OCR timing with normalization enabled"
+      - "Performance testing with various receipt volumes"
+      - "Memory usage during dictionary loading"
+      
+  - id: FUNC-001
+    category: Functional
+    title: "Over-Normalization Breaking Valid Names"
+    probability: 3  # High - Common edge cases
+    impact: 2      # Medium - Incorrect data but recoverable
+    score: 6
+    description: |
+      Aggressive normalization patterns might incorrectly modify valid merchant 
+      names, e.g., "7-Eleven" becoming "Seven-Eleven" or "H&M" becoming "H and M".
+    mitigation:
+      - "Create comprehensive exception list for special merchant names"
+      - "Implement confidence-based normalization (skip low-confidence changes)"
+      - "Allow user to report incorrect normalizations"
+      - "Regular review and update of normalization rules"
+    testing_focus:
+      - "Edge case merchant names (numbers, special characters)"
+      - "International merchant name handling"
+      - "User override functionality"
+      
+  - id: INTG-001
+    category: Integration
+    title: "CSV Export Compatibility"
+    probability: 2  # Medium - Depends on accounting software
+    impact: 3      # High - Could break imports
+    score: 6
+    description: |
+      Normalized merchant names might not match expected values in QuickBooks/Xero,
+      causing import failures or vendor matching issues.
+    mitigation:
+      - "Research common accounting software merchant name requirements"
+      - "Add export option to use original vs normalized names"
+      - "Test CSV imports with major accounting platforms"
+      - "Document normalization behavior for users"
+    testing_focus:
+      - "CSV export with normalized names"
+      - "Accounting software import testing"
+      - "Vendor matching in target systems"
+
+medium_risks:
+  - id: FUNC-002
+    category: Functional
+    title: "Inconsistent Normalization Results"
+    probability: 2
+    impact: 2
+    score: 4
+    description: |
+      Same merchant might normalize differently based on OCR quality or 
+      formatting variations, creating inconsistent data.
+    mitigation:
+      - "Implement fuzzy matching for similar patterns"
+      - "Create normalization confidence scoring"
+      - "Log normalization decisions for analysis"
+      
+  - id: UX-001
+    category: User_Experience
+    title: "User Confusion About Changes"
+    probability: 2
+    impact: 2
+    score: 4
+    description: |
+      Users might not understand why merchant names changed automatically,
+      especially if normalization is aggressive.
+    mitigation:
+      - "Clear visual indicators for normalized fields"
+      - "Tooltip showing original value"
+      - "First-time user education about feature"
+      
+  - id: TECH-001
+    category: Technical
+    title: "Feature Flag Integration Complexity"
+    probability: 2
+    impact: 2
+    score: 4
+    description: |
+      Feature flag must correctly disable all normalization paths without
+      breaking existing OCR workflow.
+    mitigation:
+      - "Comprehensive testing with flag on/off"
+      - "Ensure clean code paths for both states"
+      - "Monitor feature flag performance impact"
+      
+  - id: DATA-002
+    category: Data
+    title: "Merchant Dictionary Maintenance"
+    probability: 3
+    impact: 1
+    score: 3
+    description: |
+      Merchant dictionary will require regular updates as new vendors appear
+      and patterns change.
+    mitigation:
+      - "Establish update process for dictionary"
+      - "Track unknown merchant patterns"
+      - "Consider crowd-sourced improvements"
+      
+  - id: TEST-001
+    category: Testing
+    title: "Test Data Coverage"
+    probability: 2
+    impact: 2
+    score: 4
+    description: |
+      Comprehensive testing requires diverse receipt samples from various
+      merchants with different formatting styles.
+    mitigation:
+      - "Build extensive test receipt dataset"
+      - "Include international merchant names"
+      - "Regular test data updates"
+
+low_risks:
+  - id: TECH-002
+    category: Technical
+    title: "Service Initialization Order"
+    probability: 1
+    impact: 2
+    score: 2
+    description: "MerchantNormalizationService must initialize before OCR processing"
+    
+  - id: PERF-002
+    category: Performance
+    title: "Memory Usage from Dictionary"
+    probability: 1
+    impact: 2
+    score: 2
+    description: "Large merchant dictionary could increase memory footprint"
+    
+  - id: SEC-001
+    category: Security
+    title: "Regex Pattern Injection"
+    probability: 1
+    impact: 2
+    score: 2
+    description: "Malformed patterns could cause regex DoS if user-configurable"
+    
+  - id: OPS-001
+    category: Operational
+    title: "Settings Migration"
+    probability: 1
+    impact: 1
+    score: 1
+    description: "Adding new settings requires database migration"
+    
+  - id: BUS-001
+    category: Business
+    title: "User Preference Conflicts"
+    probability: 1
+    impact: 2
+    score: 2
+    description: "Some users may prefer original formatting for their records"
+
+risk_matrix:
+  by_category:
+    Data: { high: 1, medium: 1, low: 0, total: 2 }
+    Performance: { high: 1, medium: 0, low: 1, total: 2 }
+    Functional: { high: 1, medium: 1, low: 0, total: 2 }
+    Integration: { high: 1, medium: 0, low: 0, total: 1 }
+    User_Experience: { high: 0, medium: 1, low: 0, total: 1 }
+    Technical: { high: 0, medium: 1, low: 1, total: 2 }
+    Testing: { high: 0, medium: 1, low: 0, total: 1 }
+    Security: { high: 0, medium: 0, low: 1, total: 1 }
+    Operational: { high: 0, medium: 0, low: 1, total: 1 }
+    Business: { high: 0, medium: 0, low: 1, total: 1 }
+    
+  by_component:
+    MerchantNormalizationService: 5
+    OcrService_Integration: 3
+    UI_Components: 2
+    Database_Storage: 2
+    CSV_Export: 1
+    Settings_Management: 1
+
+testing_strategy:
+  priority_1:
+    focus: "High Risk Mitigation (Score 6)"
+    tests:
+      - name: "Original Value Preservation"
+        covers: DATA-001
+        approach: |
+          - Test all normalization patterns preserve originalValue
+          - Verify database stores both values correctly
+          - Test rollback from normalized to original
+          - Edge cases with special characters and encodings
+          
+      - name: "Performance Regression Suite"
+        covers: PERF-001
+        approach: |
+          - Baseline OCR timing without normalization
+          - Measure impact of normalization on processing time
+          - Test with batch processing (10+ receipts)
+          - Profile memory usage during dictionary operations
+          
+      - name: "Normalization Accuracy Testing"
+        covers: FUNC-001
+        approach: |
+          - Test known problematic merchant names
+          - Verify exception list handling
+          - International merchant name preservation
+          - Special character handling (TM, ®, etc.)
+          
+      - name: "CSV Export Compatibility"
+        covers: INTG-001
+        approach: |
+          - Export normalized data to CSV
+          - Import into QuickBooks test account
+          - Import into Xero test account
+          - Verify vendor matching behavior
+          
+  priority_2:
+    focus: "Medium Risk Coverage (Score 3-4)"
+    tests:
+      - name: "Consistency Testing"
+        covers: FUNC-002
+        approach: "Test same merchant with OCR quality variations"
+        
+      - name: "User Experience Validation"
+        covers: UX-001
+        approach: "Usability testing of normalization indicators"
+        
+      - name: "Feature Flag Testing"
+        covers: TECH-001
+        approach: "Full workflow with flag enabled/disabled"
+        
+  priority_3:
+    focus: "Low Risk Validation (Score 1-2)"
+    tests:
+      - "Standard unit tests for all components"
+      - "Basic integration testing"
+      - "Security input validation"
+      - "Memory profiling"
+
+acceptance_criteria:
+  must_fix:
+    - "All high-risk items must have mitigation implemented"
+    - "Original value preservation must be guaranteed"
+    - "Performance must stay within 5-second target"
+    - "No data loss under any normalization scenario"
+    
+  can_deploy_with_mitigation:
+    - "Medium risks with monitoring in place"
+    - "Feature flag for quick disable if issues arise"
+    - "Documented known limitations"
+    
+  monitoring:
+    - metric: "Normalization processing time"
+      threshold: "<50ms per merchant"
+      
+    - metric: "Normalization accuracy"
+      threshold: ">95% user acceptance"
+      
+    - metric: "Original value preservation"
+      threshold: "100% - no data loss"
+      
+    - metric: "CSV export success rate"
+      threshold: ">99% with normalized names"
+
+recommendations:
+  immediate_actions:
+    - "Design robust original value preservation mechanism"
+    - "Create comprehensive merchant test dataset"
+    - "Benchmark current OCR performance for baseline"
+    - "Research accounting software merchant requirements"
+    
+  development_focus:
+    - "Efficient string processing algorithms"
+    - "Comprehensive exception handling"
+    - "Clear user feedback mechanisms"
+    - "Extensive unit test coverage"
+    
+  quality_gate:
+    status: "READY"
+    rationale: |
+      Moderate risk profile with clear mitigation paths. No critical risks identified.
+      Story can proceed with standard risk management practices.
+
+review_triggers:
+  - "Performance benchmarks exceed targets"
+  - "User reports of incorrect normalizations"
+  - "CSV import failures in accounting software"
+  - "New merchant patterns discovered"
+  - "Feature flag issues in production"
+```

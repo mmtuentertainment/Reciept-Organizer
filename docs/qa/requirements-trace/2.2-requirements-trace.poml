@@ -1,0 +1,243 @@
+requirements_trace:
+  story_id: "2.2"
+  story_title: "Merchant Name Normalization"
+  trace_version: "1.0"
+  created_date: "2025-09-06"
+  created_by: "QA Agent"
+  
+  story_statement_trace:
+    requirement: "As Mike (Freelance Contractor), I want merchant name normalization, so that 'MCDONALDS #4521' becomes 'McDonalds'"
+    test_scenarios:
+      - scenario_id: "TS-2.2-001"
+        scenario_title: "Basic Merchant Name Normalization"
+        test_cases:
+          - "TC-2.2-001-01: Normalize franchise with store number"
+          - "TC-2.2-001-02: Normalize all caps merchant name"
+          - "TC-2.2-001-03: Normalize merchant with location suffix"
+          - "TC-2.2-001-04: Normalize merchant with special characters"
+      - scenario_id: "TS-2.2-007"
+        scenario_title: "End-to-End Normalization Flow"
+        test_cases:
+          - "TC-2.2-007-01: Complete capture to export flow"
+      - scenario_id: "TS-2.2-009"
+        scenario_title: "Acceptance Testing"
+        test_cases:
+          - "TC-2.2-009-01: User satisfaction with normalization"
+
+  acceptance_criteria_trace:
+    - ac_id: 1
+      description: "Common vendors cleaned automatically"
+      test_coverage:
+        - scenario_id: "TS-2.2-001"
+          scenario_title: "Basic Merchant Name Normalization"
+          test_cases:
+            - id: "TC-2.2-001-01"
+              description: "Tests McDonald's franchise normalization"
+            - id: "TC-2.2-001-02"
+              description: "Tests Walmart proper case normalization"
+            - id: "TC-2.2-001-03"
+              description: "Tests Starbucks location suffix removal"
+            - id: "TC-2.2-001-04"
+              description: "Tests 7-Eleven special character handling"
+              
+        - scenario_id: "TS-2.2-002"
+          scenario_title: "Merchant Dictionary Lookups"
+          test_cases:
+            - id: "TC-2.2-002-01"
+              description: "Tests MCD to McDonald's abbreviation expansion"
+            - id: "TC-2.2-002-02"
+              description: "Tests Walmart variant spellings"
+              
+        - scenario_id: "TS-2.2-004"
+          scenario_title: "OCR Service Integration"
+          test_cases:
+            - id: "TC-2.2-004-01"
+              description: "Tests automatic cleaning in OCR workflow"
+              
+        - scenario_id: "TS-2.2-007"
+          scenario_title: "End-to-End Normalization Flow"
+          test_cases:
+            - id: "TC-2.2-007-01"
+              description: "Tests McDonald's normalization through full workflow"
+            - id: "TC-2.2-007-02"
+              description: "Tests batch processing of multiple common vendors"
+
+  task_requirements_trace:
+    - task_id: "implement_merchant_normalization_service"
+      task_title: "Implement Merchant Normalization Service"
+      subtask_coverage:
+        - subtask: "Create MerchantNormalizationService with clean/normalize methods"
+          test_scenarios:
+            - "TS-2.2-001: Basic Merchant Name Normalization"
+            - "TS-2.2-002: Merchant Dictionary Lookups"
+            - "TS-2.2-003: Edge Cases and Error Handling"
+            
+        - subtask: "Implement rule-based normalization patterns for common merchant formats"
+          test_scenarios:
+            - "TS-2.2-001: All test cases verify rule patterns"
+            - "TS-2.2-002: Dictionary-based rules"
+            
+        - subtask: "Add configurable normalization rules (prefix/suffix removal, case fixing)"
+          test_scenarios:
+            - "TS-2.2-001: TC-2.2-001-01 (suffix removal)"
+            - "TS-2.2-001: TC-2.2-001-02 (case fixing)"
+            - "TS-2.2-001: TC-2.2-001-03 (location suffix)"
+            
+        - subtask: "Preserve original value for audit trail and rollback capability"
+          test_scenarios:
+            - "TS-2.2-001: All test cases verify original preservation"
+            - "TS-2.2-004: TC-2.2-004-01 (OCR integration)"
+            - "TS-2.2-005: TC-2.2-005-02 (UI display)"
+            
+        - subtask: "Add merchant lookup dictionary for common vendor name variations"
+          test_scenarios:
+            - "TS-2.2-002: All dictionary lookup test cases"
+            - "TS-2.2-008: TC-2.2-008-02 (dictionary performance)"
+            
+        - subtask: "Create unit tests for all normalization patterns and edge cases"
+          test_scenarios:
+            - "TS-2.2-001: Unit test coverage"
+            - "TS-2.2-002: Unit test coverage"
+            - "TS-2.2-003: Edge case unit tests"
+
+    - task_id: "integrate_with_ocr_processing"
+      task_title: "Integrate Normalization into OCR Processing Workflow"
+      subtask_coverage:
+        - subtask: "Modify OcrService to call MerchantNormalizationService after field extraction"
+          test_scenarios:
+            - "TS-2.2-004: TC-2.2-004-01 (integration point)"
+            
+        - subtask: "Update ProcessingResult to include normalized merchant value"
+          test_scenarios:
+            - "TS-2.2-004: TC-2.2-004-01 (ProcessingResult verification)"
+            
+        - subtask: "Ensure normalization happens before confidence score calculation"
+          test_scenarios:
+            - "TS-2.2-004: TC-2.2-004-02 (confidence preservation)"
+            
+        - subtask: "Maintain performance target of <5s for entire OCR processing"
+          test_scenarios:
+            - "TS-2.2-004: TC-2.2-004-03 (performance impact)"
+            - "TS-2.2-008: TC-2.2-008-03 (workflow performance)"
+            
+        - subtask: "Add feature flag check for ENABLE_MERCHANT_NORMALIZATION"
+          test_scenarios:
+            - "TS-2.2-004: TC-2.2-004-04 (feature flag)"
+            
+        - subtask: "Test integration with existing OCR flow on sample receipts"
+          test_scenarios:
+            - "TS-2.2-004: All integration test cases"
+            - "TS-2.2-007: End-to-end testing"
+
+    - task_id: "update_ui_to_show_normalization"
+      task_title: "Update UI to Display Normalized Merchant Names"
+      subtask_coverage:
+        - subtask: "Update PreviewScreen to show normalized merchant name"
+          test_scenarios:
+            - "TS-2.2-005: TC-2.2-005-01 (display normalized)"
+            
+        - subtask: "Add visual indicator when merchant has been normalized (info icon)"
+          test_scenarios:
+            - "TS-2.2-005: TC-2.2-005-01 (info icon)"
+            - "TS-2.2-005: TC-2.2-005-04 (visual consistency)"
+            
+        - subtask: "Implement tooltip/dialog showing original vs normalized value"
+          test_scenarios:
+            - "TS-2.2-005: TC-2.2-005-02 (tooltip display)"
+            
+        - subtask: "Ensure FieldEditor still allows manual override of normalized value"
+          test_scenarios:
+            - "TS-2.2-005: TC-2.2-005-03 (manual edit)"
+            - "TS-2.2-009: TC-2.2-009-02 (user override)"
+            
+        - subtask: "Update confidence scoring to reflect normalization (maintain original confidence)"
+          test_scenarios:
+            - "TS-2.2-004: TC-2.2-004-02 (confidence maintenance)"
+            - "TS-2.2-005: TC-2.2-005-03 (isManuallyEdited flag)"
+            
+        - subtask: "Test UI updates across different screen sizes and platforms"
+          test_scenarios:
+            - "TS-2.2-005: TC-2.2-005-04 (screen sizes)"
+
+    - task_id: "add_normalization_settings"
+      task_title: "Add Normalization Configuration Settings"
+      subtask_coverage:
+        - subtask: "Add merchant_normalization toggle to app settings"
+          test_scenarios:
+            - "TS-2.2-006: TC-2.2-006-01 (toggle implementation)"
+            
+        - subtask: "Create settings UI for enabling/disabling normalization"
+          test_scenarios:
+            - "TS-2.2-006: TC-2.2-006-01 (UI toggle)"
+            
+        - subtask: "Implement settings persistence in SettingsRepository"
+          test_scenarios:
+            - "TS-2.2-006: TC-2.2-006-03 (persistence)"
+            
+        - subtask: "Add ability to view/edit normalization rules (future expansion)"
+          test_scenarios:
+            - "Not tested in MVP scope"
+            
+        - subtask: "Ensure settings changes take effect immediately"
+          test_scenarios:
+            - "TS-2.2-006: TC-2.2-006-02 (immediate effect)"
+            
+        - subtask: "Test settings persistence across app restarts"
+          test_scenarios:
+            - "TS-2.2-006: TC-2.2-006-03 (restart persistence)"
+
+  non_functional_requirements_trace:
+    - requirement: "Performance: <50ms normalization time"
+      test_scenarios:
+        - "TS-2.2-003: TC-2.2-003-02 (long names performance)"
+        - "TS-2.2-008: TC-2.2-008-01 (normalization speed)"
+        - "TS-2.2-008: TC-2.2-008-02 (dictionary performance)"
+        
+    - requirement: "Performance: No impact on <5s OCR target"
+      test_scenarios:
+        - "TS-2.2-004: TC-2.2-004-03 (OCR performance)"
+        - "TS-2.2-008: TC-2.2-008-03 (workflow impact)"
+        
+    - requirement: "Offline functionality"
+      test_scenarios:
+        - "TS-2.2-007: TC-2.2-007-03 (offline normalization)"
+        
+    - requirement: "Audit trail preservation"
+      test_scenarios:
+        - "TS-2.2-001: All cases verify original preservation"
+        - "TS-2.2-004: TC-2.2-004-01 (originalValue field)"
+        - "TS-2.2-005: TC-2.2-005-02 (UI access to original)"
+        - "TS-2.2-007: TC-2.2-007-01 (audit log verification)"
+
+  coverage_summary:
+    total_requirements: 5
+    requirements_with_tests: 5
+    coverage_percentage: 100
+    
+    acceptance_criteria:
+      total: 1
+      covered: 1
+      coverage_percentage: 100
+      
+    tasks:
+      total: 4
+      covered: 4
+      coverage_percentage: 100
+      
+    subtasks:
+      total: 24
+      covered: 23
+      coverage_percentage: 95.8
+      uncovered:
+        - "Add ability to view/edit normalization rules (future expansion)"
+        
+    test_scenarios:
+      total: 9
+      test_cases: 44
+      
+    notes:
+      - "All core requirements have comprehensive test coverage"
+      - "Performance requirements well covered with specific benchmarks"
+      - "Edge cases and error handling thoroughly tested"
+      - "Future expansion features (rule editing) excluded from MVP testing"
+      - "Acceptance testing validates user-facing value of normalization"

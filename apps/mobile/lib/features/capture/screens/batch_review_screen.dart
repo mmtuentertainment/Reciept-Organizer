@@ -48,10 +48,7 @@ class _BatchReviewScreenState extends ConsumerState<BatchReviewScreen> {
     final receipt = _recentlyDeleted[receiptId];
     if (receipt != null) {
       final notifier = ref.read(batchCaptureProvider.notifier);
-      final currentState = ref.read(batchCaptureProvider);
-      notifier.state = currentState.copyWith(
-        receipts: [...currentState.receipts, receipt],
-      );
+      notifier.restoreReceipt(receipt);
       setState(() {
         _recentlyDeleted.remove(receiptId);
       });

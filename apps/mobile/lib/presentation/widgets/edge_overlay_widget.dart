@@ -200,7 +200,7 @@ class EdgeOverlayPainter extends CustomPainter {
     
     // Draw confidence bar
     final barWidth = textPainter.width;
-    final barHeight = 3.0;
+    const barHeight = 3.0;
     final barRect = Rect.fromLTWH(
       rect.left + padding,
       rect.bottom - padding / 2 - barHeight,

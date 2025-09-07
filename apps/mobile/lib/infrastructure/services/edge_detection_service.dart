@@ -337,11 +337,11 @@ class EdgeDetectionService {
     
     final scanStart = isTop ? 0 : height * 2 ~/ 3;
     final scanEnd = isTop ? height ~/ 3 : height;
-    final scanStep = 3; // Sample every 3rd line for performance
+    const scanStep = 3; // Sample every 3rd line for performance
     
     for (int y = scanStart; y < scanEnd; y += scanStep) {
       int edgePixels = 0;
-      final sampleStep = 5; // Sample every 5th pixel horizontally
+      const sampleStep = 5; // Sample every 5th pixel horizontally
       
       for (int x = 0; x < width; x += sampleStep) {
         final pixel = edges.getPixel(x, y);
@@ -368,11 +368,11 @@ class EdgeDetectionService {
     
     final scanStart = isLeft ? 0 : width * 2 ~/ 3;
     final scanEnd = isLeft ? width ~/ 3 : width;
-    final scanStep = 3; // Sample every 3rd column for performance
+    const scanStep = 3; // Sample every 3rd column for performance
     
     for (int x = scanStart; x < scanEnd; x += scanStep) {
       int edgePixels = 0;
-      final sampleStep = 5; // Sample every 5th pixel vertically
+      const sampleStep = 5; // Sample every 5th pixel vertically
       
       for (int y = 0; y < height; y += sampleStep) {
         final pixel = edges.getPixel(x, y);

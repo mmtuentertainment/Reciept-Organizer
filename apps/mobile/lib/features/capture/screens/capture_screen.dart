@@ -1,8 +1,10 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/capture/widgets/camera_preview_widget.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
+import 'package:receipt_organizer/features/capture/screens/preview_screen.dart';
 
 class CaptureScreen extends ConsumerStatefulWidget {
   const CaptureScreen({super.key});
@@ -46,8 +48,9 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen>
     });
 
     try {
-      // Simulate capture
-      await Future.delayed(const Duration(milliseconds: 500));
+      // In a real implementation, this would capture from camera
+      // For now, simulate image capture with a placeholder
+      final mockImageData = await _getMockImageData();
       
       if (mounted) {
         HapticFeedback.lightImpact();
@@ -56,11 +59,21 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen>
           _flashController.reverse();
         });
 
+        // Navigate to preview screen for processing
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PreviewScreen(
+              imageData: mockImageData,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Receipt captured successfully!'),
-            duration: Duration(seconds: 2),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text('Capture failed: $e'),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -69,6 +82,17 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen>
         _isCapturing = false;
       });
     }
+  }
+
+  /// Mock image data for testing - in real implementation would capture from camera
+  Future<Uint8List> _getMockImageData() async {
+    // Create a simple 1x1 pixel image for testing
+    // In real implementation, this would come from camera
+    return Uint8List.fromList([
+      0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
+      0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43,
+      // ... (minimal JPEG header for testing)
+    ]);
   }
 
   void _onLongPressStart() {

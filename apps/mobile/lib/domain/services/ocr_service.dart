@@ -1,7 +1,12 @@
 import 'dart:typed_data';
+import 'dart:math' as math;
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
+
+import 'merchant_normalization_service.dart';
+
+// Note: ConfidenceLevel import removed as not directly used in this service
 
 // Core models for OCR processing
 class FieldData {
@@ -10,6 +15,7 @@ class FieldData {
   final String originalText;
   final bool isManuallyEdited;
   final String validationStatus;
+  final Rect? boundingBox;
 
   FieldData({
     required this.value,
@@ -17,6 +23,7 @@ class FieldData {
     required this.originalText,
     this.isManuallyEdited = false,
     this.validationStatus = 'valid',
+    this.boundingBox,
   });
 
   FieldData copyWith({
@@ -25,6 +32,7 @@ class FieldData {
     String? originalText,
     bool? isManuallyEdited,
     String? validationStatus,
+    Rect? boundingBox,
   }) {
     return FieldData(
       value: value ?? this.value,
@@ -32,6 +40,52 @@ class FieldData {
       originalText: originalText ?? this.originalText,
       isManuallyEdited: isManuallyEdited ?? this.isManuallyEdited,
       validationStatus: validationStatus ?? this.validationStatus,
+      boundingBox: boundingBox ?? this.boundingBox,
+    );
+  }
+
+  /// Updates the value while preserving the original text
+  FieldData withNormalizedValue(dynamic normalizedValue) {
+    return copyWith(value: normalizedValue);
+  }
+
+  /// Serializes FieldData to JSON for session persistence
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value,
+      'confidence': confidence,
+      'originalText': originalText,
+      'isManuallyEdited': isManuallyEdited,
+      'validationStatus': validationStatus,
+      if (boundingBox != null) 'boundingBox': {
+        'left': boundingBox!.left,
+        'top': boundingBox!.top,
+        'width': boundingBox!.width,
+        'height': boundingBox!.height,
+      },
+    };
+  }
+
+  /// Creates FieldData from JSON for session restoration
+  factory FieldData.fromJson(Map<String, dynamic> json) {
+    Rect? boundingBox;
+    if (json['boundingBox'] != null) {
+      final box = json['boundingBox'] as Map<String, dynamic>;
+      boundingBox = Rect.fromLTWH(
+        (box['left'] as num).toDouble(),
+        (box['top'] as num).toDouble(),
+        (box['width'] as num).toDouble(),
+        (box['height'] as num).toDouble(),
+      );
+    }
+    
+    return FieldData(
+      value: json['value'],
+      confidence: (json['confidence'] as num).toDouble(),
+      originalText: json['originalText'],
+      isManuallyEdited: json['isManuallyEdited'] ?? false,
+      validationStatus: json['validationStatus'] ?? 'valid',
+      boundingBox: boundingBox,
     );
   }
 }
@@ -78,18 +132,51 @@ class ProcessingResult {
       allText: allText ?? this.allText,
     );
   }
+
+  /// Serializes ProcessingResult to JSON for session persistence
+  Map<String, dynamic> toJson() {
+    return {
+      'merchant': merchant?.toJson(),
+      'date': date?.toJson(),
+      'total': total?.toJson(),
+      'tax': tax?.toJson(),
+      'overallConfidence': overallConfidence,
+      'processingEngine': processingEngine,
+      'processingDurationMs': processingDurationMs,
+      'allText': allText,
+    };
+  }
+
+  /// Creates ProcessingResult from JSON for session restoration
+  factory ProcessingResult.fromJson(Map<String, dynamic> json) {
+    return ProcessingResult(
+      merchant: json['merchant'] != null ? FieldData.fromJson(json['merchant']) : null,
+      date: json['date'] != null ? FieldData.fromJson(json['date']) : null,
+      total: json['total'] != null ? FieldData.fromJson(json['total']) : null,
+      tax: json['tax'] != null ? FieldData.fromJson(json['tax']) : null,
+      overallConfidence: (json['overallConfidence'] as num).toDouble(),
+      processingEngine: json['processingEngine'] ?? 'google_ml_kit',
+      processingDurationMs: json['processingDurationMs'] as int,
+      allText: List<String>.from(json['allText'] ?? []),
+    );
+  }
 }
 
 abstract class IOCRService {
   Future<ProcessingResult> processReceipt(Uint8List imageData);
   Future<void> initialize();
   Future<void> dispose();
+  
+  /// Analyzes processing result and image data to detect capture failures
+  FailureDetectionResult detectFailure(ProcessingResult result, Uint8List imageData);
 }
 
 class OCRService implements IOCRService {
   late TextRecognizer _textRecognizer;
   bool _isInitialized = false;
   final TextRecognizer? _customRecognizer;
+  final MerchantNormalizationService? _merchantNormalizationService;
+  final bool _enableMerchantNormalization;
 
   /// Create OCR service with optional TextRecognizer for testing
   /// 
@@ -113,7 +200,13 @@ class OCRService implements IOCRService {
   /// **Review Screen Integration:**
   /// - Fields with confidence <75% should be highlighted for quick editing (AC6)
   /// - Display confidence indicators: ●●● (≥75%), ●●○ (50-74%), ●○○ (<50%)
-  OCRService({TextRecognizer? textRecognizer}) : _customRecognizer = textRecognizer;
+  OCRService({
+    TextRecognizer? textRecognizer,
+    MerchantNormalizationService? merchantNormalizationService,
+    bool enableMerchantNormalization = true,
+  }) : _customRecognizer = textRecognizer,
+       _merchantNormalizationService = merchantNormalizationService,
+       _enableMerchantNormalization = enableMerchantNormalization;
 
   @override
   Future<void> initialize() async {
@@ -141,6 +234,9 @@ class OCRService implements IOCRService {
     final stopwatch = Stopwatch()..start();
 
     try {
+      // Add timeout to prevent hanging
+      const timeoutDuration = Duration(seconds: 10);
+      
       // Try to decode image to get actual dimensions
       Size imageSize = const Size(800, 600); // Default fallback
       int bytesPerRow = 800 * 4;
@@ -161,7 +257,11 @@ class OCRService implements IOCRService {
         ),
       );
 
-      final recognizedText = await _textRecognizer.processImage(inputImage);
+      // Process image with timeout
+      final recognizedText = await _textRecognizer
+          .processImage(inputImage)
+          .timeout(timeoutDuration);
+      
       stopwatch.stop();
 
       // Extract fields from recognized text
@@ -185,7 +285,22 @@ class OCRService implements IOCRService {
     final allText = allTextLines.join(' ');
 
     // Extract merchant (usually at the top)
-    final merchant = _extractMerchant(allTextLines);
+    var merchant = _extractMerchant(allTextLines);
+    
+    // Apply merchant normalization if enabled and merchant was extracted
+    if (merchant != null && _enableMerchantNormalization && _merchantNormalizationService != null) {
+      final normalizedName = _merchantNormalizationService!.normalize(merchant.value as String);
+      if (normalizedName != merchant.value) {
+        // Update the merchant field with normalized value, preserving original
+        merchant = FieldData(
+          value: normalizedName,
+          confidence: merchant.confidence,
+          originalText: merchant.originalText,
+          isManuallyEdited: false,
+          validationStatus: merchant.validationStatus,
+        );
+      }
+    }
     
     // Extract date
     final date = _extractDate(allText);
@@ -413,6 +528,231 @@ class OCRService implements IOCRService {
     return confidence.clamp(0.0, 100.0);
   }
 
+  @override
+  FailureDetectionResult detectFailure(ProcessingResult result, Uint8List imageData) {
+    final diagnostics = <String, dynamic>{};
+    
+    // Check 1: Processing timeout (from duration)
+    if (result.processingDurationMs > 10000) {
+      return FailureDetectionResult.failure(
+        FailureReason.processingTimeout,
+        0.0,
+        diagnostics: {'duration_ms': result.processingDurationMs},
+      );
+    }
+    
+    // Check 2: Overall confidence too low
+    if (result.overallConfidence < 30.0) {
+      return FailureDetectionResult.failure(
+        FailureReason.lowConfidence,
+        result.overallConfidence,
+        diagnostics: {
+          'overall_confidence': result.overallConfidence,
+          'field_confidences': {
+            'merchant': result.merchant?.confidence,
+            'date': result.date?.confidence,
+            'total': result.total?.confidence,
+            'tax': result.tax?.confidence,
+          },
+        },
+      );
+    }
+    
+    // Check 3: No receipt-like content detected
+    if (!_hasReceiptContent(result)) {
+      return FailureDetectionResult.failure(
+        FailureReason.noReceiptDetected,
+        result.overallConfidence * 0.3, // Reduce quality score
+        diagnostics: {
+          'text_lines': result.allText.length,
+          'extracted_fields': _countExtractedFields(result),
+        },
+      );
+    }
+    
+    // Check 4: Image quality assessment
+    final imageQuality = _assessImageQuality(imageData);
+    diagnostics.addAll(imageQuality);
+    
+    // Check for blur
+    if ((imageQuality['blur_score'] as double?) != null && 
+        imageQuality['blur_score'] > 0.7) {
+      return FailureDetectionResult.failure(
+        FailureReason.blurryImage,
+        result.overallConfidence * 0.5,
+        diagnostics: diagnostics,
+      );
+    }
+    
+    // Check for poor contrast/lighting
+    if ((imageQuality['contrast_score'] as double?) != null &&
+        imageQuality['contrast_score'] < 0.3) {
+      return FailureDetectionResult.failure(
+        FailureReason.poorLighting,
+        result.overallConfidence * 0.6,
+        diagnostics: diagnostics,
+      );
+    }
+    
+    // Success case - calculate combined quality score
+    final qualityScore = _calculateOverallQuality(result, imageQuality);
+    
+    return FailureDetectionResult.success(qualityScore);
+  }
+  
+  bool _hasReceiptContent(ProcessingResult result) {
+    // Check if we have receipt-like content
+    final hasAmount = result.total != null || result.tax != null;
+    final hasMerchant = result.merchant != null;
+    final hasDate = result.date != null;
+    final hasMultipleLines = result.allText.length >= 3;
+    
+    // Need at least 2 of these indicators for receipt-like content
+    final indicators = [hasAmount, hasMerchant, hasDate, hasMultipleLines];
+    final positiveIndicators = indicators.where((indicator) => indicator).length;
+    
+    return positiveIndicators >= 2;
+  }
+  
+  int _countExtractedFields(ProcessingResult result) {
+    int count = 0;
+    if (result.merchant != null) count++;
+    if (result.date != null) count++;
+    if (result.total != null) count++;
+    if (result.tax != null) count++;
+    return count;
+  }
+  
+  Map<String, dynamic> _assessImageQuality(Uint8List imageData) {
+    final quality = <String, dynamic>{};
+    
+    try {
+      final image = img.decodeImage(imageData);
+      if (image == null) {
+        quality['error'] = 'Could not decode image';
+        return quality;
+      }
+      
+      // Basic image metrics
+      quality['width'] = image.width;
+      quality['height'] = image.height;
+      quality['aspect_ratio'] = image.width / image.height;
+      
+      // Assess blur using variance of pixel values (simplified)
+      final blurScore = _estimateBlur(image);
+      quality['blur_score'] = blurScore;
+      
+      // Assess contrast using standard deviation of luminance
+      final contrastScore = _estimateContrast(image);
+      quality['contrast_score'] = contrastScore;
+      
+      // Check resolution adequacy
+      final totalPixels = image.width * image.height;
+      quality['resolution_adequate'] = totalPixels >= 800 * 600; // 0.5MP minimum
+      
+    } catch (e) {
+      quality['error'] = 'Image quality assessment failed: $e';
+    }
+    
+    return quality;
+  }
+  
+  double _estimateBlur(img.Image image) {
+    // Simplified blur detection using luminance variance
+    // Higher values indicate more blur
+    try {
+      var totalVariance = 0.0;
+      var sampleCount = 0;
+      
+      // Sample every 10th pixel to speed up calculation
+      for (var y = 0; y < image.height; y += 10) {
+        for (var x = 0; x < image.width - 1; x += 10) {
+          final pixel1 = image.getPixel(x, y);
+          final pixel2 = image.getPixel(x + 1, y);
+          
+          final lum1 = _getLuminance(pixel1);
+          final lum2 = _getLuminance(pixel2);
+          
+          totalVariance += (lum1 - lum2).abs();
+          sampleCount++;
+        }
+      }
+      
+      final avgVariance = sampleCount > 0 ? totalVariance / sampleCount : 0.0;
+      
+      // Normalize to 0-1 scale (higher = more blur)
+      return (255.0 - avgVariance) / 255.0;
+      
+    } catch (e) {
+      return 0.5; // Default moderate blur assumption
+    }
+  }
+  
+  double _estimateContrast(img.Image image) {
+    // Estimate contrast using luminance standard deviation
+    try {
+      var luminanceSum = 0.0;
+      var luminanceSquaredSum = 0.0;
+      var sampleCount = 0;
+      
+      // Sample pixels to calculate average and standard deviation
+      for (var y = 0; y < image.height; y += 15) {
+        for (var x = 0; x < image.width; x += 15) {
+          final pixel = image.getPixel(x, y);
+          final luminance = _getLuminance(pixel);
+          
+          luminanceSum += luminance;
+          luminanceSquaredSum += luminance * luminance;
+          sampleCount++;
+        }
+      }
+      
+      if (sampleCount == 0) return 0.5;
+      
+      final mean = luminanceSum / sampleCount;
+      final variance = (luminanceSquaredSum / sampleCount) - (mean * mean);
+      final stdDev = variance.isNaN ? 0.0 : math.sqrt(variance.clamp(0.0, double.infinity));
+      
+      // Normalize standard deviation to 0-1 scale
+      return (stdDev / 127.5).clamp(0.0, 1.0);
+      
+    } catch (e) {
+      return 0.5; // Default moderate contrast assumption
+    }
+  }
+  
+  double _getLuminance(img.Pixel pixel) {
+    // Calculate luminance using standard RGB to luminance formula
+    final r = pixel.r.toDouble();
+    final g = pixel.g.toDouble(); 
+    final b = pixel.b.toDouble();
+    
+    return 0.299 * r + 0.587 * g + 0.114 * b;
+  }
+  
+  double _calculateOverallQuality(ProcessingResult result, Map<String, dynamic> imageQuality) {
+    // Combine OCR confidence with image quality metrics
+    var qualityScore = result.overallConfidence;
+    
+    // Adjust based on image quality
+    final blurScore = imageQuality['blur_score'] as double?;
+    if (blurScore != null) {
+      qualityScore *= (1.0 - blurScore * 0.3); // Blur reduces quality
+    }
+    
+    final contrastScore = imageQuality['contrast_score'] as double?;
+    if (contrastScore != null) {
+      qualityScore *= (0.5 + contrastScore * 0.5); // Low contrast reduces quality
+    }
+    
+    final isAdequateRes = imageQuality['resolution_adequate'] as bool? ?? true;
+    if (!isAdequateRes) {
+      qualityScore *= 0.8; // Low resolution reduces quality
+    }
+    
+    return qualityScore.clamp(0.0, 100.0);
+  }
+
   ProcessingResult _createDummyResult(int durationMs) {
     // Return dummy data for development/testing
     return ProcessingResult(
@@ -443,22 +783,85 @@ class OCRService implements IOCRService {
   }
 }
 
-/// Enum representing confidence levels for OCR results
-enum ConfidenceLevel {
-  low,    // <75%
-  medium, // 75-85% 
-  high,   // >85%
+
+/// Enum representing different reasons for capture failure
+enum FailureReason {
+  lowConfidence,      // Overall confidence < 30%
+  blurryImage,        // Image quality too poor
+  poorLighting,       // Contrast issues
+  noReceiptDetected,  // No receipt-like content found
+  processingTimeout,  // OCR took too long
+  processingError,    // OCR engine error
 }
 
-/// Extension to convert confidence percentages to confidence levels
-extension ConfidenceLevelExtension on double {
-  ConfidenceLevel get confidenceLevel {
-    if (this >= 85.0) {
-      return ConfidenceLevel.high;
-    } else if (this >= 75.0) {
-      return ConfidenceLevel.medium;
-    } else {
-      return ConfidenceLevel.low;
+/// Extension to provide user-friendly messages for failure reasons
+extension FailureReasonExtension on FailureReason {
+  String get userMessage {
+    switch (this) {
+      case FailureReason.lowConfidence:
+        return 'Unable to read receipt clearly';
+      case FailureReason.blurryImage:
+        return 'Image is too blurry - try taking a clearer photo';
+      case FailureReason.poorLighting:
+        return 'Poor lighting - try taking the photo in better light';
+      case FailureReason.noReceiptDetected:
+        return 'No receipt detected - make sure the receipt is in the frame';
+      case FailureReason.processingTimeout:
+        return 'Processing took too long - try again';
+      case FailureReason.processingError:
+        return 'Processing failed - please retry';
     }
+  }
+
+  String get technicalReason {
+    switch (this) {
+      case FailureReason.lowConfidence:
+        return 'Overall OCR confidence below 30% threshold';
+      case FailureReason.blurryImage:
+        return 'Image blur detection threshold exceeded';
+      case FailureReason.poorLighting:
+        return 'Image contrast below minimum threshold';
+      case FailureReason.noReceiptDetected:
+        return 'No receipt-like patterns found in OCR text';
+      case FailureReason.processingTimeout:
+        return 'OCR processing exceeded 10s timeout';
+      case FailureReason.processingError:
+        return 'OCR engine threw exception during processing';
+    }
+  }
+}
+
+/// Class representing the result of failure detection analysis
+class FailureDetectionResult {
+  final bool isFailure;
+  final FailureReason? reason;
+  final double qualityScore;
+  final Map<String, dynamic> diagnostics;
+
+  const FailureDetectionResult({
+    required this.isFailure,
+    this.reason,
+    required this.qualityScore,
+    this.diagnostics = const {},
+  });
+
+  factory FailureDetectionResult.success(double qualityScore) {
+    return FailureDetectionResult(
+      isFailure: false,
+      qualityScore: qualityScore,
+    );
+  }
+
+  factory FailureDetectionResult.failure(
+    FailureReason reason,
+    double qualityScore, {
+    Map<String, dynamic>? diagnostics,
+  }) {
+    return FailureDetectionResult(
+      isFailure: true,
+      reason: reason,
+      qualityScore: qualityScore,
+      diagnostics: diagnostics ?? {},
+    );
   }
 }

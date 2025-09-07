@@ -308,7 +308,7 @@ void main() {
 
   group('BatchCaptureState', () {
     test('should create state with default values', () {
-      const state = BatchCaptureState();
+      final state = BatchCaptureState();
       
       expect(state.receipts, isEmpty);
       expect(state.currentBatchId, isNull);
@@ -338,7 +338,7 @@ void main() {
     });
 
     test('should create copy with updated values', () {
-      const originalState = BatchCaptureState(
+      final originalState = BatchCaptureState(
         isBatchMode: false,
         isCapturing: false,
       );

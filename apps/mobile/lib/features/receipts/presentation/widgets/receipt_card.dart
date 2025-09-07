@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/models/confidence_level.dart';
 import '../../../../data/models/receipt.dart';
-import '../../../../domain/services/ocr_service.dart';
 import '../../../../shared/widgets/confidence_score_widget.dart';
 import 'confidence_badge.dart';
 
@@ -136,6 +136,28 @@ class ReceiptCard extends StatelessWidget {
             ),
           ],
         ),
+        
+        // Notes preview
+        if (receipt.notes != null && receipt.notes!.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(Icons.note, size: 14, color: Colors.grey[600]),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  receipt.notes!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }

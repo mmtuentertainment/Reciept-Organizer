@@ -1,0 +1,88 @@
+```poml
+# Quality Gate Decision for Story 2.2 - Merchant Name Normalization
+schema: 1
+story: "2.2"
+story_title: "Merchant Name Normalization"
+gate: PASS
+status_reason: "Story is well-prepared with comprehensive architecture context and clear implementation guidance. Moderate risks have mitigation strategies."
+reviewer: "Quinn (Test Architect)"
+updated: "2025-09-06T12:00:00Z"
+
+waiver:
+  active: false
+
+top_issues:
+  - id: "TECH-001"
+    severity: medium
+    finding: "Complex normalization patterns need comprehensive edge case testing"
+    suggested_action: "Implement extensive unit tests for all normalization patterns before release"
+  - id: "PERF-001"
+    severity: medium  
+    finding: "Performance impact on OCR workflow needs monitoring"
+    suggested_action: "Add performance benchmarks to CI pipeline"
+
+quality_score: 85
+
+evidence:
+  tests_reviewed: 29
+  risks_identified: 14
+  trace:
+    ac_covered: [1]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Input validation present, audit trail preserved, feature flag protection"
+  performance:
+    status: PASS
+    notes: "<50ms normalization target achievable with efficient string operations"
+  reliability:  
+    status: PASS
+    notes: "Good error handling and fallback mechanisms planned"
+  maintainability:
+    status: PASS
+    notes: "Clean architecture, configurable rules, follows established patterns"
+
+risk_summary:
+  totals:
+    critical: 0
+    high: 4
+    medium: 6
+    low: 4
+  highest:
+    id: DATA-001
+    score: 6
+    title: "Original Merchant Value Loss"
+  recommendations:
+    must_fix:
+      - "Always preserve original OCR values in ProcessingResult"
+      - "Test CSV export compatibility thoroughly"
+    monitor:
+      - "Normalization performance metrics"
+      - "User override frequency"
+
+test_design:
+  scenarios_total: 29
+  by_level:
+    unit: 15
+    integration: 10
+    e2e: 4
+  by_priority:
+    p0: 18
+    p1: 8  
+    p2: 3
+  coverage_gaps: []
+
+recommendations:
+  immediate:
+    - action: "Create comprehensive merchant test dataset"
+      refs: ["test/fixtures/merchants.json"]
+    - action: "Add performance monitoring hooks"
+      refs: ["lib/core/services/merchant_normalization_service.dart"]
+  future:
+    - action: "Build admin UI for rule management"  
+      refs: ["lib/features/admin/normalization_rules.dart"]
+    - action: "Add ML-based normalization"
+      refs: ["lib/core/services/ml_normalization_service.dart"]
+```

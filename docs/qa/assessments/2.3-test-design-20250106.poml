@@ -1,0 +1,300 @@
+```poml
+test_design:
+  story: "2.3"
+  title: "Add Notes to Receipts"
+  date: "2025-01-06"
+  designer: "Quinn (Test Architect)"
+  
+  test_strategy_overview:
+    total_scenarios: 23
+    unit_tests: 9
+    unit_percentage: 39
+    integration_tests: 10
+    integration_percentage: 43
+    e2e_tests: 4
+    e2e_percentage: 18
+    priority_distribution:
+      p0: 12
+      p1: 8
+      p2: 3
+      p3: 0
+  
+  acceptance_criteria:
+    - id: "AC1"
+      description: "Optional note field, searchable"
+      test_scenarios:
+        - id: "2.3-UNIT-001"
+          level: "unit"
+          priority: "P0"
+          test: "NotesFieldEditor widget renders correctly"
+          justification: "Core UI component functionality"
+          given: "NotesFieldEditor is instantiated"
+          when: "Widget is rendered"
+          then: "Shows TextFormField with 500 char limit and counter"
+          
+        - id: "2.3-UNIT-002"
+          level: "unit"
+          priority: "P0"
+          test: "Character limit enforcement (500 chars)"
+          justification: "Input validation logic"
+          given: "User types in notes field"
+          when: "Text exceeds 500 characters"
+          then: "Input is truncated and counter shows 500/500"
+          
+        - id: "2.3-UNIT-003"
+          level: "unit"
+          priority: "P1"
+          test: "Character counter updates correctly"
+          justification: "UI feedback logic"
+          given: "User types in notes field"
+          when: "Text changes"
+          then: "Counter shows current length/500"
+          
+        - id: "2.3-UNIT-004"
+          level: "unit"
+          priority: "P1"
+          test: "Special characters handling in notes"
+          justification: "Data validation logic"
+          given: "Notes contain emojis, Unicode, special chars"
+          when: "Text is validated"
+          then: "All characters count correctly toward limit"
+          mitigates_risks: ["DATA-001"]
+          
+        - id: "2.3-UNIT-005"
+          level: "unit"
+          priority: "P0"
+          test: "Receipt model notes field mapping"
+          justification: "Data model integrity"
+          given: "Receipt object with notes"
+          when: "Serialized/deserialized"
+          then: "Notes field preserves content"
+          
+        - id: "2.3-INT-001"
+          level: "integration"
+          priority: "P0"
+          test: "Notes persistence to database"
+          justification: "Data persistence flow"
+          given: "User enters notes and triggers save"
+          when: "ReceiptRepository.save() is called"
+          then: "Notes are stored in SQLite database"
+          
+        - id: "2.3-INT-002"
+          level: "integration"
+          priority: "P0"
+          test: "Auto-save on field blur"
+          justification: "Multi-component save flow"
+          given: "User types notes and focuses away"
+          when: "Field loses focus after 500ms debounce"
+          then: "Notes are automatically saved"
+          mitigates_risks: ["DATA-003"]
+          
+        - id: "2.3-INT-003"
+          level: "integration"
+          priority: "P0"
+          test: "Notes retrieval from database"
+          justification: "Data retrieval flow"
+          given: "Receipt with notes exists in database"
+          when: "Receipt is loaded"
+          then: "Notes display correctly in UI"
+          
+        - id: "2.3-INT-004"
+          level: "integration"
+          priority: "P0"
+          test: "Search functionality with notes"
+          justification: "Search query integration"
+          given: "Receipts with various notes exist"
+          when: "User searches for text in notes"
+          then: "Matching receipts are returned"
+          mitigates_risks: ["PERF-001"]
+          
+        - id: "2.3-INT-005"
+          level: "integration"
+          priority: "P1"
+          test: "Case-insensitive search"
+          justification: "Search behavior validation"
+          given: "Notes contain mixed case text"
+          when: "User searches with different case"
+          then: "Matches are found regardless of case"
+          
+        - id: "2.3-INT-006"
+          level: "integration"
+          priority: "P0"
+          test: "CSV export includes notes"
+          justification: "Export functionality"
+          given: "Receipts with notes are selected"
+          when: "User exports to CSV"
+          then: "Notes column contains correct data"
+          mitigates_risks: ["DATA-002"]
+          
+        - id: "2.3-INT-007"
+          level: "integration"
+          priority: "P1"
+          test: "Notes display in receipt card"
+          justification: "UI data flow"
+          given: "Receipt list with notes"
+          when: "Cards are rendered"
+          then: "First 50 chars of notes shown with ellipsis"
+          
+        - id: "2.3-INT-008"
+          level: "integration"
+          priority: "P1"
+          test: "Empty notes handling"
+          justification: "Edge case handling"
+          given: "Receipt has no notes"
+          when: "Receipt is displayed"
+          then: "Empty state shown appropriately"
+          
+        - id: "2.3-INT-009"
+          level: "integration"
+          priority: "P2"
+          test: "Keyboard handling on small screens"
+          justification: "UI responsiveness"
+          given: "Small screen device"
+          when: "Notes field is focused"
+          then: "Field scrolls into view above keyboard"
+          mitigates_risks: ["TECH-001"]
+          
+        - id: "2.3-INT-010"
+          level: "integration"
+          priority: "P2"
+          test: "Performance with 1000+ receipts"
+          justification: "Performance validation"
+          given: "1000+ receipts with notes"
+          when: "Search is performed"
+          then: "Results return in <100ms"
+          mitigates_risks: ["PERF-001"]
+          
+        - id: "2.3-E2E-001"
+          level: "e2e"
+          priority: "P0"
+          test: "Complete notes workflow"
+          justification: "Critical user journey"
+          given: "User captures new receipt"
+          when: "Adds notes and saves"
+          then: "Notes persist and are searchable"
+          
+        - id: "2.3-E2E-002"
+          level: "e2e"
+          priority: "P1"
+          test: "Edit notes in detail view"
+          justification: "Common user action"
+          given: "User views receipt details"
+          when: "Edits notes inline"
+          then: "Changes are saved and reflected"
+          
+        - id: "2.3-E2E-003"
+          level: "e2e"
+          priority: "P1"
+          test: "Search and find by notes"
+          justification: "Key feature validation"
+          given: "Multiple receipts with notes"
+          when: "User searches for specific text"
+          then: "Correct receipts are found and displayed"
+          
+        - id: "2.3-E2E-004"
+          level: "e2e"
+          priority: "P2"
+          test: "Export workflow with notes"
+          justification: "Export feature validation"
+          given: "User selects receipts with notes"
+          when: "Exports to CSV"
+          then: "CSV contains notes column with data"
+  
+  risk_coverage:
+    - risk_id: "PERF-001"
+      covered_by: ["2.3-INT-004", "2.3-INT-010"]
+      coverage: "Search performance tested with large datasets"
+      
+    - risk_id: "DATA-001"
+      covered_by: ["2.3-UNIT-004"]
+      coverage: "Special character handling validated"
+      
+    - risk_id: "DATA-002"
+      covered_by: ["2.3-INT-006"]
+      coverage: "CSV export functionality tested"
+      
+    - risk_id: "DATA-003"
+      covered_by: ["2.3-INT-002"]
+      coverage: "Auto-save mechanism validated"
+      
+    - risk_id: "TECH-001"
+      covered_by: ["2.3-INT-009"]
+      coverage: "Keyboard handling tested"
+      
+    - risk_id: "SEC-001"
+      covered_by: []
+      coverage: "Handled by framework - no specific tests needed"
+  
+  recommended_execution_order:
+    - phase: "1. P0 Unit Tests"
+      tests: ["2.3-UNIT-001", "2.3-UNIT-002", "2.3-UNIT-005"]
+      rationale: "Fail fast on component issues"
+      
+    - phase: "2. P0 Integration Tests"
+      tests: ["2.3-INT-001", "2.3-INT-002", "2.3-INT-003", "2.3-INT-004", "2.3-INT-006"]
+      rationale: "Validate data flows"
+      
+    - phase: "3. P0 E2E Tests"
+      tests: ["2.3-E2E-001"]
+      rationale: "Confirm full workflow"
+      
+    - phase: "4. P1 Tests"
+      tests: ["All P1 unit, integration, then E2E"]
+      rationale: "Secondary functionality"
+      
+    - phase: "5. P2 Tests"
+      tests: ["All P2 tests"]
+      rationale: "Edge cases and nice-to-haves"
+  
+  test_data_requirements:
+    - type: "Text variations"
+      data:
+        - "Plain text notes"
+        - "Notes with emojis 😀🎉"
+        - "Unicode characters (é, ñ, 中文)"
+        - "Special symbols (@#$%^&*)"
+        - "Maximum length text (500 chars)"
+        - "HTML/Script injection attempts"
+        
+    - type: "Receipt datasets"
+      data:
+        - "10 receipts for basic testing"
+        - "100 receipts for search testing"
+        - "1000+ receipts for performance testing"
+        - "Receipts with varying note lengths"
+        
+    - type: "Search terms"
+      data:
+        - "Single word searches"
+        - "Multi-word phrases"
+        - "Special character searches"
+        - "Case variation searches"
+  
+  quality_checklist:
+    - item: "Every AC has test coverage"
+      status: "✓"
+    - item: "Test levels are appropriate"
+      status: "✓"
+    - item: "No duplicate coverage"
+      status: "✓"
+    - item: "Priorities align with risk"
+      status: "✓"
+    - item: "Test IDs follow convention"
+      status: "✓"
+    - item: "Scenarios are atomic"
+      status: "✓"
+
+# Gate YAML Block
+test_design_summary:
+  scenarios_total: 23
+  by_level:
+    unit: 9
+    integration: 10
+    e2e: 4
+  by_priority:
+    p0: 12
+    p1: 8
+    p2: 3
+  coverage_gaps: []
+  trace_reference: "docs/qa/assessments/2.3-test-design-20250106.poml"
+```
