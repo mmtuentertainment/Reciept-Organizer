@@ -1,18 +1,12 @@
 import 'dart:typed_data';
 import 'dart:io';
-<<<<<<< Updated upstream
-=======
 import 'dart:async';
->>>>>>> Stashed changes
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
-<<<<<<< Updated upstream
-=======
 import 'package:receipt_organizer/features/capture/providers/preview_initialization_provider.dart';
->>>>>>> Stashed changes
 import 'package:receipt_organizer/features/capture/widgets/capture_failed_state.dart';
 import 'package:receipt_organizer/features/capture/widgets/retry_prompt_dialog.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
@@ -24,11 +18,7 @@ import 'package:receipt_organizer/shared/widgets/bounding_box_overlay.dart';
 import 'package:receipt_organizer/features/receipts/presentation/providers/image_viewer_provider.dart';
 
 /// Preview screen that shows capture results and handles retry scenarios
-<<<<<<< Updated upstream
-class PreviewScreen extends ConsumerStatefulWidget {
-=======
 class PreviewScreen extends ConsumerWidget {
->>>>>>> Stashed changes
   final Uint8List imageData;
   final String? sessionId;
 
@@ -39,29 +29,6 @@ class PreviewScreen extends ConsumerWidget {
   });
 
   @override
-<<<<<<< Updated upstream
-  ConsumerState<PreviewScreen> createState() => _PreviewScreenState();
-}
-
-class _PreviewScreenState extends ConsumerState<PreviewScreen> {
-  bool _isProcessing = false;
-  bool _hasUnsavedChanges = false;
-  String _notes = '';
-  
-  // Image viewer state
-  String? _imagePath;
-  final TransformationController _imageTransformController = TransformationController();
-  
-  @override
-  void initState() {
-    super.initState();
-    _saveImageToFile();
-    _processCapture();
-    
-    // Connect image viewer provider to transformation controller
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(imageViewerProvider.notifier).connectToController(_imageTransformController);
-=======
   Widget build(BuildContext context, WidgetRef ref) {
     // Create initialization params
     final initParams = PreviewInitParams(
@@ -145,73 +112,11 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
         // Start processing after UI is built
         _startProcessing();
       }
->>>>>>> Stashed changes
     });
   }
   
   @override
   void dispose() {
-<<<<<<< Updated upstream
-    // Disconnect from provider before disposing
-    ref.read(imageViewerProvider.notifier).disconnectFromController();
-    _imageTransformController.dispose();
-    // Clean up temporary image file
-    if (_imagePath != null) {
-      File(_imagePath!).deleteSync();
-    }
-    super.dispose();
-  }
-  
-  Future<void> _saveImageToFile() async {
-    try {
-      // Save image data to a temporary file for ZoomableImageViewer
-      final tempDir = await getTemporaryDirectory();
-      final uuid = const Uuid().v4();
-      final tempFile = File('${tempDir.path}/receipt_$uuid.jpg');
-      await tempFile.writeAsBytes(widget.imageData);
-      
-      if (mounted) {
-        setState(() {
-          _imagePath = tempFile.path;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error saving image to file: $e');
-    }
-  }
-
-  Future<void> _processCapture() async {
-    if (_isProcessing) return;
-
-    setState(() {
-      _isProcessing = true;
-    });
-
-    final captureNotifier = ref.read(captureProvider.notifier);
-    
-    // Start or restore session
-    if (widget.sessionId != null) {
-      final restored = await captureNotifier.restoreSession(widget.sessionId!);
-      if (!restored) {
-        captureNotifier.startCaptureSession(sessionId: widget.sessionId);
-      }
-    } else {
-      captureNotifier.startCaptureSession();
-    }
-
-    // Process the capture
-    final success = await captureNotifier.processCapture(widget.imageData);
-
-    setState(() {
-      _isProcessing = false;
-    });
-
-    if (success) {
-      _handleSuccessfulCapture();
-    } else {
-      _handleFailedCapture();
-    }
-=======
     // Cancel any pending auto-save timer
     _autoSaveTimer?.cancel();
     _autoSaveTimer = null;
@@ -249,7 +154,6 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
       ))
     );
     return processingState.isProcessing;
->>>>>>> Stashed changes
   }
 
   void _handleSuccessfulCapture() {
@@ -296,22 +200,9 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
     switch (action) {
       case RetryAction.retry:
         // Retry processing the same image
-<<<<<<< Updated upstream
-        setState(() {
-          _isProcessing = true;
-        });
-
-        final success = await captureNotifier.retryCapture();
-
-        setState(() {
-          _isProcessing = false;
-        });
-
-=======
         // Processing state is managed by the provider
         final success = await captureNotifier.retryCapture();
 
->>>>>>> Stashed changes
         if (success) {
           _handleSuccessfulCapture();
         } else {
@@ -334,24 +225,10 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
   }
 
   Future<void> _onRetry() async {
-<<<<<<< Updated upstream
-    setState(() {
-      _isProcessing = true;
-    });
-
-    final captureNotifier = ref.read(captureProvider.notifier);
-    final success = await captureNotifier.retryCapture();
-
-    setState(() {
-      _isProcessing = false;
-    });
-
-=======
     // Processing state is managed by the provider
     final captureNotifier = ref.read(captureProvider.notifier);
     final success = await captureNotifier.retryCapture();
 
->>>>>>> Stashed changes
     if (success) {
       _handleSuccessfulCapture();
     } else {
@@ -415,16 +292,11 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
   }
 
   void _scheduleAutoSaveConfirmation() {
-<<<<<<< Updated upstream
-    // Show brief save confirmation after successful update
-    Future.delayed(const Duration(milliseconds: 300), () {
-=======
     // Cancel any existing timer
     _autoSaveTimer?.cancel();
     
     // Show brief save confirmation after successful update
     _autoSaveTimer = Timer(const Duration(milliseconds: 300), () {
->>>>>>> Stashed changes
       if (mounted) {
         setState(() {
           _hasUnsavedChanges = false;
@@ -462,11 +334,7 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
         ),
         actions: [
           // View mode toggle
-<<<<<<< Updated upstream
-          if (!captureState.isRetryMode && captureState.lastProcessingResult != null && _imagePath != null) ...[
-=======
           if (!captureState.isRetryMode && captureState.lastProcessingResult != null && widget.initState.imagePath.isNotEmpty) ...[
->>>>>>> Stashed changes
             IconButton(
               icon: Icon(imageViewerState.showBoundingBoxes ? Icons.crop_free : Icons.crop_free_outlined),
               tooltip: imageViewerState.showBoundingBoxes ? 'Hide boxes' : 'Show boxes',
@@ -542,11 +410,7 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
     final imageViewerNotifier = ref.read(imageViewerProvider.notifier);
     
     // If image path is not ready, show loading
-<<<<<<< Updated upstream
-    if (_imagePath == null) {
-=======
     if (widget.initState.imagePath.isEmpty) {
->>>>>>> Stashed changes
       return const Center(child: CircularProgressIndicator());
     }
     
@@ -562,11 +426,7 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
         
         // Image viewer widget with bounding box overlay
         final imageViewer = ZoomableImageViewer(
-<<<<<<< Updated upstream
-          imagePath: _imagePath!,
-=======
           imagePath: widget.initState.imagePath,
->>>>>>> Stashed changes
           minScale: imageViewerState.minZoom,
           maxScale: imageViewerState.maxZoom,
           showFpsOverlay: false,
@@ -735,18 +595,12 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
                       children: [
                         const Icon(Icons.insights),
                         const SizedBox(width: 12),
-<<<<<<< Updated upstream
-                        Text(
-                          'Overall Confidence: ${displayResult.overallConfidence.toStringAsFixed(1)}%',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-=======
                         Expanded(
                           child: Text(
                             'Overall Confidence: ${displayResult.overallConfidence.toStringAsFixed(1)}%',
                             style: const TextStyle(fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                           ),
->>>>>>> Stashed changes
                         ),
                       ],
                     ),
@@ -854,10 +708,6 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-<<<<<<< Updated upstream
-              child: Image.memory(
-                widget.imageData,
-=======
               child: widget.initState.imagePath.isNotEmpty
                 ? Image.file(
                     File(widget.initState.imagePath),
@@ -865,9 +715,8 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
                   )
                 : Image.memory(
                     widget.imageData,
->>>>>>> Stashed changes
-                fit: BoxFit.cover,
-              ),
+                    fit: BoxFit.cover,
+                  ),
             ),
           ),
           const SizedBox(height: 24),
