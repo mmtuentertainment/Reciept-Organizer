@@ -228,7 +228,7 @@ void main() {
         ));
         
         // When
-        const normalText = 'This is a normal receipt note with $50.00 and #tags!';
+        const normalText = r'This is a normal receipt note with $50.00 and #tags!';
         await tester.enterText(find.byType(TextFormField), normalText);
         await tester.pump();
         

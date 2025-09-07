@@ -126,7 +126,7 @@ void main() {
       await _simulateReceiptCapture(tester);
       
       // Test various special characters
-      const specialNotes = 'Receipt for: $50.00 @ Store #123\nItems: Coffee & Donuts';
+      const specialNotes = r'Receipt for: $50.00 @ Store #123' '\nItems: Coffee & Donuts';
       await tester.enterText(find.byType(NotesFieldEditor), specialNotes);
       await tester.pumpAndSettle();
 

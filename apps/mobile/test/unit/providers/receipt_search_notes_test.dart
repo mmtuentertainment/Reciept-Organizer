@@ -31,10 +31,12 @@ void main() {
         notes: notes,
         ocrResults: merchantName != null || date != null || total != null
             ? ProcessingResult(
-                merchant: FieldData(value: merchantName ?? '', confidence: 90),
-                date: FieldData(value: date ?? '', confidence: 90),
-                total: FieldData(value: total ?? 0, confidence: 90),
-                tax: FieldData(value: 0, confidence: 90),
+                merchant: FieldData(value: merchantName ?? '', confidence: 90, originalText: merchantName ?? ''),
+                date: FieldData(value: date ?? '', confidence: 90, originalText: date ?? ''),
+                total: FieldData(value: total ?? 0.0, confidence: 90, originalText: total?.toString() ?? '0'),
+                tax: FieldData(value: 0.0, confidence: 90, originalText: '0'),
+                overallConfidence: 90,
+                processingDurationMs: 1000,
               )
             : null,
       );
@@ -210,7 +212,7 @@ void main() {
         ),
         createReceipt(
           id: '3',
-          notes: 'Cost: $50.00',
+          notes: r'Cost: $50.00',
         ),
       ];
 

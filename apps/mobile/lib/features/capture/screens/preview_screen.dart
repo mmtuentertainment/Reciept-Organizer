@@ -1,6 +1,9 @@
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
 import 'package:receipt_organizer/features/capture/widgets/capture_failed_state.dart';
 import 'package:receipt_organizer/features/capture/widgets/retry_prompt_dialog.dart';
@@ -8,6 +11,9 @@ import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/merchant_field_editor_with_normalization.dart';
 import 'package:receipt_organizer/features/capture/widgets/notes_field_editor.dart';
+import 'package:receipt_organizer/shared/widgets/zoomable_image_viewer.dart';
+import 'package:receipt_organizer/shared/widgets/bounding_box_overlay.dart';
+import 'package:receipt_organizer/features/receipts/presentation/providers/image_viewer_provider.dart';
 
 /// Preview screen that shows capture results and handles retry scenarios
 class PreviewScreen extends ConsumerStatefulWidget {
@@ -28,11 +34,51 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
   bool _isProcessing = false;
   bool _hasUnsavedChanges = false;
   String _notes = '';
-
+  
+  // Image viewer state
+  String? _imagePath;
+  final TransformationController _imageTransformController = TransformationController();
+  
   @override
   void initState() {
     super.initState();
+    _saveImageToFile();
     _processCapture();
+    
+    // Connect image viewer provider to transformation controller
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(imageViewerProvider.notifier).connectToController(_imageTransformController);
+    });
+  }
+  
+  @override
+  void dispose() {
+    // Disconnect from provider before disposing
+    ref.read(imageViewerProvider.notifier).disconnectFromController();
+    _imageTransformController.dispose();
+    // Clean up temporary image file
+    if (_imagePath != null) {
+      File(_imagePath!).deleteSync();
+    }
+    super.dispose();
+  }
+  
+  Future<void> _saveImageToFile() async {
+    try {
+      // Save image data to a temporary file for ZoomableImageViewer
+      final tempDir = await getTemporaryDirectory();
+      final uuid = const Uuid().v4();
+      final tempFile = File('${tempDir.path}/receipt_$uuid.jpg');
+      await tempFile.writeAsBytes(widget.imageData);
+      
+      if (mounted) {
+        setState(() {
+          _imagePath = tempFile.path;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error saving image to file: $e');
+    }
   }
 
   Future<void> _processCapture() async {
@@ -246,6 +292,7 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
   @override
   Widget build(BuildContext context) {
     final captureState = ref.watch(captureProvider);
+    final imageViewerState = ref.watch(imageViewerProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -255,6 +302,23 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
           onPressed: _onCancel,
         ),
         actions: [
+          // View mode toggle
+          if (!captureState.isRetryMode && captureState.lastProcessingResult != null && _imagePath != null) ...[
+            IconButton(
+              icon: Icon(imageViewerState.showBoundingBoxes ? Icons.crop_free : Icons.crop_free_outlined),
+              tooltip: imageViewerState.showBoundingBoxes ? 'Hide boxes' : 'Show boxes',
+              onPressed: () {
+                ref.read(imageViewerProvider.notifier).toggleBoundingBoxes();
+              },
+            ),
+            IconButton(
+              icon: Icon(!imageViewerState.isImageOnly ? Icons.image : Icons.view_sidebar),
+              tooltip: !imageViewerState.isImageOnly ? 'Image only' : 'Split view',
+              onPressed: () {
+                ref.read(imageViewerProvider.notifier).toggleImageOnlyMode();
+              },
+            ),
+          ],
           if (captureState.isRetryMode && captureState.canRetry)
             TextButton(
               onPressed: _isProcessing ? null : _onRetry,
@@ -310,150 +374,282 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
     final captureState = ref.watch(captureProvider);
     final displayResult = captureState.lastProcessingResult ?? result;
     
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image preview
-          Container(
-            width: double.infinity,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.memory(
-                widget.imageData,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Success header
-          Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.green, size: 24),
-              const SizedBox(width: 8),
-              const Text(
-                'Receipt Processed Successfully',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              if (_hasUnsavedChanges) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.orange[100],
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: Colors.orange[300]!),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.edit, size: 12, color: Colors.orange[700]),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Edited',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.orange[700],
+    // Watch image viewer state
+    final imageViewerState = ref.watch(imageViewerProvider);
+    final imageViewerNotifier = ref.read(imageViewerProvider.notifier);
+    
+    // If image path is not ready, show loading
+    if (_imagePath == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Determine if we should use tablet layout (side-by-side)
+        final isTablet = constraints.maxWidth > 768;
+        
+        // Extract bounding boxes from OCR result
+        final boundingBoxes = imageViewerState.showBoundingBoxes && displayResult.merchant != null && displayResult.merchant!.boundingBox != null
+            ? BoundingBoxOverlay.extractFromProcessingResult(displayResult)
+            : <OcrBoundingBox>[];
+        
+        // Image viewer widget with bounding box overlay
+        final imageViewer = ZoomableImageViewer(
+          imagePath: _imagePath!,
+          minScale: imageViewerState.minZoom,
+          maxScale: imageViewerState.maxZoom,
+          showFpsOverlay: false,
+          onTap: () {
+            // Toggle view mode on tap
+            imageViewerNotifier.toggleImageOnlyMode();
+          },
+          overlayBuilder: boundingBoxes.isNotEmpty ? (imageSize, transform) {
+            return BoundingBoxOverlay(
+              boundingBoxes: boundingBoxes,
+              selectedFieldName: imageViewerState.selectedField,
+              imageSize: imageSize,
+              displaySize: MediaQuery.of(context).size,
+              onFieldTapped: (fieldName) {
+                imageViewerNotifier.selectField(fieldName);
+                
+                // If in split view, show feedback
+                if (!imageViewerState.isImageOnly) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Selected: $fieldName'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                }
+              },
+              debugMode: false, // Set to true for debugging
+            );
+          } : null,
+        );
+        
+        // Fields editor widget
+        final fieldsEditor = Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Success header
+                Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.green, size: 24),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Receipt Processed',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (_hasUnsavedChanges) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.orange[100],
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.orange[300]!),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.edit, size: 12, color: Colors.orange[700]),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Edited',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.orange[700],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
+                  ],
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Editable fields
+                Text(
+                  'Receipt Information',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                
+                // Wrap each field in a container to highlight when selected
+                Container(
+                  decoration: BoxDecoration(
+                    border: imageViewerState.selectedField == 'merchant' 
+                        ? Border.all(color: Colors.green, width: 2)
+                        : null,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: MerchantFieldEditorWithNormalization(
+                    fieldData: displayResult.merchant,
+                    onChanged: _handleMerchantChanged,
+                    showNormalizationIndicator: true,
+                  ),
+                ),
+                
+                Container(
+                  decoration: BoxDecoration(
+                    border: imageViewerState.selectedField == 'date'
+                        ? Border.all(color: Colors.green, width: 2)
+                        : null,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: DateFieldEditor(
+                    fieldData: displayResult.date,
+                    onChanged: _handleDateChanged,
+                  ),
+                ),
+                
+                Container(
+                  decoration: BoxDecoration(
+                    border: imageViewerState.selectedField == 'total'
+                        ? Border.all(color: Colors.green, width: 2)
+                        : null,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: AmountFieldEditor(
+                    fieldName: 'Total',
+                    label: 'Total Amount',
+                    fieldData: displayResult.total,
+                    onChanged: _handleTotalChanged,
+                  ),
+                ),
+                
+                Container(
+                  decoration: BoxDecoration(
+                    border: imageViewerState.selectedField == 'tax'
+                        ? Border.all(color: Colors.green, width: 2)
+                        : null,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: AmountFieldEditor(
+                    fieldName: 'Tax',
+                    label: 'Tax Amount',
+                    fieldData: displayResult.tax,
+                    onChanged: _handleTaxChanged,
+                  ),
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Notes field
+                NotesFieldEditor(
+                  initialValue: _notes,
+                  onChanged: _handleNotesChanged,
+                  enabled: true,
+                ),
+                
+                const SizedBox(height: 24),
+                
+                // Overall confidence
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.insights),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Overall Confidence: ${displayResult.overallConfidence.toStringAsFixed(1)}%',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 24),
+                
+                // Action buttons
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Changes are auto-saved through CaptureProvider
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Accept & Continue'),
                   ),
                 ),
               ],
-            ],
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Editable fields using FieldEditor components
-          Text(
-            'Receipt Information',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 12),
-          
-          MerchantFieldEditorWithNormalization(
-            fieldData: displayResult.merchant,
-            onChanged: _handleMerchantChanged,
-            showNormalizationIndicator: true,
-          ),
-          
-          DateFieldEditor(
-            fieldData: displayResult.date,
-            onChanged: _handleDateChanged,
-          ),
-          
-          AmountFieldEditor(
-            fieldName: 'Total',
-            label: 'Total Amount',
-            fieldData: displayResult.total,
-            onChanged: _handleTotalChanged,
-          ),
-          
-          AmountFieldEditor(
-            fieldName: 'Tax',
-            label: 'Tax Amount',
-            fieldData: displayResult.tax,
-            onChanged: _handleTaxChanged,
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Notes field
-          NotesFieldEditor(
-            initialValue: _notes,
-            onChanged: _handleNotesChanged,
-            enabled: true,
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Overall confidence
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const Icon(Icons.insights),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Overall Confidence: ${displayResult.overallConfidence.toStringAsFixed(1)}%',
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+        );
+        
+        // Build layout based on view mode and device type
+        if (imageViewerState.isImageOnly) {
+          // Image-only view
+          return imageViewer;
+        } else if (isTablet) {
+          // Tablet: side-by-side layout
+          return Row(
+            children: [
+              // Image viewer on the left (40% width)
+              Expanded(
+                flex: 40,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                        width: 1,
+                      ),
+                    ),
                   ),
-                ],
+                  child: imageViewer,
+                ),
               ),
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Action buttons
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // Changes are auto-saved through CaptureProvider
-                Navigator.of(context).pop();
-              },
-              child: const Text('Accept & Continue'),
-            ),
-          ),
-        ],
-      ),
+              // Fields editor on the right (60% width)
+              Expanded(
+                flex: 60,
+                child: fieldsEditor,
+              ),
+            ],
+          );
+        } else {
+          // Phone: stacked layout
+          return Column(
+            children: [
+              // Collapsible image viewer at the top
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                height: !imageViewerState.isImageOnly ? 250 : 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: imageViewer,
+                ),
+              ),
+              // Fields editor below
+              Expanded(
+                child: fieldsEditor,
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 

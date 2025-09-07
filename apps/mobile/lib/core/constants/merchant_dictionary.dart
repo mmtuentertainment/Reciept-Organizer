@@ -49,7 +49,7 @@ class MerchantDictionary {
   static const List<FranchisePattern> franchisePatterns = [
     // McDonald's patterns
     FranchisePattern(r'MCDONALDS?\s*(?:#|STORE\s*#?|-)?\s*\d+', 'McDonalds'),
-    FranchisePattern(r'MCDONALD\'?S?\s*(?:#|STORE\s*#?|-)?\s*\d+', 'McDonalds'),
+    FranchisePattern(r"MCDONALD'?S?\s*(?:#|STORE\s*#?|-)?\s*\d+", 'McDonalds'),
     FranchisePattern(r'MCD\s*#?\d+', 'McDonalds'),
     
     // Starbucks patterns
@@ -92,19 +92,19 @@ class MerchantDictionary {
     FranchisePattern(r'TACO\s+BELL\s*(?:#)?\s*\d+', 'Taco Bell'),
     FranchisePattern(r'PIZZA\s+HUT\s*(?:#)?\s*\d+', 'Pizza Hut'),
     FranchisePattern(r'DOMINOS?\s*(?:#)?\s*\d+', 'Dominos'),
-    FranchisePattern(r'DUNKIN\'?\s*(?:#)?\s*\d+', 'Dunkin'),
+    FranchisePattern(r"DUNKIN'?\s*(?:#)?\s*\d+", 'Dunkin'),
     FranchisePattern(r'CHICK-?FIL-?A\s*(?:#)?\s*\d+', 'Chick-fil-A'),
     FranchisePattern(r'IN-?N-?OUT\s*(?:#)?\s*\d+', 'In-N-Out'),
-    FranchisePattern(r'WENDY\'?S\s*(?:#)?\s*\d+', 'Wendy\'s'),
-    FranchisePattern(r'ARBY\'?S\s*(?:#)?\s*\d+', 'Arby\'s'),
+    FranchisePattern(r"WENDY'?S\s*(?:#)?\s*\d+", "Wendy's"),
+    FranchisePattern(r"ARBY'?S\s*(?:#)?\s*\d+", "Arby's"),
     
     // Special format stores
     FranchisePattern(r'7-?ELEVEN\s*(?:#)?\s*\d*', '7-Eleven'),
-    FranchisePattern(r'TRADER\s+JOE\'?S?', 'Trader Joes'),
+    FranchisePattern(r"TRADER\s+JOE'?S?", 'Trader Joes'),
     FranchisePattern(r'WHOLE\s+FOODS?', 'Whole Foods'),
     FranchisePattern(r'BEST\s+BUY\s*(?:#)?\s*\d*', 'Best Buy'),
-    FranchisePattern(r'DICK\'?S\s+SPORTING', 'Dick\'s Sporting'),
-    FranchisePattern(r'BJ\'?S\s+WHOLESALE', 'BJ\'s Wholesale'),
+    FranchisePattern(r"DICK'?S\s+SPORTING", "Dick's Sporting"),
+    FranchisePattern(r"BJ'?S\s+WHOLESALE", "BJ's Wholesale"),
     FranchisePattern(r'T\.?J\.?\s*MAXX?', 'T.J.Maxx'),
   ];
 
@@ -149,7 +149,7 @@ class MerchantDictionary {
     'USPS': 'USPS',
     'KFC': 'KFC',
     'BP': 'BP',
-    'BJ\'S': 'BJ\'s',
+    "BJ'S": "BJ's",
   };
 
   /// Words that should remain uppercase
@@ -169,9 +169,8 @@ class MerchantDictionary {
 class FranchisePattern {
   final String pattern;
   final String normalizedName;
-  late final RegExp regex;
 
-  FranchisePattern(this.pattern, this.normalizedName) {
-    regex = RegExp(pattern, caseSensitive: false);
-  }
+  const FranchisePattern(this.pattern, this.normalizedName);
+  
+  RegExp get regex => RegExp(pattern, caseSensitive: false);
 }

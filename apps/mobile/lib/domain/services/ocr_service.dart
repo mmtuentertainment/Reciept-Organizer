@@ -15,6 +15,7 @@ class FieldData {
   final String originalText;
   final bool isManuallyEdited;
   final String validationStatus;
+  final Rect? boundingBox;
 
   FieldData({
     required this.value,
@@ -22,6 +23,7 @@ class FieldData {
     required this.originalText,
     this.isManuallyEdited = false,
     this.validationStatus = 'valid',
+    this.boundingBox,
   });
 
   FieldData copyWith({
@@ -30,6 +32,7 @@ class FieldData {
     String? originalText,
     bool? isManuallyEdited,
     String? validationStatus,
+    Rect? boundingBox,
   }) {
     return FieldData(
       value: value ?? this.value,
@@ -37,6 +40,7 @@ class FieldData {
       originalText: originalText ?? this.originalText,
       isManuallyEdited: isManuallyEdited ?? this.isManuallyEdited,
       validationStatus: validationStatus ?? this.validationStatus,
+      boundingBox: boundingBox ?? this.boundingBox,
     );
   }
 
@@ -53,17 +57,35 @@ class FieldData {
       'originalText': originalText,
       'isManuallyEdited': isManuallyEdited,
       'validationStatus': validationStatus,
+      if (boundingBox != null) 'boundingBox': {
+        'left': boundingBox!.left,
+        'top': boundingBox!.top,
+        'width': boundingBox!.width,
+        'height': boundingBox!.height,
+      },
     };
   }
 
   /// Creates FieldData from JSON for session restoration
   factory FieldData.fromJson(Map<String, dynamic> json) {
+    Rect? boundingBox;
+    if (json['boundingBox'] != null) {
+      final box = json['boundingBox'] as Map<String, dynamic>;
+      boundingBox = Rect.fromLTWH(
+        (box['left'] as num).toDouble(),
+        (box['top'] as num).toDouble(),
+        (box['width'] as num).toDouble(),
+        (box['height'] as num).toDouble(),
+      );
+    }
+    
     return FieldData(
       value: json['value'],
       confidence: (json['confidence'] as num).toDouble(),
       originalText: json['originalText'],
       isManuallyEdited: json['isManuallyEdited'] ?? false,
       validationStatus: json['validationStatus'] ?? 'valid',
+      boundingBox: boundingBox,
     );
   }
 }

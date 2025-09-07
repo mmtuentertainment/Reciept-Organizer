@@ -112,7 +112,9 @@ class _NotesFieldEditorState extends State<NotesFieldEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFormField(
+        Semantics(
+          label: 'Receipt notes. Maximum 500 characters.',
+          child: TextFormField(
           controller: _controller,
           focusNode: _focusNode,
           enabled: widget.enabled,
@@ -127,7 +129,6 @@ class _NotesFieldEditorState extends State<NotesFieldEditor> {
             hintText: 'Add notes about this receipt...',
             hintMaxLines: 2,
             alignLabelWithHint: true,
-            semanticsLabel: 'Receipt notes. Maximum 500 characters.',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
@@ -157,6 +158,7 @@ class _NotesFieldEditorState extends State<NotesFieldEditor> {
             counterText: '', // Hide default counter, we'll use custom
           ),
           style: theme.textTheme.bodyLarge,
+        ),
         ),
         const SizedBox(height: 4),
         // Custom character counter
