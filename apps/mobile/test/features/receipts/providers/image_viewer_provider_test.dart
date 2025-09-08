@@ -235,8 +235,8 @@ void main() {
         // Arrange
         final notifier = container.read(imageViewerProvider.notifier);
         final matrix = Matrix4.identity()
-          ..translateByDouble(100.0, 50.0)
-          ..scaleByDouble(2.0);
+          ..translate(100.0, 50.0)
+          ..scale(2.0);
         
         // Act
         notifier.updateFromMatrix(matrix);

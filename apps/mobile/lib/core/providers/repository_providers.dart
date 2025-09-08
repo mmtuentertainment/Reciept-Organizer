@@ -6,7 +6,7 @@ part 'repository_providers.g.dart';
 
 /// Provider for ReceiptRepository instance
 @riverpod
-Future<IReceiptRepository> receiptRepository(Ref ref) async {
+Future<IReceiptRepository> receiptRepository(ReceiptRepositoryRef ref) async {
   final repository = ReceiptRepository();
   // Initialize if needed
   return repository;

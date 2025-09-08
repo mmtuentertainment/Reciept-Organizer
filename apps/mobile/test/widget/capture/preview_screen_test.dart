@@ -22,18 +22,16 @@ final mockPreviewInitializationProvider = FutureProvider.family<PreviewInitState
 
 // Note: PreviewProcessingNotifier type is inferred from the implementation
 
-class MockPreviewProcessingNotifier extends StateNotifier<PreviewInitState> {
-  MockPreviewProcessingNotifier() : super(PreviewInitState(
-    imagePath: '/tmp/test-image.jpg',
-    sessionId: 'test-session-123',
-  ));
+class MockPreviewProcessingNotifier extends PreviewProcessingNotifier {
+  MockPreviewProcessingNotifier({required super.ref, required super.params}) : super();
   
+  @override
   Future<void> startProcessing() async {
     // No-op for tests
   }
 }
-@GenerateMocks([
-  CaptureNotifier,
+@GenerateNiceMocks([
+  MockSpec<CaptureNotifier>(),
 ])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -55,7 +53,7 @@ void main() {
         processingDurationMs: 1500,
       );
 
-      mockCaptureState = const CaptureState(
+      mockCaptureState = CaptureState(
         isProcessing: false,
         isRetryMode: false,
         lastProcessingResult: mockProcessingResult,
@@ -88,7 +86,7 @@ void main() {
           return initState ?? mockInitState;
         }),
         previewProcessingProvider(initParams).overrideWith((ref) {
-          return MockPreviewProcessingNotifier();
+          return MockPreviewProcessingNotifier(ref: ref, params: initParams);
         }),
         ...?additionalOverrides,
       ];

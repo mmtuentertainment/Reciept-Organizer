@@ -219,13 +219,16 @@ List<Receipt> _generateLargeReceiptDataset(int count) {
       status: ReceiptStatus.ready,
       notes: notes,
       ocrResults: ProcessingResult(
-        merchant: FieldData(value: merchant, confidence: 90 + (index % 10)),
+        merchant: FieldData(value: merchant, confidence: 90 + (index % 10).toDouble(), originalText: merchant),
         date: FieldData(
           value: '${date.month}/${date.day}/${date.year}',
-          confidence: 95 - (index % 10),
+          confidence: 95 - (index % 10).toDouble(),
+          originalText: '${date.month}/${date.day}/${date.year}',
         ),
-        total: FieldData(value: total, confidence: 92 + (index % 8)),
-        tax: FieldData(value: tax, confidence: 88 + (index % 12)),
+        total: FieldData(value: total, confidence: 92 + (index % 8).toDouble(), originalText: total.toString()),
+        tax: FieldData(value: tax, confidence: 88 + (index % 12).toDouble(), originalText: tax.toString()),
+        overallConfidence: 91.0,
+        processingDurationMs: 1000,
       ),
     );
   });

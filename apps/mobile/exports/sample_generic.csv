@@ -1,0 +1,5 @@
+﻿Receipt ID,Date,Merchant,Total Amount,Tax Amount,Notes
+test-001,01/08/2025,Office Supplies Store,45.99,3.68,Printer paper and pens
+test-002,01/09/2025,Joe's Coffee Shop,12.50,1.00,Client meeting
+test-003,01/10/2025,Gas Station #42,65.00,5.20,Business travel
+test-004,01/11/2025,'=Dangerous Shop,100.00,8.00,Testing CSV injection prevention

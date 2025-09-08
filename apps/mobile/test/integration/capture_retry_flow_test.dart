@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/domain/services/camera_service.dart';
 import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
@@ -15,8 +15,9 @@ import 'package:receipt_organizer/features/capture/widgets/retry_prompt_dialog.d
 import 'package:receipt_organizer/features/capture/widgets/capture_failed_state.dart';
 
 import 'capture_retry_flow_test.mocks.dart';
+import '../mocks/mock_text_recognizer.dart';
 
-@GenerateMocks([TextRecognizer, ICameraService, RetrySessionManager])
+@GenerateNiceMocks([MockSpec<ICameraService>(), MockSpec<RetrySessionManager>()])
 void main() {
   group('Capture Retry Flow Integration Tests', () {
     late MockTextRecognizer mockTextRecognizer;
@@ -31,8 +32,8 @@ void main() {
       ocrService = OCRService(textRecognizer: mockTextRecognizer);
 
       // Setup default mock behaviors
-      when(mockSessionManager.saveSession(any)).thenAnswer((_) async => true);
-      when(mockSessionManager.cleanupSession(any)).thenAnswer((_) async => true);
+      when(mockSessionManager.saveSession(any())).thenAnswer((_) async => true);
+      when(mockSessionManager.cleanupSession(any())).thenAnswer((_) async => true);
       when(mockSessionManager.cleanupExpiredSessions()).thenAnswer((_) async => 0);
     });
 
@@ -151,7 +152,7 @@ void main() {
       expect(find.text('Receipt Processed Successfully'), findsOneWidget);
       
       // Verify session was saved during failure
-      verify(mockSessionManager.saveSession(any)).called(greaterThan(0));
+      verify(mockSessionManager.saveSession(any())).called(greaterThan(0));
     });
 
     testWidgets('should handle retry dialog flow correctly', (tester) async {
@@ -195,11 +196,11 @@ void main() {
             home: Builder(
               builder: (context) => ElevatedButton(
                 onPressed: () async {
-                  // final action = await RetryPromptDialog.show(
-                    context= context,
-                    failureReason= FailureReason.lowConfidence,
-                    attemptNumber= 2,
-                    attemptsRemaining= 3,
+                  final action = await RetryPromptDialog.show(
+                    context: context,
+                    failureReason: FailureReason.lowConfidence,
+                    attemptNumber: 2,
+                    attemptsRemaining: 3,
                   );
                   // Handle action result if needed
                 },

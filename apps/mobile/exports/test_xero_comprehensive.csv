@@ -1,0 +1,58 @@
+﻿Date,Amount,Payee,Description,Account Code,Tax Amount,Notes
+15/01/2024,45.99,Office Depot,Business expense - Receipt #001,400,3.68,Standard purchase
+16/01/2024,12.50,Starbucks,Business expense - Receipt #002,429,1.00,Client meeting - downtown location
+17/01/2024,250.00,Best Buy Electronics,Computer equipment - Receipt #003,420,20.00,Laptop charger and accessories
+18/01/2024,0.99,Dollar Store,Office supplies - Receipt #004,400,0.08,Small items test
+19/01/2024,9999.99,Conference Center LLC,Training expense - Receipt #005,433,799.99,Annual conference registration
+20/01/2024,35.00,"Smith, John & Associates",Professional fees - Receipt #006,404,2.80,Legal consultation
+21/01/2024,150.00,"""ABC Company, Inc.""",Advertising expense - Receipt #007,410,12.00,Double quotes in name test
+22/01/2024,75.50,'O''Reilly Auto Parts,Motor vehicle expenses - Receipt #008,449,6.04,Apostrophe in name test
+23/01/2024,42.00,Café José,Entertainment expense - Receipt #009,429,3.36,Accented character test
+24/01/2024,89.99,WALMART #1234,Office supplies - Receipt #010,400,7.20,Store number in name
+25/01/2024,15000.00,Equipment Rental Co.,Equipment hire - Receipt #011,440,1200.00,Large amount test
+26/01/2024,0.01,Test Merchant,General expense - Receipt #012,493,0.00,Minimum amount test
+27/01/2024,500.00,'=DANGEROUS() FORMULA,Office supplies - Receipt #013,400,40.00,CSV injection test - formula
+28/01/2024,100.00,'+1234567890,Utilities expense - Receipt #014,445,8.00,CSV injection test - phone number
+29/01/2024,200.00,'-Negative Start,Marketing expense - Receipt #015,410,16.00,CSV injection test - minus sign
+30/01/2024,300.00,'@Command Test,Computer expense - Receipt #016,420,24.00,CSV injection test - at symbol
+31/01/2024,123.45,McDonald's® Restaurant,Entertainment expense - Receipt #017,429,9.88,Trademark symbol test
+01/02/2024,67.89,7-Eleven Store #9876,Motor vehicle expenses - Receipt #018,449,5.43,Number start name test
+02/02/2024,234.56,Home Depot,Repairs & maintenance - Receipt #019,425,18.76,Multi-word merchant
+03/02/2024,45.67,"Merchant with, comma",Office supplies - Receipt #020,400,3.65,Comma in merchant name
+04/02/2024,78.90,Target,General expense - Receipt #021,493,6.31,Simple name test
+05/02/2024,543.21,Amazon.com,Internet expense - Receipt #022,442,43.46,Domain in name
+06/02/2024,12.34,Store;With;Semicolons,Retail purchase - Receipt #023,300,0.99,Semicolon test
+07/02/2024,98.76,Store	With	Tabs,Office supplies - Receipt #024,400,7.90,Tab character test
+08/02/2024,65.43,"Store With
+Newline",Services expense - Receipt #025,493,5.23,Newline character test
+09/02/2024,1234567.89,Big Purchase Store,Capital purchase - Receipt #026,260,98765.43,Very large amount
+10/02/2024,0.00,Zero Dollar Store,Testing - Receipt #027,493,0.00,Zero amount test
+28/02/2024,29.99,Leap Year Store,Miscellaneous expense - Receipt #028,493,2.40,End of month test
+29/02/2024,29.00,Leap Day Special,Special date - Receipt #029,493,2.32,Leap day 2024
+15/03/2024,150.00,Pi Day Bakery,Food & beverage - Receipt #030,429,12.00,Mid-month test
+15/04/2024,1040.00,Tax Prep Services,Accounting fees - Receipt #031,404,83.20,Tax season test
+01/05/2024,50.00,May Day Flowers,Gift expense - Receipt #032,429,4.00,Beginning of month
+30/06/2024,99.99,End of Q2 Store,Quarter end expense - Receipt #033,493,8.00,End of quarter
+04/07/2024,76.00,Independence Day Supplies,Holiday expense - Receipt #034,429,6.08,US Holiday test
+30/09/2024,300.00,End of Q3 Services,Consulting fees - Receipt #035,404,24.00,Q3 end test
+31/10/2024,31.00,Halloween Store,Seasonal expense - Receipt #036,429,2.48,October test
+25/12/2024,250.00,Christmas Supplies Co,Holiday expense - Receipt #037,429,20.00,Christmas date
+31/12/2024,999.99,Year End Corporation,Annual service - Receipt #038,404,80.00,Year end test
+01/01/2025,100.00,New Year Start LLC,Services - Receipt #039,404,8.00,New year test
+31/12/2023,50.00,Previous Year Test,Historical entry - Receipt #040,493,4.00,Past date test
+15/01/2024,123.456789,Precision Test Store,Testing expense - Receipt #041,493,9.876543,Many decimal places
+16/01/2024,45.994,Rounding Test Store,Testing expense - Receipt #042,493,3.6795,Rounding test
+17/01/2024,1000000.00,Million Dollar Store,Large transaction - Receipt #043,260,80000.00,Million test
+18/01/2024,0.001,Sub-Penny Store,Micro transaction - Receipt #044,493,0.00,Very small amount
+19/01/2024,42.42,    Leading Spaces Store,Testing expense - Receipt #045,493,3.39,Leading spaces
+20/01/2024,84.84,Trailing Spaces Store    ,Testing expense - Receipt #046,493,6.79,Trailing spaces
+21/01/2024,100.00,ALLCAPS STORE,Testing expense - Receipt #047,493,8.00,All caps test
+22/01/2024,100.00,lowercase store,Testing expense - Receipt #048,493,8.00,All lowercase
+23/01/2024,100.00,mIxEd CaSe StOrE,Testing expense - Receipt #049,493,8.00,Mixed case
+24/01/2024,50.00,Store & Co.,Partnership expense - Receipt #050,404,4.00,Ampersand test
+25/01/2024,75.00,Store < > Test,Special chars test - Receipt #051,493,6.00,Angle brackets
+26/01/2024,100.00,Store | Pipe Test,Delimiter test - Receipt #052,493,8.00,Pipe character
+27/01/2024,200.00,Multi-Currency €£¥,International - Receipt #053,493,16.00,Currency symbols
+28/01/2024,150.00,Ñoño España S.L.,European vendor - Receipt #054,493,12.00,Spanish characters
+29/01/2024,175.00,Zürich GmbH,Swiss vendor - Receipt #055,493,14.00,German umlaut
+30/01/2024,225.00,Naïve Café,French vendor - Receipt #056,429,18.00,French diacritics

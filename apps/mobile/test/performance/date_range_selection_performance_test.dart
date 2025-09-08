@@ -5,12 +5,13 @@ import 'package:receipt_organizer/features/export/presentation/pages/export_scre
 import 'package:receipt_organizer/features/export/presentation/widgets/date_range_picker.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/date_range_provider.dart';
 import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_repository.dart';
+import 'package:receipt_organizer/core/providers/repository_providers.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 
-@GenerateMocks([IReceiptRepository])
+@GenerateNiceMocks([MockSpec<IReceiptRepository>()])
 import 'date_range_selection_performance_test.mocks.dart';
 
 void main() {

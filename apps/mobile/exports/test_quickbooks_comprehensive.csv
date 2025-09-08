@@ -1,0 +1,52 @@
+﻿Date,Amount,Payee,Category,Memo,Tax,Notes
+01/15/2024,45.99,Office Depot,Office Supplies,Receipt #001,3.68,Standard purchase
+01/16/2024,12.50,Starbucks,Meals & Entertainment,Receipt #002,1.00,Client meeting - downtown location
+01/17/2024,250.00,Best Buy Electronics,Computer Equipment,Receipt #003,20.00,Laptop charger and accessories
+01/18/2024,0.99,Dollar Store,Office Supplies,Receipt #004,0.08,Small items test
+01/19/2024,9999.99,Conference Center LLC,Training & Education,Receipt #005,799.99,Annual conference registration
+01/20/2024,35.00,"Smith, John & Associates",Professional Services,Receipt #006,2.80,Legal consultation
+01/21/2024,150.00,"""ABC Company, Inc.""",Advertising,Receipt #007,12.00,Double quotes in name test
+01/22/2024,75.50,'O''Reilly Auto Parts,Vehicle Expenses,Receipt #008,6.04,Apostrophe in name test
+01/23/2024,42.00,Café José,Meals & Entertainment,Receipt #009,3.36,Accented character test
+01/24/2024,89.99,WALMART #1234,Office Supplies,Receipt #010,7.20,Store number in name
+01/25/2024,15000.00,Equipment Rental Co.,Equipment Rental,Receipt #011,1200.00,Large amount test
+01/26/2024,0.01,Test Merchant,Miscellaneous,Receipt #012,0.00,Minimum amount test
+01/27/2024,500.00,'=DANGEROUS() FORMULA,Office Supplies,Receipt #013,40.00,CSV injection test - formula
+01/28/2024,100.00,'+1234567890,Utilities,Receipt #014,8.00,CSV injection test - phone number
+01/29/2024,200.00,'-Negative Start,Marketing,Receipt #015,16.00,CSV injection test - minus sign
+01/30/2024,300.00,'@Command Test,Software,Receipt #016,24.00,CSV injection test - at symbol
+01/31/2024,123.45,McDonald's® Restaurant,Meals & Entertainment,Receipt #017,9.88,Trademark symbol test
+02/01/2024,67.89,7-Eleven Store #9876,Fuel,Receipt #018,5.43,Number start name test
+02/02/2024,234.56,Home Depot,Building Supplies,Receipt #019,18.76,Multi-word merchant
+02/03/2024,45.67,"Merchant with, comma",Office Supplies,Receipt #020,3.65,Comma in merchant name
+02/04/2024,78.90,Target,Miscellaneous,Receipt #021,6.31,Simple name test
+02/05/2024,543.21,Amazon.com,Online Services,Receipt #022,43.46,Domain in name
+02/06/2024,12.34,Store;With;Semicolons,Retail,Receipt #023,0.99,Semicolon test
+02/07/2024,98.76,Store	With	Tabs,Office Supplies,Receipt #024,7.90,Tab character test
+02/08/2024,65.43,"Store With
+Newline",Services,Receipt #025,5.23,Newline character test
+02/09/2024,1234567.89,Big Purchase Store,Capital Equipment,Receipt #026,98765.43,Very large amount
+02/10/2024,0.00,Zero Dollar Store,Testing,Receipt #027,0.00,Zero amount test
+02/28/2024,29.99,Leap Year Store,Miscellaneous,Receipt #028,2.40,End of month test
+03/15/2024,150.00,Pi Day Bakery,Food & Beverage,Receipt #029,12.00,Mid-month test
+04/15/2024,1040.00,Tax Prep Services,Professional Services,Receipt #030,83.20,Tax season test
+05/01/2024,50.00,May Day Flowers,Gifts,Receipt #031,4.00,Beginning of month
+06/30/2024,99.99,End of Q2 Store,Quarter End,Receipt #032,8.00,End of quarter
+07/04/2024,76.00,Independence Day Supplies,Holiday,Receipt #033,6.08,Holiday test
+09/30/2024,300.00,End of Q3 Services,Consulting,Receipt #034,24.00,Q3 end test
+10/31/2024,31.00,Halloween Store,Seasonal,Receipt #035,2.48,October test
+12/25/2024,250.00,Christmas Supplies Co,Holiday,Receipt #036,20.00,Christmas date
+12/31/2024,999.99,Year End Corporation,Annual Services,Receipt #037,80.00,Year end test
+01/01/2025,100.00,New Year Start LLC,Services,Receipt #038,8.00,New year test
+12/31/2023,50.00,Previous Year Test,Historical,Receipt #039,4.00,Past date test
+01/15/2024,123.456789,Precision Test Store,Testing,Receipt #040,9.876543,Many decimal places
+01/16/2024,45.994,Rounding Test Store,Testing,Receipt #041,3.6795,Rounding test
+01/17/2024,1000000.00,Million Dollar Store,Large Transaction,Receipt #042,80000.00,Million test
+01/18/2024,0.001,Sub-Penny Store,Micro Transaction,Receipt #043,0.00,Very small amount
+01/19/2024,42.42,    Leading Spaces Store,Testing,Receipt #044,3.39,Leading spaces
+01/20/2024,84.84,Trailing Spaces Store    ,Testing,Receipt #045,6.79,Trailing spaces
+01/21/2024,100.00,ALLCAPS STORE,Testing,Receipt #046,8.00,All caps test
+01/22/2024,100.00,lowercase store,Testing,Receipt #047,8.00,All lowercase
+01/23/2024,100.00,mIxEd CaSe StOrE,Testing,Receipt #048,8.00,Mixed case
+01/24/2024,50.00,Store & Co.,Partnership,Receipt #049,4.00,Ampersand test
+01/25/2024,75.00,Store < > Test,Special Chars,Receipt #050,6.00,Angle brackets

@@ -1,3 +1,6 @@
 flutter.tar.xz
 flutter/
 apps/mobile/tmp/
+
+.gemini/
+gha-creds-*.json

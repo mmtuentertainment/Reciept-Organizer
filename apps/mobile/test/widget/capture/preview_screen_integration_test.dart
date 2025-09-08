@@ -14,7 +14,7 @@ import 'package:receipt_organizer/features/receipts/presentation/providers/image
 
 import '../../helpers/platform_test_helpers.dart';
 
-@GenerateMocks([SharedPreferences, Directory])
+@GenerateNiceMocks([MockSpec<SharedPreferences>(), MockSpec<Directory>()])
 import 'preview_screen_integration_test.mocks.dart';
 
 void main() {
@@ -33,10 +33,10 @@ void main() {
       mockPrefs = MockSharedPreferences();
       
       // Setup mock preferences
-      when(mockPrefs.getDouble(any)).thenReturn(null);
-      when(mockPrefs.getBool(any)).thenReturn(null);
-      when(mockPrefs.setDouble(any, any)).thenAnswer((_) async => true);
-      when(mockPrefs.setBool(any, any)).thenAnswer((_) async => true);
+      when(mockPrefs.getDouble(any())).thenReturn(null);
+      when(mockPrefs.getBool(any())).thenReturn(null);
+      when(mockPrefs.setDouble(any(), any())).thenAnswer((_) async => true);
+      when(mockPrefs.setBool(any(), any())).thenAnswer((_) async => true);
       
       container = ProviderContainer(
         overrides: [
@@ -63,14 +63,14 @@ void main() {
     group('Given successful OCR processing', () {
       testWidgets('When preview loads Then image viewer is displayed with fields', (tester) async {
         // Arrange
-        // final mockResult = ProcessingResult(
+        final mockResult = ProcessingResult(
           merchant: FieldData(value: 'Test Store', confidence: 0.95, originalText: 'Test Store'),
           date: FieldData(value: '2024-01-15', confidence: 0.90, originalText: '2024-01-15'),
           total: FieldData(value: '100.00', confidence: 0.85, originalText: '100.00'),
           tax: FieldData(value: '10.00', confidence: 0.80, originalText: '10.00'),
-    overallConfidence: 87.5,
-    processingDurationMs: 1000,
-  );
+          overallConfidence: 87.5,
+          processingDurationMs: 1000,
+        );
         
         // Mock getTemporaryDirectory
         final mockDir = MockDirectory();
@@ -107,14 +107,14 @@ void main() {
       
       testWidgets('When toggling view mode Then layout changes appropriately', (tester) async {
         // Arrange
-        // final mockResult = ProcessingResult(
+        final mockResult = ProcessingResult(
           merchant: FieldData(value: 'Test Store', confidence: 0.95, originalText: 'Test Store'),
           date: FieldData(value: '2024-01-15', confidence: 0.90, originalText: '2024-01-15'),
           total: FieldData(value: '100.00', confidence: 0.85, originalText: '100.00'),
           tax: FieldData(value: '10.00', confidence: 0.80, originalText: '10.00'),
-    overallConfidence: 87.5,
-    processingDurationMs: 1000,
-  );
+          overallConfidence: 87.5,
+          processingDurationMs: 1000,
+        );
         
         setupPathProviderForTests(
           temporaryPath: '/tmp',
@@ -158,7 +158,7 @@ void main() {
       
       testWidgets('When bounding boxes available Then overlay is displayed', (tester) async {
         // Arrange
-        // final mockResult = ProcessingResult(
+        final mockResult = ProcessingResult(
           merchant: FieldData(
             value: 'Test Store', 
             confidence: 0.95,
@@ -183,9 +183,9 @@ void main() {
             originalText: '10.00',
             boundingBox: const Rect.fromLTRB(0.6, 0.8, 0.9, 0.9),
           ),
-    overallConfidence: 87.5,
-    processingDurationMs: 1000,
-  );
+          overallConfidence: 87.5,
+          processingDurationMs: 1000,
+        );
         
         setupPathProviderForTests(
           temporaryPath: '/tmp',
@@ -211,7 +211,7 @@ void main() {
       
       testWidgets('When toggling bounding boxes Then overlay visibility changes', (tester) async {
         // Arrange
-        // final mockResult = ProcessingResult(
+        final mockResult = ProcessingResult(
           merchant: FieldData(
             value: 'Test Store', 
             confidence: 0.95,
@@ -221,9 +221,9 @@ void main() {
           date: FieldData(value: '2024-01-15', confidence: 0.90, originalText: '2024-01-15'),
           total: FieldData(value: '100.00', confidence: 0.85, originalText: '100.00'),
           tax: FieldData(value: '10.00', confidence: 0.80, originalText: '10.00'),
-    overallConfidence: 87.5,
-    processingDurationMs: 1000,
-  );
+          overallConfidence: 87.5,
+          processingDurationMs: 1000,
+        );
         
         setupPathProviderForTests(
           temporaryPath: '/tmp',
@@ -267,14 +267,14 @@ void main() {
     group('Given state preservation', () {
       testWidgets('When switching view modes Then zoom/pan state is maintained', (tester) async {
         // Arrange
-        // final mockResult = ProcessingResult(
+        final mockResult = ProcessingResult(
           merchant: FieldData(value: 'Test Store', confidence: 0.95, originalText: 'Test Store'),
           date: FieldData(value: '2024-01-15', confidence: 0.90, originalText: '2024-01-15'),
           total: FieldData(value: '100.00', confidence: 0.85, originalText: '100.00'),
           tax: FieldData(value: '10.00', confidence: 0.80, originalText: '10.00'),
-    overallConfidence: 87.5,
-    processingDurationMs: 1000,
-  );
+          overallConfidence: 87.5,
+          processingDurationMs: 1000,
+        );
         
         setupPathProviderForTests(
           temporaryPath: '/tmp',

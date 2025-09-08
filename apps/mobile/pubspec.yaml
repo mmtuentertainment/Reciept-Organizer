@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.5.3
+  sdk: ^3.6.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -33,49 +33,51 @@ dependencies:
 
   # UI and State Management
   cupertino_icons: ^1.0.8
-  flutter_riverpod: ^2.4.0
+  flutter_riverpod: ^2.6.1
   
   # Camera and Image Processing
-  camera: ^0.10.5
-  image: ^4.5.1
-  flutter_image_compress: ^2.1.0
+  camera: ^0.11.0+2
+  image: ^4.5.4
+  flutter_image_compress: ^2.4.0
   
   # OCR and ML
-  google_ml_kit: ^0.16.0
+  google_mlkit_text_recognition: ^0.15.0
   # OpenCV removed for now - will implement basic edge detection without it
   
   # Database and Storage
-  sqflite: ^2.3.0
-  path_provider: ^2.1.1
-  path: ^1.8.3
+  sqflite: ^2.4.2
+  path_provider: ^2.1.5
+  path: ^1.9.1
   
   # CSV Processing
   csv: ^6.0.0
   
   # Utilities
-  uuid: ^4.1.0
-  shared_preferences: ^2.2.2
-  intl: ^0.19.0
+  uuid: ^4.5.1
+  shared_preferences: ^2.5.3
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
 
   # Linting and Testing
-  flutter_lints: ^4.0.0
+  flutter_lints: ^3.0.1
   mockito: ^5.4.2
   build_runner: ^2.5.4
   
   # Code generation  
-  riverpod_generator: ^2.6.3
-  riverpod_annotation: ^2.6.0
+  riverpod_generator: ^2.6.5
+  riverpod_annotation: ^2.6.1
   json_annotation: ^4.8.1
   json_serializable: ^6.9.5
   
   # Database testing
   sqflite_common_ffi: ^2.3.3
   mocktail: ^1.0.4
-  freezed: ^3.1.0
+  freezed: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

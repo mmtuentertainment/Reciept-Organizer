@@ -17,7 +17,7 @@ void main() {
 
     testWidgets('displays field value and confidence correctly', (WidgetTester tester) async {
       // Given
-      // bool changedCalled = false;
+      bool changedCalled = false;
       FieldData? updatedFieldData;
 
       // When

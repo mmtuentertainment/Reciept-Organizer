@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'dart:math' as math;
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 

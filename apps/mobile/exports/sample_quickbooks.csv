@@ -1,0 +1,5 @@
+﻿Date,Amount,Payee,Category,Memo,Tax,Notes
+01/08/2025,45.99,Office Supplies Store,Business Expenses,Receipt #test-001,3.68,Printer paper and pens
+01/09/2025,12.50,Joe's Coffee Shop,Business Expenses,Receipt #test-002,1.00,Client meeting
+01/10/2025,65.00,Gas Station #42,Business Expenses,Receipt #test-003,5.20,Business travel
+01/11/2025,100.00,'=Dangerous Shop,Business Expenses,Receipt #test-004,8.00,Testing CSV injection prevention

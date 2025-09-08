@@ -69,66 +69,81 @@ class _FakeFileStat_3 extends _i1.SmartFake implements _i2.FileStat {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSharedPreferences extends _i1.Mock implements _i3.SharedPreferences {
-  MockSharedPreferences() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  // @override
+  @override
   Set<String> getKeys() => (super.noSuchMethod(
         Invocation.method(
           #getKeys,
           [],
         ),
         returnValue: <String>{},
+        returnValueForMissingStub: <String>{},
       ) as Set<String>);
 
-  // @override
-  Object? get(String? key) => (super.noSuchMethod(Invocation.method(
-        #get,
-        [key],
-      )) as Object?);
+  @override
+  Object? get(String? key) => (super.noSuchMethod(
+        Invocation.method(
+          #get,
+          [key],
+        ),
+        returnValueForMissingStub: null,
+      ) as Object?);
 
-  // @override
-  bool? getBool(String? key) => (super.noSuchMethod(Invocation.method(
-        #getBool,
-        [key],
-      )) as bool?);
+  @override
+  bool? getBool(String? key) => (super.noSuchMethod(
+        Invocation.method(
+          #getBool,
+          [key],
+        ),
+        returnValueForMissingStub: null,
+      ) as bool?);
 
-  // @override
-  int? getInt(String? key) => (super.noSuchMethod(Invocation.method(
-        #getInt,
-        [key],
-      )) as int?);
+  @override
+  int? getInt(String? key) => (super.noSuchMethod(
+        Invocation.method(
+          #getInt,
+          [key],
+        ),
+        returnValueForMissingStub: null,
+      ) as int?);
 
-  // @override
-  double? getDouble(String? key) => (super.noSuchMethod(Invocation.method(
-        #getDouble,
-        [key],
-      )) as double?);
+  @override
+  double? getDouble(String? key) => (super.noSuchMethod(
+        Invocation.method(
+          #getDouble,
+          [key],
+        ),
+        returnValueForMissingStub: null,
+      ) as double?);
 
-  // @override
-  String? getString(String? key) => (super.noSuchMethod(Invocation.method(
-        #getString,
-        [key],
-      )) as String?);
+  @override
+  String? getString(String? key) => (super.noSuchMethod(
+        Invocation.method(
+          #getString,
+          [key],
+        ),
+        returnValueForMissingStub: null,
+      ) as String?);
 
-  // @override
+  @override
   bool containsKey(String? key) => (super.noSuchMethod(
         Invocation.method(
           #containsKey,
           [key],
         ),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
-  // @override
-  List<String>? getStringList(String? key) =>
-      (super.noSuchMethod(Invocation.method(
-        #getStringList,
-        [key],
-      )) as List<String>?);
+  @override
+  List<String>? getStringList(String? key) => (super.noSuchMethod(
+        Invocation.method(
+          #getStringList,
+          [key],
+        ),
+        returnValueForMissingStub: null,
+      ) as List<String>?);
 
-  // @override
+  @override
   _i4.Future<bool> setBool(
     String? key,
     bool? value,
@@ -142,9 +157,10 @@ class MockSharedPreferences extends _i1.Mock implements _i3.SharedPreferences {
           ],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   _i4.Future<bool> setInt(
     String? key,
     int? value,
@@ -158,9 +174,10 @@ class MockSharedPreferences extends _i1.Mock implements _i3.SharedPreferences {
           ],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   _i4.Future<bool> setDouble(
     String? key,
     double? value,
@@ -174,9 +191,10 @@ class MockSharedPreferences extends _i1.Mock implements _i3.SharedPreferences {
           ],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   _i4.Future<bool> setString(
     String? key,
     String? value,
@@ -190,9 +208,10 @@ class MockSharedPreferences extends _i1.Mock implements _i3.SharedPreferences {
           ],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   _i4.Future<bool> setStringList(
     String? key,
     List<String>? value,
@@ -206,36 +225,40 @@ class MockSharedPreferences extends _i1.Mock implements _i3.SharedPreferences {
           ],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   _i4.Future<bool> remove(String? key) => (super.noSuchMethod(
         Invocation.method(
           #remove,
           [key],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   _i4.Future<bool> commit() => (super.noSuchMethod(
         Invocation.method(
           #commit,
           [],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   _i4.Future<bool> clear() => (super.noSuchMethod(
         Invocation.method(
           #clear,
           [],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   _i4.Future<void> reload() => (super.noSuchMethod(
         Invocation.method(
           #reload,
@@ -250,53 +273,66 @@ class MockSharedPreferences extends _i1.Mock implements _i3.SharedPreferences {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockDirectory extends _i1.Mock implements _i2.Directory {
-  MockDirectory() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  // @override
+  @override
   String get path => (super.noSuchMethod(
         Invocation.getter(#path),
         returnValue: _i5.dummyValue<String>(
           this,
           Invocation.getter(#path),
         ),
+        returnValueForMissingStub: _i5.dummyValue<String>(
+          this,
+          Invocation.getter(#path),
+        ),
       ) as String);
 
-  // @override
+  @override
   Uri get uri => (super.noSuchMethod(
         Invocation.getter(#uri),
         returnValue: _FakeUri_0(
           this,
           Invocation.getter(#uri),
         ),
+        returnValueForMissingStub: _FakeUri_0(
+          this,
+          Invocation.getter(#uri),
+        ),
       ) as Uri);
 
-  // @override
+  @override
   _i2.Directory get absolute => (super.noSuchMethod(
         Invocation.getter(#absolute),
         returnValue: _FakeDirectory_1(
           this,
           Invocation.getter(#absolute),
         ),
+        returnValueForMissingStub: _FakeDirectory_1(
+          this,
+          Invocation.getter(#absolute),
+        ),
       ) as _i2.Directory);
 
-  // @override
+  @override
   bool get isAbsolute => (super.noSuchMethod(
         Invocation.getter(#isAbsolute),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
-  // @override
+  @override
   _i2.Directory get parent => (super.noSuchMethod(
         Invocation.getter(#parent),
         returnValue: _FakeDirectory_1(
           this,
           Invocation.getter(#parent),
         ),
+        returnValueForMissingStub: _FakeDirectory_1(
+          this,
+          Invocation.getter(#parent),
+        ),
       ) as _i2.Directory);
 
-  // @override
+  @override
   _i4.Future<_i2.Directory> create({bool? recursive = false}) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -312,9 +348,18 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             {#recursive: recursive},
           ),
         )),
+        returnValueForMissingStub:
+            _i4.Future<_i2.Directory>.value(_FakeDirectory_1(
+          this,
+          Invocation.method(
+            #create,
+            [],
+            {#recursive: recursive},
+          ),
+        )),
       ) as _i4.Future<_i2.Directory>);
 
-  // @override
+  @override
   void createSync({bool? recursive = false}) => super.noSuchMethod(
         Invocation.method(
           #createSync,
@@ -324,7 +369,7 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
         returnValueForMissingStub: null,
       );
 
-  // @override
+  @override
   _i4.Future<_i2.Directory> createTemp([String? prefix]) => (super.noSuchMethod(
         Invocation.method(
           #createTemp,
@@ -337,9 +382,17 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             [prefix],
           ),
         )),
+        returnValueForMissingStub:
+            _i4.Future<_i2.Directory>.value(_FakeDirectory_1(
+          this,
+          Invocation.method(
+            #createTemp,
+            [prefix],
+          ),
+        )),
       ) as _i4.Future<_i2.Directory>);
 
-  // @override
+  @override
   _i2.Directory createTempSync([String? prefix]) => (super.noSuchMethod(
         Invocation.method(
           #createTempSync,
@@ -352,9 +405,16 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             [prefix],
           ),
         ),
+        returnValueForMissingStub: _FakeDirectory_1(
+          this,
+          Invocation.method(
+            #createTempSync,
+            [prefix],
+          ),
+        ),
       ) as _i2.Directory);
 
-  // @override
+  @override
   _i4.Future<String> resolveSymbolicLinks() => (super.noSuchMethod(
         Invocation.method(
           #resolveSymbolicLinks,
@@ -367,9 +427,17 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             [],
           ),
         )),
+        returnValueForMissingStub:
+            _i4.Future<String>.value(_i5.dummyValue<String>(
+          this,
+          Invocation.method(
+            #resolveSymbolicLinks,
+            [],
+          ),
+        )),
       ) as _i4.Future<String>);
 
-  // @override
+  @override
   String resolveSymbolicLinksSync() => (super.noSuchMethod(
         Invocation.method(
           #resolveSymbolicLinksSync,
@@ -382,9 +450,16 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             [],
           ),
         ),
+        returnValueForMissingStub: _i5.dummyValue<String>(
+          this,
+          Invocation.method(
+            #resolveSymbolicLinksSync,
+            [],
+          ),
+        ),
       ) as String);
 
-  // @override
+  @override
   _i4.Future<_i2.Directory> rename(String? newPath) => (super.noSuchMethod(
         Invocation.method(
           #rename,
@@ -397,9 +472,17 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             [newPath],
           ),
         )),
+        returnValueForMissingStub:
+            _i4.Future<_i2.Directory>.value(_FakeDirectory_1(
+          this,
+          Invocation.method(
+            #rename,
+            [newPath],
+          ),
+        )),
       ) as _i4.Future<_i2.Directory>);
 
-  // @override
+  @override
   _i2.Directory renameSync(String? newPath) => (super.noSuchMethod(
         Invocation.method(
           #renameSync,
@@ -412,9 +495,16 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             [newPath],
           ),
         ),
+        returnValueForMissingStub: _FakeDirectory_1(
+          this,
+          Invocation.method(
+            #renameSync,
+            [newPath],
+          ),
+        ),
       ) as _i2.Directory);
 
-  // @override
+  @override
   _i4.Future<_i2.FileSystemEntity> delete({bool? recursive = false}) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -431,9 +521,18 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             {#recursive: recursive},
           ),
         )),
+        returnValueForMissingStub:
+            _i4.Future<_i2.FileSystemEntity>.value(_FakeFileSystemEntity_2(
+          this,
+          Invocation.method(
+            #delete,
+            [],
+            {#recursive: recursive},
+          ),
+        )),
       ) as _i4.Future<_i2.FileSystemEntity>);
 
-  // @override
+  @override
   void deleteSync({bool? recursive = false}) => super.noSuchMethod(
         Invocation.method(
           #deleteSync,
@@ -443,7 +542,7 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
         returnValueForMissingStub: null,
       );
 
-  // @override
+  @override
   _i4.Stream<_i2.FileSystemEntity> list({
     bool? recursive = false,
     bool? followLinks = true,
@@ -458,9 +557,10 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
           },
         ),
         returnValue: _i4.Stream<_i2.FileSystemEntity>.empty(),
+        returnValueForMissingStub: _i4.Stream<_i2.FileSystemEntity>.empty(),
       ) as _i4.Stream<_i2.FileSystemEntity>);
 
-  // @override
+  @override
   List<_i2.FileSystemEntity> listSync({
     bool? recursive = false,
     bool? followLinks = true,
@@ -475,27 +575,30 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
           },
         ),
         returnValue: <_i2.FileSystemEntity>[],
+        returnValueForMissingStub: <_i2.FileSystemEntity>[],
       ) as List<_i2.FileSystemEntity>);
 
-  // @override
+  @override
   _i4.Future<bool> exists() => (super.noSuchMethod(
         Invocation.method(
           #exists,
           [],
         ),
         returnValue: _i4.Future<bool>.value(false),
+        returnValueForMissingStub: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
 
-  // @override
+  @override
   bool existsSync() => (super.noSuchMethod(
         Invocation.method(
           #existsSync,
           [],
         ),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
-  // @override
+  @override
   _i4.Future<_i2.FileStat> stat() => (super.noSuchMethod(
         Invocation.method(
           #stat,
@@ -508,9 +611,17 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             [],
           ),
         )),
+        returnValueForMissingStub:
+            _i4.Future<_i2.FileStat>.value(_FakeFileStat_3(
+          this,
+          Invocation.method(
+            #stat,
+            [],
+          ),
+        )),
       ) as _i4.Future<_i2.FileStat>);
 
-  // @override
+  @override
   _i2.FileStat statSync() => (super.noSuchMethod(
         Invocation.method(
           #statSync,
@@ -523,9 +634,16 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
             [],
           ),
         ),
+        returnValueForMissingStub: _FakeFileStat_3(
+          this,
+          Invocation.method(
+            #statSync,
+            [],
+          ),
+        ),
       ) as _i2.FileStat);
 
-  // @override
+  @override
   _i4.Stream<_i2.FileSystemEvent> watch({
     int? events = 15,
     bool? recursive = false,
@@ -540,5 +658,6 @@ class MockDirectory extends _i1.Mock implements _i2.Directory {
           },
         ),
         returnValue: _i4.Stream<_i2.FileSystemEvent>.empty(),
+        returnValueForMissingStub: _i4.Stream<_i2.FileSystemEvent>.empty(),
       ) as _i4.Stream<_i2.FileSystemEvent>);
 }

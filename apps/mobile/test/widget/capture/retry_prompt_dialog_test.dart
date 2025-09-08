@@ -7,9 +7,9 @@ void main() {
   group('RetryPromptDialog Widget Tests', () {
     testWidgets('should display failure reason and attempt information', (tester) async {
       // Arrange
-      // var retryPressed = false;
-      // var retakePressed = false;
-      // var cancelPressed = false;
+      var retryPressed = false;
+      var retakePressed = false;
+      var cancelPressed = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -86,7 +86,7 @@ void main() {
 
     testWidgets('should handle retry button press', (tester) async {
       // Arrange
-      // var retryPressed = false;
+      var retryPressed = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -111,7 +111,7 @@ void main() {
 
     testWidgets('should handle retake photo button press', (tester) async {
       // Arrange
-      // var retakePressed = false;
+      var retakePressed = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -136,7 +136,7 @@ void main() {
 
     testWidgets('should handle cancel button press', (tester) async {
       // Arrange
-      // var cancelPressed = false;
+      var cancelPressed = false;
 
       await tester.pumpWidget(
         MaterialApp(

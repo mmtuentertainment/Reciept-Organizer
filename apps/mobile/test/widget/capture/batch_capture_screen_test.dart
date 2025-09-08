@@ -13,7 +13,7 @@ import 'package:receipt_organizer/features/capture/widgets/capture_counter_widge
 
 import 'batch_capture_screen_test.mocks.dart';
 
-@GenerateMocks([ICameraService])
+@GenerateNiceMocks([MockSpec<ICameraService>()])
 void main() {
   group('BatchCaptureScreen Widget Tests', () {
     late MockICameraService mockCameraService;

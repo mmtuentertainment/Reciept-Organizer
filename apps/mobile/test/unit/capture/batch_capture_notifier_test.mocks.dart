@@ -52,11 +52,7 @@ class _FakeEdgeDetectionResult_1 extends _i1.SmartFake
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockICameraService extends _i1.Mock implements _i4.ICameraService {
-  MockICameraService() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  // @override
+  @override
   _i5.Future<_i2.CaptureResult> captureReceipt({bool? batchMode = false}) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -72,18 +68,28 @@ class MockICameraService extends _i1.Mock implements _i4.ICameraService {
             {#batchMode: batchMode},
           ),
         )),
+        returnValueForMissingStub:
+            _i5.Future<_i2.CaptureResult>.value(_FakeCaptureResult_0(
+          this,
+          Invocation.method(
+            #captureReceipt,
+            [],
+            {#batchMode: batchMode},
+          ),
+        )),
       ) as _i5.Future<_i2.CaptureResult>);
 
-  // @override
+  @override
   _i5.Stream<_i6.CameraFrame> getPreviewStream() => (super.noSuchMethod(
         Invocation.method(
           #getPreviewStream,
           [],
         ),
         returnValue: _i5.Stream<_i6.CameraFrame>.empty(),
+        returnValueForMissingStub: _i5.Stream<_i6.CameraFrame>.empty(),
       ) as _i5.Stream<_i6.CameraFrame>);
 
-  // @override
+  @override
   _i5.Future<_i3.EdgeDetectionResult> detectEdges(_i6.CameraFrame? frame) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -98,9 +104,17 @@ class MockICameraService extends _i1.Mock implements _i4.ICameraService {
             [frame],
           ),
         )),
+        returnValueForMissingStub: _i5.Future<_i3.EdgeDetectionResult>.value(
+            _FakeEdgeDetectionResult_1(
+          this,
+          Invocation.method(
+            #detectEdges,
+            [frame],
+          ),
+        )),
       ) as _i5.Future<_i3.EdgeDetectionResult>);
 
-  // @override
+  @override
   _i5.Future<_i7.CameraController?> getCameraController() =>
       (super.noSuchMethod(
         Invocation.method(
@@ -108,9 +122,10 @@ class MockICameraService extends _i1.Mock implements _i4.ICameraService {
           [],
         ),
         returnValue: _i5.Future<_i7.CameraController?>.value(),
+        returnValueForMissingStub: _i5.Future<_i7.CameraController?>.value(),
       ) as _i5.Future<_i7.CameraController?>);
 
-  // @override
+  @override
   _i5.Future<void> initialize() => (super.noSuchMethod(
         Invocation.method(
           #initialize,
@@ -120,7 +135,7 @@ class MockICameraService extends _i1.Mock implements _i4.ICameraService {
         returnValueForMissingStub: _i5.Future<void>.value(),
       ) as _i5.Future<void>);
 
-  // @override
+  @override
   _i5.Future<void> dispose() => (super.noSuchMethod(
         Invocation.method(
           #dispose,

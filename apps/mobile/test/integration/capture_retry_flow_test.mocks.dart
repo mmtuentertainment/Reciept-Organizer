@@ -3,20 +3,17 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i6;
+import 'dart:async' as _i5;
 
-import 'package:camera/camera.dart' as _i10;
-import 'package:google_mlkit_commons/google_mlkit_commons.dart' as _i7;
-import 'package:google_mlkit_text_recognition/src/text_recognizer.dart' as _i2;
+import 'package:camera/camera.dart' as _i7;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i5;
-import 'package:receipt_organizer/data/models/camera_frame.dart' as _i9;
-import 'package:receipt_organizer/data/models/capture_result.dart' as _i3;
+import 'package:receipt_organizer/data/models/camera_frame.dart' as _i6;
+import 'package:receipt_organizer/data/models/capture_result.dart' as _i2;
 import 'package:receipt_organizer/data/models/edge_detection_result.dart'
-    as _i4;
-import 'package:receipt_organizer/domain/services/camera_service.dart' as _i8;
+    as _i3;
+import 'package:receipt_organizer/domain/services/camera_service.dart' as _i4;
 import 'package:receipt_organizer/features/capture/services/retry_session_manager.dart'
-    as _i11;
+    as _i8;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -32,9 +29,8 @@ import 'package:receipt_organizer/features/capture/services/retry_session_manage
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeRecognizedText_0 extends _i1.SmartFake
-    implements _i2.RecognizedText {
-  _FakeRecognizedText_0(
+class _FakeCaptureResult_0 extends _i1.SmartFake implements _i2.CaptureResult {
+  _FakeCaptureResult_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -43,94 +39,30 @@ class _FakeRecognizedText_0 extends _i1.SmartFake
         );
 }
 
-class _FakeCaptureResult_1 extends _i1.SmartFake implements _i3.CaptureResult {
-  _FakeCaptureResult_1(
+class _FakeEdgeDetectionResult_1 extends _i1.SmartFake
+    implements _i3.EdgeDetectionResult {
+  _FakeEdgeDetectionResult_1(
     Object parent,
     Invocation parentInvocation,
   ) : super(
           parent,
           parentInvocation,
         );
-}
-
-class _FakeEdgeDetectionResult_2 extends _i1.SmartFake
-    implements _i4.EdgeDetectionResult {
-  _FakeEdgeDetectionResult_2(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
-/// A class which mocks [TextRecognizer].
-///
-/// See the documentation for Mockito's code generation for more information.
-class MockTextRecognizer extends _i1.Mock implements _i2.TextRecognizer {
-  MockTextRecognizer() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  // @override
-  _i2.TextRecognitionScript get script => (super.noSuchMethod(
-        Invocation.getter(#script),
-        returnValue: _i2.TextRecognitionScript.latin,
-      ) as _i2.TextRecognitionScript);
-
-  // @override
-  String get id => (super.noSuchMethod(
-        Invocation.getter(#id),
-        returnValue: _i5.dummyValue<String>(
-          this,
-          Invocation.getter(#id),
-        ),
-      ) as String);
-
-  // @override
-  _i6.Future<_i2.RecognizedText> processImage(_i7.InputImage? inputImage) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #processImage,
-          [inputImage],
-        ),
-        returnValue: _i6.Future<_i2.RecognizedText>.value(_FakeRecognizedText_0(
-          this,
-          Invocation.method(
-            #processImage,
-            [inputImage],
-          ),
-        )),
-      ) as _i6.Future<_i2.RecognizedText>);
-
-  // @override
-  _i6.Future<void> close() => (super.noSuchMethod(
-        Invocation.method(
-          #close,
-          [],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
 }
 
 /// A class which mocks [ICameraService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockICameraService extends _i1.Mock implements _i8.ICameraService {
-  MockICameraService() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  // @override
-  _i6.Future<_i3.CaptureResult> captureReceipt({bool? batchMode = false}) =>
+class MockICameraService extends _i1.Mock implements _i4.ICameraService {
+  @override
+  _i5.Future<_i2.CaptureResult> captureReceipt({bool? batchMode = false}) =>
       (super.noSuchMethod(
         Invocation.method(
           #captureReceipt,
           [],
           {#batchMode: batchMode},
         ),
-        returnValue: _i6.Future<_i3.CaptureResult>.value(_FakeCaptureResult_1(
+        returnValue: _i5.Future<_i2.CaptureResult>.value(_FakeCaptureResult_0(
           this,
           Invocation.method(
             #captureReceipt,
@@ -138,127 +70,148 @@ class MockICameraService extends _i1.Mock implements _i8.ICameraService {
             {#batchMode: batchMode},
           ),
         )),
-      ) as _i6.Future<_i3.CaptureResult>);
+        returnValueForMissingStub:
+            _i5.Future<_i2.CaptureResult>.value(_FakeCaptureResult_0(
+          this,
+          Invocation.method(
+            #captureReceipt,
+            [],
+            {#batchMode: batchMode},
+          ),
+        )),
+      ) as _i5.Future<_i2.CaptureResult>);
 
-  // @override
-  _i6.Stream<_i9.CameraFrame> getPreviewStream() => (super.noSuchMethod(
+  @override
+  _i5.Stream<_i6.CameraFrame> getPreviewStream() => (super.noSuchMethod(
         Invocation.method(
           #getPreviewStream,
           [],
         ),
-        returnValue: _i6.Stream<_i9.CameraFrame>.empty(),
-      ) as _i6.Stream<_i9.CameraFrame>);
+        returnValue: _i5.Stream<_i6.CameraFrame>.empty(),
+        returnValueForMissingStub: _i5.Stream<_i6.CameraFrame>.empty(),
+      ) as _i5.Stream<_i6.CameraFrame>);
 
-  // @override
-  _i6.Future<_i4.EdgeDetectionResult> detectEdges(_i9.CameraFrame? frame) =>
+  @override
+  _i5.Future<_i3.EdgeDetectionResult> detectEdges(_i6.CameraFrame? frame) =>
       (super.noSuchMethod(
         Invocation.method(
           #detectEdges,
           [frame],
         ),
-        returnValue: _i6.Future<_i4.EdgeDetectionResult>.value(
-            _FakeEdgeDetectionResult_2(
+        returnValue: _i5.Future<_i3.EdgeDetectionResult>.value(
+            _FakeEdgeDetectionResult_1(
           this,
           Invocation.method(
             #detectEdges,
             [frame],
           ),
         )),
-      ) as _i6.Future<_i4.EdgeDetectionResult>);
+        returnValueForMissingStub: _i5.Future<_i3.EdgeDetectionResult>.value(
+            _FakeEdgeDetectionResult_1(
+          this,
+          Invocation.method(
+            #detectEdges,
+            [frame],
+          ),
+        )),
+      ) as _i5.Future<_i3.EdgeDetectionResult>);
 
-  // @override
-  _i6.Future<_i10.CameraController?> getCameraController() =>
+  @override
+  _i5.Future<_i7.CameraController?> getCameraController() =>
       (super.noSuchMethod(
         Invocation.method(
           #getCameraController,
           [],
         ),
-        returnValue: _i6.Future<_i10.CameraController?>.value(),
-      ) as _i6.Future<_i10.CameraController?>);
+        returnValue: _i5.Future<_i7.CameraController?>.value(),
+        returnValueForMissingStub: _i5.Future<_i7.CameraController?>.value(),
+      ) as _i5.Future<_i7.CameraController?>);
 
-  // @override
-  _i6.Future<void> initialize() => (super.noSuchMethod(
+  @override
+  _i5.Future<void> initialize() => (super.noSuchMethod(
         Invocation.method(
           #initialize,
           [],
         ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 
-  // @override
-  _i6.Future<void> dispose() => (super.noSuchMethod(
+  @override
+  _i5.Future<void> dispose() => (super.noSuchMethod(
         Invocation.method(
           #dispose,
           [],
         ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
 }
 
 /// A class which mocks [RetrySessionManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockRetrySessionManager extends _i1.Mock
-    implements _i11.RetrySessionManager {
-  MockRetrySessionManager() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  // @override
-  _i6.Future<bool> saveSession(_i11.RetrySession? session) =>
+    implements _i8.RetrySessionManager {
+  @override
+  _i5.Future<bool> saveSession(_i8.RetrySession? session) =>
       (super.noSuchMethod(
         Invocation.method(
           #saveSession,
           [session],
         ),
-        returnValue: _i6.Future<bool>.value(false),
-      ) as _i6.Future<bool>);
+        returnValue: _i5.Future<bool>.value(false),
+        returnValueForMissingStub: _i5.Future<bool>.value(false),
+      ) as _i5.Future<bool>);
 
-  // @override
-  _i6.Future<_i11.RetrySession?> loadSession(String? sessionId) =>
+  @override
+  _i5.Future<_i8.RetrySession?> loadSession(String? sessionId) =>
       (super.noSuchMethod(
         Invocation.method(
           #loadSession,
           [sessionId],
         ),
-        returnValue: _i6.Future<_i11.RetrySession?>.value(),
-      ) as _i6.Future<_i11.RetrySession?>);
+        returnValue: _i5.Future<_i8.RetrySession?>.value(),
+        returnValueForMissingStub: _i5.Future<_i8.RetrySession?>.value(),
+      ) as _i5.Future<_i8.RetrySession?>);
 
-  // @override
-  _i6.Future<bool> cleanupSession(String? sessionId) => (super.noSuchMethod(
+  @override
+  _i5.Future<bool> cleanupSession(String? sessionId) => (super.noSuchMethod(
         Invocation.method(
           #cleanupSession,
           [sessionId],
         ),
-        returnValue: _i6.Future<bool>.value(false),
-      ) as _i6.Future<bool>);
+        returnValue: _i5.Future<bool>.value(false),
+        returnValueForMissingStub: _i5.Future<bool>.value(false),
+      ) as _i5.Future<bool>);
 
-  // @override
-  _i6.Future<int> cleanupExpiredSessions() => (super.noSuchMethod(
+  @override
+  _i5.Future<int> cleanupExpiredSessions() => (super.noSuchMethod(
         Invocation.method(
           #cleanupExpiredSessions,
           [],
         ),
-        returnValue: _i6.Future<int>.value(0),
-      ) as _i6.Future<int>);
+        returnValue: _i5.Future<int>.value(0),
+        returnValueForMissingStub: _i5.Future<int>.value(0),
+      ) as _i5.Future<int>);
 
-  // @override
-  _i6.Future<List<String>> getActiveSessions() => (super.noSuchMethod(
+  @override
+  _i5.Future<List<String>> getActiveSessions() => (super.noSuchMethod(
         Invocation.method(
           #getActiveSessions,
           [],
         ),
-        returnValue: _i6.Future<List<String>>.value(<String>[]),
-      ) as _i6.Future<List<String>>);
+        returnValue: _i5.Future<List<String>>.value(<String>[]),
+        returnValueForMissingStub: _i5.Future<List<String>>.value(<String>[]),
+      ) as _i5.Future<List<String>>);
 
-  // @override
-  _i6.Future<int> getStorageUsage() => (super.noSuchMethod(
+  @override
+  _i5.Future<int> getStorageUsage() => (super.noSuchMethod(
         Invocation.method(
           #getStorageUsage,
           [],
         ),
-        returnValue: _i6.Future<int>.value(0),
-      ) as _i6.Future<int>);
+        returnValue: _i5.Future<int>.value(0),
+        returnValueForMissingStub: _i5.Future<int>.value(0),
+      ) as _i5.Future<int>);
 }

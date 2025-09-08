@@ -43,47 +43,54 @@ class _FakeCaptureState_0 extends _i1.SmartFake implements _i2.CaptureState {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
-  MockCaptureNotifier() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  // @override
+  @override
   bool get mounted => (super.noSuchMethod(
         Invocation.getter(#mounted),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
-  // @override
+  @override
   _i3.Stream<_i2.CaptureState> get stream => (super.noSuchMethod(
         Invocation.getter(#stream),
         returnValue: _i3.Stream<_i2.CaptureState>.empty(),
+        returnValueForMissingStub: _i3.Stream<_i2.CaptureState>.empty(),
       ) as _i3.Stream<_i2.CaptureState>);
 
-  // @override
+  @override
   _i2.CaptureState get state => (super.noSuchMethod(
         Invocation.getter(#state),
         returnValue: _FakeCaptureState_0(
           this,
           Invocation.getter(#state),
         ),
+        returnValueForMissingStub: _FakeCaptureState_0(
+          this,
+          Invocation.getter(#state),
+        ),
       ) as _i2.CaptureState);
 
-  // @override
+  @override
   _i2.CaptureState get debugState => (super.noSuchMethod(
         Invocation.getter(#debugState),
         returnValue: _FakeCaptureState_0(
           this,
           Invocation.getter(#debugState),
         ),
+        returnValueForMissingStub: _FakeCaptureState_0(
+          this,
+          Invocation.getter(#debugState),
+        ),
       ) as _i2.CaptureState);
 
-  // @override
+  @override
   bool get hasListeners => (super.noSuchMethod(
         Invocation.getter(#hasListeners),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
-  // @override
+  @override
   set onError(_i4.ErrorListener? _onError) => super.noSuchMethod(
         Invocation.setter(
           #onError,
@@ -92,7 +99,7 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: null,
       );
 
-  // @override
+  @override
   set state(_i2.CaptureState? value) => super.noSuchMethod(
         Invocation.setter(
           #state,
@@ -101,7 +108,7 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: null,
       );
 
-  // @override
+  @override
   _i3.Future<void> initialize() => (super.noSuchMethod(
         Invocation.method(
           #initialize,
@@ -111,7 +118,7 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: _i3.Future<void>.value(),
       ) as _i3.Future<void>);
 
-  // @override
+  @override
   void startCaptureSession({String? sessionId}) => super.noSuchMethod(
         Invocation.method(
           #startCaptureSession,
@@ -121,7 +128,7 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: null,
       );
 
-  // @override
+  @override
   _i3.Future<bool> processCapture(
     _i5.Uint8List? imageData, {
     _i6.EdgeDetectionResult? edgeDetection,
@@ -137,18 +144,20 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
           },
         ),
         returnValue: _i3.Future<bool>.value(false),
+        returnValueForMissingStub: _i3.Future<bool>.value(false),
       ) as _i3.Future<bool>);
 
-  // @override
+  @override
   _i3.Future<bool> retryCapture() => (super.noSuchMethod(
         Invocation.method(
           #retryCapture,
           [],
         ),
         returnValue: _i3.Future<bool>.value(false),
+        returnValueForMissingStub: _i3.Future<bool>.value(false),
       ) as _i3.Future<bool>);
 
-  // @override
+  @override
   void retakePhoto() => super.noSuchMethod(
         Invocation.method(
           #retakePhoto,
@@ -157,7 +166,7 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: null,
       );
 
-  // @override
+  @override
   void cancelRetry() => super.noSuchMethod(
         Invocation.method(
           #cancelRetry,
@@ -166,7 +175,7 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: null,
       );
 
-  // @override
+  @override
   _i3.Future<void> saveSession() => (super.noSuchMethod(
         Invocation.method(
           #saveSession,
@@ -176,16 +185,17 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: _i3.Future<void>.value(),
       ) as _i3.Future<void>);
 
-  // @override
+  @override
   _i3.Future<bool> restoreSession(String? sessionId) => (super.noSuchMethod(
         Invocation.method(
           #restoreSession,
           [sessionId],
         ),
         returnValue: _i3.Future<bool>.value(false),
+        returnValueForMissingStub: _i3.Future<bool>.value(false),
       ) as _i3.Future<bool>);
 
-  // @override
+  @override
   _i3.Future<void> clearSession() => (super.noSuchMethod(
         Invocation.method(
           #clearSession,
@@ -195,7 +205,7 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: _i3.Future<void>.value(),
       ) as _i3.Future<void>);
 
-  // @override
+  @override
   _i3.Future<void> updateEdgeDetection(
           _i6.EdgeDetectionResult? edgeDetection) =>
       (super.noSuchMethod(
@@ -207,7 +217,7 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
         returnValueForMissingStub: _i3.Future<void>.value(),
       ) as _i3.Future<void>);
 
-  // @override
+  @override
   _i3.Future<bool> updateField(
     String? fieldName,
     _i7.FieldData? updatedField,
@@ -221,9 +231,10 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
           ],
         ),
         returnValue: _i3.Future<bool>.value(false),
+        returnValueForMissingStub: _i3.Future<bool>.value(false),
       ) as _i3.Future<bool>);
 
-  // @override
+  @override
   _i3.Future<bool> updateFields(Map<String, _i7.FieldData>? fieldUpdates) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -231,27 +242,30 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
           [fieldUpdates],
         ),
         returnValue: _i3.Future<bool>.value(false),
+        returnValueForMissingStub: _i3.Future<bool>.value(false),
       ) as _i3.Future<bool>);
 
-  // @override
+  @override
   _i3.Future<List<String>> getActiveSessions() => (super.noSuchMethod(
         Invocation.method(
           #getActiveSessions,
           [],
         ),
         returnValue: _i3.Future<List<String>>.value(<String>[]),
+        returnValueForMissingStub: _i3.Future<List<String>>.value(<String>[]),
       ) as _i3.Future<List<String>>);
 
-  // @override
+  @override
   _i3.Future<int> getStorageUsage() => (super.noSuchMethod(
         Invocation.method(
           #getStorageUsage,
           [],
         ),
         returnValue: _i3.Future<int>.value(0),
+        returnValueForMissingStub: _i3.Future<int>.value(0),
       ) as _i3.Future<int>);
 
-  // @override
+  @override
   bool updateShouldNotify(
     _i2.CaptureState? old,
     _i2.CaptureState? current,
@@ -265,9 +279,10 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
           ],
         ),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
-  // @override
+  @override
   _i4.RemoveListener addListener(
     _i8.Listener<_i2.CaptureState>? listener, {
     bool? fireImmediately = true,
@@ -279,9 +294,10 @@ class MockCaptureNotifier extends _i1.Mock implements _i2.CaptureNotifier {
           {#fireImmediately: fireImmediately},
         ),
         returnValue: () {},
+        returnValueForMissingStub: () {},
       ) as _i4.RemoveListener);
 
-  // @override
+  @override
   void dispose() => super.noSuchMethod(
         Invocation.method(
           #dispose,

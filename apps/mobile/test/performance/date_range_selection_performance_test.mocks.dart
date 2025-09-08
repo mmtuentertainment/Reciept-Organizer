@@ -39,29 +39,28 @@ class _FakeReceipt_0 extends _i1.SmartFake implements _i2.Receipt {
 /// See the documentation for Mockito's code generation for more information.
 class MockIReceiptRepository extends _i1.Mock
     implements _i3.IReceiptRepository {
-  MockIReceiptRepository() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  // @override
+  @override
   _i4.Future<List<_i2.Receipt>> getAllReceipts() => (super.noSuchMethod(
         Invocation.method(
           #getAllReceipts,
           [],
         ),
         returnValue: _i4.Future<List<_i2.Receipt>>.value(<_i2.Receipt>[]),
+        returnValueForMissingStub:
+            _i4.Future<List<_i2.Receipt>>.value(<_i2.Receipt>[]),
       ) as _i4.Future<List<_i2.Receipt>>);
 
-  // @override
+  @override
   _i4.Future<_i2.Receipt?> getReceiptById(String? id) => (super.noSuchMethod(
         Invocation.method(
           #getReceiptById,
           [id],
         ),
         returnValue: _i4.Future<_i2.Receipt?>.value(),
+        returnValueForMissingStub: _i4.Future<_i2.Receipt?>.value(),
       ) as _i4.Future<_i2.Receipt?>);
 
-  // @override
+  @override
   _i4.Future<List<_i2.Receipt>> getReceiptsByBatchId(String? batchId) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -69,9 +68,11 @@ class MockIReceiptRepository extends _i1.Mock
           [batchId],
         ),
         returnValue: _i4.Future<List<_i2.Receipt>>.value(<_i2.Receipt>[]),
+        returnValueForMissingStub:
+            _i4.Future<List<_i2.Receipt>>.value(<_i2.Receipt>[]),
       ) as _i4.Future<List<_i2.Receipt>>);
 
-  // @override
+  @override
   _i4.Future<List<_i2.Receipt>> getReceiptsByDateRange(
     DateTime? start,
     DateTime? end,
@@ -85,9 +86,11 @@ class MockIReceiptRepository extends _i1.Mock
           ],
         ),
         returnValue: _i4.Future<List<_i2.Receipt>>.value(<_i2.Receipt>[]),
+        returnValueForMissingStub:
+            _i4.Future<List<_i2.Receipt>>.value(<_i2.Receipt>[]),
       ) as _i4.Future<List<_i2.Receipt>>);
 
-  // @override
+  @override
   _i4.Future<_i2.Receipt> createReceipt(_i2.Receipt? receipt) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -101,9 +104,16 @@ class MockIReceiptRepository extends _i1.Mock
             [receipt],
           ),
         )),
+        returnValueForMissingStub: _i4.Future<_i2.Receipt>.value(_FakeReceipt_0(
+          this,
+          Invocation.method(
+            #createReceipt,
+            [receipt],
+          ),
+        )),
       ) as _i4.Future<_i2.Receipt>);
 
-  // @override
+  @override
   _i4.Future<void> updateReceipt(_i2.Receipt? receipt) => (super.noSuchMethod(
         Invocation.method(
           #updateReceipt,
@@ -113,7 +123,7 @@ class MockIReceiptRepository extends _i1.Mock
         returnValueForMissingStub: _i4.Future<void>.value(),
       ) as _i4.Future<void>);
 
-  // @override
+  @override
   _i4.Future<void> deleteReceipt(String? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteReceipt,
@@ -123,7 +133,7 @@ class MockIReceiptRepository extends _i1.Mock
         returnValueForMissingStub: _i4.Future<void>.value(),
       ) as _i4.Future<void>);
 
-  // @override
+  @override
   _i4.Future<void> deleteReceipts(List<String>? ids) => (super.noSuchMethod(
         Invocation.method(
           #deleteReceipts,
@@ -133,16 +143,17 @@ class MockIReceiptRepository extends _i1.Mock
         returnValueForMissingStub: _i4.Future<void>.value(),
       ) as _i4.Future<void>);
 
-  // @override
+  @override
   _i4.Future<int> getReceiptCount() => (super.noSuchMethod(
         Invocation.method(
           #getReceiptCount,
           [],
         ),
         returnValue: _i4.Future<int>.value(0),
+        returnValueForMissingStub: _i4.Future<int>.value(0),
       ) as _i4.Future<int>);
 
-  // @override
+  @override
   _i4.Future<List<_i2.Receipt>> getReceiptsPaginated(
     int? offset,
     int? limit,
@@ -156,5 +167,7 @@ class MockIReceiptRepository extends _i1.Mock
           ],
         ),
         returnValue: _i4.Future<List<_i2.Receipt>>.value(<_i2.Receipt>[]),
+        returnValueForMissingStub:
+            _i4.Future<List<_i2.Receipt>>.value(<_i2.Receipt>[]),
       ) as _i4.Future<List<_i2.Receipt>>);
 }

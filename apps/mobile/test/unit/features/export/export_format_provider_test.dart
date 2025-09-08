@@ -23,7 +23,7 @@ void main() {
       
       container = ProviderContainer(
         overrides: [
-          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier.state),
+          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier),
         ],
       );
     });
@@ -55,7 +55,7 @@ void main() {
       // When
       container = ProviderContainer(
         overrides: [
-          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier.state),
+          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier),
         ],
       );
       
@@ -76,7 +76,7 @@ void main() {
 
       // When
       when(() => mockSettingsNotifier.updateCsvFormat(any()))
-          .thenAnswer((_) async => {});
+          .thenAnswer((_) async => true);
       
       await notifier.updateFormat(ExportFormat.xero);
 
@@ -95,7 +95,7 @@ void main() {
       
       container = ProviderContainer(
         overrides: [
-          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier.state),
+          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier),
         ],
       );
       
@@ -120,7 +120,7 @@ void main() {
       
       container = ProviderContainer(
         overrides: [
-          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier.state),
+          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier),
         ],
       );
       
@@ -152,7 +152,7 @@ void main() {
       
       container = ProviderContainer(
         overrides: [
-          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier.state),
+          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier),
         ],
       );
       
@@ -183,7 +183,7 @@ void main() {
       // When
       container = ProviderContainer(
         overrides: [
-          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier.state),
+          appSettingsProvider.overrideWith((ref) => mockSettingsNotifier),
         ],
       );
       
@@ -204,7 +204,7 @@ void main() {
         
         container = ProviderContainer(
           overrides: [
-            appSettingsProvider.overrideWith((ref) => mockSettingsNotifier.state),
+            appSettingsProvider.overrideWith((ref) => mockSettingsNotifier),
           ],
         );
 
@@ -229,7 +229,7 @@ void main() {
 
         // When
         when(() => mockSettingsNotifier.updateCsvFormat(any()))
-            .thenAnswer((_) async => {});
+            .thenAnswer((_) async => true);
         
         await notifier.updateFormat(ExportFormat.quickbooks);
         await notifier.updateFormat(ExportFormat.xero);

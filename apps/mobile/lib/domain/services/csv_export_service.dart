@@ -163,13 +163,16 @@ class CSVExportService implements ICSVExportService {
 
   @override
   String generateCSVContent(List<Receipt> receipts, ExportFormat format) {
+    // Add UTF-8 BOM for Excel compatibility
+    const bom = '\uFEFF';
+    
     switch (format) {
       case ExportFormat.quickbooks:
-        return _generateQuickBooksCSV(receipts);
+        return bom + _generateQuickBooksCSV(receipts);
       case ExportFormat.xero:
-        return _generateXeroCSV(receipts);
+        return bom + _generateXeroCSV(receipts);
       case ExportFormat.generic:
-        return _generateGenericCSV(receipts);
+        return bom + _generateGenericCSV(receipts);
     }
   }
 

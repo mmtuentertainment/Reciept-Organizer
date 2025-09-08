@@ -36,12 +36,9 @@ void main() {
       return ProviderScope(
         child: MaterialApp(
           home: Scaffold(
-            body: PerformanceOverlay(
-              enabled: true,
-              child: ZoomableImageViewer(
-                imagePath: imagePath,
-                showFpsOverlay: true,
-              ),
+            body: ZoomableImageViewer(
+              imagePath: imagePath,
+              showFpsOverlay: true,
             ),
           ),
         ),
@@ -61,7 +58,7 @@ void main() {
       performanceMonitor.recordGestureStart('zoom_1mb');
       
       // Perform pinch zoom
-      // final center = tester.getCenter(find.byType(ZoomableImageViewer));
+      final center = tester.getCenter(find.byType(ZoomableImageViewer));
       final pointer1 = await tester.startGesture(center - const Offset(50, 0));
       final pointer2 = await tester.startGesture(center + const Offset(50, 0));
       

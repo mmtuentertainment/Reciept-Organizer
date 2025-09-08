@@ -1,12 +1,25 @@
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import '../mocks/mock_text_recognizer.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  
+  // Create a dummy InputImage for stubbing
+  final dummyInputImage = MockInputImage(
+    bytes: Uint8List.fromList([1, 2, 3]),
+    metadata: InputImageMetadata(
+      size: const Size(100, 100),
+      rotation: InputImageRotation.rotation0deg,
+      format: InputImageFormat.nv21,
+      bytesPerRow: 100,
+    ),
+  );
   
   group('OCRService with Mocks', () {
     late OCRService ocrService;

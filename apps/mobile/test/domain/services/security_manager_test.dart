@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:receipt_organizer/domain/services/security_manager.dart';
 
-@GenerateMocks([Directory])
+@GenerateNiceMocks([MockSpec<Directory>()])
 import '../../helpers/platform_test_helpers.dart';
 
 void main() {

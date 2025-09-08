@@ -8,7 +8,7 @@ import 'package:receipt_organizer/features/capture/providers/batch_capture_provi
 
 import 'batch_capture_notifier_test.mocks.dart';
 
-@GenerateMocks([ICameraService])
+@GenerateNiceMocks([MockSpec<ICameraService>()])
 void main() {
   group('BatchCaptureNotifier', () {
     late BatchCaptureNotifier notifier;

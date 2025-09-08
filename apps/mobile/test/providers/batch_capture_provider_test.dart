@@ -9,7 +9,7 @@ import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 
 // Generate mocks
-@GenerateMocks([ICameraService])
+@GenerateNiceMocks([MockSpec<ICameraService>()])
 import 'batch_capture_provider_test.mocks.dart';
 
 void main() {

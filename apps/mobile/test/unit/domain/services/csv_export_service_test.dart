@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
+import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
-import 'package:receipt_organizer/data/models/receipt_status.dart';
 
 void main() {
   group('CSVExportService', () {
@@ -20,17 +20,24 @@ void main() {
       String? notes,
       double? overallConfidence,
     }) {
+      final ocrResults = merchantName != null || receiptDate != null || totalAmount != null || taxAmount != null
+          ? ProcessingResult(
+              merchant: merchantName != null ? FieldData(value: merchantName, confidence: 90.0, originalText: merchantName) : null,
+              date: receiptDate != null ? FieldData(value: receiptDate, confidence: 90.0, originalText: receiptDate) : null,
+              total: totalAmount != null ? FieldData(value: totalAmount, confidence: 90.0, originalText: totalAmount.toString()) : null,
+              tax: taxAmount != null ? FieldData(value: taxAmount, confidence: 90.0, originalText: taxAmount.toString()) : null,
+              overallConfidence: overallConfidence ?? 85.5,
+              processingDurationMs: 1000,
+            )
+          : null;
+      
       return Receipt(
         id: id ?? '12345678-1234-1234-1234-123456789012',
-        merchantName: merchantName,
-        receiptDate: receiptDate,
-        totalAmount: totalAmount,
-        taxAmount: taxAmount,
-        notes: notes,
+        imageUri: 'test_image.jpg',
         capturedAt: DateTime(2024, 12, 31, 14, 30),
-        status: ReceiptStatus.extracted,
-        hasOCRResults: true,
-        overallConfidence: overallConfidence ?? 85.5,
+        status: ReceiptStatus.ready,
+        ocrResults: ocrResults,
+        notes: notes,
       );
     }
 

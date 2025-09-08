@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/mockito.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';

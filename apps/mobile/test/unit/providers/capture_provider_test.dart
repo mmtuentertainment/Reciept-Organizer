@@ -8,10 +8,10 @@ import 'package:receipt_organizer/features/capture/providers/capture_provider.da
 
 import 'capture_provider_test.mocks.dart';
 
-@GenerateMocks([
-  OCRService,
-  ICameraService,
-  RetrySessionManager,
+@GenerateNiceMocks([
+  MockSpec<OCRService>(),
+  MockSpec<ICameraService>(),
+  MockSpec<RetrySessionManager>(),
 ])
 void main() {
   group('CaptureNotifier', () {
@@ -227,7 +227,7 @@ void main() {
 
       test('should auto-save session when in retry mode', () async {
         // Given
-        when(mockSessionManager.saveSession(any)).thenAnswer((_) async => true);
+        when(mockSessionManager.saveSession(any())).thenAnswer((_) async => true);
         
         final originalResult = ProcessingResult(
           merchant: FieldData(value: 'Store', confidence: 80.0, originalText: 'Store'),
@@ -256,7 +256,7 @@ void main() {
 
         // Then
         expect(result, true);
-        verify(mockSessionManager.saveSession(any)).called(1);
+        verify(mockSessionManager.saveSession(any())).called(1);
       });
     });
 
