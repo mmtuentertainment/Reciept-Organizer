@@ -46,7 +46,7 @@ class SettingsScreen extends ConsumerWidget {
             icon: Icons.collections,
           ),
           ListTile(
-            leading: const Icon(Icons.retry),
+            leading: const Icon(Icons.refresh),
             title: const Text('Max Retry Attempts'),
             subtitle: Text('Failed captures can be retried ${settings.maxRetryAttempts} times'),
             trailing: DropdownButton<int>(

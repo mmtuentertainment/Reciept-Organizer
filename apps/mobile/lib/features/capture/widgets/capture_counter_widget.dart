@@ -64,7 +64,7 @@ class _CaptureCounterWidgetState extends State<CaptureCounterWidget>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
+              color: Colors.black.withAlpha((0.7 * 255).round()),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.white, width: 1),
             ),

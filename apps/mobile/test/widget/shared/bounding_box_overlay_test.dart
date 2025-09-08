@@ -73,7 +73,7 @@ void main() {
         ));
         
         // Assert
-        expect(highConfidenceBox.color, equals(Colors.green.withOpacity(0.3)));
+        expect(highConfidenceBox.color, equals(Colors.green.withAlpha((0.3 * 255).round())));
         expect(highConfidenceBox.borderColor, equals(Colors.green));
       });
       
@@ -91,7 +91,7 @@ void main() {
         ));
         
         // Assert
-        expect(mediumConfidenceBox.color, equals(Colors.yellow.withOpacity(0.3)));
+        expect(mediumConfidenceBox.color, equals(Colors.yellow.withAlpha((0.3 * 255).round())));
         expect(mediumConfidenceBox.borderColor, equals(Colors.yellow));
       });
       
@@ -109,7 +109,7 @@ void main() {
         ));
         
         // Assert
-        expect(lowConfidenceBox.color, equals(Colors.red.withOpacity(0.3)));
+        expect(lowConfidenceBox.color, equals(Colors.red.withAlpha((0.3 * 255).round())));
         expect(lowConfidenceBox.borderColor, equals(Colors.red));
       });
     });

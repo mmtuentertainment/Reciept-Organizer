@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:camera/camera.dart';
 import 'package:receipt_organizer/data/models/camera_frame.dart';
 import 'package:receipt_organizer/data/models/capture_result.dart';
@@ -82,7 +82,7 @@ class CameraService implements ICameraService {
           ocrResults = await _ocrService.processReceipt(dummyImageData);
         } catch (e) {
           // OCR failed, but capture was successful
-          print('OCR processing failed: $e');
+          debugPrint('OCR processing failed: $e');
         }
       }
       

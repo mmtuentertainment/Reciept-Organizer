@@ -15,7 +15,7 @@ class AppTheme {
         centerTitle: true,
         elevation: 0,
       ),
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 2,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -47,7 +47,7 @@ class AppTheme {
         centerTitle: true,
         elevation: 0,
       ),
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 2,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(

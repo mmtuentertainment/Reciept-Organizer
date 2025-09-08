@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,7 +7,6 @@ import 'package:mockito/mockito.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
-import 'package:receipt_organizer/features/capture/providers/batch_capture_provider.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
 import '../mocks/mock_text_recognizer.dart';
 
@@ -68,10 +68,10 @@ void main() {
       
       // Log performance metrics
       final avgTimePerReceipt = duration.inMilliseconds / 10;
-      print('Performance Metrics:');
-      print('  Total time: ${duration.inSeconds}s');
-      print('  Average per receipt: ${avgTimePerReceipt.toStringAsFixed(1)}ms');
-      print('  Target: 18s per receipt (${18000}ms)');
+      debugPrint('Performance Metrics:');
+      debugPrint('  Total time: ${duration.inSeconds}s');
+      debugPrint('  Average per receipt: ${avgTimePerReceipt.toStringAsFixed(1)}ms');
+      debugPrint('  Target: 18s per receipt (${18000}ms)');
       
       expect(avgTimePerReceipt, lessThan(18000), 
           reason: 'Average processing should be under 18s per receipt');

@@ -194,11 +194,11 @@ class CSVExportService implements ICSVExportService {
       rows.add([
         _formatDate(receipt.receiptDate) ?? '',
         _formatAmount(receipt.totalAmount) ?? '0.00',
-        receipt.merchantName ?? 'Unknown Merchant',
+        _sanitizeForCSV(receipt.merchantName ?? 'Unknown Merchant'),
         'Business Expenses', // Default category
         'Receipt #${receipt.id.substring(0, 8)}',
         _formatAmount(receipt.taxAmount) ?? '0.00',
-        receipt.notes ?? '',
+        _sanitizeForCSV(receipt.notes),
       ]);
     }
     
@@ -214,11 +214,11 @@ class CSVExportService implements ICSVExportService {
       rows.add([
         _formatDate(receipt.receiptDate) ?? '',
         _formatAmount(receipt.totalAmount) ?? '0.00',
-        receipt.merchantName ?? 'Unknown Merchant',
+        _sanitizeForCSV(receipt.merchantName ?? 'Unknown Merchant'),
         'Business expense - Receipt #${receipt.id.substring(0, 8)}',
         '400', // Default expense account code
         _formatAmount(receipt.taxAmount) ?? '0.00',
-        receipt.notes ?? '',
+        _sanitizeForCSV(receipt.notes),
       ]);
     }
     
@@ -245,14 +245,14 @@ class CSVExportService implements ICSVExportService {
       rows.add([
         receipt.id,
         _formatDate(receipt.receiptDate) ?? '',
-        receipt.merchantName ?? '',
+        _sanitizeForCSV(receipt.merchantName),
         _formatAmount(receipt.totalAmount) ?? '',
         _formatAmount(receipt.taxAmount) ?? '',
         _formatDateTime(receipt.capturedAt),
         receipt.batchId ?? '',
         receipt.overallConfidence.toStringAsFixed(1),
         receipt.status.name,
-        receipt.notes ?? '',
+        _sanitizeForCSV(receipt.notes),
       ]);
     }
     
@@ -262,6 +262,31 @@ class CSVExportService implements ICSVExportService {
   String? _formatAmount(double? amount) {
     if (amount == null) return null;
     return amount.toStringAsFixed(2);
+  }
+
+  /// Sanitize string to prevent CSV injection attacks
+  /// Escapes special characters: =, +, -, @, tab, CR, LF
+  String _sanitizeForCSV(String? value) {
+    if (value == null || value.isEmpty) return '';
+    
+    // Check if value starts with dangerous characters
+    final firstChar = value.isEmpty ? '' : value[0];
+    final dangerousChars = ['=', '+', '-', '@'];
+    
+    String sanitized = value;
+    
+    // If starts with dangerous character, prefix with single quote
+    if (dangerousChars.contains(firstChar)) {
+      sanitized = "'$value";
+    }
+    
+    // Replace tabs, carriage returns, and line feeds
+    sanitized = sanitized
+        .replaceAll('\t', ' ')  // Replace tab with space
+        .replaceAll('\r', ' ')  // Replace carriage return with space
+        .replaceAll('\n', ' '); // Replace line feed with space
+    
+    return sanitized;
   }
 
   String? _formatDate(String? dateStr) {

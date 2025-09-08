@@ -2,11 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
-import 'package:receipt_organizer/domain/services/image_storage_service.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
-import 'package:receipt_organizer/domain/services/camera_service.dart';
 import 'package:receipt_organizer/domain/services/merchant_normalization_service.dart';
-import 'package:receipt_organizer/features/capture/services/retry_session_manager.dart';
 import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
 import 'package:receipt_organizer/features/capture/providers/image_storage_provider.dart';
 import 'package:receipt_organizer/features/capture/providers/preview_initialization_provider.dart';
@@ -28,14 +25,14 @@ class TestProviderScope extends StatelessWidget {
   final PreviewInitState? previewInitState;
   final SharedPreferences? sharedPreferences;
   
-  const TestProviderScope({
+  const TestProviderScope({super.key,
     Key? key,
     required this.child,
     this.overrides,
     this.captureState,
     this.previewInitState,
     this.sharedPreferences,
-  }) : super(key: key);
+  }) ;
   
   @override
   Widget build(BuildContext context) {

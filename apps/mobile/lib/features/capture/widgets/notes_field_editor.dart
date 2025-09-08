@@ -20,11 +20,11 @@ class NotesFieldEditor extends StatefulWidget {
   static const int maxCharacters = 500;
 
   const NotesFieldEditor({
-    Key? key,
+    super.key,
     this.initialValue,
     required this.onChanged,
     this.enabled = true,
-  }) : super(key: key);
+  });
 
   @override
   State<NotesFieldEditor> createState() => _NotesFieldEditorState();
@@ -149,12 +149,12 @@ class _NotesFieldEditorState extends State<NotesFieldEditor> {
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
               borderSide: BorderSide(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 width: 1.0,
               ),
             ),
             filled: !widget.enabled,
-            fillColor: !widget.enabled ? theme.colorScheme.surfaceVariant : null,
+            fillColor: !widget.enabled ? theme.colorScheme.surfaceContainerHighest : null,
             counterText: '', // Hide default counter, we'll use custom
           ),
           style: theme.textTheme.bodyLarge,

@@ -144,7 +144,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
             if (_isManualAdjustmentMode)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withOpacity(0.8),
+                  color: Colors.black.withAlpha((0.8 * 255).round()),
                   child: ManualAdjustmentInterface(
                     currentResult: _currentEdgeResult,
                     viewSize: MediaQuery.of(context).size,
@@ -183,7 +183,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
         // Back button
         Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.black.withAlpha((0.6 * 255).round()),
             shape: BoxShape.circle,
           ),
           child: IconButton(
@@ -196,7 +196,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
         // Settings or help button
         Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.black.withAlpha((0.6 * 255).round()),
             shape: BoxShape.circle,
           ),
           child: IconButton(
@@ -244,7 +244,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
+              color: Colors.black.withAlpha((0.8 * 255).round()),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -262,7 +262,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
             // Manual adjustment button
             Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withAlpha((0.6 * 255).round()),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
@@ -309,7 +309,7 @@ class _ReceiptCaptureScreenState extends ConsumerState<ReceiptCaptureScreen> {
             // Flash or other controls
             Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withAlpha((0.6 * 255).round()),
                 shape: BoxShape.circle,
               ),
               child: IconButton(

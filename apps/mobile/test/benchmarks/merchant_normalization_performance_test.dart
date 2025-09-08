@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/domain/services/merchant_normalization_service.dart';
@@ -247,38 +248,38 @@ int _estimateMemoryUsage() {
 
 // Print formatted benchmark summary
 void _printBenchmarkSummary(List<BenchmarkResult> results) {
-  print('\n=== Merchant Normalization Performance Benchmark Results ===\n');
+  debugPrint('\n=== Merchant Normalization Performance Benchmark Results ===\n');
   
   for (final result in results) {
-    print('${result.name}:');
+    debugPrint('${result.name}:');
     if (result.p50 != null) {
-      print('  P50: ${result.p50!.toStringAsFixed(2)}ms');
-      print('  P95: ${result.p95!.toStringAsFixed(2)}ms');
-      print('  P99: ${result.p99!.toStringAsFixed(2)}ms');
+      debugPrint('  P50: ${result.p50!.toStringAsFixed(2)}ms');
+      debugPrint('  P95: ${result.p95!.toStringAsFixed(2)}ms');
+      debugPrint('  P99: ${result.p99!.toStringAsFixed(2)}ms');
     }
     if (result.totalTime != null) {
-      print('  Total Time: ${result.totalTime!.toStringAsFixed(2)}ms');
+      debugPrint('  Total Time: ${result.totalTime!.toStringAsFixed(2)}ms');
     }
     if (result.perItemAverage != null) {
-      print('  Per Item Avg: ${result.perItemAverage!.toStringAsFixed(2)}ms');
+      debugPrint('  Per Item Avg: ${result.perItemAverage!.toStringAsFixed(2)}ms');
     }
     if (result.scalingFactor != null) {
-      print('  Scaling Factor: ${result.scalingFactor!.toStringAsFixed(2)}');
+      debugPrint('  Scaling Factor: ${result.scalingFactor!.toStringAsFixed(2)}');
     }
     if (result.memoryIncreaseMB != null) {
-      print('  Memory Increase: ${result.memoryIncreaseMB!.toStringAsFixed(2)}MB');
+      debugPrint('  Memory Increase: ${result.memoryIncreaseMB!.toStringAsFixed(2)}MB');
     }
     if (result.coldStartMs != null) {
-      print('  Cold Start: ${result.coldStartMs!.toStringAsFixed(2)}ms');
+      debugPrint('  Cold Start: ${result.coldStartMs!.toStringAsFixed(2)}ms');
     }
     if (result.maxTimeMs != null) {
-      print('  Max Time: ${result.maxTimeMs!.toStringAsFixed(2)}ms');
+      debugPrint('  Max Time: ${result.maxTimeMs!.toStringAsFixed(2)}ms');
     }
-    print('  Sample Size: ${result.sampleSize}');
-    print('');
+    debugPrint('  Sample Size: ${result.sampleSize}');
+    debugPrint('');
   }
   
-  print('=== End Benchmark Results ===\n');
+  debugPrint('=== End Benchmark Results ===\n');
 }
 
 // Service is now imported from the actual implementation

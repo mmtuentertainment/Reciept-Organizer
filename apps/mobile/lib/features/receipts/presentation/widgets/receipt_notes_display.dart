@@ -19,7 +19,7 @@ class ReceiptNotesDisplay extends StatelessWidget {
     required this.notes,
     this.showBorder = true,
     this.maxLines,
-  }) : super(key: key);
+  }) ;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class ReceiptNotesDisplay extends StatelessWidget {
       decoration: showBorder
           ? BoxDecoration(
               border: Border.all(
-                color: theme.colorScheme.outline.withOpacity(0.5),
+                color: theme.colorScheme.outline.withAlpha((0.5 * 255).round()),
                 width: 1.0,
               ),
               borderRadius: BorderRadius.circular(8.0),
@@ -90,13 +90,13 @@ class ReceiptNotesDisplay extends StatelessWidget {
         Icon(
           Icons.note_add,
           size: 16,
-          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withAlpha((0.5 * 255).round()),
         ),
         const SizedBox(width: 8),
         Text(
           'No notes added',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: theme.colorScheme.onSurfaceVariant.withAlpha((0.5 * 255).round()),
             fontStyle: FontStyle.italic,
           ),
         ),

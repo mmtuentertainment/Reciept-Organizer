@@ -19,7 +19,7 @@ class MerchantFieldEditorWithNormalization extends StatefulWidget {
     this.onChanged,
     this.showConfidence = true,
     this.showNormalizationIndicator = true,
-  }) : super(key: key);
+  }) ;
 
   @override
   State<MerchantFieldEditorWithNormalization> createState() => 
@@ -141,7 +141,7 @@ class _MerchantFieldEditorWithNormalizationState
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withAlpha((0.1 * 255).round()),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(

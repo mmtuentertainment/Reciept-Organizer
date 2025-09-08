@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,39 +9,28 @@ import 'package:receipt_organizer/features/capture/screens/preview_screen.dart';
 import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
 import 'package:receipt_organizer/features/capture/providers/preview_initialization_provider.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
-import 'package:receipt_organizer/features/receipts/presentation/widgets/merchant_field_editor_with_normalization.dart';
-import 'package:receipt_organizer/features/capture/widgets/capture_failed_state.dart';
-import 'package:receipt_organizer/features/capture/widgets/notes_field_editor.dart';
-import 'package:receipt_organizer/shared/widgets/zoomable_image_viewer.dart';
-import 'package:state_notifier/state_notifier.dart';
-import '../../helpers/provider_test_helpers.dart';
 import 'preview_screen_test.mocks.dart';
 
 // Mock provider families for the new architecture
 final mockPreviewInitializationProvider = FutureProvider.family<PreviewInitState, PreviewInitParams>((ref, params) async {
   // Return default init state for tests
   return PreviewInitState(
-    imageData: params.imageData,
-    sessionId: params.sessionId ?? 'test-session-123',
     imagePath: '/tmp/test-image.jpg',
-    processingResult: null,
-    captureState: const CaptureState(),
+    sessionId: params.sessionId ?? 'test-session-123',
   );
 });
 
 // Note: PreviewProcessingNotifier type is inferred from the implementation
 
-class MockPreviewProcessingNotifier extends StateNotifier<PreviewProcessingState> {
-  MockPreviewProcessingNotifier() : super(const PreviewProcessingState());
+class MockPreviewProcessingNotifier extends StateNotifier<PreviewInitState> {
+  MockPreviewProcessingNotifier() : super(PreviewInitState(
+    imagePath: '/tmp/test-image.jpg',
+    sessionId: 'test-session-123',
+  ));
   
   Future<void> startProcessing() async {
     // No-op for tests
   }
-}
-
-class PreviewProcessingState {
-  final bool isProcessing;
-  const PreviewProcessingState({this.isProcessing = false});
 }
 @GenerateMocks([
   CaptureNotifier,
@@ -67,18 +55,15 @@ void main() {
         processingDurationMs: 1500,
       );
 
-      mockCaptureState = CaptureState(
+      mockCaptureState = const CaptureState(
         isProcessing: false,
         isRetryMode: false,
         lastProcessingResult: mockProcessingResult,
       );
       
-      mockInitState = PreviewInitState(
-        imageData: testImageData,
-        sessionId: 'test-session-123',
-        processingResult: mockProcessingResult,
-        captureState: mockCaptureState,
+      mockInitState = const PreviewInitState(
         imagePath: '/tmp/test-image.jpg',
+        sessionId: 'test-session-123',
       );
     });
 
@@ -300,7 +285,7 @@ void main() {
     group('Processing state', () {
       testWidgets('displays processing indicator when processing', (WidgetTester tester) async {
         // Given
-        final processingState = CaptureState(
+        final processingState = const CaptureState(
           isProcessing: true,
           isRetryMode: false,
         );
@@ -317,7 +302,7 @@ void main() {
     group('Error handling', () {
       testWidgets('handles null processing result gracefully', (WidgetTester tester) async {
         // Given
-        final nullResultState = CaptureState(
+        final nullResultState = const CaptureState(
           isProcessing: false,
           isRetryMode: false,
           lastProcessingResult: null,
@@ -403,7 +388,7 @@ void main() {
         expect(layoutBuilder, findsOneWidget);
         
         // Get the LayoutBuilder widget and check its child is a Row
-        final layoutBuilderWidget = tester.widget<LayoutBuilder>(layoutBuilder);
+        // final layoutBuilderWidget = tester.widget<LayoutBuilder>(layoutBuilder);
         tester.element(layoutBuilder).visitChildElements((element) {
           expect(element.widget, isA<Row>());
         });
@@ -425,7 +410,7 @@ void main() {
         expect(layoutBuilder, findsOneWidget);
         
         // Get the LayoutBuilder widget and check its child is a Column
-        final layoutBuilderWidget = tester.widget<LayoutBuilder>(layoutBuilder);
+        // final layoutBuilderWidget = tester.widget<LayoutBuilder>(layoutBuilder);
         tester.element(layoutBuilder).visitChildElements((element) {
           expect(element.widget, isA<Column>());
         });

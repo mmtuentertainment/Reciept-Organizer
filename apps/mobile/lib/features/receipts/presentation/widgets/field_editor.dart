@@ -32,7 +32,7 @@ class FieldEditor extends StatefulWidget {
     this.showConfidence = true,
     this.enabled = true,
     this.hintText,
-  }) : super(key: key);
+  }) ;
 
   @override
   State<FieldEditor> createState() => _FieldEditorState();
@@ -181,7 +181,7 @@ class _FieldEditorState extends State<FieldEditor>
       final parts = value.split('/');
       final month = int.parse(parts[0]);
       final day = int.parse(parts[1]);
-      final year = int.parse(parts[2]);
+      // final year = int.parse(parts[2]);
       
       if (month < 1 || month > 12 || day < 1 || day > 31) {
         return 'error'; // Invalid date values
@@ -440,7 +440,7 @@ class MerchantFieldEditor extends StatelessWidget {
     this.fieldData,
     this.onChanged,
     this.showConfidence = true,
-  }) : super(key: key);
+  }) ;
 
   @override
   Widget build(BuildContext context) {
@@ -477,7 +477,7 @@ class DateFieldEditor extends StatelessWidget {
     this.fieldData,
     this.onChanged,
     this.showConfidence = true,
-  }) : super(key: key);
+  }) ;
 
   @override
   Widget build(BuildContext context) {
@@ -511,7 +511,7 @@ class AmountFieldEditor extends StatelessWidget {
     this.fieldData,
     this.onChanged,
     this.showConfidence = true,
-  }) : super(key: key);
+  }) ;
 
   @override
   Widget build(BuildContext context) {

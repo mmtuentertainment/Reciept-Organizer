@@ -1,11 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:receipt_organizer/domain/services/security_manager.dart';
 
 @GenerateMocks([Directory])
-import 'security_manager_test.mocks.dart';
 import '../../helpers/platform_test_helpers.dart';
 
 void main() {
@@ -31,11 +30,11 @@ void main() {
         
         // Debug: Print allowed directories
         final dirs = securityManager.getAllowedDirectories();
-        print('Allowed directories: $dirs');
+        debugPrint('Allowed directories: $dirs');
         
         // Act
         final result = await securityManager.isValidPath('/tmp/test_file.jpg');
-        print('Validation result for /tmp/test_file.jpg: $result');
+        debugPrint('Validation result for /tmp/test_file.jpg: $result');
         
         // Assert
         expect(result, isTrue);

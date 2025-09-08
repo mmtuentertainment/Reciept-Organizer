@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/app_settings.dart';
 import '../../../data/repositories/settings_repository.dart';
@@ -28,7 +29,7 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
       final settings = await repository.loadSettings();
       state = settings;
     } catch (e) {
-      print('Failed to load settings: $e');
+      debugPrint('Failed to load settings: $e');
     }
   }
 

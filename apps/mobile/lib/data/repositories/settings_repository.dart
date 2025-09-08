@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/app_settings.dart';
@@ -27,7 +28,7 @@ class SettingsRepository {
       }
     } catch (e) {
       // If loading fails, return default settings
-      print('Failed to load settings: $e');
+      debugPrint('Failed to load settings: $e');
     }
     return const AppSettings();
   }
@@ -38,7 +39,7 @@ class SettingsRepository {
       final settingsJson = jsonEncode(settings.toJson());
       return await _prefs.setString(_settingsKey, settingsJson);
     } catch (e) {
-      print('Failed to save settings: $e');
+      debugPrint('Failed to save settings: $e');
       return false;
     }
   }

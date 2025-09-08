@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 
@@ -253,7 +253,7 @@ class ImageOptimizationService {
       _thumbnailCache.clear();
       _cacheOrder.clear();
     } catch (e) {
-      print('Cleanup failed: $e');
+      debugPrint('Cleanup failed: $e');
     }
   }
 
@@ -278,7 +278,7 @@ class ImageOptimizationService {
       try {
         await file.delete();
       } catch (e) {
-        print('Failed to delete file ${file.path}: $e');
+        debugPrint('Failed to delete file ${file.path}: $e');
       }
     }
   }

@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:google_ml_kit/google_ml_kit.dart' hide RecognizedText;
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/domain/services/merchant_normalization_service.dart';
 import '../mocks/mock_text_recognizer.dart';

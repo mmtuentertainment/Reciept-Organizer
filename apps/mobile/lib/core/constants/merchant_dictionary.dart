@@ -1,12 +1,12 @@
-/// Merchant dictionary for normalization
-/// Contains common vendor mappings and normalization rules
-/// 
-/// Rules are applied in this order:
-/// 1. Direct abbreviation lookup
-/// 2. Franchise pattern matching
-/// 3. Suffix removal
-/// 4. Case normalization
-/// 5. Special character handling
+
+// Contains common vendor mappings and normalization rules
+// 
+// Rules are applied in this order:
+// 1. Direct abbreviation lookup
+// 2. Franchise pattern matching
+// 3. Suffix removal
+// 4. Case normalization
+// 5. Special character handling
 
 class MerchantDictionary {
   /// Common abbreviations to full merchant names

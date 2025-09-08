@@ -2,7 +2,6 @@ import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_reposit
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:receipt_organizer/domain/services/csv_export_service.dart';
 import 'dart:convert';
 
 class ReceiptRepository implements IReceiptRepository {
@@ -11,7 +10,6 @@ class ReceiptRepository implements IReceiptRepository {
   static const int _databaseVersion = 1;
   
   Database? _database;
-  final CSVExportService _csvExportService = CSVExportService();
 
   Future<Database> get database async {
     _database ??= await _initDatabase();
@@ -105,8 +103,8 @@ class ReceiptRepository implements IReceiptRepository {
     final db = await database;
     
     // Format dates to match the stored format (MM/DD/YYYY)
-    final startStr = _formatDateForQuery(start);
-    final endStr = _formatDateForQuery(end);
+    // final startStr = _formatDateForQuery(start);
+    // final endStr = _formatDateForQuery(end);
     
     // Query with date range comparison
     // Note: This uses string comparison, which works for MM/DD/YYYY format
@@ -203,9 +201,9 @@ class ReceiptRepository implements IReceiptRepository {
   }
 
   /// Format date for display and storage (MM/DD/YYYY)
-  String _formatDateForQuery(DateTime date) {
-    return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
-  }
+//   String _formatDateForQuery(DateTime date) {
+//     return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
+//   }
 
   /// Format date for SQL comparison (YYYYMMDD)
   String _formatDateForSqlComparison(DateTime date) {

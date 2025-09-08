@@ -256,8 +256,8 @@ class RetryCountIndicator extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: attemptsRemaining > 0 
-                      ? colorScheme.primary.withOpacity(0.1)
-                      : colorScheme.error.withOpacity(0.1),
+                      ? colorScheme.primary.withAlpha((0.1 * 255).round())
+                      : colorScheme.error.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -297,7 +297,7 @@ class RetryCountIndicator extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: colorScheme.outline.withOpacity(0.3),
+                  color: colorScheme.outline.withAlpha((0.3 * 255).round()),
                   borderRadius: BorderRadius.circular(2),
                 ),
                 child: Align(

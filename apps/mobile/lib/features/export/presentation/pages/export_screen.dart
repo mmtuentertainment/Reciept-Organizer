@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/date_range_picker.dart';
+import 'package:receipt_organizer/features/export/presentation/widgets/format_selection.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/date_range_provider.dart';
-import 'package:receipt_organizer/domain/services/csv_export_service.dart';
+import 'package:receipt_organizer/features/export/presentation/providers/export_format_provider.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
-import 'package:receipt_organizer/features/settings/providers/settings_provider.dart';
 import 'package:intl/intl.dart';
 
 /// Main export screen with date range selection and format options
@@ -15,76 +15,7 @@ class ExportScreen extends ConsumerStatefulWidget {
   ConsumerState<ExportScreen> createState() => _ExportScreenState();
 }
 
-class _ExportScreenState extends ConsumerState<ExportScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final _exportFormats = ExportFormat.values;
-
-  @override
-  void initState() {
-    super.initState();
-    
-    // Load saved export format preference
-    final settings = ref.read(appSettingsProvider);
-    final savedFormat = _exportFormats.firstWhere(
-      (format) => format.name == settings.csvExportFormat,
-      orElse: () => ExportFormat.quickbooks,
-    );
-    final initialIndex = _exportFormats.indexOf(savedFormat);
-    
-    _tabController = TabController(
-      length: _exportFormats.length,
-      vsync: this,
-      initialIndex: initialIndex,
-    );
-    
-    // Save format preference when tab changes
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) return;
-      final selectedFormat = _exportFormats[_tabController.index];
-      ref.read(appSettingsProvider.notifier).updateCsvFormat(selectedFormat.name);
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  String _getFormatDisplayName(ExportFormat format) {
-    switch (format) {
-      case ExportFormat.quickbooks:
-        return 'QuickBooks';
-      case ExportFormat.xero:
-        return 'Xero';
-      case ExportFormat.generic:
-        return 'Generic CSV';
-    }
-  }
-
-  String _getFormatDescription(ExportFormat format) {
-    switch (format) {
-      case ExportFormat.quickbooks:
-        return 'Compatible with QuickBooks Desktop and Online';
-      case ExportFormat.xero:
-        return 'Compatible with Xero accounting software';
-      case ExportFormat.generic:
-        return 'Standard CSV with all available fields';
-    }
-  }
-
-  IconData _getFormatIcon(ExportFormat format) {
-    switch (format) {
-      case ExportFormat.quickbooks:
-        return Icons.account_balance;
-      case ExportFormat.xero:
-        return Icons.cloud_circle;
-      case ExportFormat.generic:
-        return Icons.table_chart;
-    }
-  }
-
+class _ExportScreenState extends ConsumerState<ExportScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -100,7 +31,17 @@ class _ExportScreenState extends ConsumerState<ExportScreen>
       body: dateRangeState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _buildErrorState(error.toString()),
-        data: (state) => _buildContent(state),
+        data: (state) => Stack(
+          children: [
+            _buildContent(state),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: _buildExportButton(state),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -142,79 +83,71 @@ class _ExportScreenState extends ConsumerState<ExportScreen>
   Widget _buildContent(DateRangeState state) {
     final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        // Date Range Picker Section
-        Container(
-          color: theme.colorScheme.surface,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Select Date Range',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Format Selection Section (Now First!)
+          Container(
+            color: theme.colorScheme.surface,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Export Format',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
-                    const SizedBox(height: 16),
-                    const DateRangePickerWidget(),
-                    if (state.receiptCount != null) ...[
-                      const SizedBox(height: 12),
-                      _buildReceiptCountChip(state.receiptCount!),
-                    ],
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 16),
+                  const FormatSelectionWidget(),
+                ],
               ),
-              const Divider(height: 1),
-            ],
+            ),
           ),
-        ),
+          const Divider(height: 1),
 
-        // Format Selection Tabs
-        Container(
-          color: theme.colorScheme.surface,
-          child: TabBar(
-            controller: _tabController,
-            tabs: _exportFormats.map((format) {
-              return Tab(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(_getFormatIcon(format), size: 18),
-                    const SizedBox(width: 8),
-                    Text(_getFormatDisplayName(format)),
+          // Date Range Picker Section
+          Container(
+            color: theme.colorScheme.surface,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Select Date Range',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const DateRangePickerWidget(),
+                  if (state.receiptCount != null) ...[
+                    const SizedBox(height: 12),
+                    _buildReceiptCountChip(context, state.receiptCount!),
                   ],
-                ),
-              );
-            }).toList(),
-            labelColor: theme.colorScheme.primary,
-            unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-            indicatorColor: theme.colorScheme.primary,
-            indicatorWeight: 3,
+                ],
+              ),
+            ),
           ),
-        ),
+          const Divider(height: 1),
 
-        // Tab Content
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: _exportFormats.map((format) {
-              return _buildFormatContent(format, state);
-            }).toList(),
+          // Export Preview Section
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: _buildExportPreview(state),
           ),
-        ),
 
-        // Export Button
-        _buildExportButton(state),
-      ],
+          // Add some space before the button
+          const SizedBox(height: 80),
+        ],
+      ),
     );
   }
 
-  Widget _buildReceiptCountChip(int count) {
+  Widget _buildReceiptCountChip(BuildContext context, int count) {
     final theme = Theme.of(context);
     final color = count > 0
         ? AppColors.success
@@ -232,195 +165,123 @@ class _ExportScreenState extends ConsumerState<ExportScreen>
             : 'No receipts in this date range',
         style: TextStyle(color: color),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withAlpha((0.1 * 255).round()),
       side: BorderSide.none,
     );
   }
 
-  Widget _buildFormatContent(ExportFormat format, DateRangeState state) {
-    final theme = Theme.of(context);
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Format Description
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        _getFormatIcon(format),
-                        size: 24,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        _getFormatDisplayName(format),
-                        style: theme.textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _getFormatDescription(format),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Required Fields
-          _buildRequiredFields(format),
-
-          const SizedBox(height: 16),
-
-          // Receipt Preview
-          if (state.receiptCount != null && state.receiptCount! > 0) ...[
-            _buildReceiptPreview(state),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRequiredFields(ExportFormat format) {
-    final theme = Theme.of(context);
-    final csvService = CSVExportService();
-    final requiredFields = csvService.getRequiredFields(format);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.checklist,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Required Fields',
-                  style: theme.textTheme.titleSmall,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: requiredFields.map((field) {
-                return Chip(
-                  label: Text(
-                    field,
-                    style: theme.textTheme.bodySmall,
-                  ),
-                  backgroundColor: theme.colorScheme.secondaryContainer,
-                  side: BorderSide.none,
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReceiptPreview(DateRangeState state) {
+  Widget _buildExportPreview(DateRangeState state) {
     final theme = Theme.of(context);
     final dateFormatter = DateFormat('MMM d, yyyy');
 
+    if (state.receiptCount == null || state.receiptCount == 0) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 48,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'No receipts found in the selected date range',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final selectedFormat = ref.watch(selectedExportFormatProvider);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.preview,
-                      size: 20,
-                      color: theme.colorScheme.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Date Range Preview',
-                      style: theme.textTheme.titleSmall,
-                    ),
-                  ],
-                ),
-                Text(
-                  '${state.receiptCount} receipts',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+            Text(
+              'Export Preview',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.calendar_month,
-                    size: 16,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '${dateFormatter.format(state.dateRange.start)} - ${dateFormatter.format(state.dateRange.end)}',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 16),
+            // Summary info
+            _buildInfoRow(
+              context,
+              Icons.receipt_long,
+              'Receipts',
+              '${state.receiptCount} receipt${state.receiptCount == 1 ? '' : 's'}',
+            ),
+            const SizedBox(height: 8),
+            _buildInfoRow(
+              context,
+              Icons.calendar_month,
+              'Date Range',
+              '${dateFormatter.format(state.dateRange.start)} - ${dateFormatter.format(state.dateRange.end)}',
+            ),
+            const SizedBox(height: 8),
+            _buildInfoRow(
+              context,
+              Icons.table_chart,
+              'Export Format',
+              ref.read(exportFormatNotifierProvider.notifier).getFormatDisplayName(selectedFormat),
             ),
             if (state.presetOption != DateRangePreset.custom) ...[
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.schedule,
-                    size: 14,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    state.presetOption.label,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+              _buildInfoRow(
+                context,
+                Icons.schedule,
+                'Preset',
+                state.presetOption.label,
               ),
             ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoRow(BuildContext context, IconData icon, String label, String value) {
+    final theme = Theme.of(context);
+    
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: theme.colorScheme.primary,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              Text(
+                value,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -433,7 +294,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen>
         color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             offset: const Offset(0, -2),
             blurRadius: 4,
           ),
@@ -466,7 +327,8 @@ class _ExportScreenState extends ConsumerState<ExportScreen>
   }
 
   Future<void> _handleExport(DateRangeState state) async {
-    final format = _exportFormats[_tabController.index];
+    final format = ref.read(selectedExportFormatProvider);
+    final formatNotifier = ref.read(exportFormatNotifierProvider.notifier);
     
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
@@ -475,7 +337,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen>
         title: Text('Export ${state.receiptCount} Receipts?'),
         content: Text(
           'You are about to export ${state.receiptCount} receipt${state.receiptCount == 1 ? '' : 's'} '
-          'in ${_getFormatDisplayName(format)} format.',
+          'in ${formatNotifier.getFormatDisplayName(format)} format.',
         ),
         actions: [
           TextButton(

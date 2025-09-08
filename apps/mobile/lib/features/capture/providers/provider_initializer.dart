@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
 
@@ -26,7 +27,7 @@ class ProviderInitializer {
       _initialized = true;
     } catch (e) {
       // Log but don't throw - allow app to continue
-      print('Provider initialization warning: $e');
+      debugPrint('Provider initialization warning: $e');
     }
   }
   

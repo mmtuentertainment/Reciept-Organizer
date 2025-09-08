@@ -5,10 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:receipt_organizer/features/capture/screens/preview_screen.dart';
-import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/shared/widgets/zoomable_image_viewer.dart';
 import 'package:receipt_organizer/shared/widgets/bounding_box_overlay.dart';
@@ -65,7 +63,7 @@ void main() {
     group('Given successful OCR processing', () {
       testWidgets('When preview loads Then image viewer is displayed with fields', (tester) async {
         // Arrange
-        final mockResult = ProcessingResult(
+        // final mockResult = ProcessingResult(
           merchant: FieldData(value: 'Test Store', confidence: 0.95, originalText: 'Test Store'),
           date: FieldData(value: '2024-01-15', confidence: 0.90, originalText: '2024-01-15'),
           total: FieldData(value: '100.00', confidence: 0.85, originalText: '100.00'),
@@ -109,7 +107,7 @@ void main() {
       
       testWidgets('When toggling view mode Then layout changes appropriately', (tester) async {
         // Arrange
-        final mockResult = ProcessingResult(
+        // final mockResult = ProcessingResult(
           merchant: FieldData(value: 'Test Store', confidence: 0.95, originalText: 'Test Store'),
           date: FieldData(value: '2024-01-15', confidence: 0.90, originalText: '2024-01-15'),
           total: FieldData(value: '100.00', confidence: 0.85, originalText: '100.00'),
@@ -160,7 +158,7 @@ void main() {
       
       testWidgets('When bounding boxes available Then overlay is displayed', (tester) async {
         // Arrange
-        final mockResult = ProcessingResult(
+        // final mockResult = ProcessingResult(
           merchant: FieldData(
             value: 'Test Store', 
             confidence: 0.95,
@@ -213,7 +211,7 @@ void main() {
       
       testWidgets('When toggling bounding boxes Then overlay visibility changes', (tester) async {
         // Arrange
-        final mockResult = ProcessingResult(
+        // final mockResult = ProcessingResult(
           merchant: FieldData(
             value: 'Test Store', 
             confidence: 0.95,
@@ -269,7 +267,7 @@ void main() {
     group('Given state preservation', () {
       testWidgets('When switching view modes Then zoom/pan state is maintained', (tester) async {
         // Arrange
-        final mockResult = ProcessingResult(
+        // final mockResult = ProcessingResult(
           merchant: FieldData(value: 'Test Store', confidence: 0.95, originalText: 'Test Store'),
           date: FieldData(value: '2024-01-15', confidence: 0.90, originalText: '2024-01-15'),
           total: FieldData(value: '100.00', confidence: 0.85, originalText: '100.00'),
@@ -298,7 +296,7 @@ void main() {
         
         // Perform zoom gesture
         final imageViewer = find.byType(ZoomableImageViewer);
-        final center = tester.getCenter(imageViewer);
+        // final center = tester.getCenter(imageViewer);
         
         // Double tap to zoom
         await tester.tap(imageViewer);

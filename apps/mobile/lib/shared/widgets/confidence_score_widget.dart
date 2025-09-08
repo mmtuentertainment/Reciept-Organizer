@@ -27,7 +27,7 @@ class ConfidenceScoreWidget extends StatelessWidget {
     this.showIcon = true,
     this.size,
     this.animate = true,
-  }) : super(key: key);
+  }) ;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +59,7 @@ class ConfidenceScoreWidget extends StatelessWidget {
       height: displaySize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color.withOpacity(0.1),
+        color: color.withAlpha((0.1 * 255).round()),
         border: Border.all(color: color, width: 2),
       ),
       child: Column(
@@ -87,8 +87,8 @@ class ConfidenceScoreWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: color.withOpacity(0.1),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: color.withAlpha((0.1 * 255).round()),
+        border: Border.all(color: color.withAlpha((0.3 * 255).round())),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -143,7 +143,7 @@ class ConfidenceScoreWidget extends StatelessWidget {
       width: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(3),
-        color: color.withOpacity(0.2),
+        color: color.withAlpha((0.2 * 255).round()),
       ),
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,
@@ -166,8 +166,8 @@ class ConfidenceScoreWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: color.withOpacity(0.1),
-          border: Border.all(color: color.withOpacity(0.3)),
+          color: color.withAlpha((0.1 * 255).round()),
+          border: Border.all(color: color.withAlpha((0.3 * 255).round())),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
@@ -200,7 +200,7 @@ class ConfidenceScoreWidget extends StatelessWidget {
       height: size ?? 32.0,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color.withOpacity(0.1),
+        color: color.withAlpha((0.1 * 255).round()),
         border: Border.all(color: color, width: 2),
       ),
       child: const Center(

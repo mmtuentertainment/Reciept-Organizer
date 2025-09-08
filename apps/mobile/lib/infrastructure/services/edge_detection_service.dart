@@ -531,7 +531,6 @@ class EdgeDetectionService {
   /// Dispose of service resources and clear memory
   void dispose() {
     // Clear cached data to free memory
-    _lastProcessedImage = null;
     _cachedResult = null;
     _lastImageHash = 0;
   }

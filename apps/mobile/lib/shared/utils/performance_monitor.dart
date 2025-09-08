@@ -214,7 +214,7 @@ class PerformanceOverlay extends StatefulWidget {
     Key? key,
     required this.child,
     this.enabled = true,
-  }) : super(key: key);
+  }) ;
   
   @override
   State<PerformanceOverlay> createState() => _PerformanceOverlayState();
@@ -263,8 +263,8 @@ class _PerformanceOverlayState extends State<PerformanceOverlay> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: _metrics!.isPerformant 
-                  ? Colors.green.withOpacity(0.9) 
-                  : Colors.orange.withOpacity(0.9),
+                  ? Colors.green.withAlpha((0.9 * 255).round()) 
+                  : Colors.orange.withAlpha((0.9 * 255).round()),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(

@@ -25,11 +25,11 @@ class TestOCRData {
       _createMockLine('STARBUCKS COFFEE'),
       _createMockLine('123 Main Street'),
       _createMockLine('12/06/2024 14:30'),
-      _createMockLine('Latte Grande        \$4.25'),
-      _createMockLine('Cookie              \$2.50'),
-      _createMockLine('Subtotal            \$6.75'),
-      _createMockLine('Tax                 \$0.54'),
-      _createMockLine('Total               \$7.29'),
+      _createMockLine('Latte Grande        \\\$4.25'),
+      _createMockLine('Cookie              \\\$2.50'),
+      _createMockLine('Subtotal            \\\$6.75'),
+      _createMockLine('Tax                 \\\$0.54'),
+      _createMockLine('Total               \\\$7.29'),
     ];
     
     final block = MockTextBlock();
@@ -49,7 +49,7 @@ class TestOCRData {
       _createMockLine('ST@RB#CKS C0FF33'),  // Corrupted merchant name
       _createMockLine('123 M@in St'),
       _createMockLine('12/0G/Z024'),        // Corrupted date
-      _createMockLine('L@tte               4.Z5'),  // Missing $ and corrupted
+      _createMockLine('L@tte               4.Z5'),  // Missing \$ and corrupted
       _createMockLine('T0t@l               ?.?9'),  // Heavily corrupted total
     ];
     
@@ -102,11 +102,11 @@ class MerchantTestData {
       'MCDONALDS #4521',
       '123 Main Street',
       '12/06/2024 14:30',
-      'Big Mac Meal        $10.99',
-      'Medium Fries        $2.50',
-      'Subtotal            $13.49',
-      'Tax                 $1.50',
-      'Total               $14.99',
+      'Big Mac Meal        \$10.99',
+      'Medium Fries        \$2.50',
+      'Subtotal            \$13.49',
+      'Tax                 \$1.50',
+      'Total               \$14.99',
     ]);
   }
 
@@ -116,10 +116,10 @@ class MerchantTestData {
       merchantName,
       '123 Main Street',
       '12/06/2024 14:30',
-      'Item                $10.00',
-      'Subtotal            $10.00',
-      'Tax                 $0.80',
-      'Total               $10.80',
+      'Item                \$10.00',
+      'Subtotal            \$10.00',
+      'Tax                 \$0.80',
+      'Total               \$10.80',
     ]);
   }
 
@@ -129,10 +129,10 @@ class MerchantTestData {
       'Target',
       '456 Elm Street',
       '12/06/2024 15:45',
-      'Electronics         $99.99',
-      'Subtotal            $99.99',
-      'Tax                 $8.00',
-      'Total               $107.99',
+      'Electronics         \$99.99',
+      'Subtotal            \$99.99',
+      'Tax                 \$8.00',
+      'Total               \$107.99',
     ]);
   }
 
@@ -140,21 +140,21 @@ class MerchantTestData {
   static MockRecognizedText receiptWithMissingMerchant() {
     return TestOCRData.createRecognizedText([
       '12/06/2024 16:00',
-      'Item                $15.00',
-      'Subtotal            $15.00',
-      'Tax                 $1.20',
-      'Total               $16.20',
+      'Item                \$15.00',
+      'Subtotal            \$15.00',
+      'Tax                 \$1.20',
+      'Total               \$16.20',
     ]);
   }
 
   /// Receipt with corrupted data for normalization error testing
   static MockRecognizedText receiptWithCorruptedData() {
     return TestOCRData.createRecognizedText([
-      '@#$%^&*',  // Corrupted merchant
-      '!@#$%^',
+      '@#\$%^&*',  // Corrupted merchant
+      '!@#\$%^',
       '99/99/9999',
-      'ERROR               $?.??',
-      'Total               $?.??',
+      'ERROR               \$?.??',
+      'Total               \$?.??',
     ]);
   }
 }

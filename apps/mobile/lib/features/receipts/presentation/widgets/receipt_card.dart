@@ -16,13 +16,13 @@ class ReceiptCard extends StatelessWidget {
   final bool isSelected;
 
   const ReceiptCard({
-    Key? key,
+    super.key,
     required this.receipt,
     this.onTap,
     this.onLongPress,
     this.showConfidenceSummary = true,
     this.isSelected = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +184,6 @@ class ReceiptCard extends StatelessWidget {
         statusIcon = Icons.error;
         break;
       case ReceiptStatus.captured:
-      default:
         statusColor = Colors.grey;
         statusIcon = Icons.photo_camera;
         break;
@@ -199,7 +198,7 @@ class ReceiptCard extends StatelessWidget {
 
   Widget _buildConfidenceDisplay() {
     if (!receipt.hasOCRResults) {
-      return Container(
+      return SizedBox(
         width: 48,
         height: 48,
         child: const Center(
@@ -334,11 +333,11 @@ class CompactReceiptCard extends StatelessWidget {
   final bool isSelected;
 
   const CompactReceiptCard({
-    Key? key,
+    super.key,
     required this.receipt,
     this.onTap,
     this.isSelected = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

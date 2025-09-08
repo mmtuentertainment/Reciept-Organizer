@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/shared/utils/performance_monitor.dart';
 import 'package:receipt_organizer/domain/services/image_cache_service.dart';
@@ -65,7 +63,7 @@ class ZoomableImageViewer extends ConsumerStatefulWidget {
     this.imageQuality = 85,
     this.progressiveLoadingThreshold = 2 * 1024 * 1024, // 2MB
     this.overlayBuilder,
-  }) : super(key: key);
+  }) ;
 
   @override
   ConsumerState<ZoomableImageViewer> createState() => _ZoomableImageViewerState();
@@ -79,7 +77,7 @@ class _ZoomableImageViewerState extends ConsumerState<ZoomableImageViewer>
   String? _errorMessage;
   
   // FPS monitoring
-  int _frameCount = 0;
+  // Commented out unused field:   int _frameCount = 0;
   double _currentFps = 0;
   Timer? _fpsTimer;
   
@@ -212,7 +210,7 @@ class _ZoomableImageViewerState extends ConsumerState<ZoomableImageViewer>
     
     if (mounted && thumbnailBytes != null) {
       setState(() {
-        _thumbnailBytes = thumbnailBytes;
+        // _thumbnailBytes = thumbnailBytes;
         _imageProvider = MemoryImage(thumbnailBytes);
         _isLoading = false;
         _isLoadingFullImage = true;
@@ -229,7 +227,7 @@ class _ZoomableImageViewerState extends ConsumerState<ZoomableImageViewer>
     
     if (mounted && fullBytes != null) {
       setState(() {
-        _fullImageBytes = fullBytes;
+        // _fullImageBytes = fullBytes;
         _imageProvider = MemoryImage(fullBytes);
         _isLoadingFullImage = false;
       });
@@ -250,7 +248,7 @@ class _ZoomableImageViewerState extends ConsumerState<ZoomableImageViewer>
     
     if (mounted && bytes != null) {
       setState(() {
-        _fullImageBytes = bytes;
+        // _fullImageBytes = bytes;
         _imageProvider = MemoryImage(bytes);
         _isLoading = false;
       });
@@ -406,7 +404,7 @@ class _ZoomableImageViewerState extends ConsumerState<ZoomableImageViewer>
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   SizedBox(
                     width: 16,
                     height: 16,

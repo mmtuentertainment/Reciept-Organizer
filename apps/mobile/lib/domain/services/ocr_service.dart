@@ -289,7 +289,7 @@ class OCRService implements IOCRService {
     
     // Apply merchant normalization if enabled and merchant was extracted
     if (merchant != null && _enableMerchantNormalization && _merchantNormalizationService != null) {
-      final normalizedName = _merchantNormalizationService!.normalize(merchant.value as String);
+      final normalizedName = _merchantNormalizationService.normalize(merchant.value as String);
       if (normalizedName != merchant.value) {
         // Update the merchant field with normalized value, preserving original
         merchant = FieldData(

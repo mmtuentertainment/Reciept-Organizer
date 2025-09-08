@@ -170,7 +170,7 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
             animation: _flashController,
             builder: (context, child) {
               return Container(
-                color: Colors.white.withOpacity(_flashController.value * 0.8),
+                color: Colors.white.withAlpha((_flashController.value * 0.8 * 255).round()),
               );
             },
           ),
@@ -194,7 +194,7 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.9),
+                        color: Colors.orange.withAlpha((0.9 * 255).round()),
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Column(
@@ -214,7 +214,7 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
                             height: 4,
                             child: LinearProgressIndicator(
                               value: _autoAdvanceController.value,
-                              backgroundColor: Colors.white.withOpacity(0.3),
+                              backgroundColor: Colors.white.withAlpha((0.3 * 255).round()),
                               valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           ),

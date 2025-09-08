@@ -1,4 +1,4 @@
-/// Comprehensive merchant test dataset for normalization testing
+
 /// Covers edge cases, common franchises, and various formats
 /// 
 /// Test categories:

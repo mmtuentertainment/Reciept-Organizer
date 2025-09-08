@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart' as ocr;
 import 'package:receipt_organizer/domain/services/image_optimization_service.dart';
@@ -68,7 +67,7 @@ class BackgroundProcessingService {
   
   // Processing control
   bool _isProcessing = false;
-  int _maxConcurrentTasks = 2;
+  final int _maxConcurrentTasks = 2;
   Timer? _processTimer;
   
   // Statistics

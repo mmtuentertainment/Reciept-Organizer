@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:receipt_organizer/data/repositories/receipt_repository.dart';
@@ -357,7 +358,7 @@ void main() {
       }
       stopwatch.stop();
       
-      print('Inserted 1000 receipts in ${stopwatch.elapsedMilliseconds}ms');
+      debugPrint('Inserted 1000 receipts in ${stopwatch.elapsedMilliseconds}ms');
 
       // When - Query a month's worth of data
       stopwatch.reset();
@@ -369,7 +370,7 @@ void main() {
       stopwatch.stop();
 
       // Then
-      print('Queried date range in ${stopwatch.elapsedMilliseconds}ms');
+      debugPrint('Queried date range in ${stopwatch.elapsedMilliseconds}ms');
       expect(stopwatch.elapsedMilliseconds, lessThan(100), 
         reason: 'Date range query should complete within 100ms with index');
       expect(results.length, greaterThan(300)); // Should have ~333 receipts in January

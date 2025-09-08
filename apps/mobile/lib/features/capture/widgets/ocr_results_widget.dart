@@ -128,7 +128,7 @@ class OCRResultsWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: _getConfidenceColor(confidence).withOpacity(0.1),
+        color: _getConfidenceColor(confidence).withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: _getConfidenceColor(confidence), width: 1),
       ),

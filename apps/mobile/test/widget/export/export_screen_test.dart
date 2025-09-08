@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/export/presentation/pages/export_screen.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/date_range_provider.dart';
+import 'package:receipt_organizer/features/export/presentation/providers/export_format_provider.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/date_range_picker.dart';
+import 'package:receipt_organizer/features/export/presentation/widgets/format_selection.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
 import 'package:receipt_organizer/features/settings/providers/settings_provider.dart';
@@ -15,6 +17,7 @@ void main() {
     return ProviderScope(
       overrides: [
         appSettingsProvider.overrideWith((ref) => _MockAppSettingsNotifier(ref)),
+        exportFormatNotifierProvider.overrideWith((ref) => _MockExportFormatNotifier(ref)),
         ...?overrides,
       ],
       child: MaterialApp(
@@ -38,7 +41,7 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('should display all main sections', (tester) async {
+    testWidgets('should display all main sections with format selection first', (tester) async {
       // Given - Create test state
       final testState = DateRangeState(
         dateRange: DateTimeRange(
@@ -62,17 +65,25 @@ void main() {
       // Check app bar
       expect(find.text('Export Receipts'), findsOneWidget);
 
-      // Check date range picker
+      // Check format selection appears first
+      expect(find.text('Export Format'), findsOneWidget);
+      expect(find.byType(FormatSelectionWidget), findsOneWidget);
+      expect(find.byType(SegmentedButton<ExportFormat>), findsOneWidget);
+
+      // Check date range picker appears after format
       expect(find.text('Select Date Range'), findsNWidgets(2)); // One in ExportScreen, one in DateRangePickerWidget
       expect(find.byType(DateRangePickerWidget), findsOneWidget);
+
+      // Verify format selection appears before date range
+      final exportFormatY = tester.getCenter(find.text('Export Format')).dy;
+      final dateRangeY = tester.getCenter(find.text('Select Date Range').first).dy;
+      expect(exportFormatY, lessThan(dateRangeY));
 
       // Check receipt count
       expect(find.text('42 receipts found'), findsOneWidget);
 
-      // Check format tabs
-      expect(find.text('QuickBooks'), findsAtLeastNWidgets(1));
-      expect(find.text('Xero'), findsAtLeastNWidgets(1));
-      expect(find.text('Generic CSV'), findsAtLeastNWidgets(1));
+      // Check export preview
+      expect(find.text('Export Preview'), findsOneWidget);
 
       // Check export button
       expect(find.text('Export 42 Receipts'), findsOneWidget);
@@ -101,12 +112,9 @@ void main() {
       // Then
       expect(find.text('No receipts in this date range'), findsOneWidget);
       expect(find.text('No Receipts to Export'), findsOneWidget);
+      expect(find.text('No receipts found in the selected date range'), findsOneWidget);
 
       // Export button should be disabled
-      expect(find.text('No Receipts to Export'), findsOneWidget);
-      
-      // Check that the export button is disabled (onPressed is null)
-      // Note: FilledButton.icon creates a _FilledButtonWithIcon widget
       final exportButton = tester.widget<FilledButton>(
         find.ancestor(
           of: find.text('No Receipts to Export'),
@@ -116,7 +124,7 @@ void main() {
       expect(exportButton.onPressed, isNull);
     });
 
-    testWidgets('should display format details when tab selected', (tester) async {
+    testWidgets('should display format selection with all options', (tester) async {
       // Given
       final testState = DateRangeState(
         dateRange: DateTimeRange(
@@ -136,17 +144,20 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // Then - QuickBooks tab is selected by default
-      expect(find.text('Compatible with QuickBooks Desktop and Online'), findsOneWidget);
-      expect(find.text('Required Fields'), findsOneWidget);
+      // Then - All format options should be visible
+      expect(find.text('QuickBooks'), findsNWidgets(2)); // In button and description
+      expect(find.text('Xero'), findsOneWidget);
+      expect(find.text('Generic CSV'), findsNWidgets(2)); // Default selection
 
-      // Check required fields for QuickBooks
-      expect(find.text('Date'), findsAtLeastNWidgets(1));
-      expect(find.text('Amount'), findsAtLeastNWidgets(1));
-      expect(find.text('Payee'), findsAtLeastNWidgets(1));
+      // Check format description
+      expect(find.textContaining('Standard CSV'), findsOneWidget);
+      expect(find.text('Required fields for Generic CSV'), findsOneWidget);
+      
+      // Check security info
+      expect(find.text('CSV injection prevention enabled'), findsOneWidget);
     });
 
-    testWidgets('should switch between format tabs', (tester) async {
+    testWidgets('should update preview when format changes', (tester) async {
       // Given
       final testState = DateRangeState(
         dateRange: DateTimeRange(
@@ -166,20 +177,18 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // Then - Switch to Xero tab
-      await tester.tap(find.text('Xero'));
+      // Then - Generic is selected by default
+      expect(find.text('Generic CSV'), findsNWidgets(2)); // In selector and preview
+
+      // Select QuickBooks
+      await tester.tap(find.text('QuickBooks').first);
       await tester.pumpAndSettle();
 
-      expect(find.text('Compatible with Xero accounting software'), findsOneWidget);
-
-      // Switch to Generic CSV tab
-      await tester.tap(find.text('Generic CSV'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Standard CSV with all available fields'), findsOneWidget);
+      // Preview should update
+      expect(find.text('QuickBooks'), findsNWidgets(2)); // In selector and description
     });
 
-    testWidgets('should display date range preview', (tester) async {
+    testWidgets('should display export preview with all info', (tester) async {
       // Given
       final testState = DateRangeState(
         dateRange: DateTimeRange(
@@ -200,11 +209,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Then
-      expect(find.text('Date Range Preview'), findsOneWidget);
+      expect(find.text('Export Preview'), findsOneWidget);
       expect(find.text('25 receipts'), findsOneWidget);
       expect(find.textContaining('Jan 1, 2024'), findsOneWidget);
       expect(find.textContaining('Jan 31, 2024'), findsOneWidget);
-      expect(find.text('This Month'), findsNWidgets(2)); // Preset appears in picker and preview
+      expect(find.text('Generic CSV'), findsNWidgets(2));
+      expect(find.text('This Month'), findsNWidgets(2)); // In picker and preview
     });
 
     testWidgets('should show confirmation dialog when export clicked', (tester) async {
@@ -234,11 +244,11 @@ void main() {
       // Then - Confirmation dialog appears
       expect(find.text('Export 15 Receipts?'), findsOneWidget);
       expect(
-        find.text('You are about to export 15 receipts in QuickBooks format.'),
+        find.text('You are about to export 15 receipts in Generic CSV format.'),
         findsOneWidget,
       );
       expect(find.text('Cancel'), findsOneWidget);
-      expect(find.text('Export'), findsOneWidget);
+      expect(find.text('Export'), findsNWidgets(2)); // Button text and dialog button
     });
 
     testWidgets('should display error state', (tester) async {
@@ -302,13 +312,72 @@ void main() {
       // Then - Check singular forms
       expect(find.text('1 receipt found'), findsOneWidget);
       expect(find.text('Export 1 Receipt'), findsOneWidget);
+      expect(find.text('1 receipt'), findsOneWidget); // In preview
+    });
+
+    testWidgets('should be scrollable for small screens', (tester) async {
+      // Given
+      final testState = DateRangeState(
+        dateRange: DateTimeRange(
+          start: DateTime(2024, 1, 1),
+          end: DateTime(2024, 12, 31),
+        ),
+        presetOption: DateRangePreset.last90Days,
+        receiptCount: 150,
+      );
+
+      // When
+      await tester.pumpWidget(createTestWidget(
+        const ExportScreen(),
+        overrides: [
+          dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
+        ],
+      ));
+      await tester.pumpAndSettle();
+
+      // Then - Verify scrollable
+      final scrollable = find.byType(SingleChildScrollView);
+      expect(scrollable, findsOneWidget);
+
+      // Scroll to bottom
+      await tester.drag(scrollable, const Offset(0, -500));
+      await tester.pumpAndSettle();
+      
+      // Content should still be visible
+      expect(find.text('Export Preview'), findsOneWidget);
+    });
+
+    testWidgets('should show format-specific info', (tester) async {
+      // Given
+      final testState = DateRangeState(
+        dateRange: DateTimeRange(
+          start: DateTime(2024, 1, 1),
+          end: DateTime(2024, 1, 31),
+        ),
+        presetOption: DateRangePreset.custom,
+        receiptCount: 10,
+      );
+
+      // When
+      await tester.pumpWidget(createTestWidget(
+        const ExportScreen(),
+        overrides: [
+          dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
+          exportFormatNotifierProvider.overrideWith((ref) => _MockExportFormatNotifier(ref, ExportFormat.quickbooks)),
+        ],
+      ));
+      await tester.pumpAndSettle();
+
+      // Then - QuickBooks specific info
+      expect(find.text('Date format: MM/dd/yyyy'), findsOneWidget);
+      expect(find.text('Amount format: 0.00 (two decimal places)'), findsOneWidget);
+      expect(find.text('Category'), findsOneWidget); // QuickBooks specific field
     });
   });
 }
 
 // Mock notifier that always returns loading state
 class _LoadingDateRangeNotifier extends DateRangeNotifier {
-  @override
   Future<DateRangeState> build() async {
     // Return a future that never completes to simulate loading
     final completer = Completer<DateRangeState>();
@@ -322,7 +391,6 @@ class _TestDateRangeNotifier extends DateRangeNotifier {
   
   _TestDateRangeNotifier(this._testState);
   
-  @override
   Future<DateRangeState> build() async {
     return _testState;
   }
@@ -330,7 +398,6 @@ class _TestDateRangeNotifier extends DateRangeNotifier {
 
 // Mock notifier that returns an error state
 class _ErrorDateRangeNotifier extends DateRangeNotifier {
-  @override
   Future<DateRangeState> build() async {
     throw 'Failed to load receipts';
   }
@@ -340,21 +407,37 @@ class _ErrorDateRangeNotifier extends DateRangeNotifier {
 class _MockAppSettingsNotifier extends AppSettingsNotifier {
   _MockAppSettingsNotifier(Ref ref) : super(ref);
   
-  @override
-  Future<void> _loadSettings() async {
+  Future<void> loadSettings() async {
     // Override to avoid loading from repository
     state = const AppSettings();
   }
   
-  @override
   Future<bool> updateCsvFormat(String format) async {
     state = state.copyWith(csvExportFormat: format);
     return true;
   }
   
-  @override
   Future<bool> updateDateRangePreset(String preset) async {
     state = state.copyWith(dateRangePreset: preset);
     return true;
+  }
+}
+
+// Mock export format notifier
+class _MockExportFormatNotifier extends ExportFormatNotifier {
+  final ExportFormat _defaultFormat;
+  
+  _MockExportFormatNotifier(Ref ref, [this._defaultFormat = ExportFormat.generic]) : super(ref);
+  
+  Future<void> loadSavedFormat() async {
+    state = ExportFormatState(
+      selectedFormat: _defaultFormat,
+      lastUsedFormat: _defaultFormat,
+      isLoading: false,
+    );
+  }
+  
+  Future<void> updateFormat(ExportFormat newFormat) async {
+    state = state.copyWith(selectedFormat: newFormat);
   }
 }

@@ -1,0 +1,74 @@
+schema: 1
+story: '3.10'
+gate: CONCERNS
+status_reason: 'Story well-prepared with security considerations added, but CSV injection risk requires careful implementation.'
+reviewer: 'Quinn'
+updated: '2025-01-12T16:30:00Z'
+top_issues:
+  - id: 'SEC-001'
+    severity: high
+    finding: 'CSV injection vulnerability requires comprehensive sanitization'
+    suggested_action: 'Implement and thoroughly test special character escaping before any export functionality'
+  - id: 'DATA-001'
+    severity: medium
+    finding: 'Format compliance with QuickBooks/Xero not yet verified with actual imports'
+    suggested_action: 'Create test files from real exports and verify import compatibility during development'
+  - id: 'TEST-001'
+    severity: medium
+    finding: 'File system permission testing cannot be automated'
+    suggested_action: 'Plan manual testing on different OS configurations and document results'
+waiver: { active: false }
+
+# Extended fields for comprehensive tracking
+risk_summary:
+  totals:
+    critical: 0
+    high: 2
+    medium: 5
+    low: 4
+  highest:
+    id: SEC-001
+    score: 6
+    title: 'CSV injection vulnerability'
+  recommendations:
+    must_fix:
+      - 'Implement CSV injection prevention with comprehensive testing'
+      - 'Verify actual QuickBooks/Xero import compatibility'
+    monitor:
+      - 'Export success rates by format'
+      - 'User format selection patterns'
+
+test_design:
+  scenarios_total: 28
+  by_level:
+    unit: 15
+    integration: 10
+    e2e: 3
+  by_priority:
+    p0: 12
+    p1: 11
+    p2: 5
+  coverage_gaps: []
+
+nfr_validation:
+  security:
+    status: CONCERNS
+    notes: 'CSV injection risk requires careful implementation and testing'
+  performance:
+    status: PASS
+    notes: 'Low risk for reasonable data volumes'
+  reliability:
+    status: PASS
+    notes: 'Error handling and fallbacks specified'
+  maintainability:
+    status: PASS
+    notes: 'Follows established patterns from Story 3.9'
+
+trace:
+  coverage_summary: 'All 3 acceptance criteria have comprehensive test coverage'
+  gaps: []
+
+# Assessment References
+assessments:
+  risk_profile: 'docs/qa/assessments/3.10-risk-20250112.md'
+  test_design: 'docs/qa/assessments/3.10-test-design-20250112.md'

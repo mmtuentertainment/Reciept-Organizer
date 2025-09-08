@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/data/models/edge_detection_result.dart';
@@ -74,7 +73,7 @@ class CaptureState {
 
 class CaptureNotifier extends StateNotifier<CaptureState> {
   final OCRService _ocrService;
-  final ICameraService _cameraService;
+  // Commented out unused field:   final ICameraService _cameraService;
   final RetrySessionManager _sessionManager;
 
   CaptureNotifier({
@@ -82,11 +81,16 @@ class CaptureNotifier extends StateNotifier<CaptureState> {
     required ICameraService cameraService,
     required RetrySessionManager sessionManager,
   }) : _ocrService = ocrService, 
-       _cameraService = cameraService,
        _sessionManager = sessionManager,
        super(const CaptureState()) {
     // Clean up expired sessions on initialization
     _cleanupExpiredSessions();
+  }
+
+  /// Initialize the capture provider
+  Future<void> initialize() async {
+    // Perform any async initialization if needed
+    await _cleanupExpiredSessions();
   }
 
   /// Starts a new capture session

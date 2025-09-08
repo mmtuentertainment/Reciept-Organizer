@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -178,7 +177,7 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen>
             animation: _flashController,
             builder: (context, child) {
               return Container(
-                color: Colors.white.withOpacity(_flashController.value * 0.8),
+                color: Colors.white.withAlpha((_flashController.value * 0.8 * 255).round()),
               );
             },
           ),
@@ -237,7 +236,7 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen>
                           boxShadow: [
                             BoxShadow(
                               color: (_isLongPressing ? Colors.orange : Colors.black)
-                                  .withOpacity(0.3),
+                                  .withAlpha((0.3 * 255).round()),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),

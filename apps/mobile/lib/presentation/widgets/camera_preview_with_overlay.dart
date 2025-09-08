@@ -165,7 +165,7 @@ class _CameraPreviewWithOverlayState
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: Colors.black.withAlpha((0.6 * 255).round()),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Row(
@@ -236,7 +236,7 @@ class _CameraPreviewWithOverlayState
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.8),
+        color: Colors.black.withAlpha((0.8 * 255).round()),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

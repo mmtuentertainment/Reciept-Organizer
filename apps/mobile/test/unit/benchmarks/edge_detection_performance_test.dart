@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/infrastructure/services/edge_detection_service.dart';
@@ -44,11 +45,11 @@ void main() {
         final maxTime = processingTimes.reduce((a, b) => a > b ? a : b);
         final minTime = processingTimes.reduce((a, b) => a < b ? a : b);
 
-        print('Performance Statistics:');
-        print('  Average processing time: ${avgTime.toStringAsFixed(1)}ms');
-        print('  Maximum processing time: ${maxTime}ms');
-        print('  Minimum processing time: ${minTime}ms');
-        print('  Success rate: ${processingTimes.where((t) => t < 100).length}/$iterations (${(processingTimes.where((t) => t < 100).length / iterations * 100).toStringAsFixed(1)}%)');
+        debugPrint('Performance Statistics:');
+        debugPrint('  Average processing time: ${avgTime.toStringAsFixed(1)}ms');
+        debugPrint('  Maximum processing time: ${maxTime}ms');
+        debugPrint('  Minimum processing time: ${minTime}ms');
+        debugPrint('  Success rate: ${processingTimes.where((t) => t < 100).length}/$iterations (${(processingTimes.where((t) => t < 100).length / iterations * 100).toStringAsFixed(1)}%)');
 
         // Performance requirements validation
         expect(avgTime, lessThan(100), reason: 'Average processing time must be under 100ms');
@@ -75,9 +76,9 @@ void main() {
         final result2 = await service.detectEdges(frame);
         stopwatch2.stop();
 
-        print('Caching Performance:');
-        print('  First processing: ${stopwatch1.elapsedMilliseconds}ms');
-        print('  Cached processing: ${stopwatch2.elapsedMilliseconds}ms');
+        debugPrint('Caching Performance:');
+        debugPrint('  First processing: ${stopwatch1.elapsedMilliseconds}ms');
+        debugPrint('  Cached processing: ${stopwatch2.elapsedMilliseconds}ms');
 
         // Cached result should be faster
         expect(stopwatch2.elapsedMilliseconds, lessThanOrEqualTo(stopwatch1.elapsedMilliseconds));
@@ -118,10 +119,10 @@ void main() {
           await Future.delayed(const Duration(milliseconds: 1));
         }
 
-        print('Memory Usage Test:');
-        print('  Iterations completed: $iterations');
-        print('  Largest processing time: ${largestProcessingTime}ms');
-        print('  Memory blowup detected: $memoryBlowupDetected');
+        debugPrint('Memory Usage Test:');
+        debugPrint('  Iterations completed: $iterations');
+        debugPrint('  Largest processing time: ${largestProcessingTime}ms');
+        debugPrint('  Memory blowup detected: $memoryBlowupDetected');
 
         expect(memoryBlowupDetected, isFalse, reason: 'No significant memory blowup should occur');
         expect(largestProcessingTime, lessThan(200), reason: 'Processing time should stay reasonable');
@@ -172,7 +173,7 @@ void main() {
           final result = await service.detectEdges(frame);
           stopwatch.stop();
 
-          print('Image Size ${size.$1}x${size.$2}: ${stopwatch.elapsedMilliseconds}ms');
+          debugPrint('Image Size ${size.$1}x${size.$2}: ${stopwatch.elapsedMilliseconds}ms');
 
           // All sizes should process reasonably quickly
           expect(stopwatch.elapsedMilliseconds, lessThan(150), 
@@ -197,10 +198,10 @@ void main() {
         final totalTime = stopwatch.elapsedMilliseconds;
         final avgTimePerRequest = totalTime / concurrentRequests;
 
-        print('Concurrent Processing:');
-        print('  Requests: $concurrentRequests');
-        print('  Total time: ${totalTime}ms');
-        print('  Avg time per request: ${avgTimePerRequest.toStringAsFixed(1)}ms');
+        debugPrint('Concurrent Processing:');
+        debugPrint('  Requests: $concurrentRequests');
+        debugPrint('  Total time: ${totalTime}ms');
+        debugPrint('  Avg time per request: ${avgTimePerRequest.toStringAsFixed(1)}ms');
 
         // Concurrent processing should be efficient
         expect(results.length, equals(concurrentRequests));
@@ -217,13 +218,13 @@ void main() {
 
 /// Create realistic test data that mimics camera frame data
 Uint8List _createRealisticTestData({int seed = 42}) {
-  final random = seed;
+  // final random = seed;
   final size = 640 * 480 * 3; // RGB data
   final data = List<int>.generate(size, (index) {
     // Create patterns that might represent receipt-like structures
     final x = (index ~/ 3) % 640;
     final y = (index ~/ 3) ~/ 640;
-    final channel = index % 3;
+    // final channel = index % 3;
     
     // Create some edge-like patterns
     int value = 128; // Base gray

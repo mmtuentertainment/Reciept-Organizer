@@ -1,12 +1,10 @@
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:receipt_organizer/domain/services/image_storage_service.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/domain/services/camera_service.dart';
 import 'package:receipt_organizer/domain/services/merchant_normalization_service.dart';
 import 'package:receipt_organizer/features/capture/services/retry_session_manager.dart';
-import 'package:receipt_organizer/data/models/capture_session.dart' hide RetrySession;
 import 'package:receipt_organizer/data/models/edge_detection_result.dart';
 import 'package:receipt_organizer/data/models/camera_frame.dart';
 import 'package:receipt_organizer/data/models/capture_result.dart';

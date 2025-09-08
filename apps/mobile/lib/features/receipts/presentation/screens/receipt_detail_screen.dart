@@ -17,7 +17,7 @@ class ReceiptDetailScreen extends StatefulWidget {
     Key? key,
     required this.receipt,
     this.onReceiptUpdated,
-  }) : super(key: key);
+  }) ;
 
   @override
   State<ReceiptDetailScreen> createState() => _ReceiptDetailScreenState();

@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:receipt_organizer/domain/services/image_storage_service.dart';
@@ -31,7 +31,7 @@ class ImageStorageServiceImpl implements IImageStorageService {
       }
     } catch (e) {
       // Log error but don't throw - deletion failures are non-critical
-      print('Failed to delete temporary file: $e');
+      debugPrint('Failed to delete temporary file: $e');
     }
   }
   

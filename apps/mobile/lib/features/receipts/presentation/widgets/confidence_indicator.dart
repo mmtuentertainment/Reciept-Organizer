@@ -23,7 +23,7 @@ class ConfidenceIndicator extends StatefulWidget {
     this.showProgressBar = false,
     this.padding = const EdgeInsets.all(8.0),
     this.animate = true,
-  }) : super(key: key);
+  }) ;
 
   @override
   State<ConfidenceIndicator> createState() => _ConfidenceIndicatorState();
@@ -97,7 +97,7 @@ class _ConfidenceIndicatorState extends State<ConfidenceIndicator>
               color: backgroundColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: color.withOpacity(0.3),
+                color: color.withAlpha((0.3 * 255).round()),
                 width: fieldData.isManuallyEdited ? 2 : 1,
               ),
             ),
@@ -161,7 +161,7 @@ class _ConfidenceIndicatorState extends State<ConfidenceIndicator>
       width: 120,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(2),
-        color: color.withOpacity(0.2),
+        color: color.withAlpha((0.2 * 255).round()),
       ),
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,

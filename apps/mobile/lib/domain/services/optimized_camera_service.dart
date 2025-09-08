@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:receipt_organizer/data/models/camera_frame.dart';
@@ -146,7 +145,7 @@ class OptimizedCameraService implements ICameraService {
 
   Future<void> _performMemoryCleanup() async {
     if (kDebugMode) {
-      print('Performing memory cleanup. Current usage: ${_currentMemoryUsage ~/ (1024 * 1024)}MB');
+      debugPrint('Performing memory cleanup. Current usage: ${_currentMemoryUsage ~/ (1024 * 1024)}MB');
     }
     
     _currentMemoryUsage = 0;

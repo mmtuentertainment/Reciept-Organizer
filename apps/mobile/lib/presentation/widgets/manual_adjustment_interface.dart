@@ -123,7 +123,7 @@ class _ManualAdjustmentInterfaceState extends State<ManualAdjustmentInterface>
     // Calculate area to ensure reasonable rectangle size
     final topLeft = corners[0];
     final topRight = corners[1];
-    final bottomRight = corners[2];
+    // final bottomRight = corners[2];
     final bottomLeft = corners[3];
 
     final width = (topRight.x - topLeft.x).abs();
@@ -152,14 +152,30 @@ class _ManualAdjustmentInterfaceState extends State<ManualAdjustmentInterface>
     }
   }
 
-  void _cancelChanges() {
-    setState(() {
-      _workingResult = widget.currentResult;
-      _hasChanges = false;
-      _selectedCornerIndex = null;
-    });
-    widget.onCancel?.call();
-  }
+
+
+  // void _cancelChanges() {
+
+
+  // setState(() {
+
+
+  // _workingResult = widget.currentResult;
+
+
+  // _hasChanges = false;
+
+
+  // _selectedCornerIndex = null;
+
+
+  // });
+
+
+  // widget.onCancel?.call();
+
+
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -293,7 +309,7 @@ class _ManualAdjustmentInterfaceState extends State<ManualAdjustmentInterface>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withAlpha((0.3 * 255).round()),
                   blurRadius: isSelected ? 6 : 3,
                   offset: const Offset(0, 2),
                 ),
@@ -387,7 +403,7 @@ class GuidelinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blue.withOpacity(0.5)
+      ..color = Colors.blue.withAlpha((0.5 * 255).round())
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -408,7 +424,7 @@ class GuidelinesPainter extends CustomPainter {
 
     // Draw grid lines for precision
     final gridPaint = Paint()
-      ..color = Colors.blue.withOpacity(0.2)
+      ..color = Colors.blue.withAlpha((0.2 * 255).round())
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
 

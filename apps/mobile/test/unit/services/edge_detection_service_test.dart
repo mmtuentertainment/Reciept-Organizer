@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/infrastructure/services/edge_detection_service.dart';
 import 'package:receipt_organizer/data/models/camera_frame.dart';
-import 'package:receipt_organizer/data/models/edge_detection_result.dart';
 
 void main() {
   group('EdgeDetectionService', () {

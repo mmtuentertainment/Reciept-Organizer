@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_repository.dart';
 import 'package:receipt_organizer/core/providers/repository_providers.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/date_range_picker.dart';
 import 'package:receipt_organizer/features/settings/providers/settings_provider.dart';
-import 'dart:convert';
 
 part 'date_range_provider.g.dart';
 

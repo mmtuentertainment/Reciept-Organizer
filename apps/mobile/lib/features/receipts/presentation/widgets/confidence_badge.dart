@@ -16,7 +16,7 @@ class ConfidenceBadge extends StatelessWidget {
     required this.confidence,
     this.size = 24.0,
     this.showPercentage = true,
-  }) : super(key: key);
+  }) ;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class ConfidenceBadge extends StatelessWidget {
         color: color,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withAlpha((0.2 * 255).round()),
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),
@@ -70,7 +70,7 @@ class ConfidenceBadge extends StatelessWidget {
         color: Colors.grey.shade400,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withAlpha((0.2 * 255).round()),
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),
@@ -125,7 +125,7 @@ class PositionedConfidenceBadge extends StatelessWidget {
     required this.child,
     this.size = 24.0,
     this.margin = const EdgeInsets.all(4.0),
-  }) : super(key: key);
+  }) ;
 
   @override
   Widget build(BuildContext context) {

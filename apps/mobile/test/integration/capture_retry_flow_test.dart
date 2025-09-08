@@ -119,7 +119,7 @@ void main() {
         }
       });
 
-      final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);
+      // final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);
 
       // Create test app with providers
       await tester.pumpWidget(
@@ -181,7 +181,7 @@ void main() {
         );
       });
 
-      final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);
+      // final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);
 
       // Create test app
       await tester.pumpWidget(
@@ -195,11 +195,11 @@ void main() {
             home: Builder(
               builder: (context) => ElevatedButton(
                 onPressed: () async {
-                  final action = await RetryPromptDialog.show(
-                    context: context,
-                    failureReason: FailureReason.lowConfidence,
-                    attemptNumber: 2,
-                    attemptsRemaining: 3,
+                  // final action = await RetryPromptDialog.show(
+                    context= context,
+                    failureReason= FailureReason.lowConfidence,
+                    attemptNumber= 2,
+                    attemptsRemaining= 3,
                   );
                   // Handle action result if needed
                 },
@@ -236,7 +236,7 @@ void main() {
         );
       });
 
-      final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);
+      // final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);
 
       await tester.pumpWidget(
         ProviderScope(

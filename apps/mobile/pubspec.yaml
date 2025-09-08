@@ -64,15 +64,18 @@ dev_dependencies:
   # Linting and Testing
   flutter_lints: ^4.0.0
   mockito: ^5.4.2
-  build_runner: ^2.4.13
+  build_runner: ^2.5.4
   
   # Code generation  
   riverpod_generator: ^2.6.3
+  riverpod_annotation: ^2.6.0
   json_annotation: ^4.8.1
-  json_serializable: ^6.7.1
+  json_serializable: ^6.9.5
   
   # Database testing
   sqflite_common_ffi: ^2.3.3
+  mocktail: ^1.0.4
+  freezed: ^3.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

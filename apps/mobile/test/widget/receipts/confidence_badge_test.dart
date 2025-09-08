@@ -150,7 +150,7 @@ void main() {
       final container = tester.widget<Container>(find.byType(Container).first);
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.boxShadow, isNotEmpty);
-      expect(decoration.boxShadow?.first.color, Colors.black.withOpacity(0.2));
+      expect(decoration.boxShadow?.first.color, Colors.black.withAlpha((0.2 * 255).round()));
     });
   });
 

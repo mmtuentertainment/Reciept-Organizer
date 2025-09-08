@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:receipt_organizer/data/repositories/settings_repository.dart';
 import 'package:receipt_organizer/data/models/app_settings.dart';
-import 'dart:convert';
 
 void main() {
   group('Settings Persistence for Export Features', () {

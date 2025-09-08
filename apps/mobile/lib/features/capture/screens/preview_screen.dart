@@ -3,8 +3,6 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
 import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
 import 'package:receipt_organizer/features/capture/providers/preview_initialization_provider.dart';
 import 'package:receipt_organizer/features/capture/widgets/capture_failed_state.dart';
@@ -219,7 +217,9 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
       case RetryAction.cancel:
         // Cancel and cleanup
         await captureNotifier.clearSession();
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
         break;
     }
   }
@@ -245,7 +245,9 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
   Future<void> _onCancel() async {
     final captureNotifier = ref.read(captureProvider.notifier);
     await captureNotifier.clearSession();
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   void _handleMerchantChanged(FieldData updatedField) {
@@ -700,7 +702,7 @@ class _PreviewScreenContentState extends ConsumerState<_PreviewScreenContent> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withAlpha((0.1 * 255).round()),
                   blurRadius: 10,
                   spreadRadius: 2,
                 ),

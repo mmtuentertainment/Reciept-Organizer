@@ -1,9 +1,7 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/capture/providers/capture_provider.dart';
 import 'package:receipt_organizer/features/capture/providers/image_storage_provider.dart';
-import 'package:receipt_organizer/domain/services/ocr_service.dart';
 
 /// Parameters for preview screen initialization
 @immutable
@@ -81,7 +79,7 @@ final previewInitializationProvider = FutureProvider.family<PreviewInitState, Pr
   try {
     // Get required services
     final imageStorage = ref.read(imageStorageServiceProvider);
-    final captureNotifier = ref.read(captureProvider.notifier);
+    // final captureNotifier = ref.read(captureProvider.notifier);
     
     // Save image to temporary file
     final imagePath = await imageStorage.saveTemporary(params.imageData);
@@ -159,6 +157,7 @@ class PreviewProcessingNotifier extends StateNotifier<PreviewInitState> {
   }
   
   /// Clean up resources
+  @override
   Future<void> dispose() async {
     final imageStorage = ref.read(imageStorageServiceProvider);
     if (state.imagePath.isNotEmpty) {

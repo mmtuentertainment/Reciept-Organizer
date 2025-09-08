@@ -21,8 +21,8 @@ void main() {
       final file = File('${tempDir.path}/test_${sizeInMb}mb.png');
       
       // Generate a simple PNG of approximate size
-      final width = 1000 * math.sqrt(sizeInMb).toInt();
-      final height = 1000 * math.sqrt(sizeInMb).toInt();
+      // final width = 1000 * math.sqrt(sizeInMb).toInt();
+      // final height = 1000 * math.sqrt(sizeInMb).toInt();
       
       // Create a simple image data (this is a placeholder)
       // In a real test, you'd generate actual image data
@@ -61,7 +61,7 @@ void main() {
       performanceMonitor.recordGestureStart('zoom_1mb');
       
       // Perform pinch zoom
-      final center = tester.getCenter(find.byType(ZoomableImageViewer));
+      // final center = tester.getCenter(find.byType(ZoomableImageViewer));
       final pointer1 = await tester.startGesture(center - const Offset(50, 0));
       final pointer2 = await tester.startGesture(center + const Offset(50, 0));
       
@@ -104,7 +104,7 @@ void main() {
       performanceMonitor.recordGestureStart('zoom_5mb');
       
       // Perform double tap zoom
-      final center = tester.getCenter(find.byType(ZoomableImageViewer));
+      // final center = tester.getCenter(find.byType(ZoomableImageViewer));
       await tester.tap(find.byType(ZoomableImageViewer));
       await tester.pump(const Duration(milliseconds: 100));
       await tester.tap(find.byType(ZoomableImageViewer));

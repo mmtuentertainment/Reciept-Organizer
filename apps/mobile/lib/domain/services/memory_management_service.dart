@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
 class MemoryUsage {
@@ -65,8 +64,8 @@ class MemoryManagementService {
   // Image cache management
   final Map<String, Uint8List> _imageCache = {};
   final Map<String, DateTime> _imageCacheAccess = {};
-  int _maxCacheSize = 50;
-  int _maxCacheSizeMB = 100;
+  final int _maxCacheSize = 50;
+  final int _maxCacheSizeMB = 100;
   
   // Stream for memory updates
   final StreamController<MemoryUsage> _memoryController = StreamController<MemoryUsage>.broadcast();
@@ -325,6 +324,6 @@ class MemoryManagementService {
       }
     }
     
-    return null;
+    return;
   }
 }

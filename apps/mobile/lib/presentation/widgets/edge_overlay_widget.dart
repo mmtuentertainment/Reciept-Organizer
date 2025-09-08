@@ -75,7 +75,7 @@ class EdgeOverlayWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withAlpha((0.3 * 255).round()),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),
@@ -118,7 +118,7 @@ class EdgeOverlayPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final fillPaint = Paint()
-      ..color = overlayColor.withOpacity(0.1)
+      ..color = overlayColor.withAlpha((0.1 * 255).round())
       ..style = PaintingStyle.fill;
 
     // Convert normalized corners to screen coordinates
@@ -169,7 +169,7 @@ class EdgeOverlayPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final backgroundPaint = Paint()
-      ..color = Colors.black.withOpacity(0.6)
+      ..color = Colors.black.withAlpha((0.6 * 255).round())
       ..style = PaintingStyle.fill;
 
     final textPainter = TextPainter(

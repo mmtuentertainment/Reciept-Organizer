@@ -16,11 +16,11 @@ class OcrBoundingBox {
   /// Get color based on confidence level
   Color get color {
     if (confidence > 0.9) {
-      return Colors.green.withOpacity(0.3);
+      return Colors.green.withAlpha((0.3 * 255).round());
     } else if (confidence > 0.75) {
-      return Colors.yellow.withOpacity(0.3);
+      return Colors.yellow.withAlpha((0.3 * 255).round());
     } else {
-      return Colors.red.withOpacity(0.3);
+      return Colors.red.withAlpha((0.3 * 255).round());
     }
   }
 
@@ -92,7 +92,7 @@ class BoundingBoxPainter extends CustomPainter {
       // Draw filled rectangle
       final fillPaint = Paint()
         ..color = box.fieldName == selectedFieldName 
-            ? box.color.withOpacity(0.5) 
+            ? box.color.withAlpha((0.5 * 255).round()) 
             : box.color
         ..style = PaintingStyle.fill;
       
@@ -102,7 +102,7 @@ class BoundingBoxPainter extends CustomPainter {
       final borderPaint = Paint()
         ..color = box.fieldName == selectedFieldName 
             ? box.borderColor 
-            : box.borderColor.withOpacity(0.7)
+            : box.borderColor.withAlpha((0.7 * 255).round())
         ..style = PaintingStyle.stroke
         ..strokeWidth = box.fieldName == selectedFieldName ? 3 : 2;
       
@@ -118,7 +118,7 @@ class BoundingBoxPainter extends CustomPainter {
             fontWeight: box.fieldName == selectedFieldName 
                 ? FontWeight.bold 
                 : FontWeight.normal,
-            backgroundColor: box.borderColor.withOpacity(0.8),
+            backgroundColor: box.borderColor.withAlpha((0.8 * 255).round()),
           ),
         ),
         textDirection: TextDirection.ltr,
@@ -219,7 +219,7 @@ class BoundingBoxOverlay extends StatelessWidget {
     this.debugMode = false,
     required this.imageSize,
     required this.displaySize,
-  }) : super(key: key);
+  }) ;
 
   /// Extract bounding boxes from ProcessingResult
   static List<OcrBoundingBox> extractFromProcessingResult(ProcessingResult result) {

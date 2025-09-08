@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
 import '../helpers/platform_test_helpers.dart';
@@ -16,21 +17,21 @@ void main() {
     final normalizedPath = path.normalize(testPath);
     final absolutePath = path.absolute(normalizedPath);
     
-    print('Original path: $testPath');
-    print('Normalized path: $normalizedPath');
-    print('Absolute path: $absolutePath');
-    print('Current directory: ${path.current}');
+    debugPrint('Original path: $testPath');
+    debugPrint('Normalized path: $normalizedPath');
+    debugPrint('Absolute path: $absolutePath');
+    debugPrint('Current directory: ${path.current}');
     
     // Test if path starts with /tmp
-    print('Starts with /tmp: ${absolutePath.startsWith('/tmp')}');
+    debugPrint('Starts with /tmp: ${absolutePath.startsWith('/tmp')}');
     
     // Test custom directory
     final customPath = '/custom/dir/file.jpg';
     final customNormalized = path.normalize(customPath);
     final customAbsolute = path.absolute(customNormalized);
     
-    print('\nCustom path: $customPath');
-    print('Custom normalized: $customNormalized');
-    print('Custom absolute: $customAbsolute');
+    debugPrint('\nCustom path: $customPath');
+    debugPrint('Custom normalized: $customNormalized');
+    debugPrint('Custom absolute: $customAbsolute');
   });
 }

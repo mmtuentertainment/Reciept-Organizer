@@ -85,7 +85,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget>
                   height: 200,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Colors.green.withOpacity(_edgeAnimation.value),
+                      color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                       width: 3,
                     ),
                     borderRadius: BorderRadius.circular(12),
@@ -101,11 +101,11 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget>
                           decoration: BoxDecoration(
                             border: Border(
                               top: BorderSide(
-                                color: Colors.green.withOpacity(_edgeAnimation.value),
+                                color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                                 width: 4,
                               ),
                               left: BorderSide(
-                                color: Colors.green.withOpacity(_edgeAnimation.value),
+                                color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                                 width: 4,
                               ),
                             ),
@@ -121,11 +121,11 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget>
                           decoration: BoxDecoration(
                             border: Border(
                               top: BorderSide(
-                                color: Colors.green.withOpacity(_edgeAnimation.value),
+                                color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                                 width: 4,
                               ),
                               right: BorderSide(
-                                color: Colors.green.withOpacity(_edgeAnimation.value),
+                                color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                                 width: 4,
                               ),
                             ),
@@ -141,11 +141,11 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget>
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                color: Colors.green.withOpacity(_edgeAnimation.value),
+                                color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                                 width: 4,
                               ),
                               left: BorderSide(
-                                color: Colors.green.withOpacity(_edgeAnimation.value),
+                                color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                                 width: 4,
                               ),
                             ),
@@ -161,11 +161,11 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget>
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                color: Colors.green.withOpacity(_edgeAnimation.value),
+                                color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                                 width: 4,
                               ),
                               right: BorderSide(
-                                color: Colors.green.withOpacity(_edgeAnimation.value),
+                                color: Colors.green.withAlpha((_edgeAnimation.value * 255).round()),
                                 width: 4,
                               ),
                             ),
