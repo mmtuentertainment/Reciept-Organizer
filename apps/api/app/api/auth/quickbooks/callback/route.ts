@@ -2,6 +2,130 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyOAuthState, storeTokens } from '@/lib/redis';
 import { createSessionToken } from '@/lib/jwt';
 
+type OAuthCallbackSuccess = {
+  success: true;
+  sessionId: string;
+  sessionToken: string;
+  realmId: string;
+  deepLink: string;
+  expiresIn: number;
+  status: number;
+};
+
+type OAuthCallbackError = {
+  success: false;
+  error: string;
+  details?: string;
+  status: number;
+};
+
+type OAuthCallbackResult = OAuthCallbackSuccess | OAuthCallbackError;
+
+// Shared logic for processing OAuth callback
+async function processOAuthCallback(code: string, state: string, realmId: string): Promise<OAuthCallbackResult> {
+  // Log minimal info for debugging without exposing sensitive data
+  console.log('Processing OAuth callback');
+  
+  // Verify state parameter
+  const stateData = await verifyOAuthState(state);
+  if (!stateData) {
+    console.error('State verification failed for:', state);
+    return {
+      success: false,
+      error: 'Invalid or expired state parameter. Please try logging in again.',
+      status: 400
+    };
+  }
+  
+  const { sessionId } = stateData;
+  
+  // Exchange authorization code for tokens
+  const tokenUrl = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
+  const credentials = Buffer.from(
+    `${process.env.QB_CLIENT_ID}:${process.env.QB_CLIENT_SECRET}`
+  ).toString('base64');
+  
+  const tokenResponse = await fetch(tokenUrl, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${credentials}`,
+    },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: process.env.QB_REDIRECT_URI!,
+    }),
+  });
+  
+  // Read response body once
+  const responseText = await tokenResponse.text();
+  // Token response received
+  
+  if (!tokenResponse.ok) {
+    console.error('Token exchange failed with status:', tokenResponse.status);
+    
+    // Try to parse error response
+    let errorMessage = 'Failed to exchange code for tokens';
+    try {
+      const errorJson = JSON.parse(responseText);
+      errorMessage = errorJson.error_description || errorJson.error || errorMessage;
+    } catch {
+      // If not JSON, use raw text
+      errorMessage = responseText || errorMessage;
+    }
+    
+    return {
+      success: false,
+      error: errorMessage,
+      details: `Token exchange failed with status ${tokenResponse.status}`,
+      status: 400
+    };
+  }
+  
+  let tokens;
+  try {
+    tokens = JSON.parse(responseText);
+  } catch (parseError) {
+    console.error('Failed to parse token response as JSON');
+    return {
+      success: false,
+      error: 'Invalid response from QuickBooks token endpoint',
+      details: 'The authorization server returned an invalid response format',
+      status: 500
+    };
+  }
+  // Store tokens in Redis
+  
+  // Store tokens in Redis
+  await storeTokens('quickbooks', sessionId, {
+    accessToken: tokens.access_token,
+    refreshToken: tokens.refresh_token,
+    expiresIn: tokens.expires_in || 3600,
+    realmId: realmId,
+  });
+  
+  // Create authenticated session token
+  const sessionToken = await createSessionToken({
+    sessionId,
+    provider: 'quickbooks',
+    authenticated: true,
+  });
+  
+  // OAuth callback processed successfully
+  
+  // Return success with deep link for Flutter
+  return {
+    success: true,
+    sessionId,
+    sessionToken,
+    realmId,
+    deepLink: `${process.env.FLUTTER_APP_SCHEME}://oauth/success?session=${sessionId}&provider=quickbooks`,
+    expiresIn: tokens.expires_in,
+    status: 200
+  };
+}
 // POST - Handle QuickBooks OAuth callback
 export async function POST(request: NextRequest) {
   try {
@@ -98,6 +222,8 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get('state');
   const realmId = searchParams.get('realmId');
   const error = searchParams.get('error');
+  
+  // GET callback received
   
   // If there's an error from QuickBooks
   if (error) {

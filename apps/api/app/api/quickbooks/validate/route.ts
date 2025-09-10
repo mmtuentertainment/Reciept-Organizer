@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTokens } from '@/lib/redis';
 import { verifySessionToken } from '@/lib/jwt';
+import { rateLimit, rateLimitResponse } from '@/lib/ratelimit';
+import { validateRequest, receiptsValidationSchema, ValidationError } from '@/lib/validation';
 
 interface Receipt {
   merchantName?: string | null;
@@ -22,6 +24,10 @@ interface ValidationIssue {
 // POST - Validate receipts for QuickBooks
 export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const { success, remaining, reset } = await rateLimit(request, 'validation');
+    const rateLimitError = rateLimitResponse(success, remaining, reset);
+    if (rateLimitError) return rateLimitError;
     // Get session from header
     const authorization = request.headers.get('Authorization');
     const sessionToken = authorization?.replace('Bearer ', '') || '';
@@ -36,7 +42,23 @@ export async function POST(request: NextRequest) {
     }
     
     const { sessionId } = session;
-    const { receipts } = await request.json();
+    
+    // Validate request body
+    let validatedData;
+    try {
+      const body = await request.json();
+      validatedData = await validateRequest(body, receiptsValidationSchema);
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid request', issues: error.issues },
+          { status: 400 }
+        );
+      }
+      throw error;
+    }
+    
+    const { receipts } = validatedData;
     
     if (!Array.isArray(receipts) || receipts.length === 0) {
       return NextResponse.json({
