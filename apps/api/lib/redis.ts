@@ -15,12 +15,35 @@ export interface TokenData {
   tenantId?: string; // Xero specific
 }
 
+// OAuth state data type
+export interface OAuthStateData {
+  sessionId: string;
+  provider: 'quickbooks' | 'xero';
+  timestamp: number;
+}
+
+// PKCE verifier data type
+export interface PKCEData {
+  verifier: string;
+  sessionId: string;
+}
+
+// Token response from Redis with expiry check
+export interface StoredTokenData {
+  accessToken: string;
+  realmId?: string;
+  tenantId?: string;
+  expiresAt: number;
+  expired?: boolean;
+  refreshToken?: string;
+}
+
 // Store OAuth tokens with proper TTL
 export async function storeTokens(
   provider: 'quickbooks' | 'xero',
   sessionId: string,
   tokens: TokenData
-) {
+): Promise<void> {
   const key = `tokens:${provider}:${sessionId}`;
   const ttl = tokens.expiresIn || 3600; // Default 1 hour
   
@@ -61,9 +84,9 @@ export async function storeTokens(
 }
 
 // Retrieve OAuth tokens
-export async function getTokens(provider: string, sessionId: string) {
+export async function getTokens(provider: string, sessionId: string): Promise<StoredTokenData | null> {
   const key = `tokens:${provider}:${sessionId}`;
-  const tokens = await redis.get(key);
+  const tokens = await redis.get<StoredTokenData>(key);
   
   if (!tokens) {
     return null;
@@ -72,12 +95,12 @@ export async function getTokens(provider: string, sessionId: string) {
   // Check if token is expired
   if (tokens.expiresAt && tokens.expiresAt < Date.now()) {
     // Try to refresh
-    const refreshToken = await redis.get(`refresh:${provider}:${sessionId}`);
+    const refreshToken = await redis.get<string>(`refresh:${provider}:${sessionId}`);
     if (refreshToken) {
       return {
         ...tokens,
         expired: true,
-        refreshToken: refreshToken as string,
+        refreshToken: refreshToken,
       };
     }
     return null;
@@ -87,13 +110,13 @@ export async function getTokens(provider: string, sessionId: string) {
 }
 
 // Get refresh token
-export async function getRefreshToken(provider: string, sessionId: string) {
+export async function getRefreshToken(provider: string, sessionId: string): Promise<string | null> {
   const key = `refresh:${provider}:${sessionId}`;
-  return await redis.get(key) as string | null;
+  return await redis.get<string>(key);
 }
 
 // Store OAuth state for verification
-export async function storeOAuthState(state: string, data: any) {
+export async function storeOAuthState(state: string, data: OAuthStateData): Promise<void> {
   // Store with 30 minute TTL for OAuth flow completion (increased from 10)
   // Upstash automatically serializes objects, no need for JSON.stringify
   await redis.setex(`state:${state}`, 1800, data);
@@ -101,9 +124,9 @@ export async function storeOAuthState(state: string, data: any) {
 }
 
 // Verify and retrieve OAuth state
-export async function verifyOAuthState(state: string) {
+export async function verifyOAuthState(state: string): Promise<OAuthStateData | null> {
   console.log(`Verifying OAuth state: ${state}`);
-  const data = await redis.get(`state:${state}`);
+  const data = await redis.get<OAuthStateData>(`state:${state}`);
   if (!data) {
     console.error(`State not found or expired: ${state}`);
     return null;
@@ -118,7 +141,7 @@ export async function verifyOAuthState(state: string) {
 }
 
 // Store PKCE verifier for Xero
-export async function storePKCEVerifier(state: string, verifier: string, sessionId: string) {
+export async function storePKCEVerifier(state: string, verifier: string, sessionId: string): Promise<void> {
   // Upstash automatically serializes objects
   await redis.setex(
     `pkce:${state}`,
@@ -128,8 +151,8 @@ export async function storePKCEVerifier(state: string, verifier: string, session
 }
 
 // Get and delete PKCE verifier
-export async function getPKCEVerifier(state: string) {
-  const data = await redis.get(`pkce:${state}`);
+export async function getPKCEVerifier(state: string): Promise<PKCEData | null> {
+  const data = await redis.get<PKCEData>(`pkce:${state}`);
   if (!data) {
     return null;
   }
