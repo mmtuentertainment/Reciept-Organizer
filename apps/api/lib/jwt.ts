@@ -1,18 +1,22 @@
 import { SignJWT, jwtVerify } from 'jose';
 
-const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'default-secret-change-in-production'
-);
+// Ensure JWT_SECRET is set in production
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export interface SessionPayload {
   sessionId: string;
   provider?: string;
   authenticated?: boolean;
   exp?: number;
+  [key: string]: any; // Allow additional properties for JWT compatibility
 }
 
 export async function createSessionToken(payload: SessionPayload): Promise<string> {
-  return await new SignJWT(payload)
+  return await new SignJWT(payload as any)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('24h')
