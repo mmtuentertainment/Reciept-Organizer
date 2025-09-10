@@ -23,7 +23,8 @@ type OAuthCallbackResult = OAuthCallbackSuccess | OAuthCallbackError;
 
 // Shared logic for processing OAuth callback
 async function processOAuthCallback(code: string, state: string, realmId: string): Promise<OAuthCallbackResult> {
-  console.log('Processing OAuth callback - state:', state, 'code:', code?.substring(0, 10) + '...', 'realmId:', realmId);
+  // Log minimal info for debugging without exposing sensitive data
+  console.log('Processing OAuth callback');
   
   // Verify state parameter
   const stateData = await verifyOAuthState(state);
@@ -44,7 +45,6 @@ async function processOAuthCallback(code: string, state: string, realmId: string
     `${process.env.QB_CLIENT_ID}:${process.env.QB_CLIENT_SECRET}`
   ).toString('base64');
   
-  console.log('Exchanging code for tokens...');
   const tokenResponse = await fetch(tokenUrl, {
     method: 'POST',
     headers: {
@@ -61,16 +61,10 @@ async function processOAuthCallback(code: string, state: string, realmId: string
   
   // Read response body once
   const responseText = await tokenResponse.text();
-  console.log('Token response status:', tokenResponse.status);
+  // Token response received
   
   if (!tokenResponse.ok) {
-    console.error('Token exchange failed:', {
-      status: tokenResponse.status,
-      error: responseText,
-      redirectUri: process.env.QB_REDIRECT_URI,
-      hasClientId: !!process.env.QB_CLIENT_ID,
-      hasClientSecret: !!process.env.QB_CLIENT_SECRET
-    });
+    console.error('Token exchange failed with status:', tokenResponse.status);
     
     // Try to parse error response
     let errorMessage = 'Failed to exchange code for tokens';
@@ -92,11 +86,9 @@ async function processOAuthCallback(code: string, state: string, realmId: string
   
   let tokens;
   try {
-    console.log('Token response received, attempting to parse...');
     tokens = JSON.parse(responseText);
   } catch (parseError) {
-    console.error('Failed to parse token response as JSON:', parseError);
-    console.error('Response text was:', responseText);
+    console.error('Failed to parse token response as JSON');
     return {
       success: false,
       error: 'Invalid response from QuickBooks token endpoint',
@@ -104,7 +96,7 @@ async function processOAuthCallback(code: string, state: string, realmId: string
       status: 500
     };
   }
-  console.log('Tokens parsed successfully, storing in Redis...');
+  // Store tokens in Redis
   
   // Store tokens in Redis
   await storeTokens('quickbooks', sessionId, {
@@ -121,7 +113,7 @@ async function processOAuthCallback(code: string, state: string, realmId: string
     authenticated: true,
   });
   
-  console.log('OAuth callback processed successfully');
+  // OAuth callback processed successfully
   
   // Return success with deep link for Flutter
   return {
@@ -168,13 +160,7 @@ export async function GET(request: NextRequest) {
   const realmId = searchParams.get('realmId');
   const error = searchParams.get('error');
   
-  console.log('GET callback received:', {
-    code: code ? 'present' : 'missing',
-    state: state ? 'present' : 'missing',
-    realmId: realmId ? 'present' : 'missing',
-    error: error,
-    url: request.url
-  });
+  // GET callback received
   
   // If there's an error from QuickBooks
   if (error) {

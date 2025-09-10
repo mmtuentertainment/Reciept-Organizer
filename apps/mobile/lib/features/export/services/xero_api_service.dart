@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models/receipt.dart';
+import '../../../core/config/environment.dart';
 import 'quickbooks_api_service.dart';
 
 /// Service for interacting with Xero API via Vercel proxy
@@ -12,7 +13,8 @@ class XeroAPIService {
   factory XeroAPIService() => _instance;
   XeroAPIService._internal();
   
-  static const String _baseUrl = 'https://receipt-organizer-api.vercel.app';
+  // EXPERIMENT: Using Environment configuration instead of hardcoded URL
+  static String get _baseUrl => Environment.apiUrl;
   final _secureStorage = const FlutterSecureStorage();
   String? _sessionId;
   String? _sessionToken;
@@ -68,33 +70,24 @@ class XeroAPIService {
     }
   }
   
-  /// Refresh access token
+  /// Refresh access token via Vercel proxy
   Future<void> refreshAccessToken() async {
-    final refreshToken = await APICredentials.getXeroRefreshToken();
-    if (refreshToken == null) {
-      throw Exception('No refresh token available');
+    final sessionToken = await _secureStorage.read(key: 'xero_session_token');
+    if (sessionToken == null) {
+      throw Exception('No session token available');
     }
     
     final response = await http.post(
-      Uri.parse(APICredentials.xeroTokenUrl),
+      Uri.parse('$_baseUrl/api/auth/xero/refresh'),
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: {
-        'grant_type': 'refresh_token',
-        'refresh_token': refreshToken,
-        'client_id': APICredentials.xeroClientId,
+        'Authorization': 'Bearer $sessionToken',
+        'Content-Type': 'application/json',
       },
     );
     
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      
-      // Update stored tokens
-      await APICredentials.storeXeroTokens(
-        accessToken: data['access_token'],
-        refreshToken: data['refresh_token'],
-      );
+      // Token refreshed server-side
     } else {
       throw Exception('Failed to refresh token: ${response.body}');
     }
@@ -102,10 +95,9 @@ class XeroAPIService {
   
   /// Create expense bills in Xero (using Invoice with Type=ACCPAY)
   Future<Map<String, dynamic>> createExpenseBills(List<Receipt> receipts) async {
-    final accessToken = await APICredentials.getXeroAccessToken();
-    final tenantId = await APICredentials.getXeroTenantId();
+    final sessionToken = await _secureStorage.read(key: 'xero_session_token');
     
-    if (accessToken == null || tenantId == null) {
+    if (sessionToken == null) {
       throw Exception('Not authenticated with Xero');
     }
     
@@ -122,16 +114,9 @@ class XeroAPIService {
         'Invoices': batch.map(_convertReceiptToInvoice).toList(),
       };
       
-      final response = await http.post(
-        Uri.parse('${APICredentials.xeroApiBaseUrl}/Invoices'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'xero-tenant-id': tenantId,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(invoicesData),
-      );
+      // This would be implemented via the Vercel proxy
+      // For now, throw unimplemented since the proxy needs to handle this
+      throw UnimplementedError('Expense bill creation should be implemented via Vercel proxy');
       
       if (response.statusCode == 200 || response.statusCode == 201) {
         results.add(json.decode(response.body));
@@ -155,8 +140,8 @@ class XeroAPIService {
     
     try {
       // Check authentication
-      final accessToken = await APICredentials.getXeroAccessToken();
-      if (accessToken == null) {
+      final sessionToken = await _secureStorage.read(key: 'xero_session_token');
+      if (sessionToken == null) {
         errors.add('Not authenticated with Xero. Please connect your account.');
         return ValidationResult(isValid: false, errors: errors, warnings: warnings);
       }
@@ -222,24 +207,20 @@ class XeroAPIService {
         }
       }
       
-      // Test connection with API
+      // Test connection with API via proxy
       try {
-        final tenantId = await APICredentials.getXeroTenantId();
-        if (tenantId != null) {
-          final testResponse = await http.get(
-            Uri.parse('${APICredentials.xeroApiBaseUrl}/Organisation'),
-            headers: {
-              'Authorization': 'Bearer $accessToken',
-              'xero-tenant-id': tenantId,
-              'Accept': 'application/json',
-            },
-          );
-          
-          if (testResponse.statusCode == 401) {
-            await refreshAccessToken();
-          } else if (testResponse.statusCode != 200) {
-            warnings.add('Xero API connection test failed. Some validations may be incomplete.');
-          }
+        final testResponse = await http.get(
+          Uri.parse('$_baseUrl/api/xero/status'),
+          headers: {
+            'Authorization': 'Bearer $sessionToken',
+            'Accept': 'application/json',
+          },
+        );
+        
+        if (testResponse.statusCode == 401) {
+          await refreshAccessToken();
+        } else if (testResponse.statusCode != 200) {
+          warnings.add('Xero API connection test failed. Some validations may be incomplete.');
         }
       } catch (e) {
         warnings.add('Could not verify Xero connection: ${e.toString()}');

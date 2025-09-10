@@ -12,21 +12,21 @@ Copy these EXACT values to your Vercel project settings:
 
 ```env
 # QuickBooks OAuth (Your Developer Credentials)
-QB_CLIENT_ID=ABHeXjfhxPZWmMVLLKNFQ5BkThuwSmT8SeRkx1bJsX3Zcn5djW
-QB_CLIENT_SECRET=IZD9kUK4lpRMnzIW3vQZXLE85TJkqtvJZVfoNQib
+QB_CLIENT_ID=<YOUR_QB_CLIENT_ID_FROM_DEVELOPER_DASHBOARD>
+QB_CLIENT_SECRET=<YOUR_QB_CLIENT_SECRET_FROM_DEVELOPER_DASHBOARD>
 QB_REDIRECT_URI=https://YOUR-PROJECT.vercel.app/api/auth/quickbooks/callback
 
 # Xero OAuth (Your Developer Credentials)
-XERO_CLIENT_ID=F7E48B5BA8CC43F9AA035C7803EB1504
+XERO_CLIENT_ID=<YOUR_XERO_CLIENT_ID_FROM_DEVELOPER_PORTAL>
 XERO_REDIRECT_URI=https://YOUR-PROJECT.vercel.app/api/auth/xero/callback
 
 # Upstash Redis (Your Instance)
-KV_REST_API_URL=https://star-finch-11621.upstash.io
-KV_REST_API_TOKEN=AS1lAAIncDE2ZjE1N2JlNzkxYWQ0Y2ViODQ5MjU3ZmQ3N2VmMjViM3AxMTE2MjE
-KV_REST_API_READ_ONLY_TOKEN=Ai1lAAIgcDHbgDmJm85yRFfMfwb3y9YnWszlW8J02MUJ67CzY4Kr1Q
+KV_REST_API_URL=<YOUR_UPSTASH_REDIS_URL>
+KV_REST_API_TOKEN=<YOUR_UPSTASH_REST_API_TOKEN>
+KV_REST_API_READ_ONLY_TOKEN=<YOUR_UPSTASH_READ_ONLY_TOKEN>
 
-# JWT Secret (PRODUCTION - Generated Securely)
-JWT_SECRET=MJOyqf/tBV6d8DQQELZpXscd1vEasvZ/NDMes2cTEUQ=
+# JWT Secret (Generate with: openssl rand -base64 32)
+JWT_SECRET=<GENERATE_NEW_SECRET_WITH_OPENSSL>
 
 # App Configuration
 FLUTTER_APP_SCHEME=receiptorganizer
@@ -94,12 +94,13 @@ curl https://YOUR-PROJECT.vercel.app/api/auth/quickbooks
 curl https://YOUR-PROJECT.vercel.app/api/auth/xero
 ```
 
-## ⚠️ IMPORTANT NOTES
+## ⚠️ IMPORTANT SECURITY NOTES
 
-1. **Replace YOUR-PROJECT** with your actual Vercel project URL
-2. **JWT_SECRET** is production-ready (generated with openssl)
-3. **Upstash Redis** is already connected with your credentials
-4. **OAuth credentials** are your actual developer account credentials
+1. **NEVER commit real credentials** - Always use placeholders in documentation
+2. **Replace YOUR-PROJECT** with your actual Vercel project URL
+3. **Generate JWT_SECRET** securely: `openssl rand -base64 32`
+4. **Store all secrets in Vercel Dashboard** - Never in code or documentation
+5. **Rotate credentials regularly** - Especially if exposed
 
 ## 🆘 Troubleshooting
 
@@ -124,4 +125,3 @@ curl https://YOUR-PROJECT.vercel.app/api/auth/xero
 
 ---
 Last Updated: 2025-09-10
-JWT Secret Generated: MJOyqf/tBV6d8DQQELZpXscd1vEasvZ/NDMes2cTEUQ=
