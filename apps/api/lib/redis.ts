@@ -25,12 +25,13 @@ export async function storeTokens(
   const ttl = tokens.expiresIn || 3600; // Default 1 hour
   
   // Store main token data with expiry
-  await redis.setex(key, ttl, JSON.stringify({
+  // Upstash automatically serializes objects, no need for JSON.stringify
+  await redis.setex(key, ttl, {
     accessToken: tokens.accessToken,
     realmId: tokens.realmId,
     tenantId: tokens.tenantId,
     expiresAt: Date.now() + (ttl * 1000),
-  }));
+  });
   
   // Store refresh token separately with longer TTL (30 days)
   if (tokens.refreshToken) {
@@ -62,13 +63,11 @@ export async function storeTokens(
 // Retrieve OAuth tokens
 export async function getTokens(provider: string, sessionId: string) {
   const key = `tokens:${provider}:${sessionId}`;
-  const data = await redis.get(key);
+  const tokens = await redis.get(key);
   
-  if (!data) {
+  if (!tokens) {
     return null;
   }
-  
-  const tokens = JSON.parse(data as string);
   
   // Check if token is expired
   if (tokens.expiresAt && tokens.expiresAt < Date.now()) {
@@ -96,7 +95,8 @@ export async function getRefreshToken(provider: string, sessionId: string) {
 // Store OAuth state for verification
 export async function storeOAuthState(state: string, data: any) {
   // Store with 30 minute TTL for OAuth flow completion (increased from 10)
-  await redis.setex(`state:${state}`, 1800, JSON.stringify(data));
+  // Upstash automatically serializes objects, no need for JSON.stringify
+  await redis.setex(`state:${state}`, 1800, data);
   console.log(`Stored OAuth state: ${state} with data:`, data);
 }
 
@@ -113,15 +113,17 @@ export async function verifyOAuthState(state: string) {
   // Delete state after retrieval (one-time use)
   await redis.del(`state:${state}`);
   
-  return JSON.parse(data as string);
+  // Upstash Redis automatically deserializes JSON, no need to parse
+  return data;
 }
 
 // Store PKCE verifier for Xero
 export async function storePKCEVerifier(state: string, verifier: string, sessionId: string) {
+  // Upstash automatically serializes objects
   await redis.setex(
     `pkce:${state}`,
     600, // 10 minutes
-    JSON.stringify({ verifier, sessionId })
+    { verifier, sessionId }
   );
 }
 
@@ -135,5 +137,6 @@ export async function getPKCEVerifier(state: string) {
   // Delete after retrieval
   await redis.del(`pkce:${state}`);
   
-  return JSON.parse(data as string);
+  // Upstash automatically deserializes
+  return data;
 }

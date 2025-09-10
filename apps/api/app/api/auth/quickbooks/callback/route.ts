@@ -230,18 +230,37 @@ export async function GET(request: NextRequest) {
     successUrl.searchParams.set('session', result.sessionId);
     return NextResponse.redirect(successUrl);
   } else {
+    console.error('OAuth callback failed with result:', result);
     return new NextResponse(
       `
       <html>
+        <head>
+          <title>Authentication Failed</title>
+          <style>
+            body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; text-align: center; }
+            h1 { color: #dc2626; }
+            .error-details { background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: 0.5rem; margin: 2rem auto; max-width: 600px; }
+            .retry-btn { background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 1rem; }
+          </style>
+        </head>
         <body>
           <h1>Authentication Failed</h1>
-          <p>${result.error}</p>
-          <p>Please close this window and try again.</p>
+          <div class="error-details">
+            <p><strong>Error:</strong> ${result.error}</p>
+            ${result.details ? `<p><strong>Details:</strong> ${result.details}</p>` : ''}
+            <p>This usually happens when:</p>
+            <ul style="text-align: left;">
+              <li>The authorization code has expired</li>
+              <li>The OAuth state doesn't match</li>
+              <li>The redirect URI doesn't match exactly</li>
+            </ul>
+          </div>
+          <a href="/quickbooks" class="retry-btn">Try Again</a>
         </body>
       </html>
       `,
       { 
-        status: 400,
+        status: result.status || 400,
         headers: { 'Content-Type': 'text/html' }
       }
     );
