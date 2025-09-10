@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function OAuthSuccess() {
+function OAuthSuccessContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('Processing...');
   
@@ -45,5 +45,21 @@ export default function OAuthSuccess() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function OAuthSuccess() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        padding: '2rem', 
+        textAlign: 'center',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
+        <h1>Loading...</h1>
+      </div>
+    }>
+      <OAuthSuccessContent />
+    </Suspense>
   );
 }
