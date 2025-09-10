@@ -12,8 +12,7 @@ class QuickBooksAPIService {
   factory QuickBooksAPIService() => _instance;
   QuickBooksAPIService._internal();
   
-  // TODO: Update with production URL when deployed
-  static const String _baseUrl = 'http://localhost:3001';
+  static const String _baseUrl = 'https://receipt-organizer-api.vercel.app';
   final _secureStorage = const FlutterSecureStorage();
   String? _sessionId;
   String? _sessionToken;
