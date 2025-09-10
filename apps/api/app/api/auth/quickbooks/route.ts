@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
     const state = nanoid();
     const sessionId = nanoid();
     
-    // Store state for verification (10 min TTL)
+    // Store state for verification (30 min TTL as updated in redis.ts)
+    console.log('Storing OAuth state:', { state, sessionId });
     await storeOAuthState(state, {
       sessionId,
       provider: 'quickbooks',
@@ -27,6 +28,8 @@ export async function GET(request: NextRequest) {
     });
     
     const authUrl = `https://appcenter.intuit.com/connect/oauth2?${params}`;
+    
+    console.log('Generated auth URL with redirect URI:', process.env.QB_REDIRECT_URI);
     
     // Create session token for Flutter app
     const sessionToken = await createSessionToken({
