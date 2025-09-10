@@ -4,9 +4,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:receipt_organizer/features/capture/screens/capture_screen.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
 import 'package:receipt_organizer/features/receipts/presentation/providers/image_viewer_provider.dart';
+import 'package:receipt_organizer/core/services/background_sync_service.dart';
+import 'package:receipt_organizer/core/services/network_connectivity_service.dart';
+import 'package:receipt_organizer/core/services/request_queue_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // EXPERIMENT: Phase 4 - Initialize background sync
+  await BackgroundSyncService.initialize();
+  
+  // Initialize core services
+  final connectivityService = NetworkConnectivityService();
+  await connectivityService.initialize();
+  
+  final queueService = RequestQueueService();
+  await queueService.initialize();
+  
+  // Register background sync if available
+  final backgroundSync = BackgroundSyncService();
+  if (backgroundSync.isBackgroundSyncAvailable()) {
+    await backgroundSync.registerPeriodicSync();
+  }
   
   // Initialize SharedPreferences
   final sharedPreferences = await SharedPreferences.getInstance();
