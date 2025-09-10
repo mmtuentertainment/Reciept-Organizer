@@ -28,7 +28,7 @@ void main() {
     test('should have valid client ID configured', () {
       expect(APICredentials.xeroClientId, isNotEmpty);
       expect(APICredentials.xeroClientId, 
-             equals('***REMOVED***'));
+             equals('F7E48B5BA8CC43F9AA035C7803EB1504'));
     });
     
     test('should generate valid PKCE authorization URL', () async {

@@ -2,8 +2,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyOAuthState, storeTokens } from '@/lib/redis';
 import { createSessionToken } from '@/lib/jwt';
 
+type OAuthCallbackSuccess = {
+  success: true;
+  sessionId: string;
+  sessionToken: string;
+  realmId: string;
+  deepLink: string;
+  expiresIn: number;
+  status: number;
+};
+
+type OAuthCallbackError = {
+  success: false;
+  error: string;
+  details?: string;
+  status: number;
+};
+
+type OAuthCallbackResult = OAuthCallbackSuccess | OAuthCallbackError;
+
 // Shared logic for processing OAuth callback
-async function processOAuthCallback(code: string, state: string, realmId: string) {
+async function processOAuthCallback(code: string, state: string, realmId: string): Promise<OAuthCallbackResult> {
   console.log('Processing OAuth callback - state:', state, 'code:', code?.substring(0, 10) + '...', 'realmId:', realmId);
   
   // Verify state parameter

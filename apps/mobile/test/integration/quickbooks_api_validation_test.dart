@@ -29,7 +29,7 @@ void main() {
       expect(APICredentials.quickBooksClientId, isNotEmpty);
       expect(APICredentials.quickBooksClientSecret, isNotEmpty);
       expect(APICredentials.quickBooksClientId, 
-             equals('***REMOVED***'));
+             equals('ABHeXjfhxPZWmMVLLKNFQ5BkThuwSmT8SeRkx1bJsX3Zcn5djW'));
     });
     
     test('should generate valid authorization URL', () async {

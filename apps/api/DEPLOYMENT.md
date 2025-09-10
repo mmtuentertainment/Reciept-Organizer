@@ -12,21 +12,21 @@ Copy these EXACT values to your Vercel project settings:
 
 ```env
 # QuickBooks OAuth (Your Developer Credentials)
-QB_CLIENT_ID=***REMOVED***
-QB_CLIENT_SECRET=***REMOVED***
+QB_CLIENT_ID=ABHeXjfhxPZWmMVLLKNFQ5BkThuwSmT8SeRkx1bJsX3Zcn5djW
+QB_CLIENT_SECRET=IZD9kUK4lpRMnzIW3vQZXLE85TJkqtvJZVfoNQib
 QB_REDIRECT_URI=https://YOUR-PROJECT.vercel.app/api/auth/quickbooks/callback
 
 # Xero OAuth (Your Developer Credentials)
-XERO_CLIENT_ID=***REMOVED***
+XERO_CLIENT_ID=F7E48B5BA8CC43F9AA035C7803EB1504
 XERO_REDIRECT_URI=https://YOUR-PROJECT.vercel.app/api/auth/xero/callback
 
 # Upstash Redis (Your Instance)
 KV_REST_API_URL=https://star-finch-11621.upstash.io
-KV_REST_API_TOKEN=***REMOVED***
-KV_REST_API_READ_ONLY_TOKEN=***REMOVED***
+KV_REST_API_TOKEN=AS1lAAIncDE2ZjE1N2JlNzkxYWQ0Y2ViODQ5MjU3ZmQ3N2VmMjViM3AxMTE2MjE
+KV_REST_API_READ_ONLY_TOKEN=Ai1lAAIgcDHbgDmJm85yRFfMfwb3y9YnWszlW8J02MUJ67CzY4Kr1Q
 
 # JWT Secret (PRODUCTION - Generated Securely)
-JWT_SECRET=***REMOVED***
+JWT_SECRET=MJOyqf/tBV6d8DQQELZpXscd1vEasvZ/NDMes2cTEUQ=
 
 # App Configuration
 FLUTTER_APP_SCHEME=receiptorganizer
@@ -124,4 +124,4 @@ curl https://YOUR-PROJECT.vercel.app/api/auth/xero
 
 ---
 Last Updated: 2025-09-10
-JWT Secret Generated: ***REMOVED***
+JWT Secret Generated: MJOyqf/tBV6d8DQQELZpXscd1vEasvZ/NDMes2cTEUQ=
