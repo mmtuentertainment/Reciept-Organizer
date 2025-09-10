@@ -68,8 +68,21 @@ async function processOAuthCallback(code: string, state: string, realmId: string
     };
   }
   
-  const tokens = await tokenResponse.json();
-  console.log('Tokens received, storing in Redis...');
+  let tokens;
+  try {
+    const responseText = await tokenResponse.text();
+    console.log('Token response received, attempting to parse...');
+    tokens = JSON.parse(responseText);
+  } catch (parseError) {
+    console.error('Failed to parse token response as JSON:', parseError);
+    return {
+      success: false,
+      error: 'Invalid response from QuickBooks token endpoint',
+      details: 'The authorization server returned an invalid response format',
+      status: 500
+    };
+  }
+  console.log('Tokens parsed successfully, storing in Redis...');
   
   // Store tokens in Redis
   await storeTokens('quickbooks', sessionId, {
@@ -232,7 +245,24 @@ export async function GET(request: NextRequest) {
   }
   } catch (error) {
     console.error('Callback processing error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    let errorMessage = 'Unknown error occurred';
+    let errorDetails = '';
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null) {
+      // Handle result object with error property
+      const err = error as any;
+      if (err.error) {
+        errorMessage = err.error;
+        errorDetails = err.details || '';
+      } else {
+        errorMessage = JSON.stringify(error);
+      }
+    } else {
+      errorMessage = String(error);
+    }
+    
     return new NextResponse(
       `
       <html>
@@ -249,6 +279,7 @@ export async function GET(request: NextRequest) {
           <h1>Authentication Failed</h1>
           <div class="error-details">
             <p><strong>Error:</strong> ${errorMessage}</p>
+            ${errorDetails ? `<p><strong>Details:</strong> ${errorDetails}</p>` : ''}
             <p>This usually happens when:</p>
             <ul style="text-align: left;">
               <li>The authorization code has expired</li>
