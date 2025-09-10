@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/date_range_picker.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/format_selection.dart';
+import 'package:receipt_organizer/features/export/presentation/widgets/csv_preview_table.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/date_range_provider.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/export_format_provider.dart';
+import 'package:receipt_organizer/features/export/presentation/providers/csv_preview_provider.dart';
+import 'package:receipt_organizer/features/export/domain/services/csv_preview_service.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
-import 'package:intl/intl.dart';
 
-/// Main export screen with date range selection and format options
+/// Main export screen with date range selection, format options, and CSV preview
 class ExportScreen extends ConsumerStatefulWidget {
   const ExportScreen({super.key});
 
@@ -27,6 +29,16 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         centerTitle: true,
         elevation: 0,
         backgroundColor: theme.colorScheme.surface,
+        actions: [
+          // Refresh preview button
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh Preview',
+            onPressed: () {
+              ref.read(csvPreviewProvider.notifier).refresh();
+            },
+          ),
+        ],
       ),
       body: dateRangeState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -134,14 +146,61 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           ),
           const Divider(height: 1),
 
-          // Export Preview Section
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: _buildExportPreview(state),
+          // CSV Preview Section - ENHANCED WITH ACTUAL PREVIEW TABLE
+          Container(
+            color: theme.colorScheme.surface,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'CSV Preview',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      // Performance indicator
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final performanceDuration = ref.watch(previewPerformanceProvider);
+                          if (performanceDuration != null) {
+                            final isWithinTarget = performanceDuration.inMilliseconds <= 100;
+                            return Chip(
+                              avatar: Icon(
+                                isWithinTarget ? Icons.speed : Icons.warning_amber,
+                                size: 16,
+                                color: isWithinTarget ? AppColors.success : theme.colorScheme.error,
+                              ),
+                              label: Text(
+                                '${performanceDuration.inMilliseconds}ms',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isWithinTarget ? AppColors.success : theme.colorScheme.error,
+                                ),
+                              ),
+                              visualDensity: VisualDensity.compact,
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // CSV Preview Table Widget
+                  _buildCSVPreview(),
+                ],
+              ),
+            ),
           ),
 
           // Add some space before the button
-          const SizedBox(height: 80),
+          const SizedBox(height: 100),
         ],
       ),
     );
@@ -170,124 +229,76 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
     );
   }
 
-  Widget _buildExportPreview(DateRangeState state) {
-    final theme = Theme.of(context);
-    final dateFormatter = DateFormat('MMM d, yyyy');
-
-    if (state.receiptCount == null || state.receiptCount == 0) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 48,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No receipts found in the selected date range',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    final selectedFormat = ref.watch(selectedExportFormatProvider);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Export Preview',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Summary info
-            _buildInfoRow(
-              context,
-              Icons.receipt_long,
-              'Receipts',
-              '${state.receiptCount} receipt${state.receiptCount == 1 ? '' : 's'}',
-            ),
-            const SizedBox(height: 8),
-            _buildInfoRow(
-              context,
-              Icons.calendar_month,
-              'Date Range',
-              '${dateFormatter.format(state.dateRange.start)} - ${dateFormatter.format(state.dateRange.end)}',
-            ),
-            const SizedBox(height: 8),
-            _buildInfoRow(
-              context,
-              Icons.table_chart,
-              'Export Format',
-              ref.read(exportFormatNotifierProvider.notifier).getFormatDisplayName(selectedFormat),
-            ),
-            if (state.presetOption != DateRangePreset.custom) ...[
-              const SizedBox(height: 8),
-              _buildInfoRow(
-                context,
-                Icons.schedule,
-                'Preset',
-                state.presetOption.label,
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(BuildContext context, IconData icon, String label, String value) {
-    final theme = Theme.of(context);
+  Widget _buildCSVPreview() {
+    final previewAsync = ref.watch(csvPreviewProvider);
     
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 20,
-          color: theme.colorScheme.primary,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              Text(
-                value,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return previewAsync.when(
+      loading: () => const CSVPreviewTable(
+        previewRows: [],
+        totalCount: 0,
+        isLoading: true,
+      ),
+      error: (error, _) => CSVPreviewTable(
+        previewRows: const [],
+        totalCount: 0,
+        error: error.toString(),
+      ),
+      data: (previewState) {
+        if (previewState.isLoading) {
+          return const CSVPreviewTable(
+            previewRows: [],
+            totalCount: 0,
+            isLoading: true,
+          );
+        }
+        
+        if (previewState.error != null) {
+          return CSVPreviewTable(
+            previewRows: const [],
+            totalCount: 0,
+            error: previewState.error,
+          );
+        }
+        
+        return CSVPreviewTable(
+          previewRows: previewState.previewData,
+          totalCount: previewState.totalCount,
+          warnings: previewState.validationWarnings,
+        );
+      },
     );
   }
 
   Widget _buildExportButton(DateRangeState state) {
     final theme = Theme.of(context);
-    final hasReceipts = state.receiptCount != null && state.receiptCount! > 0;
+    final canExport = ref.watch(canExportProvider);
+    final previewAsync = ref.watch(csvPreviewProvider);
+    
+    // Determine button state and message
+    String buttonText = 'Preparing Export...';
+    bool isEnabled = false;
+    Color? buttonColor;
+    
+    previewAsync.whenData((preview) {
+      if (preview.hasCriticalWarnings) {
+        buttonText = 'Export Blocked - Critical Security Issues';
+        buttonColor = theme.colorScheme.error;
+        isEnabled = false;
+      } else if (state.receiptCount == null || state.receiptCount == 0) {
+        buttonText = 'No Receipts to Export';
+        isEnabled = false;
+      } else if (preview.isLoading) {
+        buttonText = 'Generating Preview...';
+        isEnabled = false;
+      } else if (canExport) {
+        buttonText = 'Export ${state.receiptCount} Receipt${state.receiptCount == 1 ? '' : 's'}';
+        isEnabled = true;
+      } else {
+        buttonText = 'Cannot Export - Fix Validation Issues';
+        buttonColor = theme.colorScheme.error;
+        isEnabled = false;
+      }
+    });
 
     return Container(
       decoration: BoxDecoration(
@@ -303,25 +314,114 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: hasReceipts && !state.isLoading
-                  ? () => _handleExport(state)
-                  : null,
-              icon: const Icon(Icons.download),
-              label: Text(
-                hasReceipts
-                    ? 'Export ${state.receiptCount} Receipt${state.receiptCount == 1 ? '' : 's'}'
-                    : 'No Receipts to Export',
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Warning summary if present
+              if (previewAsync.hasValue) ...[
+                _buildValidationSummary(previewAsync.value!),
+              ],
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: isEnabled && !state.isLoading
+                      ? () => _handleExport(state)
+                      : null,
+                  icon: Icon(
+                    isEnabled ? Icons.download : Icons.block,
+                  ),
+                  label: Text(buttonText),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: theme.textTheme.titleMedium,
+                    backgroundColor: buttonColor,
+                  ),
+                ),
               ),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                textStyle: theme.textTheme.titleMedium,
-              ),
-            ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildValidationSummary(CSVPreviewState preview) {
+    if (!preview.hasWarnings) return const SizedBox.shrink();
+    
+    final theme = Theme.of(context);
+    final warningSummary = ref.read(csvPreviewProvider.notifier).getWarningSummary();
+    
+    final criticalCount = warningSummary[WarningSeverity.critical] ?? 0;
+    final highCount = warningSummary[WarningSeverity.high] ?? 0;
+    final mediumCount = warningSummary[WarningSeverity.medium] ?? 0;
+    
+    if (criticalCount == 0 && highCount == 0 && mediumCount == 0) {
+      return const SizedBox.shrink();
+    }
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: criticalCount > 0 
+          ? theme.colorScheme.errorContainer 
+          : theme.colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: criticalCount > 0
+                  ? theme.colorScheme.onErrorContainer
+                  : theme.colorScheme.onSecondaryContainer,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Validation Issues Found',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: criticalCount > 0
+                    ? theme.colorScheme.onErrorContainer
+                    : theme.colorScheme.onSecondaryContainer,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (criticalCount > 0) ...[
+            Text(
+              '• $criticalCount Critical security issues (MUST FIX)',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onErrorContainer,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+          if (highCount > 0) ...[
+            Text(
+              '• $highCount High priority issues',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: criticalCount > 0
+                  ? theme.colorScheme.onErrorContainer
+                  : theme.colorScheme.onSecondaryContainer,
+              ),
+            ),
+          ],
+          if (mediumCount > 0) ...[
+            Text(
+              '• $mediumCount Medium priority issues',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: criticalCount > 0
+                  ? theme.colorScheme.onErrorContainer
+                  : theme.colorScheme.onSecondaryContainer,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -329,15 +429,74 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
   Future<void> _handleExport(DateRangeState state) async {
     final format = ref.read(selectedExportFormatProvider);
     final formatNotifier = ref.read(exportFormatNotifierProvider.notifier);
+    final previewState = ref.read(csvPreviewProvider).value;
+    
+    // Double-check for critical warnings (SEC-001)
+    if (previewState != null && previewState.hasCriticalWarnings) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          icon: const Icon(Icons.security, color: Colors.red, size: 48),
+          title: const Text('Security Risk Detected'),
+          content: const Text(
+            'Cannot export due to potential CSV injection attacks detected in the data. '
+            'Please review and fix the highlighted security issues before exporting.',
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Understood'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
     
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Export ${state.receiptCount} Receipts?'),
-        content: Text(
-          'You are about to export ${state.receiptCount} receipt${state.receiptCount == 1 ? '' : 's'} '
-          'in ${formatNotifier.getFormatDisplayName(format)} format.',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'You are about to export ${state.receiptCount} receipt${state.receiptCount == 1 ? '' : 's'} '
+              'in ${formatNotifier.getFormatDisplayName(format)} format.',
+            ),
+            if (previewState != null && previewState.hasWarnings) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${previewState.validationWarnings.length} validation warnings present',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
         ),
         actions: [
           TextButton(
@@ -376,7 +535,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
       ),
     );
 
-    // TODO: Implement actual export logic
+    // TODO: Implement actual export logic using CSVExportService
     await Future.delayed(const Duration(seconds: 2));
 
     // Close progress dialog
