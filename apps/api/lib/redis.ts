@@ -95,17 +95,21 @@ export async function getRefreshToken(provider: string, sessionId: string) {
 
 // Store OAuth state for verification
 export async function storeOAuthState(state: string, data: any) {
-  // Store with 10 minute TTL for OAuth flow completion
-  await redis.setex(`state:${state}`, 600, JSON.stringify(data));
+  // Store with 30 minute TTL for OAuth flow completion (increased from 10)
+  await redis.setex(`state:${state}`, 1800, JSON.stringify(data));
+  console.log(`Stored OAuth state: ${state} with data:`, data);
 }
 
 // Verify and retrieve OAuth state
 export async function verifyOAuthState(state: string) {
+  console.log(`Verifying OAuth state: ${state}`);
   const data = await redis.get(`state:${state}`);
   if (!data) {
+    console.error(`State not found or expired: ${state}`);
     return null;
   }
   
+  console.log(`State verified successfully: ${state}`);
   // Delete state after retrieval (one-time use)
   await redis.del(`state:${state}`);
   

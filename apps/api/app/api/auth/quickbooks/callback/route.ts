@@ -9,10 +9,12 @@ export async function POST(request: NextRequest) {
     const { code, state, realmId } = body;
     
     // Verify state parameter
+    console.log('Callback received - state:', state, 'code:', code?.substring(0, 10) + '...', 'realmId:', realmId);
     const stateData = await verifyOAuthState(state);
     if (!stateData) {
+      console.error('State verification failed for:', state);
       return NextResponse.json(
-        { success: false, error: 'Invalid or expired state parameter' },
+        { success: false, error: 'Invalid or expired state parameter. Please try logging in again.' },
         { status: 400 }
       );
     }
