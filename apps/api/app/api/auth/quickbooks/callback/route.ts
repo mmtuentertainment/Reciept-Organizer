@@ -40,11 +40,14 @@ async function processOAuthCallback(code: string, state: string, realmId: string
     }),
   });
   
+  // Read response body once
+  const responseText = await tokenResponse.text();
+  console.log('Token response status:', tokenResponse.status);
+  
   if (!tokenResponse.ok) {
-    const errorText = await tokenResponse.text();
     console.error('Token exchange failed:', {
       status: tokenResponse.status,
-      error: errorText,
+      error: responseText,
       redirectUri: process.env.QB_REDIRECT_URI,
       hasClientId: !!process.env.QB_CLIENT_ID,
       hasClientSecret: !!process.env.QB_CLIENT_SECRET
@@ -53,11 +56,11 @@ async function processOAuthCallback(code: string, state: string, realmId: string
     // Try to parse error response
     let errorMessage = 'Failed to exchange code for tokens';
     try {
-      const errorJson = JSON.parse(errorText);
+      const errorJson = JSON.parse(responseText);
       errorMessage = errorJson.error_description || errorJson.error || errorMessage;
     } catch {
       // If not JSON, use raw text
-      errorMessage = errorText || errorMessage;
+      errorMessage = responseText || errorMessage;
     }
     
     return {
@@ -70,11 +73,11 @@ async function processOAuthCallback(code: string, state: string, realmId: string
   
   let tokens;
   try {
-    const responseText = await tokenResponse.text();
     console.log('Token response received, attempting to parse...');
     tokens = JSON.parse(responseText);
   } catch (parseError) {
     console.error('Failed to parse token response as JSON:', parseError);
+    console.error('Response text was:', responseText);
     return {
       success: false,
       error: 'Invalid response from QuickBooks token endpoint',
