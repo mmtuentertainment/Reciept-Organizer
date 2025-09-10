@@ -5,6 +5,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../core/models/receipt.dart';
+import '../../../core/config/environment.dart';
+import '../../../core/services/network_connectivity_service.dart';
+import '../../../core/services/request_queue_service.dart';
+import '../../../core/services/background_sync_service.dart';
 
 /// Service for interacting with QuickBooks API via Vercel proxy
 class QuickBooksAPIService {
@@ -12,8 +16,8 @@ class QuickBooksAPIService {
   factory QuickBooksAPIService() => _instance;
   QuickBooksAPIService._internal();
   
-  // TODO: Update with production URL when deployed
-  static const String _baseUrl = 'http://localhost:3001';
+  // EXPERIMENT: Using Environment configuration instead of hardcoded URL
+  static String get _baseUrl => Environment.apiUrl;
   final _secureStorage = const FlutterSecureStorage();
   String? _sessionId;
   String? _sessionToken;
@@ -106,6 +110,52 @@ class QuickBooksAPIService {
   
   /// Validate receipts via Vercel proxy
   Future<ValidationResult> validateReceipts(List<Receipt> receipts) async {
+    // EXPERIMENT: Phase 3.4 - Test queue mechanism with single endpoint
+    final connectivity = NetworkConnectivityService();
+    final queueService = RequestQueueService();
+    
+    // Check if we can make API calls
+    if (!connectivity.canMakeApiCall()) {
+      // Queue the validation request for later
+      final sessionToken = await _secureStorage.read(key: 'qb_session_token');
+      
+      final requestBody = {
+        'receipts': receipts.map((r) => {
+          'merchantName': r.merchantName,
+          'date': r.date?.toIso8601String(),
+          'totalAmount': r.totalAmount,
+          'taxAmount': r.taxAmount,
+        }).toList(),
+      };
+      
+      final queueId = await queueService.queueRequest(
+        endpoint: '$_baseUrl/api/quickbooks/validate',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': sessionToken != null ? 'Bearer $sessionToken' : '',
+        },
+        body: requestBody,
+        feature: 'quickbooks_validation',
+      );
+      
+      // EXPERIMENT: Phase 4 - Trigger background sync for faster processing
+      final backgroundSync = BackgroundSyncService();
+      if (backgroundSync.isBackgroundSyncAvailable()) {
+        // Schedule a one-time sync in 1 minute
+        await backgroundSync.registerOneTimeSync(
+          delay: const Duration(minutes: 1),
+        );
+      }
+      
+      // Return offline validation result with queue information
+      return ValidationResult(
+        isValid: false,
+        errors: ['Validation queued for processing when online.'],
+        warnings: ['Request ID: $queueId. Will retry automatically when connection is restored.'],
+      );
+    }
+    
     final sessionToken = await _secureStorage.read(key: 'qb_session_token');
     
     final response = await http.post(
