@@ -126,82 +126,19 @@ async function processOAuthCallback(code: string, state: string, realmId: string
     status: 200
   };
 }
+
 // POST - Handle QuickBooks OAuth callback
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { code, state, realmId } = body;
     
-    // Verify state parameter
-    const stateData = await verifyOAuthState(state);
-    if (!stateData) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid or expired state parameter' },
-        { status: 400 }
-      );
-    }
+    const result = await processOAuthCallback(code, state, realmId);
     
-    const { sessionId } = stateData;
-    
-    // Exchange authorization code for tokens
-    const tokenUrl = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
-    const credentials = Buffer.from(
-      `${process.env.QB_CLIENT_ID}:${process.env.QB_CLIENT_SECRET}`
-    ).toString('base64');
-    
-    const tokenResponse = await fetch(tokenUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${credentials}`,
-      },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: process.env.QB_REDIRECT_URI!,
-      }),
-    });
-    
-    if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
-      console.error('Token exchange failed:', errorText);
-      return NextResponse.json(
-        { 
-          success: false,
-          error: 'Failed to exchange code for tokens',
-          details: errorText
-        },
-        { status: 400 }
-      );
-    }
-    
-    const tokens = await tokenResponse.json();
-    
-    // Store tokens in Redis
-    await storeTokens('quickbooks', sessionId, {
-      accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token,
-      expiresIn: tokens.expires_in || 3600,
-      realmId: realmId,
-    });
-    
-    // Create authenticated session token
-    const sessionToken = await createSessionToken({
-      sessionId,
-      provider: 'quickbooks',
-      authenticated: true,
-    });
-    
-    // Return success with deep link for Flutter
-    return NextResponse.json({
-      success: true,
-      sessionId,
-      sessionToken,
-      realmId,
-      deepLink: `${process.env.FLUTTER_APP_SCHEME}://oauth/success?session=${sessionId}&provider=quickbooks`,
-      expiresIn: tokens.expires_in,
-    });
+    return NextResponse.json(
+      result,
+      { status: result.status }
+    );
   } catch (error) {
     console.error('QuickBooks callback error:', error);
     return NextResponse.json(
@@ -227,13 +164,25 @@ export async function GET(request: NextRequest) {
   
   // If there's an error from QuickBooks
   if (error) {
+    const errorDescription = searchParams.get('error_description');
     return new NextResponse(
       `
       <html>
+        <head>
+          <title>Authentication Failed</title>
+          <style>
+            body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; text-align: center; }
+            h1 { color: #dc2626; }
+            .error-details { background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: 0.5rem; margin: 2rem auto; max-width: 600px; }
+          </style>
+        </head>
         <body>
           <h1>Authentication Failed</h1>
-          <p>Error: ${error}</p>
-          <p>Please close this window and try again.</p>
+          <div class="error-details">
+            <p><strong>Error from QuickBooks:</strong> ${error}</p>
+            ${errorDescription ? `<p>${errorDescription}</p>` : ''}
+            <p>Please close this window and try again.</p>
+          </div>
         </body>
       </html>
       `,
@@ -244,31 +193,133 @@ export async function GET(request: NextRequest) {
     );
   }
   
-  // Process the callback by calling our POST endpoint
-  const response = await fetch(new URL('/api/auth/quickbooks/callback', request.url), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code, state, realmId }),
-  });
-  
-  const result = await response.json();
-  
-  if (result.success) {
-    // Redirect to Flutter app via deep link
-    return NextResponse.redirect(result.deepLink);
-  } else {
+  // Check required parameters
+  if (!code || !state) {
+    console.error('Missing required parameters:', { code: !!code, state: !!state });
     return new NextResponse(
       `
       <html>
+        <head>
+          <title>Authentication Failed</title>
+          <style>
+            body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; text-align: center; }
+            h1 { color: #dc2626; }
+            .error-details { background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: 0.5rem; margin: 2rem auto; max-width: 600px; }
+          </style>
+        </head>
         <body>
           <h1>Authentication Failed</h1>
-          <p>${result.error}</p>
-          <p>Please close this window and try again.</p>
+          <div class="error-details">
+            <p><strong>Error:</strong> Missing required parameters</p>
+            <p>The OAuth callback is missing required information.</p>
+            <p>Please try logging in again.</p>
+          </div>
         </body>
       </html>
       `,
       { 
         status: 400,
+        headers: { 'Content-Type': 'text/html' }
+      }
+    );
+  }
+  
+  // Process the callback directly (avoid internal HTTP request)
+  try {
+    const result = await processOAuthCallback(code, state, realmId || '');
+  
+  if (result.success) {
+    // Redirect to success page instead of deep link
+    const successUrl = new URL('/oauth/success', request.url);
+    successUrl.searchParams.set('provider', 'quickbooks');
+    successUrl.searchParams.set('session', result.sessionId);
+    return NextResponse.redirect(successUrl);
+  } else {
+    console.error('OAuth callback failed with result:', result);
+    return new NextResponse(
+      `
+      <html>
+        <head>
+          <title>Authentication Failed</title>
+          <style>
+            body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; text-align: center; }
+            h1 { color: #dc2626; }
+            .error-details { background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: 0.5rem; margin: 2rem auto; max-width: 600px; }
+            .retry-btn { background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 1rem; }
+          </style>
+        </head>
+        <body>
+          <h1>Authentication Failed</h1>
+          <div class="error-details">
+            <p><strong>Error:</strong> ${result.error}</p>
+            ${result.details ? `<p><strong>Details:</strong> ${result.details}</p>` : ''}
+            <p>This usually happens when:</p>
+            <ul style="text-align: left;">
+              <li>The authorization code has expired</li>
+              <li>The OAuth state doesn't match</li>
+              <li>The redirect URI doesn't match exactly</li>
+            </ul>
+          </div>
+          <a href="/quickbooks" class="retry-btn">Try Again</a>
+        </body>
+      </html>
+      `,
+      { 
+        status: result.status || 400,
+        headers: { 'Content-Type': 'text/html' }
+      }
+    );
+  }
+  } catch (error) {
+    console.error('Callback processing error:', error);
+    let errorMessage = 'Unknown error occurred';
+    let errorDetails = '';
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null) {
+      // Handle result object with error property
+      const err = error as any;
+      if (err.error) {
+        errorMessage = err.error;
+        errorDetails = err.details || '';
+      } else {
+        errorMessage = JSON.stringify(error);
+      }
+    } else {
+      errorMessage = String(error);
+    }
+    
+    return new NextResponse(
+      `
+      <html>
+        <head>
+          <title>Authentication Failed</title>
+          <style>
+            body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; text-align: center; }
+            h1 { color: #dc2626; }
+            .error-details { background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: 0.5rem; margin: 2rem auto; max-width: 600px; }
+            .retry-btn { background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 1rem; }
+          </style>
+        </head>
+        <body>
+          <h1>Authentication Failed</h1>
+          <div class="error-details">
+            <p><strong>Error:</strong> ${errorMessage}</p>
+            ${errorDetails ? `<p><strong>Details:</strong> ${errorDetails}</p>` : ''}
+            <p>This usually happens when:</p>
+            <ul style="text-align: left;">
+              <li>The authorization code has expired</li>
+              <li>The OAuth state doesn't match</li>
+              <li>The redirect URI doesn't match exactly</li>
+            </ul>
+          </div>
+          <a href="/quickbooks" class="retry-btn">Try Again</a>
+        </body>
+      </html>
+      `,
+      { 
+        status: 500,
         headers: { 'Content-Type': 'text/html' }
       }
     );
