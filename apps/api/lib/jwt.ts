@@ -29,7 +29,13 @@ export async function createSessionToken(payload: SessionPayload): Promise<strin
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, secret);
-    return payload as SessionPayload;
+    // Extract our custom fields from the JWT payload
+    return {
+      sessionId: payload.sessionId as string,
+      provider: payload.provider as string | undefined,
+      authenticated: payload.authenticated as boolean | undefined,
+      exp: payload.exp as number | undefined,
+    };
   } catch (error) {
     return null;
   }
