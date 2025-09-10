@@ -45,5 +45,20 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- Deep linking configuration -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>receiptorganizer</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>com.receiptorganizer</string>
+		</dict>
+	</array>
 </dict>
 </plist>

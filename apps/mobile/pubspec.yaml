@@ -20,6 +20,7 @@ version: 1.0.0+1
 
 environment:
   sdk: ^3.5.0
+  flutter: ">=3.24.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -45,7 +46,7 @@ dependencies:
   # OpenCV removed for now - will implement basic edge detection without it
   
   # Database and Storage
-  sqflite: ^2.4.2
+  sqflite: ^2.3.3+2
   path_provider: ^2.1.5
   path: ^1.9.0
   
@@ -56,6 +57,16 @@ dependencies:
   uuid: ^4.5.1
   shared_preferences: ^2.5.3
   intl: ^0.20.2
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  share_plus: ^7.2.2
+  
+  # API and Security
+  http: ^1.2.0
+  flutter_secure_storage: ^9.2.2
+  crypto: ^3.0.3
+  url_launcher: ^6.2.5
+  app_links: ^6.3.2  # For OAuth deep linking
 
 dev_dependencies:
   flutter_test:
@@ -66,18 +77,18 @@ dev_dependencies:
   # Linting and Testing
   flutter_lints: ^3.0.1
   mockito: ^5.4.2
-  build_runner: ^2.5.4
+  build_runner: ^2.4.13
   
   # Code generation  
-  riverpod_generator: ^2.6.5
-  riverpod_annotation: ^2.6.1
+  riverpod_generator: ^2.4.3
+  riverpod_annotation: ^2.3.5
   json_annotation: ^4.8.1
-  json_serializable: ^6.9.5
+  json_serializable: ^6.8.0
   
   # Database testing
   sqflite_common_ffi: ^2.3.3
   mocktail: ^1.0.4
-  freezed: ^3.0.0
+  freezed: ^2.5.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

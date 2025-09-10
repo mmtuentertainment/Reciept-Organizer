@@ -8,6 +8,12 @@ import 'package:receipt_organizer/features/export/presentation/providers/export_
 import 'package:receipt_organizer/features/export/presentation/providers/csv_preview_provider.dart';
 import 'package:receipt_organizer/features/export/domain/services/csv_preview_service.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
+import 'package:receipt_organizer/features/export/presentation/widgets/validation_report_dialog.dart';
+import 'package:receipt_organizer/features/export/presentation/providers/export_validation_provider.dart';
+import 'package:receipt_organizer/features/export/domain/export_validator.dart';
+import 'package:receipt_organizer/core/models/receipt.dart';
+import 'package:receipt_organizer/core/providers/repository_providers.dart';
+import 'package:receipt_organizer/features/export/domain/receipt_converter.dart';
 
 /// Main export screen with date range selection, format options, and CSV preview
 class ExportScreen extends ConsumerStatefulWidget {
@@ -426,31 +432,86 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
     );
   }
 
+  ExportFormat _getExportFormat(String format) {
+    switch (format.toLowerCase()) {
+      case 'quickbooks':
+      case 'qb':
+        return ExportFormat.quickbooks;
+      case 'xero':
+        return ExportFormat.xero;
+      default:
+        return ExportFormat.generic;
+    }
+  }
+  
   Future<void> _handleExport(DateRangeState state) async {
     final format = ref.read(selectedExportFormatProvider);
     final formatNotifier = ref.read(exportFormatNotifierProvider.notifier);
     final previewState = ref.read(csvPreviewProvider).value;
     
-    // Double-check for critical warnings (SEC-001)
-    if (previewState != null && previewState.hasCriticalWarnings) {
+    // Fetch actual receipts from repository
+    final receiptRepo = await ref.read(receiptRepositoryProvider.future);
+    final dataReceipts = await receiptRepo.getReceiptsByDateRange(
+      state.dateRange.start,
+      state.dateRange.end,
+    );
+    
+    // Filter for exportable receipts (those with OCR results and ready status)
+    final exportableReceipts = ReceiptConverter.filterExportableReceipts(dataReceipts);
+    
+    // Convert data layer receipts to core layer receipts for validation
+    final List<Receipt> receipts = ReceiptConverter.fromDataReceipts(exportableReceipts);
+    
+    // Show warning if no receipts to export
+    if (receipts.isEmpty) {
       if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          icon: const Icon(Icons.security, color: Colors.red, size: 48),
-          title: const Text('Security Risk Detected'),
-          content: const Text(
-            'Cannot export due to potential CSV injection attacks detected in the data. '
-            'Please review and fix the highlighted security issues before exporting.',
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Understood'),
-            ),
-          ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No receipts found in the selected date range that are ready for export'),
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
+      return;
+    }
+    
+    // Convert format to ExportFormat enum
+    final exportFormat = _getExportFormat(format.toString());
+    
+    // Log validation info for debugging
+    debugPrint('Export Validation: Found ${receipts.length} receipts to validate');
+    debugPrint('Export Format: $exportFormat');
+    
+    // Run validation before export
+    final validationNotifier = ref.read(exportValidationProvider.notifier);
+    final validationResult = await validationNotifier.validateReceipts(
+      receipts: receipts,
+      format: exportFormat,
+    );
+    
+    if (validationResult == null) {
+      // Validation failed
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to validate export data'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    // Log validation results
+    debugPrint('Validation Result: ${validationResult.isValid ? "VALID" : "INVALID"}');
+    debugPrint('Errors: ${validationResult.errors.length}, Warnings: ${validationResult.warnings.length}');
+    
+    // Show validation report dialog
+    if (!mounted) return;
+    final shouldExport = await showValidationReportDialog(
+      context: context,
+      validationResult: validationResult,
+    );
+    
+    if (!shouldExport) {
       return;
     }
     

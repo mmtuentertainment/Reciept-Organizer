@@ -200,11 +200,12 @@ class CSVPreviewTable extends StatelessWidget {
     
     return DataTable(
       headingRowHeight: 48,
-      dataRowHeight: 52,
+      dataRowMinHeight: 52,
+      dataRowMaxHeight: 52,
       horizontalMargin: 16,
       columnSpacing: 24,
-      headingRowColor: MaterialStateProperty.all(
-        theme.colorScheme.surfaceVariant.withOpacity(0.3),
+      headingRowColor: WidgetStateProperty.all(
+        theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
       ),
       border: TableBorder(
         horizontalInside: BorderSide(
@@ -265,7 +266,7 @@ class CSVPreviewTable extends StatelessWidget {
                         ? const EdgeInsets.symmetric(horizontal: 4, vertical: 2)
                         : null,
                       decoration: hasWarning ? BoxDecoration(
-                        color: _getWarningColor(cellWarning!.severity, theme),
+                        color: _getWarningColor(cellWarning.severity, theme),
                         borderRadius: BorderRadius.circular(4),
                       ) : null,
                       child: Row(
@@ -315,7 +316,7 @@ class CSVPreviewTable extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.2),
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.2),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(8),
           bottomRight: Radius.circular(8),
@@ -351,7 +352,7 @@ class CSVPreviewTable extends StatelessWidget {
       case WarningSeverity.medium:
         return theme.colorScheme.secondaryContainer;
       case WarningSeverity.low:
-        return theme.colorScheme.surfaceVariant.withOpacity(0.3);
+        return theme.colorScheme.surfaceContainerHighest.withOpacity(0.3);
     }
   }
 

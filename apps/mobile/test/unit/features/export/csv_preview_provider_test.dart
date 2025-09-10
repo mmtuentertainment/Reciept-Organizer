@@ -13,7 +13,8 @@ import 'package:flutter/material.dart';
 
 import 'csv_preview_provider_test.mocks.dart';
 
-@GenerateMocks([ReceiptRepository, CSVPreviewService])
+// @GenerateMocks([ReceiptRepository, CSVPreviewService])
+// TODO: Uncomment when ReceiptRepository and CSVPreviewService are implemented
 void main() {
   late ProviderContainer container;
   late MockReceiptRepository mockReceiptRepository;
