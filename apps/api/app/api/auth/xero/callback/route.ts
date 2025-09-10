@@ -141,8 +141,11 @@ export async function GET(request: NextRequest) {
   const result = await response.json();
   
   if (result.success) {
-    // Redirect to Flutter app via deep link
-    return NextResponse.redirect(result.deepLink);
+    // Redirect to success page instead of deep link
+    const successUrl = new URL('/oauth/success', request.url);
+    successUrl.searchParams.set('provider', 'xero');
+    successUrl.searchParams.set('session', result.sessionId);
+    return NextResponse.redirect(successUrl);
   } else {
     return new NextResponse(
       `

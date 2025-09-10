@@ -119,17 +119,21 @@ export async function GET(request: NextRequest) {
   }
   
   // Process the callback by calling our POST endpoint
-  const response = await fetch(new URL('/api/auth/quickbooks/callback', request.url), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code, state, realmId }),
-  });
-  
-  const result = await response.json();
+  try {
+    const response = await fetch(new URL('/api/auth/quickbooks/callback', request.url), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, state, realmId }),
+    });
+    
+    const result = await response.json();
   
   if (result.success) {
-    // Redirect to Flutter app via deep link
-    return NextResponse.redirect(result.deepLink);
+    // Redirect to success page instead of deep link
+    const successUrl = new URL('/oauth/success', request.url);
+    successUrl.searchParams.set('provider', 'quickbooks');
+    successUrl.searchParams.set('session', result.sessionId);
+    return NextResponse.redirect(successUrl);
   } else {
     return new NextResponse(
       `
@@ -143,6 +147,24 @@ export async function GET(request: NextRequest) {
       `,
       { 
         status: 400,
+        headers: { 'Content-Type': 'text/html' }
+      }
+    );
+  }
+  } catch (error) {
+    console.error('Callback processing error:', error);
+    return new NextResponse(
+      `
+      <html>
+        <body>
+          <h1>Authentication Failed</h1>
+          <p>Error processing callback: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+          <p>Please close this window and try again.</p>
+        </body>
+      </html>
+      `,
+      { 
+        status: 500,
         headers: { 'Content-Type': 'text/html' }
       }
     );
