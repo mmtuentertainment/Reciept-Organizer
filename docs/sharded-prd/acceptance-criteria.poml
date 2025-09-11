@@ -84,6 +84,71 @@
           <item>Android: Pixel 5+ with Android 13+</item>
           <item>Tablets: Graceful scaling (not optimized)</item>
           <item>Orientation: Portrait primary, landscape functional</item>
+          <item>Web: Chrome 100+, Safari 15+, Firefox 100+</item>
+          <item>Progressive Web App: Installable on all platforms</item>
+        </criteria>
+      </section>
+    </section>
+    
+    <section id="migration-success-criteria">
+      <h2>Migration Success Criteria</h2>
+      
+      <section id="technical-migration">
+        <h3>Technical Migration</h3>
+        <criteria priority="required">
+          <item>All 571 tests passing (100% from 77% baseline)</item>
+          <item>Zero path_provider dependencies in test suite</item>
+          <item>Mock services fully replace file system in tests</item>
+          <item>Test execution time &lt;2 minutes (from 5+ minutes)</item>
+          <item>Code coverage maintained at >95%</item>
+        </criteria>
+      </section>
+      
+      <section id="cloud-infrastructure">
+        <h3>Cloud Infrastructure</h3>
+        <criteria priority="required">
+          <item>Supabase PostgreSQL operational with RLS</item>
+          <item>Image storage in Supabase Storage (S3-compatible)</item>
+          <item>Authentication via Supabase Auth</item>
+          <item>Vercel API handling OAuth and validation</item>
+          <item>Real-time sync latency &lt;5 seconds</item>
+          <item>API response time &lt;200ms p95</item>
+        </criteria>
+      </section>
+      
+      <section id="data-migration">
+        <h3>Data Migration</h3>
+        <criteria priority="required">
+          <item>Zero data loss during migration</item>
+          <item>All local receipts successfully uploaded</item>
+          <item>Image integrity verified via checksums</item>
+          <item>Rollback capability within 24 hours</item>
+          <item>Migration progress visible to users</item>
+          <item>Batch processing handles 1000+ receipts</item>
+        </criteria>
+      </section>
+      
+      <section id="user-experience">
+        <h3>User Experience</h3>
+        <criteria priority="required">
+          <item>No disruption to existing users</item>
+          <item>Seamless transition via feature flags</item>
+          <item>Offline functionality maintained</item>
+          <item>Sync conflicts resolved automatically</item>
+          <item>Local storage reduced to &lt;50MB typical</item>
+          <item>Cross-device sync within 5 seconds</item>
+        </criteria>
+      </section>
+      
+      <section id="operational-metrics">
+        <h3>Operational Metrics</h3>
+        <criteria priority="required">
+          <item>Cloud sync success rate >99.9%</item>
+          <item>User adoption rate >80% within 30 days</item>
+          <item>Support tickets &lt;1% of active users</item>
+          <item>App store rating maintained or improved</item>
+          <item>Zero security incidents</item>
+          <item>Rollback time &lt;5 minutes if needed</item>
         </criteria>
       </section>
     </section>

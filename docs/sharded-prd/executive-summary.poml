@@ -10,16 +10,23 @@
     
     <section id="product-vision">
       <h2>Product Vision</h2>
-      <p>Create a pragmatic receipt capture and export tool for mom-and-pop businesses that prioritizes accuracy transparency, offline reliability, and first-try CSV export success over complex automation promises.</p>
+      <p>Create a pragmatic receipt capture and export tool for mom-and-pop businesses that combines cloud convenience with offline reliability, prioritizing accuracy transparency, cross-device access, and first-try CSV export success over complex automation promises.</p>
+    </section>
+    
+    <section id="architectural-evolution">
+      <h2>Architectural Evolution</h2>
+      <p>Migrating from offline-first to hybrid cloud architecture to address mobile storage limitations, enable cross-device synchronization, and support web platform access while maintaining offline functionality.</p>
     </section>
     
     <section id="key-differentiators">
       <h2>Key Differentiators</h2>
       <differentiators>
         <item type="honest-ocr">Shows confidence scores, makes corrections trivial</item>
-        <item type="offline-first">Full functionality without network dependency</item>
+        <item type="hybrid-cloud">Cloud sync with offline fallback for reliability</item>
+        <item type="cross-platform">Access from any device - mobile, tablet, or web</item>
         <item type="export-excellence">99%+ first-try success with QuickBooks/Xero</item>
-        <item type="mobile-optimized">Camera-first workflow for owner-operators</item>
+        <item type="mobile-optimized">Camera-first workflow with minimal storage footprint</item>
+        <item type="cloud-backup">Automatic backup prevents data loss</item>
       </differentiators>
     </section>
     

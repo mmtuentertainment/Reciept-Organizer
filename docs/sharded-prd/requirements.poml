@@ -51,12 +51,25 @@
           </features>
         </capability>
         
-        <capability id="offline-first-storage">
-          <h4>Offline-First Storage</h4>
+        <capability id="hybrid-cloud-storage">
+          <h4>Hybrid Cloud Storage</h4>
           <features>
-            <feature>Local SQLite/RxDB persistence</feature>
-            <feature>Automatic image compression</feature>
-            <feature>Privacy-compliant data handling</feature>
+            <feature>Supabase PostgreSQL for primary data</feature>
+            <feature>Local SQLite cache for offline access</feature>
+            <feature>Automatic cloud synchronization</feature>
+            <feature>S3-compatible image storage</feature>
+            <feature>Intelligent local cache management (&lt;50MB typical)</feature>
+            <feature>Privacy-compliant with encryption</feature>
+          </features>
+        </capability>
+        
+        <capability id="cross-platform-access">
+          <h4>Cross-Platform Access</h4>
+          <features>
+            <feature>Native mobile apps (iOS/Android)</feature>
+            <feature>Progressive web app (PWA)</feature>
+            <feature>Real-time sync across devices</feature>
+            <feature>Consistent experience on all platforms</feature>
           </features>
         </capability>
       </section>
@@ -79,9 +92,11 @@
         <h3>Reliability</h3>
         <requirements>
           <requirement metric="crash-free-rate">>99.5%</requirement>
-          <requirement metric="data-loss-prevention">Auto-save every edit</requirement>
-          <requirement metric="offline-operation">100% features work offline</requirement>
-          <requirement metric="error-recovery">Graceful degradation</requirement>
+          <requirement metric="data-loss-prevention">Auto-save with cloud backup</requirement>
+          <requirement metric="offline-operation">Core features work offline with sync queue</requirement>
+          <requirement metric="sync-reliability">99.9% successful sync rate</requirement>
+          <requirement metric="error-recovery">Graceful degradation with retry logic</requirement>
+          <requirement metric="data-consistency">Conflict resolution for concurrent edits</requirement>
         </requirements>
       </section>
       

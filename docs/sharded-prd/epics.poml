@@ -10,12 +10,20 @@
     
     <epic id="capture-and-extract">
       <h2>Epic: Capture &amp; Extract</h2>
-      <goal>Seamless photo-to-data pipeline</goal>
+      <goal>Seamless photo-to-data pipeline with automatic cloud backup</goal>
+      
+      <architecture-note>
+        Built on hybrid cloud from the start:
+        - Local processing for speed
+        - Automatic cloud upload after capture
+        - Intelligent caching (recent receipts only)
+      </architecture-note>
       
       <user-stories>
         <story id="batch-capture" priority="P0" persona="Sarah">
-          <narrative>As Sarah, I want to capture multiple receipts quickly, so I can process a stack during downtime</narrative>
-          <acceptance-criteria>Batch mode captures 10 receipts in &lt;3min</acceptance-criteria>
+          <narrative>As Sarah, I want to capture multiple receipts quickly with automatic cloud backup, so I can process a stack during downtime without worrying about storage</narrative>
+          <acceptance-criteria>Batch mode captures 10 receipts in &lt;3min, auto-uploads to cloud, local cache manages space</acceptance-criteria>
+          <implementation>OCR locally, upload to Supabase Storage, keep recent in SQLite cache</implementation>
         </story>
         
         <story id="edge-detection" priority="P0" persona="Mike">
@@ -37,7 +45,14 @@
     
     <epic id="review-and-correct">
       <h2>Epic: Review &amp; Correct</h2>
-      <goal>Efficient error correction with transparency</goal>
+      <goal>Efficient error correction with real-time sync across devices</goal>
+      
+      <architecture-note>
+        Real-time synchronization built-in:
+        - Edits sync immediately via Supabase
+        - Conflict resolution for concurrent edits
+        - Offline queue for connectivity issues
+      </architecture-note>
       
       <implementation-note>
         Stories evolved during development:
@@ -75,7 +90,14 @@
     
     <epic id="organize-and-export">
       <h2>Epic: Organize &amp; Export</h2>
-      <goal>Zero-friction data export</goal>
+      <goal>Zero-friction data export from cloud or local cache</goal>
+      
+      <architecture-note>
+        Cloud-first export strategy:
+        - Export from Supabase for complete data
+        - Fall back to local cache if offline
+        - Vercel API handles validation
+      </architecture-note>
       
       <user-stories>
         <story id="date-range-export" priority="P0" persona="Sarah">
@@ -112,7 +134,14 @@
     
     <epic id="settings-and-support">
       <h2>Epic: Settings &amp; Support</h2>
-      <goal>User control and assistance</goal>
+      <goal>User control including sync preferences and cache management</goal>
+      
+      <architecture-note>
+        Cloud-aware settings:
+        - Sync frequency controls
+        - Local cache size limits
+        - Offline mode preferences
+      </architecture-note>
       
       <user-stories>
         <story id="default-export-format" priority="P2" persona="Mike">
@@ -121,8 +150,9 @@
         </story>
         
         <story id="storage-usage" priority="P2" persona="Sarah">
-          <narrative>As Sarah, I want to see storage usage, so I know when to clean up</narrative>
-          <acceptance-criteria>Visual indicator with management options</acceptance-criteria>
+          <narrative>As Sarah, I want to see local cache vs cloud storage usage, so I can manage my device space</narrative>
+          <acceptance-criteria>Separate indicators for local cache and cloud storage, one-tap cache cleanup</acceptance-criteria>
+          <implementation>Show SQLite cache size, Supabase quota, smart cleanup options</implementation>
         </story>
         
         <story id="confidence-thresholds" priority="P3" persona="Linda">
@@ -135,6 +165,88 @@
           <acceptance-criteria>Full JSON export option</acceptance-criteria>
         </story>
       </user-stories>
+    </epic>
+    
+    <epic id="cross-device-collaboration">
+      <h2>Epic: Cross-Device &amp; Collaboration</h2>
+      <goal>Seamless multi-device access and team collaboration</goal>
+      
+      <architecture-note>
+        Enabled by hybrid cloud foundation:
+        - Supabase handles device sync
+        - Web access via Flutter Web
+        - Sharing via secure URLs
+        - All devices see same data
+      </architecture-note>
+      
+      <user-stories>
+        <story id="multi-device-sync" priority="P0" persona="Sarah">
+          <narrative>As Sarah, I want to capture on my phone and review on my tablet, so I can work from any device</narrative>
+          <acceptance-criteria>Changes sync within 5 seconds, seamless device switching, consistent state</acceptance-criteria>
+          <implementation>Supabase realtime subscriptions, device-aware caching</implementation>
+        </story>
+        
+        <story id="web-dashboard" priority="P0" persona="Mike">
+          <narrative>As Mike, I want a web dashboard for receipt management, so I can work from my desktop without installing software</narrative>
+          <acceptance-criteria>Full feature parity, responsive design, keyboard shortcuts, bulk operations</acceptance-criteria>
+          <implementation>Flutter Web with progressive enhancement</implementation>
+        </story>
+        
+        <story id="accountant-sharing" priority="P1" persona="Linda">
+          <narrative>As Linda, I want to share receipts with my accountant, so they can access what they need without me exporting</narrative>
+          <acceptance-criteria>Secure share links, read-only access, time-limited sharing, revocation control</acceptance-criteria>
+          <implementation>Supabase RLS with signed URLs, share management UI</implementation>
+        </story>
+        
+        <story id="team-workspace" priority="P2" persona="Linda">
+          <narrative>As Linda, I want my bookkeeper to help process receipts, so we can divide the work</narrative>
+          <acceptance-criteria>Role-based access, activity history, concurrent editing protection</acceptance-criteria>
+          <implementation>Supabase Auth with teams, optimistic locking</implementation>
+        </story>
+        
+        <story id="receipt-comments" priority="P2" persona="Mike">
+          <narrative>As Mike, I want to add comments to receipts, so I can communicate with my accountant about specific items</narrative>
+          <acceptance-criteria>Threaded comments, @mentions, notifications, comment history</acceptance-criteria>
+          <implementation>Comments table with real-time updates</implementation>
+        </story>
+      </user-stories>
+    </epic>
+    
+    <epic id="platform-infrastructure">
+      <h2>Epic: Platform Infrastructure</h2>
+      <goal>Technical foundation for hybrid cloud architecture</goal>
+      
+      <implementation-note>
+        This epic represents the technical implementation work needed to support
+        the user-facing features in other epics. It's not user-visible but enables
+        the hybrid cloud architecture that makes everything else possible.
+      </implementation-note>
+      
+      <technical-stories>
+        <story id="test-infrastructure" priority="P0">
+          <narrative>Fix 131 failing tests by implementing mock services</narrative>
+          <acceptance-criteria>All 571 tests passing, no path_provider dependencies, <2min test execution</acceptance-criteria>
+          <implementation>Repository pattern with mock implementations</implementation>
+        </story>
+        
+        <story id="supabase-setup" priority="P0">
+          <narrative>Setup Supabase backend with proper schema and RLS</narrative>
+          <acceptance-criteria>Database operational, RLS configured, storage buckets created</acceptance-criteria>
+          <implementation>PostgreSQL schema, row-level security, S3 storage</implementation>
+        </story>
+        
+        <story id="sync-engine" priority="P0">
+          <narrative>Implement bidirectional sync with conflict resolution</narrative>
+          <acceptance-criteria>Automatic sync, offline queue, conflict resolution, retry logic</acceptance-criteria>
+          <implementation>Sync queue pattern with optimistic updates</implementation>
+        </story>
+        
+        <story id="data-migration" priority="P0">
+          <narrative>Migrate existing user data from local to cloud</narrative>
+          <acceptance-criteria>Zero data loss, progress tracking, rollback capability</acceptance-criteria>
+          <implementation>Batch upload with checksums, feature flags</implementation>
+        </story>
+      </technical-stories>
     </epic>
   </section>
 </document>
