@@ -13,11 +13,13 @@ class CameraPreviewWithOverlay extends ConsumerStatefulWidget {
     required this.cameraService,
     this.onEdgeDetectionResult,
     this.enableManualAdjustment = true,
+    this.testMode = false,
   });
 
   final CameraService cameraService;
   final Function(EdgeDetectionResult)? onEdgeDetectionResult;
   final bool enableManualAdjustment;
+  final bool testMode; // Skip camera controller in test mode
 
   @override
   ConsumerState<CameraPreviewWithOverlay> createState() =>
@@ -107,6 +109,16 @@ class _CameraPreviewWithOverlayState
 
   @override
   Widget build(BuildContext context) {
+    // In test mode, skip camera controller and show UI directly
+    if (widget.testMode) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final size = Size(constraints.maxWidth, constraints.maxHeight);
+          return _buildCameraView(size, null);
+        },
+      );
+    }
+    
     return FutureBuilder<CameraController?>(
       future: widget.cameraService.getCameraController(),
       builder: (context, snapshot) {
@@ -126,20 +138,39 @@ class _CameraPreviewWithOverlayState
         return LayoutBuilder(
           builder: (context, constraints) {
             final size = Size(constraints.maxWidth, constraints.maxHeight);
-            
-            return Stack(
-              children: [
-                // Camera preview
-                SizedBox.expand(
-                  child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: controller.value.previewSize?.height ?? size.width,
-                      height: controller.value.previewSize?.width ?? size.height,
-                      child: CameraPreview(controller),
-                    ),
-                  ),
-                ),
+            return _buildCameraView(size, controller);
+          },
+        );
+      },
+    );
+  }
+  
+  Widget _buildCameraView(Size size, CameraController? controller) {
+    return Stack(
+      children: [
+        // Camera preview or placeholder in test mode
+        if (controller != null)
+          SizedBox.expand(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: controller.value.previewSize?.height ?? size.width,
+                height: controller.value.previewSize?.width ?? size.height,
+                child: CameraPreview(controller),
+              ),
+            ),
+          )
+        else
+          Container(
+            color: Colors.black,
+            child: const Center(
+              child: Icon(
+                Icons.camera_alt,
+                size: 64,
+                color: Colors.white24,
+              ),
+            ),
+          ),
                 
                 // Edge detection overlay
                 if (_currentResult != null)
@@ -200,11 +231,7 @@ class _CameraPreviewWithOverlayState
                     right: 16,
                     child: _buildStatusIndicator(),
                   ),
-              ],
-            );
-          },
-        );
-      },
+      ],
     );
   }
 

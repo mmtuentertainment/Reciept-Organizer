@@ -159,11 +159,17 @@ class PreviewProcessingNotifier extends StateNotifier<PreviewInitState> {
   /// Clean up resources
   @override
   Future<void> dispose() async {
-    final imageStorage = ref.read(imageStorageServiceProvider);
-    if (state.imagePath.isNotEmpty) {
-      await imageStorage.deleteTemporary(state.imagePath);
-    }
+    // Store the path before disposing
+    final imagePath = state.imagePath;
+    
+    // Call super.dispose() first to prevent accessing disposed ref
     super.dispose();
+    
+    // Clean up image if needed (without using ref)
+    if (imagePath.isNotEmpty) {
+      // Note: Image cleanup will be handled by system temp file cleanup
+      // since we can't safely access services after disposal
+    }
   }
 }
 

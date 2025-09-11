@@ -537,3 +537,140 @@ class AmountFieldEditor extends StatelessWidget {
     );
   }
 }
+
+/// Category field editor with dropdown selection
+class CategoryFieldEditor extends StatelessWidget {
+  final FieldData? fieldData;
+  final ValueChanged<FieldData>? onChanged;
+  final bool showConfidence;
+  final List<String> categories;
+
+  const CategoryFieldEditor({
+    Key? key,
+    this.fieldData,
+    this.onChanged,
+    this.showConfidence = true,
+    this.categories = const [
+      'Food & Dining',
+      'Groceries',
+      'Transportation',
+      'Shopping',
+      'Entertainment',
+      'Healthcare',
+      'Utilities',
+      'Business',
+      'Other',
+    ],
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final currentValue = fieldData?.value?.toString() ?? categories.first;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Category',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 4),
+        DropdownButtonFormField<String>(
+          value: categories.contains(currentValue) ? currentValue : categories.first,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            suffixIcon: showConfidence && fieldData != null
+                ? ConfidenceIndicator(fieldData: fieldData, fieldName: 'Category')
+                : null,
+          ),
+          items: categories.map((category) {
+            return DropdownMenuItem(
+              value: category,
+              child: Text(category),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value != null && onChanged != null) {
+              onChanged!(FieldData(
+                value: value,
+                confidence: fieldData?.confidence ?? 100.0,
+                originalText: value,
+              ));
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
+
+/// Payment method field editor with common payment types
+class PaymentMethodFieldEditor extends StatelessWidget {
+  final FieldData? fieldData;
+  final ValueChanged<FieldData>? onChanged;
+  final bool showConfidence;
+  final List<String> paymentMethods;
+
+  const PaymentMethodFieldEditor({
+    Key? key,
+    this.fieldData,
+    this.onChanged,
+    this.showConfidence = true,
+    this.paymentMethods = const [
+      'Credit Card',
+      'Debit Card',
+      'Cash',
+      'Check',
+      'Mobile Payment',
+      'Gift Card',
+      'Store Credit',
+      'Other',
+    ],
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final currentValue = fieldData?.value?.toString() ?? paymentMethods.first;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Payment Method',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 4),
+        DropdownButtonFormField<String>(
+          value: paymentMethods.contains(currentValue) ? currentValue : paymentMethods.first,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            suffixIcon: showConfidence && fieldData != null
+                ? ConfidenceIndicator(fieldData: fieldData, fieldName: 'Payment Method')
+                : null,
+          ),
+          items: paymentMethods.map((method) {
+            return DropdownMenuItem(
+              value: method,
+              child: Text(method),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value != null && onChanged != null) {
+              onChanged!(FieldData(
+                value: value,
+                confidence: fieldData?.confidence ?? 100.0,
+                originalText: value,
+              ));
+            }
+          },
+        ),
+      ],
+    );
+  }
+}

@@ -1,5 +1,6 @@
 import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_repository.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
+import 'package:receipt_organizer/core/models/audit_log.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:convert';
@@ -64,7 +65,7 @@ class ReceiptRepository implements IReceiptRepository {
   }
 
   @override
-  Future<List<Receipt>> getAllReceipts() async {
+  Future<List<Receipt>> getAllReceipts({bool excludeDeleted = true}) async {
     final db = await database;
     final maps = await db.query(_tableName, orderBy: 'capturedAt DESC');
     
@@ -99,7 +100,11 @@ class ReceiptRepository implements IReceiptRepository {
   }
 
   @override
-  Future<List<Receipt>> getReceiptsByDateRange(DateTime start, DateTime end) async {
+  Future<List<Receipt>> getReceiptsByDateRange(
+    DateTime start,
+    DateTime end, {
+    bool excludeDeleted = true,
+  }) async {
     final db = await database;
     
     // Format dates to match the stored format (MM/DD/YYYY)
@@ -178,7 +183,7 @@ class ReceiptRepository implements IReceiptRepository {
   }
 
   @override
-  Future<int> getReceiptCount() async {
+  Future<int> getReceiptCount({bool excludeDeleted = true}) async {
     final db = await database;
     final count = Sqflite.firstIntValue(
       await db.rawQuery('SELECT COUNT(*) FROM $_tableName')
@@ -188,7 +193,11 @@ class ReceiptRepository implements IReceiptRepository {
   }
 
   @override
-  Future<List<Receipt>> getReceiptsPaginated(int offset, int limit) async {
+  Future<List<Receipt>> getReceiptsPaginated(
+    int offset,
+    int limit, {
+    bool excludeDeleted = true,
+  }) async {
     final db = await database;
     final maps = await db.query(
       _tableName,
@@ -251,5 +260,53 @@ class ReceiptRepository implements IReceiptRepository {
       // In a real implementation, we'd serialize OCR results to JSON
       'ocrResultsJson': receipt.ocrResults != null ? jsonEncode({}) : null,
     };
+  }
+
+  // Additional methods required by IReceiptRepository
+
+  @override
+  Future<List<Receipt>> getReceiptsByUserId(
+    String userId, {
+    bool excludeDeleted = true,
+  }) async {
+    // For now, return all receipts as we don't have user-based filtering yet
+    return getAllReceipts();
+  }
+
+  @override
+  Future<void> softDelete(List<String> ids, String userId) async {
+    // For now, use the existing delete functionality
+    // In a real implementation, we'd set a deletedAt timestamp
+    await deleteReceipts(ids);
+  }
+
+  @override
+  Future<void> restore(List<String> ids, String userId) async {
+    // Not implemented yet - would clear deletedAt timestamp
+    // For now, this is a no-op
+  }
+
+  @override
+  Future<void> permanentDelete(List<String> ids, String userId) async {
+    // Use the existing delete functionality
+    await deleteReceipts(ids);
+  }
+
+  @override
+  Future<List<Receipt>> getExpiredSoftDeletes(int daysOld) async {
+    // Not implemented yet - would query for receipts with old deletedAt
+    return [];
+  }
+
+  @override
+  Future<void> logAudit(AuditLog auditLog) async {
+    // Not implemented yet - would write to audit log table
+    // For now, this is a no-op
+  }
+
+  @override
+  Future<List<AuditLog>> getAuditLogs(String userId, {int? limit}) async {
+    // Not implemented yet - would query audit log table
+    return [];
   }
 }

@@ -48,9 +48,11 @@ class BatchCaptureNotifier extends StateNotifier<BatchCaptureState> {
   }
 
   void stopBatchMode() {
-    state = state.copyWith(
+    state = BatchCaptureState(
+      receipts: state.receipts,
       isBatchMode: false,
       currentBatchId: null,
+      isCapturing: state.isCapturing,
     );
   }
 
@@ -114,11 +116,7 @@ class BatchCaptureNotifier extends StateNotifier<BatchCaptureState> {
   }
 
   void clearBatch() {
-    state = state.copyWith(
-      receipts: [],
-      isBatchMode: false,
-      currentBatchId: null,
-    );
+    state = BatchCaptureState();
   }
 }
 
