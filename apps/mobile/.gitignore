@@ -41,3 +41,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Test output files
+test_results_*.txt
+test_module_results.md
+test_module_baseline.sh
