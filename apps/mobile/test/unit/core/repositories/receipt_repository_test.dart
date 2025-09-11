@@ -26,13 +26,21 @@ void main() {
   setUp(() async {
     repository = ReceiptRepository();
     
-    // Clean up any existing test database
+    // Clean up the actual database that ReceiptRepository uses
     final databasePath = await getDatabasesPath();
-    final testDbPath = path.join(databasePath, 'test_receipt_organizer.db');
+    final dbPath = path.join(databasePath, 'receipt_organizer.db');
     try {
-      await File(testDbPath).delete();
+      await File(dbPath).delete();
     } catch (_) {
       // Ignore if doesn't exist
+    }
+    
+    // Also clean up ALL existing receipts in case database persists
+    try {
+      final db = await repository.database;
+      await db.delete('receipts');
+    } catch (_) {
+      // Ignore errors
     }
   });
 

@@ -15,7 +15,7 @@ class AppSettings {
     this.enableAudioFeedback = true,
     this.enableBatchCapture = false,
     this.maxRetryAttempts = 3,
-    this.csvExportFormat = 'generic',
+    this.csvExportFormat = 'quickbooks',
     this.dateFormat = 'MM/dd/yyyy',
     this.dateRangePreset = 'last30Days',
   });
@@ -58,7 +58,7 @@ class AppSettings {
       enableAudioFeedback: json['enableAudioFeedback'] ?? true,
       enableBatchCapture: json['enableBatchCapture'] ?? false,
       maxRetryAttempts: json['maxRetryAttempts'] ?? 3,
-      csvExportFormat: json['csvExportFormat'] ?? 'generic',
+      csvExportFormat: json['csvExportFormat'] ?? 'quickbooks',
       dateFormat: json['dateFormat'] ?? 'MM/dd/yyyy',
       dateRangePreset: json['dateRangePreset'] ?? 'last30Days',
     );

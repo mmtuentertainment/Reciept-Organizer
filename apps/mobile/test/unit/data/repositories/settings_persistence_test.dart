@@ -2,21 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:receipt_organizer/data/repositories/settings_repository.dart';
 import 'package:receipt_organizer/data/models/app_settings.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import '../../../test_config/test_setup.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize FFI for testing
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
-  
-  group('Settings Persistence for Export Features', () {
+  testWithSetup('Settings Persistence for Export Features', () {
     late SettingsRepository repository;
     
     setUp(() async {
-      // Initialize with test values
-      SharedPreferences.setMockInitialValues({});
+      // Test setup already initializes SharedPreferences mock
+      // Just get the instance and create repository
       final prefs = await SharedPreferences.getInstance();
       repository = SettingsRepository(prefs);
     });
