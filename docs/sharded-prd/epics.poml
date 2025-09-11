@@ -39,25 +39,36 @@
       <h2>Epic: Review &amp; Correct</h2>
       <goal>Efficient error correction with transparency</goal>
       
+      <implementation-note>
+        Stories evolved during development:
+        - "receipt-notes" → Implemented as notes field in Story 2.3
+        - "image-reference" → Expanded to full "Zoom and Pan" feature (Story 2.3)
+        - Added "Quick Actions" (Story 2.4) for rapid receipt operations
+      </implementation-note>
+      
       <user-stories>
         <story id="inline-editing" priority="P0" persona="Linda">
           <narrative>As Linda, I want to edit low-confidence fields inline, so corrections are fast</narrative>
           <acceptance-criteria>Single tap to edit, auto-keyboard selection</acceptance-criteria>
+          <implementation>Story 2.1 - Complete</implementation>
         </story>
         
         <story id="merchant-normalization" priority="P1" persona="Mike">
           <narrative>As Mike, I want merchant name normalization, so "MCDONALDS #4521" becomes "McDonalds"</narrative>
           <acceptance-criteria>Common vendors cleaned automatically</acceptance-criteria>
+          <implementation>Story 2.2 - Complete</implementation>
         </story>
         
-        <story id="receipt-notes" priority="P2" persona="Sarah">
-          <narrative>As Sarah, I want to add notes to receipts, so I can remember context</narrative>
-          <acceptance-criteria>Optional note field, searchable</acceptance-criteria>
+        <story id="zoom-and-pan" priority="P1" persona="Linda">
+          <narrative>As Linda, I want to zoom and pan receipt images, so I can verify hard-to-read areas</narrative>
+          <acceptance-criteria>Pinch-to-zoom, double-tap zoom, smooth panning, includes note field</acceptance-criteria>
+          <implementation>Story 2.3 - Complete (expanded from original "image-reference")</implementation>
         </story>
         
-        <story id="image-reference" priority="P1" persona="Linda">
-          <narrative>As Linda, I want to see original image while editing, so I can verify accuracy</narrative>
-          <acceptance-criteria>Zoomable image alongside fields</acceptance-criteria>
+        <story id="quick-actions" priority="P2" persona="Sarah">
+          <narrative>As Sarah, I want quick action buttons, so I can rapidly process receipts</narrative>
+          <acceptance-criteria>One-tap delete, duplicate, share actions</acceptance-criteria>
+          <implementation>Story 2.4 - Complete (new addition)</implementation>
         </story>
       </user-stories>
     </epic>
@@ -85,6 +96,11 @@
         <story id="export-validation" priority="P0" persona="Sarah">
           <narrative>As Sarah, I want export validation, so I know it will import successfully</narrative>
           <acceptance-criteria>Pre-flight check with specific warnings</acceptance-criteria>
+        </story>
+        
+        <story id="oauth-integration" priority="P0" persona="Linda">
+          <narrative>As Linda, I want to connect directly to QuickBooks/Xero, so exports work seamlessly without manual CSV handling</narrative>
+          <acceptance-criteria>OAuth 2.0 flow complete, tokens securely managed, direct API export</acceptance-criteria>
         </story>
         
         <story id="bulk-delete" priority="P2" persona="Linda">

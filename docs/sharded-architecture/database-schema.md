@@ -8,9 +8,10 @@ SECTION_METADATA:
   performance_approach: "Denormalized for query speed, normalized for integrity"
 
 DATABASE_ARCHITECTURE:
-  engine: "SQLite 3.x"
+  primary_engine: "SQLite 3.x"
   access_layer: "sqflite package for Flutter"
-  reactive_layer: "RxDB for real-time UI updates"
+  settings_store: "Hive for key-value preferences"
+  state_management: "Riverpod for reactive updates"
   optimization_strategy: "Strategic denormalization for mobile performance"
   
 DESIGN_PRINCIPLES:
@@ -286,4 +287,134 @@ STORAGE_ESTIMATES:
     - "1000 receipts: ~2MB database + ~110MB images"
     - "5000 receipts: ~10MB database + ~550MB images" 
     - "10000 receipts: ~20MB database + ~1.1GB images"
+```
+
+## Hive Key-Value Storage
+
+```poml
+HIVE_CONFIGURATION:
+  purpose: "Lightweight settings and preferences storage"
+  rationale: "Faster than SQLite for simple key-value pairs"
+  implementation: "Hive 2.2+ with type adapters"
+  
+  advantages_over_sqlite:
+    - "No SQL overhead for simple settings"
+    - "Type-safe with code generation"
+    - "Lazy loading and caching"
+    - "Smaller footprint for preferences"
+    
+  use_cases:
+    - "User preferences that change frequently"
+    - "OAuth tokens and credentials"
+    - "Temporary UI state"
+    - "Feature flags and experiments"
+```
+
+### Hive Boxes (Collections)
+
+```dart
+// Settings Box - User Preferences
+Box<dynamic> settingsBox = await Hive.openBox('settings');
+/*
+Keys stored:
+  - default_export_format: String
+  - confidence_threshold: double
+  - merchant_normalization_enabled: bool
+  - show_confidence_scores: bool
+  - haptic_feedback_enabled: bool
+  - theme_mode: String
+  - batch_mode_default: bool
+  - auto_save_enabled: bool
+*/
+
+// OAuth Box - Secure Credentials
+Box<dynamic> oauthBox = await Hive.openBox('oauth', 
+  encryptionCipher: HiveAesCipher(encryptionKey));
+/*
+Keys stored:
+  - quickbooks_access_token: String (encrypted)
+  - quickbooks_refresh_token: String (encrypted)
+  - quickbooks_token_expiry: DateTime
+  - xero_access_token: String (encrypted)
+  - xero_refresh_token: String (encrypted)
+  - xero_token_expiry: DateTime
+*/
+
+// Cache Box - Temporary Data
+Box<dynamic> cacheBox = await Hive.openBox('cache');
+/*
+Keys stored:
+  - last_export_date: DateTime
+  - merchant_normalization_cache: Map<String, String>
+  - recent_merchants: List<String>
+  - ui_state: Map (collapsible sections, sort preferences)
+*/
+```
+
+### Hive vs SQLite Usage Guidelines
+
+```poml
+USE_HIVE_FOR:
+  simple_values: "Single key-value pairs"
+  frequent_updates: "Settings that change often"
+  small_datasets: "< 1000 items"
+  examples:
+    - "User preferences"
+    - "OAuth tokens"
+    - "UI state"
+    - "Feature flags"
+    
+USE_SQLITE_FOR:
+  structured_data: "Complex relational data"
+  large_datasets: "> 1000 items"
+  queries: "Need WHERE, JOIN, ORDER BY"
+  examples:
+    - "Receipt records"
+    - "Export history"
+    - "Audit logs"
+    - "Bulk operations"
+```
+
+### Migration Strategy
+
+```dart
+// Settings Migration: SQLite app_settings → Hive
+class SettingsMigration {
+  static Future<void> migrateFromSQLite() async {
+    // 1. Read from SQLite app_settings table
+    final sqliteSettings = await db.query('app_settings');
+    
+    // 2. Write to Hive settingsBox
+    final box = await Hive.openBox('settings');
+    for (var setting in sqliteSettings.first.entries) {
+      await box.put(setting.key, setting.value);
+    }
+    
+    // 3. Mark migration complete
+    await box.put('migrated_from_sqlite', true);
+    
+    // 4. Keep SQLite table for rollback capability
+  }
+}
+```
+
+### Performance Comparison
+
+```poml
+PERFORMANCE_METRICS:
+  read_single_setting:
+    hive: "< 1ms"
+    sqlite: "5-10ms"
+    
+  write_single_setting:
+    hive: "< 2ms" 
+    sqlite: "10-20ms"
+    
+  batch_read_10_settings:
+    hive: "< 5ms"
+    sqlite: "15-30ms"
+    
+  memory_overhead:
+    hive: "~100KB for settings box"
+    sqlite: "~1MB minimum database size"
 ```

@@ -6,7 +6,8 @@ DOCUMENT_METADATA:
   purpose: "Comprehensive technology stack for Receipt Organizer MVP"
   scope: "Complete frontend, backend, and tooling stack"
   decision_framework: "Evidence-based technology selection"
-  last_updated: "2025-01-06"
+  last_updated: "2025-01-10"
+  revision: "2.0 - Updated to reflect implemented architecture"
   
 TECH_STACK_PHILOSOPHY:
   approach: "Boring technology where possible, exciting where necessary"
@@ -32,10 +33,16 @@ TECHNOLOGY_SELECTION_CRITERIA:
     nice_to_have: "Features that would be beneficial but not critical"
     
 DECISION_RATIONALE:
-  single_language_strategy:
-    choice: "Dart everywhere (frontend + backend services)"
-    benefit: "No context switching, consistent tooling, shared types"
-    tradeoff: "Limited to Flutter/Dart ecosystem"
+  hybrid_language_strategy:
+    original_plan: "Dart everywhere (frontend + backend services)"
+    implemented_approach: "Flutter frontend + Next.js API backend"
+    rationale_for_change: |
+      - OAuth 2.0 flows require robust server-side handling
+      - Next.js/Vercel provides superior OAuth integration
+      - JavaScript ecosystem offers mature accounting API SDKs
+      - Vercel Edge Functions ideal for stateless API endpoints
+    benefit: "Best tool for each layer - Flutter for mobile, Next.js for web APIs"
+    tradeoff: "Two language ecosystems to maintain"
     
   offline_first_architecture:
     choice: "All processing on-device"
@@ -74,20 +81,23 @@ TECHNOLOGY_MATRIX:
       rationale: "More modern than BLoC, better DevTools, compile-safe, easier testing"
   
   backend_layer:
-    language:
-      name: "Dart"
-      version: "3.2+"
-      rationale: "Same language as frontend, no context switching for small team"
+    local_processing:
+      name: "On-device Services (Dart)"
+      version: "Within Flutter App"
+      purpose: "OCR, image processing, local data management"
+      rationale: "Core offline functionality remains on-device"
       
-    architecture:
-      name: "On-device Services"
-      version: "N/A"
-      rationale: "No backend server in MVP, all processing on-device"
+    api_gateway:
+      name: "Next.js API"
+      version: "15.5.2"
+      runtime: "Node.js with Vercel Edge"
+      purpose: "OAuth flows, CSV validation, accounting integrations"
+      rationale: "Superior OAuth handling, mature ecosystem for web APIs"
       
     api_style:
-      name: "Local Service Interfaces"
-      version: "N/A"
-      rationale: "Direct service calls, no network API in MVP"
+      name: "RESTful + Local Services Hybrid"
+      pattern: "Local-first with cloud enhancement"
+      rationale: "Core features work offline, cloud features enhance experience"
   
   data_layer:
     database:
@@ -96,9 +106,14 @@ TECHNOLOGY_MATRIX:
       rationale: "Proven mobile database, works offline, good Flutter support"
       
     reactive_layer:
-      name: "RxDB"
-      version: "0.5+"
-      rationale: "Reactive updates for UI, offline-first design"
+      name: "Riverpod State Management"
+      version: "2.4+"
+      rationale: "Reactive updates for UI, replaces planned RxDB with simpler solution"
+      
+    settings_persistence:
+      name: "Hive"
+      version: "2.2+"
+      rationale: "Lightweight key-value storage for app settings and preferences"
       
     storage:
       name: "Device File System"
@@ -106,9 +121,10 @@ TECHNOLOGY_MATRIX:
       rationale: "Direct device storage with path_provider package"
       
     authentication:
-      name: "Local Only"
-      version: "N/A"
-      rationale: "Single-device usage, no user accounts in MVP"
+      name: "OAuth 2.0 for Integrations"
+      implementation: "Jose (JWT) on Next.js"
+      version: "6.1.0"
+      rationale: "QuickBooks/Xero OAuth integration, secure token management"
 ```
 
 ### Complete Technology Matrix
@@ -119,13 +135,16 @@ TECHNOLOGY_MATRIX:
 | Frontend Framework | Flutter | 3.24.0+ | Cross-platform mobile UI framework | Superior camera integration, consistent UI across platforms, proven OCR plugin support |
 | UI Component Library | Material 3 + Custom | Latest | Design system implementation | Material for platform conventions, custom components for receipt-specific UI |
 | State Management | Riverpod | 2.4+ | Reactive state management | More modern than BLoC, better DevTools, compile-safe, easier testing |
-| Backend Language | Dart | 3.2+ | Service layer implementation | Same language as frontend, no context switching for small team |
-| Backend Framework | N/A (On-device) | - | Local processing only | No backend server in MVP, all processing on-device |
-| API Style | Local Services | - | Internal service interfaces | Direct service calls, no network API in MVP |
+| Backend (Local) | Dart Services | 3.2+ | On-device processing | OCR, image processing within Flutter app |
+| Backend (API) | Next.js | 15.5.2 | Cloud integrations | OAuth flows, CSV validation, accounting APIs |
+| API Runtime | Vercel Edge | Latest | Serverless functions | Scalable, stateless API endpoints |
+| API Style | REST + Local Hybrid | - | Dual architecture | Local services for offline, REST for integrations |
 | Database | SQLite via sqflite | 2.3+ | Local data persistence | Proven mobile database, works offline, good Flutter support |
-| Cache | In-Memory + RxDB | rxdb 0.5+ | Reactive caching layer | Reactive updates for UI, offline-first design |
+| Settings Store | Hive | 2.2+ | Key-value storage | Lightweight settings and preferences storage |
+| State Management | Riverpod | 2.4+ | Reactive state layer | Replaces RxDB, simpler reactive updates |
 | File Storage | Device File System | - | Image storage | Direct device storage with path_provider package |
-| Authentication | Local Only | - | No auth in MVP | Single-device usage, no user accounts in MVP |
+| Authentication | OAuth 2.0 (Jose) | 6.1.0 | Integration auth | QuickBooks/Xero OAuth, JWT token management |
+| Rate Limiting | Upstash Redis | 1.35.3 | API protection | Prevent abuse of cloud endpoints |
 
 ## Specialized Processing Stack
 
