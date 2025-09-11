@@ -33,3 +33,22 @@ bfg.jar
 releases/**/*.apk
 releases/**/*.aab
 releases/**/*.ipa
+
+# Temporary fix scripts (development tools)
+apps/mobile/fix_*.py
+apps/mobile/*.py
+fix_*.py
+fix_*.sh
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary research files
+TEMP_*.md
+DRAFT_*.md
+WIP_*.md
