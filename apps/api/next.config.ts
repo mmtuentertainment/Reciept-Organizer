@@ -20,12 +20,7 @@ const nextConfig: NextConfig = {
       'jose',
       'zod',
     ],
-    // Disable CSS optimization to avoid critters dependency
-    optimizeCss: false,
   },
-  
-  // Set output file tracing root
-  outputFileTracingRoot: '/home/matt/FINAPP/Receipt Organizer',
 };
 
 export default nextConfig;
