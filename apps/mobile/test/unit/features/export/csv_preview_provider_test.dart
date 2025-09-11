@@ -10,18 +10,18 @@ import 'package:receipt_organizer/features/export/presentation/providers/csv_pre
 import 'package:receipt_organizer/features/export/presentation/providers/date_range_provider.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/export_format_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import '../test_config/test_setup.dart';
+// Removed sqflite_common_ffi import - using test setup
 
 import 'csv_preview_provider_test.mocks.dart';
+import '../test_config/test_setup.dart';
 
 // @GenerateMocks([ReceiptRepository, CSVPreviewService])
 // TODO: Uncomment when ReceiptRepository and CSVPreviewService are implemented
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  // Test setup handles initialization
   
   // Initialize FFI for testing
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
   
   late ProviderContainer container;
   late MockReceiptRepository mockReceiptRepository;
@@ -36,7 +36,7 @@ void main() {
     container.dispose();
   });
 
-  group('CSVPreviewProvider', () {
+  testWithSetup('CSVPreviewProvider', () {
     test('generates preview when date range changes', () async {
       // Arrange
       final receipts = _createTestReceipts(5);

@@ -15,15 +15,14 @@ import 'package:receipt_organizer/features/capture/widgets/retry_prompt_dialog.d
 import 'package:receipt_organizer/features/capture/widgets/capture_failed_state.dart';
 import 'package:receipt_organizer/features/capture/providers/preview_initialization_provider.dart';
 import 'package:receipt_organizer/features/receipts/presentation/providers/image_viewer_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../test_config/test_setup.dart';
 import 'capture_retry_flow_test.mocks.dart';
 import '../mocks/mock_text_recognizer.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 
 @GenerateNiceMocks([MockSpec<ICameraService>(), MockSpec<RetrySessionManager>()])
 void main() {
-  group('Capture Retry Flow Integration Tests', () {
+  testWithSetup('Capture Retry Flow Integration Tests', () {
     late MockTextRecognizer mockTextRecognizer;
     late MockICameraService mockCameraService;
     late MockRetrySessionManager mockSessionManager;
@@ -47,8 +46,7 @@ void main() {
         ),
       );
 
-      // Setup shared preferences mock
-      SharedPreferences.setMockInitialValues({});
+      // Test setup already initializes SharedPreferences mock
 
       // Setup default mock behaviors
       when(mockSessionManager.saveSession(any)).thenAnswer((_) async => true);

@@ -13,10 +13,12 @@ import 'package:receipt_organizer/core/services/undo_service.dart';
 import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import '../test_config/test_setup.dart';
+// Removed sqflite_common_ffi import - using test setup
 import 'dart:async';
 import 'package:flutter/services.dart';
 
+import '../test_config/test_setup.dart';
 @GenerateMocks([
   IReceiptRepository,
   AuthorizationService,
@@ -25,14 +27,13 @@ import 'package:flutter/services.dart';
 ])
 import 'bulk_delete_workflow_test.mocks.dart';
 
+import '../test_config/test_setup.dart';
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  // Test setup handles initialization
   
   // Initialize FFI for testing
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
   
-  group('Bulk Delete Workflow Integration Tests', () {
+  testWithSetup('Bulk Delete Workflow Integration Tests', () {
     late MockIReceiptRepository mockRepository;
     late MockAuthorizationService mockAuthService;
     late MockUndoService mockUndoService;

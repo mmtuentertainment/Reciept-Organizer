@@ -2,21 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/data/models/app_settings.dart';
 import 'package:receipt_organizer/data/repositories/settings_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import '../../test_config/test_setup.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize FFI for testing
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
-  
-  group('Settings Integration Test', () {
+  testWithSetup('Settings Integration Test', () {
     late SettingsRepository repository;
 
     setUp(() async {
-      // Set up test shared preferences
-      SharedPreferences.setMockInitialValues({});
+      // Test setup already initializes SharedPreferences mock
       final prefs = await SharedPreferences.getInstance();
       repository = SettingsRepository(prefs);
     });
@@ -125,7 +118,7 @@ void main() {
     });
   });
 
-  group('AppSettings Model', () {
+  testWithSetup('AppSettings Model', () {
     test('should create with default values', () {
       // Act
       const settings = AppSettings();

@@ -10,19 +10,19 @@ import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import '../test_config/test_setup.dart';
+// Removed sqflite_common_ffi import - using test setup
 
 @GenerateNiceMocks([MockSpec<IReceiptRepository>()])
 import 'date_range_selection_performance_test.mocks.dart';
 
+import '../test_config/test_setup.dart';
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  // Test setup handles initialization
   
   // Initialize FFI for testing
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
   
-  group('Date Range Selection Performance Tests', () {
+  testWithSetup('Date Range Selection Performance Tests', () {
     late MockIReceiptRepository mockReceiptRepository;
 
     setUp(() {

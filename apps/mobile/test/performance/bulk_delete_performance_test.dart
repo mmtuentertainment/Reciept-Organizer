@@ -7,19 +7,19 @@ import 'package:receipt_organizer/core/models/audit_log.dart';
 import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import '../test_config/test_setup.dart';
+// Removed sqflite_common_ffi import - using test setup
 
 @GenerateMocks([IReceiptRepository, AuthorizationService, UndoService])
 import 'bulk_delete_performance_test.mocks.dart';
+import '../test_config/test_setup.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  // Test setup handles initialization
   
   // Initialize FFI for testing
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
   
-  group('Bulk Delete Performance Tests', () {
+  testWithSetup('Bulk Delete Performance Tests', () {
     late MockIReceiptRepository mockRepository;
     late MockAuthorizationService mockAuthService;
     late MockUndoService mockUndoService;

@@ -5,20 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:receipt_organizer/shared/widgets/zoomable_image_viewer.dart';
 import 'package:receipt_organizer/shared/utils/performance_monitor.dart';
+import '../test_config/test_setup.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  TestSetup.initializeTestEnvironment();
   
   group('Image Viewer Performance Tests', () {
     final performanceMonitor = PerformanceMonitor();
     
     // Generate test images of various sizes
     Future<String> generateTestImage(int sizeInMb) async {
-      final tempDir = await getTemporaryDirectory();
-      final file = File('${tempDir.path}/test_${sizeInMb}mb.png');
+      // Use mock temporary directory path from test setup
+      final tempDirPath = '/tmp';
+      final file = File('$tempDirPath/test_${sizeInMb}mb.png');
       
       // Generate a simple PNG of approximate size
       // final width = 1000 * math.sqrt(sizeInMb).toInt();
