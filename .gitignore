@@ -52,3 +52,7 @@ fix_*.sh
 TEMP_*.md
 DRAFT_*.md
 WIP_*.md
+
+# Story documents (work in progress, not for commit)
+docs/stories/*.story.poml
+docs/stories/*-SUMMARY.poml
