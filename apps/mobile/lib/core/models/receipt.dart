@@ -7,6 +7,8 @@ part 'receipt.g.dart';
 /// Core receipt model for the application
 @freezed
 class Receipt with _$Receipt {
+  const Receipt._();
+  
   const factory Receipt({
     required String id,
     String? merchantName,
@@ -26,7 +28,18 @@ class Receipt with _$Receipt {
     // Export tracking
     DateTime? lastExportedAt,
     String? lastExportFormat,
+    bool? wasExported,
+    
+    // Soft delete fields
+    DateTime? deletedAt,
+    String? deletedBy,
   }) = _Receipt;
+  
+  /// Check if the receipt is soft deleted
+  bool get isDeleted => deletedAt != null;
+  
+  /// Check if the receipt was exported
+  bool get hasBeenExported => wasExported ?? false;
 
   factory Receipt.fromJson(Map<String, dynamic> json) => _$ReceiptFromJson(json);
   

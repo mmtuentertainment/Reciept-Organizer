@@ -28,3 +28,8 @@ bfg.jar
 *.sql
 *.sqlite
 *.db
+
+# Release artifacts (too large for git)
+releases/**/*.apk
+releases/**/*.aab
+releases/**/*.ipa

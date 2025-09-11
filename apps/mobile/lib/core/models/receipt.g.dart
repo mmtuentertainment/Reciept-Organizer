@@ -28,6 +28,11 @@ _$ReceiptImpl _$$ReceiptImplFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['lastExportedAt'] as String),
       lastExportFormat: json['lastExportFormat'] as String?,
+      wasExported: json['wasExported'] as bool?,
+      deletedAt: json['deletedAt'] == null
+          ? null
+          : DateTime.parse(json['deletedAt'] as String),
+      deletedBy: json['deletedBy'] as String?,
     );
 
 Map<String, dynamic> _$$ReceiptImplToJson(_$ReceiptImpl instance) =>
@@ -44,6 +49,9 @@ Map<String, dynamic> _$$ReceiptImplToJson(_$ReceiptImpl instance) =>
       'thumbnailPath': instance.thumbnailPath,
       'lastExportedAt': instance.lastExportedAt?.toIso8601String(),
       'lastExportFormat': instance.lastExportFormat,
+      'wasExported': instance.wasExported,
+      'deletedAt': instance.deletedAt?.toIso8601String(),
+      'deletedBy': instance.deletedBy,
     };
 
 _$ProcessingResultImpl _$$ProcessingResultImplFromJson(

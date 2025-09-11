@@ -35,6 +35,10 @@ mixin _$Receipt {
       throw _privateConstructorUsedError; // Export tracking
   DateTime? get lastExportedAt => throw _privateConstructorUsedError;
   String? get lastExportFormat => throw _privateConstructorUsedError;
+  bool? get wasExported =>
+      throw _privateConstructorUsedError; // Soft delete fields
+  DateTime? get deletedAt => throw _privateConstructorUsedError;
+  String? get deletedBy => throw _privateConstructorUsedError;
 
   /// Serializes this Receipt to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -62,7 +66,10 @@ abstract class $ReceiptCopyWith<$Res> {
       String? imagePath,
       String? thumbnailPath,
       DateTime? lastExportedAt,
-      String? lastExportFormat});
+      String? lastExportFormat,
+      bool? wasExported,
+      DateTime? deletedAt,
+      String? deletedBy});
 
   $ProcessingResultCopyWith<$Res>? get ocrResults;
 }
@@ -94,6 +101,9 @@ class _$ReceiptCopyWithImpl<$Res, $Val extends Receipt>
     Object? thumbnailPath = freezed,
     Object? lastExportedAt = freezed,
     Object? lastExportFormat = freezed,
+    Object? wasExported = freezed,
+    Object? deletedAt = freezed,
+    Object? deletedBy = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -144,6 +154,18 @@ class _$ReceiptCopyWithImpl<$Res, $Val extends Receipt>
           ? _value.lastExportFormat
           : lastExportFormat // ignore: cast_nullable_to_non_nullable
               as String?,
+      wasExported: freezed == wasExported
+          ? _value.wasExported
+          : wasExported // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      deletedBy: freezed == deletedBy
+          ? _value.deletedBy
+          : deletedBy // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 
@@ -181,7 +203,10 @@ abstract class _$$ReceiptImplCopyWith<$Res> implements $ReceiptCopyWith<$Res> {
       String? imagePath,
       String? thumbnailPath,
       DateTime? lastExportedAt,
-      String? lastExportFormat});
+      String? lastExportFormat,
+      bool? wasExported,
+      DateTime? deletedAt,
+      String? deletedBy});
 
   @override
   $ProcessingResultCopyWith<$Res>? get ocrResults;
@@ -212,6 +237,9 @@ class __$$ReceiptImplCopyWithImpl<$Res>
     Object? thumbnailPath = freezed,
     Object? lastExportedAt = freezed,
     Object? lastExportFormat = freezed,
+    Object? wasExported = freezed,
+    Object? deletedAt = freezed,
+    Object? deletedBy = freezed,
   }) {
     return _then(_$ReceiptImpl(
       id: null == id
@@ -262,13 +290,25 @@ class __$$ReceiptImplCopyWithImpl<$Res>
           ? _value.lastExportFormat
           : lastExportFormat // ignore: cast_nullable_to_non_nullable
               as String?,
+      wasExported: freezed == wasExported
+          ? _value.wasExported
+          : wasExported // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      deletedBy: freezed == deletedBy
+          ? _value.deletedBy
+          : deletedBy // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ReceiptImpl implements _Receipt {
+class _$ReceiptImpl extends _Receipt {
   const _$ReceiptImpl(
       {required this.id,
       this.merchantName,
@@ -281,7 +321,11 @@ class _$ReceiptImpl implements _Receipt {
       this.imagePath,
       this.thumbnailPath,
       this.lastExportedAt,
-      this.lastExportFormat});
+      this.lastExportFormat,
+      this.wasExported,
+      this.deletedAt,
+      this.deletedBy})
+      : super._();
 
   factory _$ReceiptImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReceiptImplFromJson(json);
@@ -313,10 +357,17 @@ class _$ReceiptImpl implements _Receipt {
   final DateTime? lastExportedAt;
   @override
   final String? lastExportFormat;
+  @override
+  final bool? wasExported;
+// Soft delete fields
+  @override
+  final DateTime? deletedAt;
+  @override
+  final String? deletedBy;
 
   @override
   String toString() {
-    return 'Receipt(id: $id, merchantName: $merchantName, date: $date, totalAmount: $totalAmount, taxAmount: $taxAmount, ocrResults: $ocrResults, createdAt: $createdAt, updatedAt: $updatedAt, imagePath: $imagePath, thumbnailPath: $thumbnailPath, lastExportedAt: $lastExportedAt, lastExportFormat: $lastExportFormat)';
+    return 'Receipt(id: $id, merchantName: $merchantName, date: $date, totalAmount: $totalAmount, taxAmount: $taxAmount, ocrResults: $ocrResults, createdAt: $createdAt, updatedAt: $updatedAt, imagePath: $imagePath, thumbnailPath: $thumbnailPath, lastExportedAt: $lastExportedAt, lastExportFormat: $lastExportFormat, wasExported: $wasExported, deletedAt: $deletedAt, deletedBy: $deletedBy)';
   }
 
   @override
@@ -345,7 +396,13 @@ class _$ReceiptImpl implements _Receipt {
             (identical(other.lastExportedAt, lastExportedAt) ||
                 other.lastExportedAt == lastExportedAt) &&
             (identical(other.lastExportFormat, lastExportFormat) ||
-                other.lastExportFormat == lastExportFormat));
+                other.lastExportFormat == lastExportFormat) &&
+            (identical(other.wasExported, wasExported) ||
+                other.wasExported == wasExported) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt) &&
+            (identical(other.deletedBy, deletedBy) ||
+                other.deletedBy == deletedBy));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -363,7 +420,10 @@ class _$ReceiptImpl implements _Receipt {
       imagePath,
       thumbnailPath,
       lastExportedAt,
-      lastExportFormat);
+      lastExportFormat,
+      wasExported,
+      deletedAt,
+      deletedBy);
 
   /// Create a copy of Receipt
   /// with the given fields replaced by the non-null parameter values.
@@ -381,7 +441,7 @@ class _$ReceiptImpl implements _Receipt {
   }
 }
 
-abstract class _Receipt implements Receipt {
+abstract class _Receipt extends Receipt {
   const factory _Receipt(
       {required final String id,
       final String? merchantName,
@@ -394,7 +454,11 @@ abstract class _Receipt implements Receipt {
       final String? imagePath,
       final String? thumbnailPath,
       final DateTime? lastExportedAt,
-      final String? lastExportFormat}) = _$ReceiptImpl;
+      final String? lastExportFormat,
+      final bool? wasExported,
+      final DateTime? deletedAt,
+      final String? deletedBy}) = _$ReceiptImpl;
+  const _Receipt._() : super._();
 
   factory _Receipt.fromJson(Map<String, dynamic> json) = _$ReceiptImpl.fromJson;
 
@@ -422,6 +486,12 @@ abstract class _Receipt implements Receipt {
   DateTime? get lastExportedAt;
   @override
   String? get lastExportFormat;
+  @override
+  bool? get wasExported; // Soft delete fields
+  @override
+  DateTime? get deletedAt;
+  @override
+  String? get deletedBy;
 
   /// Create a copy of Receipt
   /// with the given fields replaced by the non-null parameter values.
