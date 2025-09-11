@@ -1,0 +1,272 @@
+# Flutter & Dart Technology Stack
+@poml:meta {
+  type: "tech-specification"
+  version: "1.0.0"
+  created: "2025-01-11"
+  technology: "Flutter 3.24+ with Dart 3.0+"
+}
+
+## Flutter Framework
+@poml:flutter {
+  
+  @version {
+    minimum: "3.24.0"
+    dart: "3.0+"
+    platforms: ["iOS 12+", "Android API 21+"]
+  }
+  
+  @architecture {
+    pattern: "Feature-based modules"
+    structure: {
+      core: "Foundation services and models"
+      domain: "Business logic layer"
+      features: "Vertical slice per feature"
+      infrastructure: "External integrations"
+    }
+  }
+  
+  @key_packages {
+    state_management: {
+      package: "flutter_riverpod"
+      version: "2.4.0+"
+      pattern: "Provider + StateNotifier"
+    }
+    
+    local_database: {
+      package: "sqflite"
+      version: "2.3.0"
+      usage: "Local SQLite storage"
+    }
+    
+    image_processing: {
+      package: "image_picker"
+      version: "1.0.0+"
+      usage: "Camera and gallery access"
+    }
+    
+    ocr: {
+      package: "google_mlkit_text_recognition"
+      version: "0.11.0"
+      usage: "On-device OCR processing"
+    }
+  }
+}
+
+## Riverpod State Management
+@poml:riverpod {
+  
+  @patterns {
+    provider_types: [
+      "Provider - Simple values",
+      "StateNotifierProvider - Complex state",
+      "FutureProvider - Async operations",
+      "StreamProvider - Realtime data"
+    ]
+  }
+  
+  @implementation {
+    ```dart
+    // State class with Freezed
+    @freezed
+    class CaptureState with _$CaptureState {
+      const factory CaptureState({
+        @Default(false) bool isProcessing,
+        @Default(0) int retryCount,
+        ProcessingResult? lastResult,
+        FailureReason? failureReason,
+      }) = _CaptureState;
+    }
+    
+    // StateNotifier for business logic
+    class CaptureNotifier extends StateNotifier<CaptureState> {
+      final OCRService _ocrService;
+      
+      CaptureNotifier(this._ocrService) : super(const CaptureState());
+      
+      Future<bool> processCapture(Uint8List imageData) async {
+        state = state.copyWith(isProcessing: true);
+        
+        try {
+          final result = await _ocrService.process(imageData);
+          state = state.copyWith(
+            isProcessing: false,
+            lastResult: result,
+          );
+          return true;
+        } catch (e) {
+          state = state.copyWith(
+            isProcessing: false,
+            failureReason: FailureReason.processingError,
+          );
+          return false;
+        }
+      }
+    }
+    
+    // Provider definition
+    final captureProvider = StateNotifierProvider<CaptureNotifier, CaptureState>((ref) {
+      final ocrService = ref.watch(ocrServiceProvider);
+      return CaptureNotifier(ocrService);
+    });
+    ```
+  }
+}
+
+## Testing Strategy
+@poml:testing {
+  
+  @test_types {
+    unit: {
+      framework: "flutter_test"
+      mocking: "mockito"
+      coverage: "> 80%"
+    }
+    
+    widget: {
+      framework: "flutter_test"
+      helpers: "TestProviderScope"
+      coverage: "> 70%"
+    }
+    
+    integration: {
+      framework: "integration_test"
+      devices: "Emulators/Simulators"
+      coverage: "Critical paths"
+    }
+  }
+  
+  @mock_pattern {
+    problem: "path_provider MissingPluginException"
+    solution: "Interface + Mock implementation"
+    
+    ```dart
+    // Interface definition
+    abstract class IImageStorageService {
+      Future<String> saveTemporary(Uint8List data);
+      Future<Uint8List?> loadImage(String path);
+      Future<void> deleteImage(String path);
+    }
+    
+    // Mock implementation for tests
+    class MockImageStorageService implements IImageStorageService {
+      final Map<String, Uint8List> _storage = {};
+      
+      @override
+      Future<String> saveTemporary(Uint8List data) async {
+        final id = DateTime.now().millisecondsSinceEpoch.toString();
+        _storage['/mock/$id.jpg'] = data;
+        return '/mock/$id.jpg';
+      }
+      
+      @override
+      Future<Uint8List?> loadImage(String path) async {
+        return _storage[path];
+      }
+    }
+    
+    // Test helper widget
+    class TestProviderScope extends StatelessWidget {
+      final Widget child;
+      final List<Override>? overrides;
+      
+      @override
+      Widget build(BuildContext context) {
+        return ProviderScope(
+          overrides: [
+            imageStorageServiceProvider.overrideWithValue(
+              MockImageStorageService(),
+            ),
+            ...?overrides,
+          ],
+          child: MaterialApp(
+            home: child,
+          ),
+        );
+      }
+    }
+    ```
+  }
+}
+
+## Build & Deployment
+@poml:deployment {
+  
+  @build_commands {
+    debug: "flutter build apk --debug"
+    release: "flutter build apk --release"
+    ios: "flutter build ios --release"
+    bundle: "flutter build appbundle"
+  }
+  
+  @code_generation {
+    freezed: "dart run build_runner build --delete-conflicting-outputs"
+    json: "dart run build_runner watch"
+  }
+  
+  @ci_cd {
+    pipeline: "GitHub Actions"
+    stages: ["Test", "Analyze", "Build", "Deploy"]
+    
+    ```yaml
+    name: Flutter CI
+    on: [push, pull_request]
+    
+    jobs:
+      test:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v2
+          - uses: subosito/flutter-action@v2
+            with:
+              flutter-version: '3.24.0'
+          - run: flutter pub get
+          - run: flutter analyze
+          - run: flutter test
+          - run: flutter build apk --debug
+    ```
+  }
+}
+
+## Performance Optimization
+@poml:performance {
+  
+  @image_handling {
+    compression: "70% quality for storage"
+    caching: "LRU cache for recent images"
+    lazy_loading: "Load on demand"
+  }
+  
+  @state_optimization {
+    selective_rebuilds: "Use select() for specific fields"
+    memoization: "Cache expensive computations"
+    debouncing: "Throttle rapid state changes"
+  }
+  
+  @database_optimization {
+    indexes: "Create for frequently queried fields"
+    pagination: "Limit queries to viewport"
+    batch_operations: "Group database writes"
+  }
+}
+
+## Migration Considerations
+@poml:migration {
+  
+  @from_offline {
+    current: "Direct file system access"
+    issue: "Breaks testing"
+    solution: "Abstract with interfaces"
+  }
+  
+  @to_hybrid {
+    pattern: "Repository with strategy"
+    local: "SQLite for offline"
+    cloud: "Supabase for sync"
+  }
+  
+  @compatibility {
+    backwards: "Maintain offline mode"
+    forwards: "Progressive cloud features"
+    data: "Lossless migration"
+  }
+}

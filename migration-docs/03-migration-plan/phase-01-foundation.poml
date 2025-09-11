@@ -1,0 +1,374 @@
+# Phase 1: Foundation Layer (Days 1-2)
+@poml:meta {
+  type: "migration-phase"
+  version: "1.0.0"
+  created: "2025-01-11"
+  phase: 1
+  duration: "2 days"
+  risk: "low"
+}
+
+## Phase Overview
+@poml:overview {
+  
+  @objective {
+    primary: "Create abstraction layer for data access"
+    secondary: "Implement mock services for testing"
+    outcome: "Enable tests to run without file system"
+  }
+  
+  @deliverables {
+    interfaces: ["IReceiptRepository", "IImageStorageService", "IAuthService"]
+    mocks: ["MockReceiptRepository", "MockImageStorageService", "MockAuthService"]
+    tests: "50+ tests passing with mocks"
+    documentation: "Interface contracts documented"
+  }
+  
+  @success_criteria {
+    tests_passing: "> 50"
+    interfaces_complete: "100%"
+    mocks_functional: "100%"
+    no_file_system: "Zero path_provider calls in tests"
+  }
+}
+
+## Day 1: Interface Creation
+@poml:day1 {
+  
+  @morning_tasks {
+    
+    @task1 {
+      name: "Create repository interfaces"
+      duration: "2 hours"
+      location: "lib/core/repositories/interfaces/"
+      
+      ```dart
+      // i_receipt_repository.dart
+      abstract class IReceiptRepository {
+        Future<List<Receipt>> getAllReceipts();
+        Future<Receipt?> getReceiptById(String id);
+        Future<Receipt> createReceipt(Receipt receipt);
+        Future<void> updateReceipt(Receipt receipt);
+        Future<void> deleteReceipt(String id);
+        Future<List<Receipt>> getUnsyncedReceipts();
+        Future<void> markAsSynced(List<String> ids);
+      }
+      ```
+    }
+    
+    @task2 {
+      name: "Create storage interface"
+      duration: "1 hour"
+      location: "lib/core/services/interfaces/"
+      
+      ```dart
+      // i_image_storage_service.dart
+      abstract class IImageStorageService {
+        Future<String> saveTemporary(Uint8List data, {String? fileName});
+        Future<String> savePermanent(Uint8List data, String receiptId);
+        Future<Uint8List?> loadImage(String path);
+        Future<void> deleteImage(String path);
+        Future<List<String>> listImages();
+        Future<int> getStorageUsage();
+      }
+      ```
+    }
+    
+    @task3 {
+      name: "Create auth interface"
+      duration: "1 hour"
+      location: "lib/core/services/interfaces/"
+      
+      ```dart
+      // i_auth_service.dart
+      abstract class IAuthService {
+        Future<AuthUser?> getCurrentUser();
+        Future<AuthResult> signIn(String email, String password);
+        Future<AuthResult> signUp(String email, String password);
+        Future<void> signOut();
+        Stream<AuthUser?> authStateChanges();
+        Future<String?> getAccessToken();
+      }
+      ```
+    }
+  }
+  
+  @afternoon_tasks {
+    
+    @task4 {
+      name: "Implement MockReceiptRepository"
+      duration: "2 hours"
+      location: "test/mocks/"
+      
+      ```dart
+      class MockReceiptRepository implements IReceiptRepository {
+        final List<Receipt> _receipts = [];
+        
+        @override
+        Future<List<Receipt>> getAllReceipts() async {
+          await Future.delayed(Duration(milliseconds: 10));
+          return List.from(_receipts);
+        }
+        
+        @override
+        Future<Receipt> createReceipt(Receipt receipt) async {
+          final newReceipt = receipt.copyWith(
+            id: receipt.id ?? Uuid().v4(),
+          );
+          _receipts.add(newReceipt);
+          return newReceipt;
+        }
+        
+        // Test helpers
+        void addTestData(List<Receipt> receipts) {
+          _receipts.addAll(receipts);
+        }
+        
+        void clear() => _receipts.clear();
+      }
+      ```
+    }
+    
+    @task5 {
+      name: "Implement MockImageStorageService"
+      duration: "2 hours"
+      location: "test/mocks/"
+      
+      ```dart
+      class MockImageStorageService implements IImageStorageService {
+        final Map<String, Uint8List> _storage = {};
+        
+        @override
+        Future<String> saveTemporary(Uint8List data, {String? fileName}) async {
+          final path = '/mock/temp/${fileName ?? '${DateTime.now().millisecondsSinceEpoch}.jpg'}';
+          _storage[path] = data;
+          return path;
+        }
+        
+        @override
+        Future<Uint8List?> loadImage(String path) async {
+          await Future.delayed(Duration(milliseconds: 5));
+          return _storage[path];
+        }
+        
+        @override
+        Future<int> getStorageUsage() async {
+          return _storage.values.fold(0, (sum, data) => sum + data.length);
+        }
+      }
+      ```
+    }
+  }
+}
+
+## Day 2: Integration and Testing
+@poml:day2 {
+  
+  @morning_tasks {
+    
+    @task1 {
+      name: "Update providers to use interfaces"
+      duration: "2 hours"
+      location: "lib/core/providers/"
+      
+      ```dart
+      // repository_providers.dart
+      final receiptRepositoryProvider = Provider<IReceiptRepository>((ref) {
+        // Check if in test mode
+        if (kDebugMode && Platform.environment['FLUTTER_TEST'] == 'true') {
+          return MockReceiptRepository();
+        }
+        
+        // Production - will be hybrid later
+        return LocalReceiptRepository();
+      });
+      
+      // storage_providers.dart
+      final imageStorageServiceProvider = Provider<IImageStorageService>((ref) {
+        if (kDebugMode && Platform.environment['FLUTTER_TEST'] == 'true') {
+          return MockImageStorageService();
+        }
+        
+        return ImageStorageService();
+      });
+      ```
+    }
+    
+    @task2 {
+      name: "Create TestProviderScope"
+      duration: "1 hour"
+      location: "test/helpers/"
+      
+      ```dart
+      class TestProviderScope extends StatelessWidget {
+        final Widget child;
+        final List<Override>? overrides;
+        
+        const TestProviderScope({
+          required this.child,
+          this.overrides,
+        });
+        
+        @override
+        Widget build(BuildContext context) {
+          return ProviderScope(
+            overrides: [
+              receiptRepositoryProvider.overrideWithValue(
+                MockReceiptRepository(),
+              ),
+              imageStorageServiceProvider.overrideWithValue(
+                MockImageStorageService(),
+              ),
+              authServiceProvider.overrideWithValue(
+                MockAuthService(),
+              ),
+              ...?overrides,
+            ],
+            child: MaterialApp(
+              home: child,
+            ),
+          );
+        }
+      }
+      ```
+    }
+  }
+  
+  @afternoon_tasks {
+    
+    @task3 {
+      name: "Fix failing tests"
+      duration: "2 hours"
+      approach: "Replace direct service usage with mocks"
+      
+      ```dart
+      // Before (FAILS)
+      testWidgets('saves image', (tester) async {
+        final service = ImageStorageService();
+        final path = await service.saveTemporary(imageData);
+        expect(File(path).existsSync(), isTrue); // FAILS!
+      });
+      
+      // After (PASSES)
+      testWidgets('saves image', (tester) async {
+        await tester.pumpWidget(
+          TestProviderScope(
+            child: TestWidget(),
+          ),
+        );
+        
+        // Widget uses mocked service internally
+        await tester.tap(find.byIcon(Icons.camera));
+        await tester.pumpAndSettle();
+        
+        expect(find.byType(PreviewScreen), findsOneWidget);
+      });
+      ```
+    }
+    
+    @task4 {
+      name: "Document patterns"
+      duration: "1 hour"
+      location: "docs/testing-patterns.md"
+      
+      content: [
+        "Interface + Mock pattern explanation",
+        "TestProviderScope usage",
+        "Mock data setup patterns",
+        "Common test scenarios"
+      ]
+    }
+    
+    @task5 {
+      name: "Verify success"
+      duration: "1 hour"
+      
+      checklist: [
+        "Run full test suite",
+        "Count passing tests (target: 50+)",
+        "Verify no path_provider errors",
+        "Check CI/CD pipeline"
+      ]
+    }
+  }
+}
+
+## Implementation Checklist
+@poml:checklist {
+  
+  @prerequisites {
+    environment: ["Flutter 3.24+", "Dart 3.0+"]
+    tools: ["VS Code/Android Studio", "Git"]
+    access: ["Repository write access", "CI/CD access"]
+  }
+  
+  @day1_checklist {
+    - [ ] Create interfaces directory structure
+    - [ ] Implement IReceiptRepository
+    - [ ] Implement IImageStorageService
+    - [ ] Implement IAuthService
+    - [ ] Create MockReceiptRepository
+    - [ ] Create MockImageStorageService
+    - [ ] Create MockAuthService
+    - [ ] Commit: "feat: Add repository interfaces and mocks"
+  }
+  
+  @day2_checklist {
+    - [ ] Update provider definitions
+    - [ ] Create TestProviderScope
+    - [ ] Fix preview_screen_test.dart
+    - [ ] Fix capture_flow tests
+    - [ ] Run flutter test
+    - [ ] Document patterns
+    - [ ] Commit: "test: Fix 50+ tests with mock services"
+  }
+}
+
+## Risk Mitigation
+@poml:risks {
+  
+  @identified_risks {
+    
+    @risk1 {
+      risk: "Missing interface methods discovered"
+      probability: "Medium"
+      impact: "Low"
+      mitigation: "Add methods as needed, interfaces are internal"
+    }
+    
+    @risk2 {
+      risk: "Mock behavior differs from real service"
+      probability: "Low"
+      impact: "Medium"
+      mitigation: "Integration tests will catch discrepancies"
+    }
+  }
+  
+  @rollback {
+    not_needed: "This phase is additive only"
+    no_impact: "No changes to production code paths"
+  }
+}
+
+## Success Metrics
+@poml:metrics {
+  
+  @quantitative {
+    tests_passing: "> 50 (from 440 baseline)"
+    test_failures: "< 81 (from 131 baseline)"
+    coverage: "Maintain > 70%"
+  }
+  
+  @qualitative {
+    code_quality: "Clean separation of concerns"
+    maintainability: "Easy to add new mocks"
+    developer_experience: "Tests run fast and reliably"
+  }
+}
+
+## Next Phase
+@poml:next {
+  phase: "Phase 2: Supabase Integration"
+  dependency: "Interfaces and mocks complete"
+  handoff: "Repository interfaces ready for cloud implementation"
+}

@@ -1,0 +1,221 @@
+# Problem Statement: 131 Test Failures Root Cause
+@poml:meta {
+  type: "problem-analysis"
+  version: "1.0.0"
+  created: "2025-01-11"
+  severity: "Critical - Blocks deployment"
+}
+
+## The Problem
+@poml:problem {
+  
+  @symptoms {
+    test_results: "440 passing, 131 failing"
+    failure_rate: "23% of test suite"
+    error_type: "MissingPluginException"
+    error_source: "path_provider package"
+    
+    @example_error {
+      message: "MissingPluginException(No implementation found for method getApplicationDocumentsDirectory)"
+      location: "preview_initialization_provider.dart:85"
+      cause: "await imageStorage.saveTemporary(params.imageData)"
+    }
+  }
+  
+  @root_cause {
+    primary: "Offline-first architecture requires file system access"
+    secondary: "path_provider doesn't work in test environment"
+    impact: "Cannot test any code that saves/loads files"
+    
+    @technical_details {
+      package: "path_provider"
+      issue: "Requires platform channel implementation"
+      test_env: "No platform channels in unit tests"
+      result: "Tests fail when accessing file system"
+    }
+  }
+}
+
+## Failed Test Categories
+@poml:test_failures {
+  
+  @preview_screen {
+    count: 15
+    issue: "Image storage to file system"
+    example: "preview_screen_test.dart"
+    failure: "Stuck in loading state"
+  }
+  
+  @capture_flow {
+    count: 22
+    issue: "Saving captured images"
+    example: "capture_retry_flow_test.dart"
+    failure: "Cannot save to temp directory"
+  }
+  
+  @export_features {
+    count: 18
+    issue: "CSV file generation"
+    example: "batch_capture_flow_test.dart"
+    failure: "Cannot write export files"
+  }
+  
+  @receipt_management {
+    count: 31
+    issue: "Image loading from storage"
+    example: "receipt_details_test.dart"
+    failure: "Cannot load receipt images"
+  }
+  
+  @integration_tests {
+    count: 45
+    issue: "End-to-end workflows"
+    example: "full_capture_workflow_test.dart"
+    failure: "Multiple file system touches"
+  }
+}
+
+## Why Tests Matter
+@poml:importance {
+  
+  @development_velocity {
+    current: "Blocked - cannot validate changes"
+    impact: "No confidence in code modifications"
+    risk: "Introducing bugs without detection"
+  }
+  
+  @ci_cd_pipeline {
+    current: "Red - failing builds"
+    impact: "Cannot deploy to production"
+    requirement: "Green builds for deployment"
+  }
+  
+  @code_quality {
+    current: "Degrading without tests"
+    impact: "Technical debt accumulation"
+    need: "Tests as specification"
+  }
+}
+
+## Current Architecture Limitations
+@poml:limitations {
+  
+  @offline_first_issues {
+    storage: "Local file system only"
+    testing: "Cannot mock file system"
+    scalability: "Single device limitation"
+    backup: "No cloud recovery"
+  }
+  
+  @mobile_app_expectations {
+    users_expect: [
+      "Cloud backup of receipts",
+      "Access from multiple devices",
+      "Share receipts with accountant",
+      "Recover after device loss"
+    ]
+    
+    current_gap: [
+      "No cloud storage",
+      "No synchronization",
+      "No sharing capability",
+      "No recovery mechanism"
+    ]
+  }
+}
+
+## Discovery Process
+@poml:discovery {
+  
+  @initial_observation {
+    symptom: "Tests failing in CI/CD"
+    investigation: "Local tests also fail"
+    pattern: "All failures involve file I/O"
+  }
+  
+  @root_cause_analysis {
+    step1: "Identified MissingPluginException"
+    step2: "Traced to path_provider calls"
+    step3: "Confirmed platform channel issue"
+    step4: "Validated with Flutter documentation"
+  }
+  
+  @solution_exploration {
+    option1: {
+      approach: "Mock platform channels"
+      result: "Complex, brittle, maintenance burden"
+      decision: "Rejected"
+    }
+    
+    option2: {
+      approach: "Integration tests only"
+      result: "Slow, requires devices/emulators"
+      decision: "Rejected"
+    }
+    
+    option3: {
+      approach: "Abstract file system, use mocks"
+      result: "Clean, testable, maintainable"
+      decision: "Accepted"
+    }
+  }
+}
+
+## Impact Analysis
+@poml:impact {
+  
+  @immediate {
+    development: "Blocked feature development"
+    testing: "Cannot validate code"
+    deployment: "Cannot release updates"
+  }
+  
+  @ongoing {
+    quality: "Accumulating untested code"
+    risk: "Hidden bugs in production"
+    morale: "Developer frustration"
+  }
+  
+  @future {
+    scalability: "Cannot add cloud features"
+    competition: "Falling behind competitors"
+    users: "Missing expected features"
+  }
+}
+
+## Solution Requirements
+@poml:requirements {
+  
+  @must_have {
+    tests: "All 571 tests must pass"
+    offline: "Maintain offline capability"
+    data: "No data loss during migration"
+    users: "Zero disruption to users"
+  }
+  
+  @should_have {
+    cloud: "Add cloud synchronization"
+    backup: "Automatic cloud backup"
+    devices: "Multi-device support"
+    sharing: "Receipt sharing capability"
+  }
+  
+  @nice_to_have {
+    realtime: "Live collaboration"
+    analytics: "Usage insights"
+    ml: "Smart categorization"
+  }
+}
+
+## Key Insight
+@poml:insight {
+  realization: "Tests define the specification"
+  principle: "Tests aren't made to fit code, code is made to fit tests"
+  implication: "Architecture must change to support testing"
+  
+  @paradigm_shift {
+    from: "Offline-first with local files"
+    to: "Hybrid cloud with local cache"
+    benefit: "Best of both worlds"
+  }
+}

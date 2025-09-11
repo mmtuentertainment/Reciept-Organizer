@@ -1,0 +1,662 @@
+# Revised Migration Plan: Infrastructure Enablement for Hybrid Cloud
+@poml:meta {
+  type: "migration-plan-v2"
+  version: "2.0.0"
+  created: "2025-01-11"
+  paradigm: "Infrastructure enablement, not architecture change"
+  approach: "Parallel tracks with continuous delivery"
+}
+
+## Executive Summary
+@poml:summary {
+  
+  @core_insight {
+    old_view: "Migrating from offline-first to hybrid cloud"
+    new_view: "Enabling the infrastructure our PRD already assumes"
+    implication: "Not changing the product, just making it work as designed"
+  }
+  
+  @key_changes {
+    mindset: "From sequential migration to parallel enablement"
+    timeline: "From 17 days linear to 3 parallel tracks over 10-14 days"
+    risk: "From high (architecture change) to medium (infrastructure setup)"
+    approach: "From big bang to continuous delivery"
+  }
+  
+  @outcomes {
+    immediate: "Unblock development with passing tests"
+    short_term: "Enable all PRD epics to be built correctly"
+    long_term: "Sustainable hybrid cloud platform"
+  }
+}
+
+## Three-Track Parallel Approach
+@poml:tracks {
+  
+  @track_1_test_infrastructure {
+    name: "Development Enablement"
+    duration: "2-3 days"
+    blockers_removed: "131 test failures"
+    enables: "All development work can proceed"
+    
+    tasks: [
+      "Create IReceiptRepository interface",
+      "Create IImageStorageService interface", 
+      "Implement MockReceiptRepository",
+      "Implement MockImageStorageService",
+      "Fix SharedPreferences provider issues",
+      "Update all test files to use mocks",
+      "Verify all 571 tests pass"
+    ]
+    
+    deliverable: "Green CI/CD pipeline"
+    owner: "Senior Developer"
+    priority: "P0 - Blocks everything"
+  }
+  
+  @track_2_cloud_infrastructure {
+    name: "Platform Foundation"
+    duration: "3-4 days"
+    blockers_removed: "No cloud backend"
+    enables: "Epics 1-5 can be built as designed"
+    
+    tasks: [
+      "Create Supabase project",
+      "Design PostgreSQL schema",
+      "Configure row-level security",
+      "Setup storage buckets",
+      "Configure auth providers",
+      "Setup Vercel project",
+      "Deploy API endpoints",
+      "Configure rate limiting"
+    ]
+    
+    deliverable: "Operational cloud platform"
+    owner: "DevOps Engineer"
+    priority: "P0 - Core infrastructure"
+    
+    can_start: "Immediately (parallel with Track 1)"
+  }
+  
+  @track_3_implementation_bridge {
+    name: "Code Integration"
+    duration: "5-7 days"
+    depends_on: "Track 1 interfaces complete"
+    enables: "Hybrid operation"
+    
+    tasks: [
+      "Implement HybridReceiptRepository",
+      "Implement CloudImageStorageService",
+      "Create SyncQueueService",
+      "Implement conflict resolution",
+      "Add feature flags",
+      "Create migration utilities",
+      "Implement dual-write pattern"
+    ]
+    
+    deliverable: "Working hybrid system"
+    owner: "Full Stack Developer"
+    priority: "P1 - Enables features"
+    
+    starts_when: "Track 1 interfaces ready (Day 2)"
+  }
+}
+
+## Detailed Phase Breakdown
+@poml:phases {
+  
+  @phase_0_preparation {
+    name: "Pre-Migration Preparation"
+    duration: "Day 0 (Before official start)"
+    parallel: true
+    
+    activities: {
+      planning: [
+        "Team alignment on new approach",
+        "Resource allocation",
+        "Environment setup",
+        "Tool installation"
+      ]
+      
+      administrative: [
+        "Create Supabase account",
+        "Setup Vercel account",
+        "Configure GitHub Actions",
+        "Setup monitoring"
+      ]
+    }
+    
+    exit_criteria: [
+      "All team members understand parallel approach",
+      "Development environments ready",
+      "Cloud accounts created"
+    ]
+  }
+  
+  @phase_1_foundation {
+    name: "Foundation Layer"
+    duration: "Days 1-3"
+    tracks: ["Track 1", "Track 2 start"]
+    
+    @track_1_deliverables {
+      day_1: {
+        morning: [
+          "Repository interfaces defined",
+          "Service interfaces defined",
+          "Provider patterns established"
+        ]
+        afternoon: [
+          "Mock implementations started",
+          "Test helper utilities created",
+          "First 10 tests converted to mocks"
+        ]
+      }
+      
+      day_2: {
+        morning: [
+          "SharedPreferences mock complete",
+          "ImageStorage mock complete", 
+          "50% of tests using mocks"
+        ]
+        afternoon: [
+          "Provider overrides working",
+          "Test fixture system complete",
+          "75% of tests passing"
+        ]
+      }
+      
+      day_3: {
+        morning: [
+          "All test conversions complete",
+          "CI/CD pipeline green",
+          "Test execution < 2 minutes"
+        ]
+        afternoon: [
+          "Documentation updated",
+          "Developer guide written",
+          "Team training on new patterns"
+        ]
+      }
+    }
+    
+    @track_2_deliverables {
+      day_1: {
+        tasks: [
+          "Supabase project created",
+          "Database schema designed",
+          "Initial tables created",
+          "RLS policies drafted"
+        ]
+      }
+      
+      day_2: {
+        tasks: [
+          "Storage buckets configured",
+          "Auth providers setup",
+          "API endpoints scaffolded",
+          "Environment variables configured"
+        ]
+      }
+      
+      day_3: {
+        tasks: [
+          "Vercel deployment complete",
+          "OAuth endpoints working",
+          "Rate limiting configured",
+          "Monitoring enabled"
+        ]
+      }
+    }
+  }
+  
+  @phase_2_integration {
+    name: "Integration Layer"
+    duration: "Days 4-7"
+    tracks: ["Track 3 primary", "Track 2 continues"]
+    
+    @hybrid_implementation {
+      day_4: {
+        focus: "Repository Pattern Implementation"
+        tasks: [
+          "HybridReceiptRepository created",
+          "Strategy pattern for online/offline",
+          "Fallback logic implemented",
+          "Unit tests for hybrid behavior"
+        ]
+      }
+      
+      day_5: {
+        focus: "Sync Engine Core"
+        tasks: [
+          "SyncQueue table created",
+          "Queue service implemented",
+          "Retry logic with exponential backoff",
+          "Conflict detection algorithm"
+        ]
+      }
+      
+      day_6: {
+        focus: "Real-time Subscriptions"
+        tasks: [
+          "Supabase realtime connected",
+          "Change detection implemented",
+          "Optimistic updates working",
+          "Subscription management"
+        ]
+      }
+      
+      day_7: {
+        focus: "Feature Flags & Safety"
+        tasks: [
+          "Feature flag system implemented",
+          "Gradual rollout configuration",
+          "Kill switch implemented",
+          "Metrics collection started"
+        ]
+      }
+    }
+  }
+  
+  @phase_3_validation {
+    name: "Validation & Optimization"
+    duration: "Days 8-10"
+    focus: "Quality assurance and performance"
+    
+    activities: {
+      testing: [
+        "End-to-end testing with hybrid mode",
+        "Load testing sync engine",
+        "Offline/online transition testing",
+        "Conflict resolution validation"
+      ]
+      
+      optimization: [
+        "Query optimization",
+        "Cache tuning",
+        "Sync batch sizing",
+        "Image compression settings"
+      ]
+      
+      documentation: [
+        "Architecture documentation",
+        "Runbook creation",
+        "Troubleshooting guide",
+        "API documentation"
+      ]
+    }
+  }
+  
+  @phase_4_data_migration {
+    name: "User Data Migration"
+    duration: "Days 11-12"
+    approach: "Batch processing with validation"
+    
+    @migration_strategy {
+      segmentation: [
+        "Internal test users first",
+        "Beta users (10%)",
+        "Gradual rollout (25%, 50%, 100%)"
+      ]
+      
+      process: [
+        "Export local SQLite data",
+        "Transform to cloud schema",
+        "Upload to Supabase",
+        "Verify with checksums",
+        "Update sync markers"
+      ]
+      
+      safety: [
+        "Backup before migration",
+        "Rollback capability",
+        "Data validation reports",
+        "User notification system"
+      ]
+    }
+  }
+  
+  @phase_5_rollout {
+    name: "Production Rollout"
+    duration: "Days 13-14"
+    approach: "Canary deployment with monitoring"
+    
+    stages: {
+      canary: {
+        percentage: "5%"
+        duration: "4 hours"
+        metrics: ["Error rate", "Sync success", "Performance"]
+        rollback_triggers: ["Error rate > 1%", "Sync failures > 5%"]
+      }
+      
+      staged: {
+        waves: ["5%", "25%", "50%", "100%"]
+        wait_between: "2 hours"
+        monitoring: "Real-time dashboards"
+        support: "Tier 1 on standby"
+      }
+    }
+  }
+}
+
+## Epic Enablement Mapping
+@poml:epic_enablement {
+  
+  @epic_1_capture {
+    epic: "Capture & Extract"
+    enabled_by: [
+      "Track 1: Mock services for testing",
+      "Track 2: Supabase Storage for images",
+      "Track 3: Hybrid repository for dual save"
+    ]
+    
+    implementation_notes: [
+      "Capture saves locally first (fast)",
+      "Background upload to cloud",
+      "Smart cache management",
+      "Progress indicators for sync"
+    ]
+  }
+  
+  @epic_2_review {
+    epic: "Review & Correct"
+    enabled_by: [
+      "Track 2: Real-time subscriptions",
+      "Track 3: Conflict resolution",
+      "Track 3: Optimistic updates"
+    ]
+    
+    implementation_notes: [
+      "Edits apply locally immediately",
+      "Sync to cloud in background",
+      "Other devices receive updates",
+      "Conflict UI if needed"
+    ]
+  }
+  
+  @epic_3_export {
+    epic: "Organize & Export"
+    enabled_by: [
+      "Track 2: Vercel API endpoints",
+      "Track 2: PostgreSQL queries",
+      "Track 3: Hybrid data access"
+    ]
+    
+    implementation_notes: [
+      "Export from cloud when online",
+      "Fall back to local cache if offline",
+      "Validation via Vercel API",
+      "QuickBooks/Xero integration ready"
+    ]
+  }
+  
+  @epic_4_settings {
+    epic: "Settings & Support"
+    enabled_by: [
+      "Track 1: Settings persistence mocks",
+      "Track 3: Sync preferences",
+      "Track 3: Cache management"
+    ]
+    
+    implementation_notes: [
+      "Settings sync across devices",
+      "Cache size limits configurable",
+      "Sync frequency adjustable",
+      "Storage metrics visible"
+    ]
+  }
+  
+  @epic_5_collaboration {
+    epic: "Cross-Device & Collaboration"
+    enabled_by: [
+      "Track 2: Supabase Auth",
+      "Track 2: RLS for sharing",
+      "Track 3: Real-time sync"
+    ]
+    
+    implementation_notes: [
+      "Multi-device from day one",
+      "Sharing via signed URLs",
+      "Team workspaces ready",
+      "Comments with real-time updates"
+    ]
+  }
+}
+
+## Risk Mitigation Strategies
+@poml:risks {
+  
+  @technical_risks {
+    test_failures_persist: {
+      probability: "Low"
+      impact: "High"
+      mitigation: [
+        "Incremental test fixing",
+        "Pair programming on complex tests",
+        "Fall back to integration tests temporarily"
+      ]
+    }
+    
+    cloud_service_issues: {
+      probability: "Medium"
+      impact: "Medium"
+      mitigation: [
+        "Multi-region Supabase setup",
+        "Vercel edge deployment",
+        "Local fallback always available"
+      ]
+    }
+    
+    sync_conflicts: {
+      probability: "Medium"
+      impact: "Low"
+      mitigation: [
+        "Last-write-wins with history",
+        "Conflict resolution UI",
+        "Audit log for recovery"
+      ]
+    }
+  }
+  
+  @operational_risks {
+    team_availability: {
+      probability: "Medium"
+      impact: "Medium"
+      mitigation: [
+        "Cross-training on all tracks",
+        "Documentation as we go",
+        "Daily standups for coordination"
+      ]
+    }
+    
+    user_disruption: {
+      probability: "Low"
+      impact: "High"
+      mitigation: [
+        "Feature flags for control",
+        "Gradual rollout",
+        "Instant rollback capability",
+        "Clear communication"
+      ]
+    }
+  }
+}
+
+## Success Metrics
+@poml:metrics {
+  
+  @development_metrics {
+    test_suite: {
+      baseline: "440/571 passing (77%)"
+      target: "571/571 passing (100%)"
+      measurement: "CI/CD dashboard"
+    }
+    
+    test_execution: {
+      baseline: "5+ minutes"
+      target: "< 2 minutes"
+      measurement: "GitHub Actions timing"
+    }
+    
+    code_coverage: {
+      baseline: "Unknown"
+      target: "> 95%"
+      measurement: "Coverage reports"
+    }
+  }
+  
+  @infrastructure_metrics {
+    api_response: {
+      target: "< 200ms p95"
+      measurement: "Vercel Analytics"
+    }
+    
+    sync_latency: {
+      target: "< 5 seconds"
+      measurement: "Supabase metrics"
+    }
+    
+    storage_efficiency: {
+      target: "< 50MB local cache"
+      measurement: "App telemetry"
+    }
+  }
+  
+  @user_metrics {
+    migration_success: {
+      target: "100% data migrated"
+      measurement: "Migration dashboard"
+    }
+    
+    sync_reliability: {
+      target: "> 99.9%"
+      measurement: "Sync success rate"
+    }
+    
+    user_satisfaction: {
+      target: "No degradation"
+      measurement: "App store ratings"
+    }
+  }
+}
+
+## Communication Plan
+@poml:communication {
+  
+  @internal {
+    daily_standups: {
+      format: "15-minute sync"
+      focus: "Track coordination"
+      participants: "All track owners"
+    }
+    
+    progress_updates: {
+      frequency: "End of day"
+      channel: "Slack #migration"
+      format: "Metrics dashboard"
+    }
+    
+    blockers: {
+      escalation: "Immediate"
+      channel: "Direct message to PM"
+      resolution: "Same day"
+    }
+  }
+  
+  @external {
+    user_notification: {
+      timing: "1 week before rollout"
+      message: "Exciting new features coming"
+      focus: "Benefits, not technical details"
+    }
+    
+    beta_recruitment: {
+      timing: "Day 8"
+      target: "Power users"
+      incentive: "Early access to web dashboard"
+    }
+    
+    support_preparation: {
+      timing: "Day 10"
+      materials: "FAQ, troubleshooting guide"
+      training: "2-hour session"
+    }
+  }
+}
+
+## Continuous Delivery Approach
+@poml:continuous_delivery {
+  
+  @principle {
+    statement: "Ship working software daily"
+    rationale: "Reduce risk, get feedback, maintain momentum"
+  }
+  
+  @daily_deployments {
+    day_1: "Interfaces merged, mocks in test branch"
+    day_2: "50% tests passing in CI"
+    day_3: "All tests green, merge to main"
+    day_4: "Hybrid repository in feature flag"
+    day_5: "Sync engine behind flag"
+    day_6: "Real-time updates for internal testing"
+    day_7: "Feature flags in production"
+    day_8: "Beta users enabled"
+    day_9: "Performance optimizations deployed"
+    day_10: "Monitoring dashboards live"
+  }
+  
+  @rollback_strategy {
+    feature_flags: "Instant disable"
+    code_rollback: "Previous version in 5 minutes"
+    data_rollback: "Restore from backup in 1 hour"
+  }
+}
+
+## Key Differences from V1
+@poml:differences {
+  
+  @philosophical {
+    v1: "We're changing the architecture"
+    v2: "We're enabling what was always intended"
+    impact: "Less risk, clearer purpose"
+  }
+  
+  @tactical {
+    v1: "Sequential 17-day migration"
+    v2: "Parallel 10-14 day enablement"
+    impact: "Faster delivery, reduced dependencies"
+  }
+  
+  @technical {
+    v1: "Migrate from offline to online"
+    v2: "Enable hybrid from the start"
+    impact: "No architectural debt"
+  }
+  
+  @organizational {
+    v1: "Migration team"
+    v2: "Three parallel tracks"
+    impact: "Better resource utilization"
+  }
+}
+
+## Conclusion
+@poml:conclusion {
+  
+  @summary {
+    approach: "Parallel tracks, not sequential phases"
+    timeline: "10-14 days, not 17"
+    risk: "Medium, not high"
+    outcome: "PRD-compliant system from day one"
+  }
+  
+  @key_insight {
+    message: "This isn't a migration, it's an enablement"
+    implication: "We're not changing what we built, we're making it possible to build what we designed"
+  }
+  
+  @call_to_action {
+    immediate: "Start all three tracks Monday"
+    focus: "Tests green by Wednesday"
+    goal: "Beta users on hybrid by week 2"
+  }
+}

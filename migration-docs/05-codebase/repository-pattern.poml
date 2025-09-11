@@ -1,0 +1,458 @@
+# Repository Pattern Implementation
+@poml:meta {
+  type: "code-pattern"
+  version: "1.0.0"
+  created: "2025-01-11"
+  pattern: "Repository with Strategy"
+}
+
+## Pattern Overview
+@poml:pattern {
+  
+  @purpose {
+    abstraction: "Decouple data access from business logic"
+    testing: "Enable mock implementations"
+    flexibility: "Switch between local/cloud/hybrid"
+  }
+  
+  @components {
+    interface: "IReceiptRepository - Contract"
+    local: "LocalReceiptRepository - SQLite"
+    cloud: "CloudReceiptRepository - Supabase"
+    mock: "MockReceiptRepository - Testing"
+    hybrid: "HybridReceiptRepository - Strategy"
+  }
+}
+
+## Interface Definition
+@poml:interface {
+  
+  @contract {
+    ```dart
+    // lib/core/repositories/interfaces/i_receipt_repository.dart
+    
+    abstract class IReceiptRepository {
+      // Read operations
+      Future<List<Receipt>> getAllReceipts({bool excludeDeleted = true});
+      Future<Receipt?> getReceiptById(String id);
+      Future<List<Receipt>> getReceiptsByDateRange(
+        DateTime start,
+        DateTime end,
+      );
+      Future<List<Receipt>> getReceiptsByBatchId(String batchId);
+      Future<int> getReceiptCount({bool excludeDeleted = true});
+      
+      // Write operations
+      Future<Receipt> createReceipt(Receipt receipt);
+      Future<void> updateReceipt(Receipt receipt);
+      Future<void> deleteReceipt(String id);
+      Future<void> deleteReceipts(List<String> ids);
+      
+      // Sync operations
+      Future<List<Receipt>> getUnsyncedReceipts();
+      Future<void> markAsSynced(List<String> ids);
+      Future<void> updateSyncVersion(String id, int version);
+    }
+    ```
+  }
+}
+
+## Local Implementation
+@poml:local {
+  
+  @sqlite_repository {
+    ```dart
+    // lib/data/repositories/local_receipt_repository.dart
+    
+    class LocalReceiptRepository implements IReceiptRepository {
+      static const String _tableName = 'receipts';
+      Database? _database;
+      
+      Future<Database> get database async {
+        _database ??= await _initDatabase();
+        return _database!;
+      }
+      
+      Future<Database> _initDatabase() async {
+        final path = join(await getDatabasesPath(), 'receipts.db');
+        
+        return await openDatabase(
+          path,
+          version: 1,
+          onCreate: (db, version) async {
+            await db.execute('''
+              CREATE TABLE $_tableName (
+                id TEXT PRIMARY KEY,
+                merchant_name TEXT,
+                receipt_date TEXT,
+                total_amount REAL,
+                tax_amount REAL,
+                image_uri TEXT,
+                sync_status TEXT DEFAULT 'pending',
+                sync_version INTEGER DEFAULT 0,
+                created_at TEXT,
+                updated_at TEXT
+              )
+            ''');
+            
+            // Performance indexes
+            await db.execute(
+              'CREATE INDEX idx_sync ON $_tableName (sync_status, updated_at)'
+            );
+            await db.execute(
+              'CREATE INDEX idx_date ON $_tableName (receipt_date)'
+            );
+          },
+        );
+      }
+      
+      @override
+      Future<List<Receipt>> getAllReceipts({bool excludeDeleted = true}) async {
+        final db = await database;
+        final maps = await db.query(
+          _tableName,
+          orderBy: 'created_at DESC',
+        );
+        
+        return maps.map((map) => Receipt.fromJson(map)).toList();
+      }
+      
+      @override
+      Future<Receipt> createReceipt(Receipt receipt) async {
+        final db = await database;
+        
+        final id = receipt.id ?? const Uuid().v4();
+        final now = DateTime.now().toIso8601String();
+        
+        final data = {
+          ...receipt.toJson(),
+          'id': id,
+          'created_at': now,
+          'updated_at': now,
+          'sync_status': 'pending',
+        };
+        
+        await db.insert(_tableName, data);
+        
+        return receipt.copyWith(id: id);
+      }
+      
+      @override
+      Future<List<Receipt>> getUnsyncedReceipts() async {
+        final db = await database;
+        final maps = await db.query(
+          _tableName,
+          where: 'sync_status = ?',
+          whereArgs: ['pending'],
+          orderBy: 'updated_at ASC',
+          limit: 100,
+        );
+        
+        return maps.map((map) => Receipt.fromJson(map)).toList();
+      }
+    }
+    ```
+  }
+}
+
+## Cloud Implementation
+@poml:cloud {
+  
+  @supabase_repository {
+    ```dart
+    // lib/data/repositories/cloud_receipt_repository.dart
+    
+    class CloudReceiptRepository implements IReceiptRepository {
+      final SupabaseClient _supabase;
+      
+      CloudReceiptRepository(this._supabase);
+      
+      @override
+      Future<List<Receipt>> getAllReceipts({bool excludeDeleted = true}) async {
+        var query = _supabase
+          .from('receipts')
+          .select()
+          .eq('user_id', _supabase.auth.currentUser!.id)
+          .order('created_at', ascending: false);
+        
+        if (excludeDeleted) {
+          query = query.is_('deleted_at', null);
+        }
+        
+        final response = await query;
+        
+        return (response as List)
+          .map((json) => Receipt.fromJson(json))
+          .toList();
+      }
+      
+      @override
+      Future<Receipt> createReceipt(Receipt receipt) async {
+        final data = {
+          ...receipt.toJson(),
+          'user_id': _supabase.auth.currentUser!.id,
+          'sync_version': 1,
+        };
+        
+        final response = await _supabase
+          .from('receipts')
+          .insert(data)
+          .select()
+          .single();
+        
+        return Receipt.fromJson(response);
+      }
+      
+      @override
+      Future<void> deleteReceipt(String id) async {
+        // Soft delete
+        await _supabase
+          .from('receipts')
+          .update({'deleted_at': DateTime.now().toIso8601String()})
+          .eq('id', id);
+      }
+      
+      // Batch operations for efficiency
+      Future<void> createBatch(List<Receipt> receipts) async {
+        final data = receipts.map((r) => {
+          ...r.toJson(),
+          'user_id': _supabase.auth.currentUser!.id,
+        }).toList();
+        
+        await _supabase
+          .from('receipts')
+          .insert(data);
+      }
+    }
+    ```
+  }
+}
+
+## Mock Implementation
+@poml:mock {
+  
+  @test_repository {
+    ```dart
+    // test/mocks/mock_receipt_repository.dart
+    
+    class MockReceiptRepository implements IReceiptRepository {
+      final List<Receipt> _receipts = [];
+      final Map<String, int> _syncVersions = {};
+      
+      // Simulate network delay
+      Future<void> _simulateDelay() async {
+        await Future.delayed(const Duration(milliseconds: 10));
+      }
+      
+      @override
+      Future<List<Receipt>> getAllReceipts({bool excludeDeleted = true}) async {
+        await _simulateDelay();
+        
+        return List.from(_receipts.where((r) => 
+          !excludeDeleted || r.deletedAt == null
+        ));
+      }
+      
+      @override
+      Future<Receipt> createReceipt(Receipt receipt) async {
+        await _simulateDelay();
+        
+        final newReceipt = receipt.copyWith(
+          id: receipt.id ?? const Uuid().v4(),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        
+        _receipts.add(newReceipt);
+        _syncVersions[newReceipt.id!] = 1;
+        
+        return newReceipt;
+      }
+      
+      @override
+      Future<void> deleteReceipt(String id) async {
+        await _simulateDelay();
+        _receipts.removeWhere((r) => r.id == id);
+      }
+      
+      // Test helpers
+      void addTestReceipt(Receipt receipt) {
+        _receipts.add(receipt);
+      }
+      
+      void clearAll() {
+        _receipts.clear();
+        _syncVersions.clear();
+      }
+      
+      int get receiptCount => _receipts.length;
+    }
+    ```
+  }
+}
+
+## Hybrid Strategy Implementation
+@poml:hybrid {
+  
+  @strategy_pattern {
+    ```dart
+    // lib/data/repositories/hybrid_receipt_repository.dart
+    
+    class HybridReceiptRepository implements IReceiptRepository {
+      final LocalReceiptRepository _local;
+      final CloudReceiptRepository _cloud;
+      final ConnectivityService _connectivity;
+      final SyncQueueService _syncQueue;
+      final FeatureFlags _featureFlags;
+      
+      HybridReceiptRepository({
+        required LocalReceiptRepository local,
+        required CloudReceiptRepository cloud,
+        required ConnectivityService connectivity,
+        required SyncQueueService syncQueue,
+        required FeatureFlags featureFlags,
+      }) : _local = local,
+           _cloud = cloud,
+           _connectivity = connectivity,
+           _syncQueue = syncQueue,
+           _featureFlags = featureFlags;
+      
+      @override
+      Future<List<Receipt>> getAllReceipts({bool excludeDeleted = true}) async {
+        // Check if cloud sync is enabled
+        if (!_featureFlags.isEnabled('cloud_sync')) {
+          return _local.getAllReceipts(excludeDeleted: excludeDeleted);
+        }
+        
+        // Check connectivity
+        if (await _connectivity.isOnline()) {
+          try {
+            // Fetch from cloud
+            final cloudReceipts = await _cloud.getAllReceipts(
+              excludeDeleted: excludeDeleted,
+            );
+            
+            // Update local cache
+            await _local.cacheReceipts(cloudReceipts);
+            
+            return cloudReceipts;
+          } catch (e) {
+            // Fall back to local on cloud failure
+            print('Cloud fetch failed, using local: $e');
+            return _local.getAllReceipts(excludeDeleted: excludeDeleted);
+          }
+        }
+        
+        // Offline - use local
+        return _local.getAllReceipts(excludeDeleted: excludeDeleted);
+      }
+      
+      @override
+      Future<Receipt> createReceipt(Receipt receipt) async {
+        // Always save locally first (fast, reliable)
+        final localReceipt = await _local.createReceipt(receipt);
+        
+        // Check if dual-write is enabled
+        if (_featureFlags.isEnabled('dual_write')) {
+          // Attempt cloud save
+          if (await _connectivity.isOnline()) {
+            try {
+              await _cloud.createReceipt(localReceipt);
+              await _local.markAsSynced([localReceipt.id!]);
+            } catch (e) {
+              // Queue for later sync
+              _syncQueue.enqueue(
+                SyncOperation.create(localReceipt),
+              );
+            }
+          } else {
+            // Queue for later sync
+            _syncQueue.enqueue(
+              SyncOperation.create(localReceipt),
+            );
+          }
+        }
+        
+        return localReceipt;
+      }
+      
+      @override
+      Future<void> deleteReceipt(String id) async {
+        // Delete locally
+        await _local.deleteReceipt(id);
+        
+        // Queue cloud delete if enabled
+        if (_featureFlags.isEnabled('cloud_sync')) {
+          _syncQueue.enqueue(
+            SyncOperation.delete(id),
+          );
+        }
+      }
+      
+      // Sync management
+      Future<void> syncPendingChanges() async {
+        if (!await _connectivity.isOnline()) return;
+        
+        final unsynced = await _local.getUnsyncedReceipts();
+        
+        for (final receipt in unsynced) {
+          try {
+            await _cloud.createReceipt(receipt);
+            await _local.markAsSynced([receipt.id!]);
+          } catch (e) {
+            print('Sync failed for ${receipt.id}: $e');
+          }
+        }
+      }
+    }
+    ```
+  }
+}
+
+## Provider Configuration
+@poml:providers {
+  
+  @riverpod_setup {
+    ```dart
+    // lib/core/providers/repository_providers.dart
+    
+    // Local repository
+    final localRepositoryProvider = Provider<LocalReceiptRepository>((ref) {
+      return LocalReceiptRepository();
+    });
+    
+    // Cloud repository
+    final cloudRepositoryProvider = Provider<CloudReceiptRepository>((ref) {
+      final supabase = ref.watch(supabaseProvider);
+      return CloudReceiptRepository(supabase);
+    });
+    
+    // Hybrid repository (default)
+    final receiptRepositoryProvider = Provider<IReceiptRepository>((ref) {
+      // Check if in test mode
+      if (kDebugMode && Platform.environment['FLUTTER_TEST'] == 'true') {
+        return MockReceiptRepository();
+      }
+      
+      final local = ref.watch(localRepositoryProvider);
+      final cloud = ref.watch(cloudRepositoryProvider);
+      final connectivity = ref.watch(connectivityProvider);
+      final syncQueue = ref.watch(syncQueueProvider);
+      final featureFlags = ref.watch(featureFlagsProvider);
+      
+      return HybridReceiptRepository(
+        local: local,
+        cloud: cloud,
+        connectivity: connectivity,
+        syncQueue: syncQueue,
+        featureFlags: featureFlags,
+      );
+    });
+    
+    // Test override helper
+    final testRepositoryOverride = receiptRepositoryProvider.overrideWithValue(
+      MockReceiptRepository(),
+    );
+    ```
+  }
+}

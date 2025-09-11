@@ -1,0 +1,241 @@
+# Solution Overview: Hybrid Cloud Architecture
+@poml:meta {
+  type: "solution-design"
+  version: "1.0.0"
+  created: "2025-01-11"
+  pattern: "Hybrid cloud with offline-first fallback"
+}
+
+## Solution Architecture
+@poml:solution {
+  
+  @core_pattern {
+    name: "Hybrid Cloud with Local Cache"
+    description: "Local SQLite cache + Supabase cloud sync"
+    
+    @benefits {
+      offline: "Works without internet"
+      online: "Syncs automatically"
+      testing: "Mock-first approach"
+      scalability: "Cloud-native backend"
+    }
+  }
+  
+  @key_components {
+    local: {
+      technology: "SQLite via sqflite"
+      purpose: "Fast local cache"
+      capacity: "Unlimited offline storage"
+    }
+    
+    cloud: {
+      technology: "Supabase PostgreSQL"
+      purpose: "Central truth source"
+      features: ["Auth", "RLS", "Realtime", "Storage"]
+    }
+    
+    sync: {
+      technology: "Custom sync engine"
+      pattern: "Queue-based eventual consistency"
+      conflict: "Last-write-wins with versioning"
+    }
+  }
+}
+
+## How It Solves The Problem
+@poml:problem_solution {
+  
+  @test_failures {
+    problem: "131 tests fail due to path_provider"
+    solution: "Mock services with in-memory storage"
+    
+    @implementation {
+      before: "ImageStorageService uses file system"
+      after: "IImageStorageService interface with MockImageStorageService"
+      result: "Tests run without platform dependencies"
+    }
+  }
+  
+  @architecture_limitations {
+    problem: "Offline-only, single device"
+    solution: "Hybrid cloud, multi-device sync"
+    
+    @transformation {
+      storage: "Local + Cloud"
+      access: "Any device with login"
+      backup: "Automatic to cloud"
+      sharing: "Via cloud permissions"
+    }
+  }
+}
+
+## Implementation Strategy
+@poml:implementation {
+  
+  @phase1_abstraction {
+    duration: "Days 1-2"
+    goal: "Create testable interfaces"
+    
+    @tasks {
+      interfaces: "Define IReceiptRepository, IImageStorageService"
+      mocks: "Implement in-memory mock services"
+      result: "Tests can run without file system"
+    }
+  }
+  
+  @phase2_cloud {
+    duration: "Days 3-4"
+    goal: "Setup Supabase backend"
+    
+    @tasks {
+      database: "Create PostgreSQL schema"
+      auth: "Configure authentication"
+      storage: "Setup image buckets"
+      security: "Implement Row Level Security"
+    }
+  }
+  
+  @phase3_sync {
+    duration: "Days 5-10"
+    goal: "Implement synchronization"
+    
+    @tasks {
+      dual_write: "Write to both local and cloud"
+      sync_engine: "Queue-based sync mechanism"
+      conflict: "Resolution strategies"
+      monitoring: "Sync status tracking"
+    }
+  }
+}
+
+## Technology Stack
+@poml:tech_stack {
+  
+  @frontend {
+    framework: "Flutter 3.24+"
+    state: "Riverpod 2.4+"
+    local_db: "sqflite 2.3.0"
+    testing: "flutter_test + mockito"
+  }
+  
+  @backend {
+    database: "Supabase PostgreSQL"
+    auth: "Supabase Auth"
+    storage: "Supabase Storage"
+    realtime: "Supabase Realtime"
+  }
+  
+  @api {
+    framework: "Next.js 15.5.2"
+    runtime: "Vercel Edge"
+    validation: "Zod schemas"
+    rate_limit: "Upstash Redis"
+  }
+  
+  @deployment {
+    mobile: "App Store + Play Store"
+    api: "Vercel Production"
+    database: "Supabase Cloud"
+    monitoring: "Sentry + Analytics"
+  }
+}
+
+## Data Flow
+@poml:data_flow {
+  
+  @capture_flow {
+    step1: "User captures receipt photo"
+    step2: "OCR processes locally (ML Kit)"
+    step3: "Save to local SQLite"
+    step4: "Queue for cloud sync"
+    step5: "Upload to Supabase when online"
+  }
+  
+  @sync_flow {
+    trigger: "Network available OR timer"
+    pull: "Fetch remote changes"
+    resolve: "Handle conflicts"
+    push: "Send local changes"
+    broadcast: "Notify other devices"
+  }
+  
+  @recovery_flow {
+    detection: "Sync failure detected"
+    queue: "Add to retry queue"
+    backoff: "Exponential delay"
+    retry: "Attempt sync"
+    deadletter: "Move to manual review"
+  }
+}
+
+## Migration Safety
+@poml:safety {
+  
+  @rollback_capability {
+    mechanism: "Feature flags"
+    time: "< 5 minutes"
+    triggers: [
+      "Error rate > 1%",
+      "Performance degradation",
+      "User complaints"
+    ]
+  }
+  
+  @data_integrity {
+    validation: "Checksums on transfer"
+    verification: "Count and content checks"
+    backup: "Pre-migration snapshot"
+    recovery: "Point-in-time restore"
+  }
+  
+  @gradual_rollout {
+    stage1: "5% users for 2 hours"
+    stage2: "25% users for 4 hours"
+    stage3: "50% users for 12 hours"
+    stage4: "100% users permanent"
+  }
+}
+
+## Success Metrics
+@poml:metrics {
+  
+  @immediate {
+    tests: "571/571 passing"
+    build: "Green CI/CD pipeline"
+    deployment: "Successful to production"
+  }
+  
+  @week_1 {
+    sync_rate: "> 99% successful"
+    performance: "No degradation"
+    errors: "< 0.1% rate"
+  }
+  
+  @month_1 {
+    adoption: "> 80% using sync"
+    satisfaction: "> 4.5 rating"
+    support: "< 1% tickets"
+  }
+}
+
+## Key Innovations
+@poml:innovations {
+  
+  @mock_first_testing {
+    concept: "Eliminate file system dependency"
+    implementation: "Interface + Mock pattern"
+    benefit: "100% testable code"
+  }
+  
+  @queue_based_sync {
+    concept: "Resilient synchronization"
+    implementation: "Persistent queue with retry"
+    benefit: "Never lose data"
+  }
+  
+  @feature_flag_migration {
+    concept: "Risk-free deployment"
+    implementation: "Gradual user rollout"
+    benefit: "Instant rollback capability"
+  }
+}

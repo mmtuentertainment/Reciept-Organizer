@@ -1,0 +1,247 @@
+# Master Context: Project Relationships
+@poml:meta {
+  type: "context-map"
+  version: "1.0.0"
+  created: "2025-01-11"
+  purpose: "Comprehensive relationship mapping"
+}
+
+## Project Context
+@poml:context {
+  
+  @project_state {
+    name: "Receipt Organizer MVP"
+    phase: "Epic 3 Complete, Epic 4 Ready"
+    architecture: "Migrating from offline-first to hybrid cloud"
+    
+    @current_issues {
+      test_failures: 131
+      root_cause: "path_provider MissingPluginException"
+      impact: "Cannot deploy, cannot validate changes"
+    }
+  }
+  
+  @business_context {
+    users: ["Small business owners", "Freelancers", "Contractors"]
+    problem: "Receipt management for tax compliance"
+    solution: "OCR-powered receipt capture and export"
+    
+    @personas {
+      sarah: "Freelance designer, 15-20 receipts/month"
+      mike: "Restaurant owner, 100+ receipts/month"
+      linda: "Contractor, needs QuickBooks integration"
+    }
+  }
+}
+
+## Relationship Map
+@poml:relationships {
+  
+  @document_hierarchy {
+    prd: "docs/sharded-prd/ → Requirements"
+    architecture: "docs/sharded-architecture/ → Technical specs"
+    stories: "docs/stories/ → Implementation tasks"
+    qa: "docs/qa/assessments/ → Quality validation"
+    migration: "migration-docs/ → Cloud migration"
+  }
+  
+  @code_relationships {
+    mobile: {
+      location: "apps/mobile/"
+      framework: "Flutter"
+      dependencies: ["Riverpod", "sqflite", "ML Kit"]
+    }
+    
+    api: {
+      location: "apps/api/"
+      framework: "Next.js"
+      dependencies: ["Vercel", "Upstash", "Jose"]
+    }
+  }
+  
+  @data_flow {
+    capture: "Camera → OCR → Local DB"
+    sync: "Local DB ↔ Sync Queue ↔ Supabase"
+    export: "Supabase → Validation → CSV"
+  }
+}
+
+## Technical Discoveries
+@poml:discoveries {
+  
+  @key_findings {
+    finding1: {
+      issue: "path_provider breaks tests"
+      research: "Flutter platform channels"
+      solution: "Mock services pattern"
+      impact: "100% testable code"
+    }
+    
+    finding2: {
+      issue: "Offline-first limits mobile apps"
+      research: "User expectations analysis"
+      solution: "Hybrid cloud architecture"
+      impact: "Cloud features + offline mode"
+    }
+    
+    finding3: {
+      issue: "Sync complexity"
+      research: "PowerSync, Brick frameworks"
+      solution: "Queue-based eventual consistency"
+      impact: "Reliable data synchronization"
+    }
+  }
+  
+  @technology_evaluation {
+    supabase: {
+      version: "2.10.0"
+      strengths: ["Flutter SDK", "Realtime", "RLS"]
+      selection: "Primary cloud backend"
+    }
+    
+    vercel: {
+      version: "Next.js 15.5.2"
+      strengths: ["Edge runtime", "Serverless"]
+      selection: "API deployment platform"
+    }
+    
+    sqlite: {
+      package: "sqflite 2.3.0"
+      strengths: ["Local performance", "Offline capable"]
+      selection: "Local cache layer"
+    }
+  }
+}
+
+## Contextual Patterns
+@poml:patterns {
+  
+  @repository_pattern {
+    purpose: "Abstract data access"
+    implementation: "Interface + Concrete + Mock"
+    
+    @example {
+      interface: "IReceiptRepository"
+      local: "LocalReceiptRepository"
+      cloud: "CloudReceiptRepository"
+      mock: "MockReceiptRepository"
+      hybrid: "HybridReceiptRepository"
+    }
+  }
+  
+  @state_management {
+    pattern: "Riverpod StateNotifier"
+    purpose: "Reactive state updates"
+    
+    @example {
+      provider: "captureProvider"
+      notifier: "CaptureNotifier"
+      state: "CaptureState"
+    }
+  }
+  
+  @sync_pattern {
+    pattern: "Queue + Retry + Conflict Resolution"
+    purpose: "Resilient synchronization"
+    
+    @components {
+      queue: "SyncQueueService"
+      retry: "ExponentialBackoff"
+      conflict: "LastWriteWins"
+    }
+  }
+}
+
+## Integration Points
+@poml:integrations {
+  
+  @quickbooks {
+    auth: "OAuth 2.0"
+    api: "REST v3"
+    validation: "Local + API"
+    export: "CSV format"
+  }
+  
+  @xero {
+    auth: "OAuth 2.0"
+    api: "Accounting API"
+    validation: "Schema based"
+    export: "CSV format"
+  }
+  
+  @ocr {
+    primary: "Google ML Kit"
+    fallback: "TensorFlow Lite"
+    accuracy: "89-92%"
+    processing: "On-device"
+  }
+}
+
+## Migration Context
+@poml:migration {
+  
+  @drivers {
+    technical: "131 test failures blocking development"
+    business: "Users expect cloud features"
+    strategic: "Platform for future growth"
+  }
+  
+  @approach {
+    strategy: "Phased migration with rollback"
+    timeline: "17 days"
+    risk: "Medium with mitigation"
+    validation: "Checkpoints after each phase"
+  }
+  
+  @outcomes {
+    immediate: "All tests passing"
+    short_term: "Cloud sync enabled"
+    long_term: "Platform for scaling"
+  }
+}
+
+## Knowledge Sources
+@poml:sources {
+  
+  @official_docs {
+    flutter: "https://docs.flutter.dev (2025)"
+    supabase: "https://supabase.com/docs (v2.10.0)"
+    vercel: "https://vercel.com/docs (2025)"
+    sqlite: "https://www.sqlite.org/docs.html"
+  }
+  
+  @codebase_examples {
+    capture_provider: "lib/features/capture/providers/capture_provider.dart"
+    receipt_repository: "lib/data/repositories/receipt_repository.dart"
+    test_helpers: "test/helpers/provider_test_helpers.dart"
+    api_validation: "apps/api/app/api/quickbooks/validate/route.ts"
+  }
+  
+  @research {
+    anthropic: "MCP and Contextual Retrieval"
+    patterns: "Repository, Strategy, Queue"
+    frameworks: "PowerSync, Brick evaluation"
+  }
+}
+
+## Cross-References
+@poml:references {
+  
+  @problem_to_solution {
+    from: "00-overview/problem-statement.poml"
+    to: "00-overview/solution-overview.poml"
+    via: "05-codebase/mock-services.poml"
+  }
+  
+  @requirements_to_implementation {
+    from: "docs/sharded-prd/epics.poml"
+    to: "docs/stories/*.story.md"
+    via: "02-architecture/component-architecture.poml"
+  }
+  
+  @plan_to_execution {
+    from: "03-migration-plan/phase-*.poml"
+    to: "04-tech-stack/*.poml"
+    via: "05-codebase/*.poml"
+  }
+}

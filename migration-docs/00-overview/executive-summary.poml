@@ -1,0 +1,176 @@
+# Executive Summary: Hybrid Cloud Migration
+@poml:meta {
+  type: "executive-summary"
+  version: "1.0.0"
+  created: "2025-01-11"
+  audience: "Technical leadership, Development team"
+}
+
+## Migration Overview
+@poml:summary {
+  current_state: "Offline-first Flutter app with 131 failing tests"
+  target_state: "Hybrid cloud architecture with Supabase backend"
+  duration: "17 days"
+  risk_level: "Medium with mitigation strategies"
+  investment: "2 developers, 1 QA, 1 DevOps"
+}
+
+## Business Case
+@poml:business {
+  
+  @problem {
+    test_failures: 131
+    root_cause: "path_provider MissingPluginException in tests"
+    impact: "Cannot validate code changes, blocked deployment"
+    limitation: "Single device only, no cloud backup"
+  }
+  
+  @solution {
+    approach: "Hybrid cloud with offline-first fallback"
+    technology: "Supabase + Vercel + Flutter"
+    benefits: [
+      "Cross-device synchronization",
+      "Cloud backup and recovery",
+      "Collaborative features",
+      "100% testable codebase"
+    ]
+  }
+  
+  @roi {
+    immediate: "Unblock development with passing tests"
+    short_term: "Enable cloud features for users"
+    long_term: "Platform for scaling and collaboration"
+  }
+}
+
+## Technical Approach
+@poml:technical {
+  
+  @strategy {
+    pattern: "Repository pattern with strategy"
+    testing: "Mock-first without file system"
+    sync: "Queue-based eventual consistency"
+    deployment: "Feature flags with canary rollout"
+  }
+  
+  @phases {
+    foundation: "Days 1-2: Create abstraction layer"
+    backend: "Days 3-4: Setup Supabase"
+    implementation: "Days 5-10: Dual-write and sync"
+    testing: "Days 7-8: Fix all 131 tests"
+    deployment: "Days 11-17: Rollout with monitoring"
+  }
+}
+
+## Risk Assessment
+@poml:risks {
+  
+  @identified_risks {
+    data_loss: {
+      probability: "Low"
+      impact: "High"
+      mitigation: "Backups, checksums, validation"
+    }
+    
+    performance: {
+      probability: "Low"
+      impact: "High"
+      mitigation: "Caching, monitoring, rollback"
+    }
+    
+    user_disruption: {
+      probability: "Low"
+      impact: "High"
+      mitigation: "Feature flags, canary deployment"
+    }
+  }
+  
+  @rollback {
+    trigger_conditions: [
+      "Error rate > 1%",
+      "P95 latency > 500ms",
+      "Sync failures > 5%"
+    ]
+    time_to_rollback: "< 5 minutes"
+    mechanism: "Feature flags disable"
+  }
+}
+
+## Success Criteria
+@poml:success {
+  
+  @technical {
+    tests: "571/571 passing (100%)"
+    coverage: "> 95%"
+    performance: "< 200ms API response"
+    reliability: "> 99.9% uptime"
+  }
+  
+  @business {
+    adoption: "> 80% users enable sync"
+    satisfaction: "> 4.5/5 rating"
+    support: "< 1% ticket rate"
+    retention: "No decrease"
+  }
+  
+  @operational {
+    deployment: "< 30 minutes"
+    rollback: "< 5 minutes"
+    recovery: "< 1 hour MTTR"
+  }
+}
+
+## Decision Record
+@poml:decisions {
+  
+  @why_hybrid {
+    reason: "Best of both worlds"
+    benefits: [
+      "Works offline like current app",
+      "Syncs when online for backup",
+      "No user disruption",
+      "Gradual migration possible"
+    ]
+  }
+  
+  @why_supabase {
+    reason: "Optimal for mobile apps"
+    benefits: [
+      "Built-in auth and RLS",
+      "Realtime subscriptions",
+      "PostgreSQL reliability",
+      "Excellent Flutter SDK"
+    ]
+  }
+  
+  @why_mock_first {
+    reason: "Eliminate test failures"
+    benefits: [
+      "No file system dependencies",
+      "Fast test execution",
+      "Predictable test data",
+      "Works in CI/CD"
+    ]
+  }
+}
+
+## Quick Actions
+@poml:actions {
+  start_now: [
+    "Review 00-overview/problem-statement.poml",
+    "Read 03-migration-plan/phase-01-foundation.poml",
+    "Check 05-codebase/mock-services.poml"
+  ]
+  
+  prepare: [
+    "Create Supabase account",
+    "Setup Vercel project",
+    "Review test failures"
+  ]
+  
+  communicate: [
+    "Team standup announcement",
+    "User notification draft",
+    "Success metrics dashboard"
+  ]
+}

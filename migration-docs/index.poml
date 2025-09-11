@@ -1,0 +1,169 @@
+# Migration Documentation: Source of Truth Tree
+@poml:meta {
+  type: "index"
+  version: "1.0.0"
+  created: "2025-01-11"
+  purpose: "Master navigation for hybrid cloud migration documentation"
+  structure: "Sharded sequential documents"
+}
+
+## Document Structure
+@poml:structure {
+  format: "Sequential numbered directories"
+  pattern: "00-99 prefix for ordering"
+  extension: ".poml for all documents"
+}
+
+## Navigation Tree
+@poml:navigation {
+  
+  ## 00-overview
+  @section:overview {
+    purpose: "Executive summary and quick reference"
+    documents: [
+      "index.poml - This navigation file",
+      "executive-summary.poml - Migration overview",
+      "problem-statement.poml - 131 test failures root cause",
+      "solution-overview.poml - Hybrid cloud approach"
+    ]
+  }
+  
+  ## 01-knowledge-base
+  @section:knowledge {
+    purpose: "Comprehensive knowledge and research"
+    documents: [
+      "master-context.poml - Project relationships",
+      "technology-stack.poml - Flutter, Supabase, Vercel, SQLite",
+      "codebase-patterns.poml - Repository, State, Mock patterns",
+      "known-issues.poml - path_provider and workarounds",
+      "testing-evolution.poml - From file-based to mock-first"
+    ]
+  }
+  
+  ## 02-architecture
+  @section:architecture {
+    purpose: "Technical architecture specifications"
+    documents: [
+      "current-state.poml - Offline-first limitations",
+      "target-state.poml - Hybrid cloud benefits",
+      "component-architecture.poml - Layers and patterns",
+      "data-flow.poml - Sync and queue mechanisms",
+      "security-model.poml - Auth and encryption"
+    ]
+  }
+  
+  ## 03-migration-plan
+  @section:migration {
+    purpose: "17-day phased implementation"
+    phases: [
+      "phase-01-foundation.poml - Days 1-2: Abstraction layer",
+      "phase-02-supabase.poml - Days 3-4: Cloud setup",
+      "phase-03-dual-write.poml - Days 5-6: Parallel persistence",
+      "phase-04-test-migration.poml - Days 7-8: Fix 131 tests",
+      "phase-05-sync-engine.poml - Days 9-10: Bidirectional sync",
+      "phase-06-feature-flags.poml - Days 11-12: Controlled rollout",
+      "phase-07-migration-tools.poml - Days 13-14: Data migration",
+      "phase-08-performance.poml - Day 15: Optimization",
+      "phase-09-error-recovery.poml - Day 16: Resilience",
+      "phase-10-rollout.poml - Day 17: Production deployment"
+    ]
+  }
+  
+  ## 04-tech-stack
+  @section:tech-stack {
+    purpose: "Technology specifications and configurations"
+    documents: [
+      "flutter-dart.poml - v3.24+ patterns and Riverpod",
+      "supabase.poml - v2.10.0 PostgreSQL, Auth, Storage",
+      "vercel.poml - Next.js 15.5.2 Edge Runtime",
+      "sqlite.poml - Local caching with sqflite",
+      "integration-points.poml - OAuth, CSV, APIs"
+    ]
+  }
+  
+  ## 05-codebase
+  @section:codebase {
+    purpose: "Real code examples and implementations"
+    documents: [
+      "repository-pattern.poml - IReceiptRepository examples",
+      "state-management.poml - Riverpod StateNotifier",
+      "mock-services.poml - Testing without file system",
+      "sync-implementation.poml - Queue and conflict resolution",
+      "migration-scripts.poml - Data transfer utilities"
+    ]
+  }
+}
+
+## Reading Order
+@poml:sequence {
+  quickstart: [
+    "00-overview/executive-summary.poml",
+    "00-overview/problem-statement.poml",
+    "03-migration-plan/phase-01-foundation.poml"
+  ]
+  
+  deep-dive: [
+    "01-knowledge-base/master-context.poml",
+    "02-architecture/target-state.poml",
+    "All phase documents in order"
+  ]
+  
+  implementation: [
+    "04-tech-stack/flutter-dart.poml",
+    "05-codebase/repository-pattern.poml",
+    "05-codebase/mock-services.poml"
+  ]
+}
+
+## Cross-References
+@poml:references {
+  problem-solution: {
+    from: "00-overview/problem-statement.poml"
+    to: "05-codebase/mock-services.poml"
+    relationship: "path_provider issue → mock implementation"
+  }
+  
+  architecture-implementation: {
+    from: "02-architecture/component-architecture.poml"
+    to: "05-codebase/repository-pattern.poml"
+    relationship: "design → code"
+  }
+  
+  plan-execution: {
+    from: "03-migration-plan/phase-*.poml"
+    to: "04-tech-stack/*.poml"
+    relationship: "tasks → technology"
+  }
+}
+
+## Success Metrics
+@poml:metrics {
+  technical: {
+    tests_passing: "571/571"
+    test_coverage: "> 95%"
+    api_response: "< 200ms p95"
+    sync_time: "< 5s"
+  }
+  
+  business: {
+    downtime: "zero"
+    user_retention: "maintained"
+    feature_adoption: "> 80%"
+    satisfaction: "> 4.5/5"
+  }
+}
+
+## Quick Links
+@poml:links {
+  original_docs: [
+    "../KNOWLEDGE_BASE.md",
+    "../MIGRATION_PLAN.md",
+    "../apps/mobile/docs/architecture.md"
+  ]
+  
+  project_docs: [
+    "../docs/sharded-prd/",
+    "../docs/sharded-architecture/",
+    "../CLAUDE.md"
+  ]
+}

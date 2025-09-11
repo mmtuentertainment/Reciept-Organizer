@@ -1,0 +1,340 @@
+# Supabase Cloud Backend
+@poml:meta {
+  type: "tech-specification"
+  version: "1.0.0"
+  created: "2025-01-11"
+  technology: "Supabase v2.10.0"
+}
+
+## Supabase Overview
+@poml:supabase {
+  
+  @version {
+    sdk: "supabase_flutter 2.10.0"
+    backend: "PostgreSQL 15"
+    features: ["Auth", "Database", "Storage", "Realtime", "Edge Functions"]
+  }
+  
+  @architecture {
+    database: "PostgreSQL with RLS"
+    auth: "GoTrue authentication"
+    storage: "S3-compatible object storage"
+    realtime: "Phoenix channels"
+    api: "PostgREST automatic API"
+  }
+}
+
+## Database Schema
+@poml:database {
+  
+  @receipts_table {
+    ```sql
+    CREATE TABLE receipts (
+      -- Identity
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+      
+      -- Receipt data
+      merchant_name TEXT,
+      receipt_date DATE,
+      total_amount DECIMAL(10,2),
+      tax_amount DECIMAL(10,2),
+      category TEXT,
+      payment_method TEXT,
+      notes TEXT,
+      
+      -- Image references
+      image_url TEXT,
+      thumbnail_url TEXT,
+      
+      -- OCR metadata
+      ocr_confidence FLOAT,
+      ocr_raw_text TEXT,
+      ocr_bounding_boxes JSONB,
+      
+      -- Sync metadata
+      sync_version INTEGER DEFAULT 1,
+      local_id TEXT UNIQUE,
+      last_synced_at TIMESTAMPTZ,
+      
+      -- Timestamps
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      deleted_at TIMESTAMPTZ
+    );
+    
+    -- Indexes for performance
+    CREATE INDEX idx_user_receipts ON receipts(user_id, created_at DESC);
+    CREATE INDEX idx_receipt_date ON receipts(user_id, receipt_date);
+    CREATE INDEX idx_sync_status ON receipts(sync_version, updated_at);
+    CREATE INDEX idx_local_id ON receipts(local_id) WHERE local_id IS NOT NULL;
+    ```
+  }
+  
+  @sync_queue_table {
+    ```sql
+    CREATE TABLE sync_queue (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      user_id UUID REFERENCES auth.users(id),
+      operation_type TEXT NOT NULL, -- CREATE, UPDATE, DELETE
+      entity_type TEXT NOT NULL, -- receipt, image, etc
+      entity_id TEXT NOT NULL,
+      payload JSONB NOT NULL,
+      retry_count INTEGER DEFAULT 0,
+      max_retries INTEGER DEFAULT 3,
+      status TEXT DEFAULT 'pending', -- pending, processing, completed, failed
+      error_message TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      processed_at TIMESTAMPTZ
+    );
+    
+    CREATE INDEX idx_sync_queue_status ON sync_queue(status, created_at);
+    CREATE INDEX idx_sync_queue_user ON sync_queue(user_id, status);
+    ```
+  }
+}
+
+## Row Level Security
+@poml:security {
+  
+  @policies {
+    ```sql
+    -- Enable RLS
+    ALTER TABLE receipts ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE sync_queue ENABLE ROW LEVEL SECURITY;
+    
+    -- Receipts policies
+    CREATE POLICY "Users can view own receipts"
+      ON receipts FOR SELECT
+      USING (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can create own receipts"
+      ON receipts FOR INSERT
+      WITH CHECK (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can update own receipts"
+      ON receipts FOR UPDATE
+      USING (auth.uid() = user_id);
+    
+    CREATE POLICY "Users can soft delete own receipts"
+      ON receipts FOR UPDATE
+      USING (auth.uid() = user_id AND deleted_at IS NULL);
+    
+    -- Sync queue policies
+    CREATE POLICY "Users can manage own sync queue"
+      ON sync_queue FOR ALL
+      USING (auth.uid() = user_id);
+    ```
+  }
+  
+  @authentication {
+    providers: ["Email/Password", "Google", "Apple"]
+    jwt_expiry: "1 hour"
+    refresh_token: "30 days"
+    
+    ```dart
+    // Initialize Supabase
+    await Supabase.initialize(
+      url: 'YOUR_SUPABASE_URL',
+      anonKey: 'YOUR_ANON_KEY',
+      authOptions: FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.pkce,
+        localStorage: SecureLocalStorage(),
+      ),
+    );
+    
+    // Sign in
+    final response = await supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+    
+    // Auto refresh session
+    supabase.auth.onAuthStateChange.listen((data) {
+      final session = data.session;
+      if (session != null) {
+        // Update local auth state
+      }
+    });
+    ```
+  }
+}
+
+## Storage Configuration
+@poml:storage {
+  
+  @buckets {
+    receipts: {
+      public: false
+      file_size_limit: "10MB"
+      allowed_mime_types: ["image/jpeg", "image/png", "application/pdf"]
+    }
+    
+    thumbnails: {
+      public: false
+      file_size_limit: "500KB"
+      allowed_mime_types: ["image/jpeg", "image/png"]
+    }
+  }
+  
+  @implementation {
+    ```dart
+    // Upload image
+    final fileName = '${userId}/${receiptId}.jpg';
+    final response = await supabase.storage
+      .from('receipts')
+      .upload(fileName, imageBytes);
+    
+    // Get signed URL (1 hour expiry)
+    final url = await supabase.storage
+      .from('receipts')
+      .createSignedUrl(fileName, 3600);
+    
+    // Delete image
+    await supabase.storage
+      .from('receipts')
+      .remove([fileName]);
+    ```
+  }
+}
+
+## Realtime Subscriptions
+@poml:realtime {
+  
+  @configuration {
+    ```dart
+    // Subscribe to receipt changes
+    final subscription = supabase
+      .from('receipts')
+      .stream(primaryKey: ['id'])
+      .eq('user_id', userId)
+      .listen((List<Map<String, dynamic>> data) {
+        // Update local cache with changes
+        for (final record in data) {
+          final receipt = Receipt.fromJson(record);
+          _updateLocalCache(receipt);
+        }
+      });
+    
+    // Subscribe to specific events
+    supabase
+      .channel('receipts:${userId}')
+      .on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(
+          event: 'INSERT',
+          schema: 'public',
+          table: 'receipts',
+        ),
+        (payload, [ref]) {
+          final newReceipt = Receipt.fromJson(payload['new']);
+          _handleNewReceipt(newReceipt);
+        },
+      )
+      .subscribe();
+    ```
+  }
+  
+  @sync_notifications {
+    ```dart
+    // Broadcast sync status
+    supabase.channel('sync:${userId}')
+      .send(
+        type: 'broadcast',
+        event: 'sync_progress',
+        payload: {
+          'status': 'syncing',
+          'progress': 0.75,
+          'remaining': 5,
+        },
+      );
+    ```
+  }
+}
+
+## Edge Functions
+@poml:edge_functions {
+  
+  @use_cases {
+    image_processing: "Resize and optimize uploaded images"
+    export_generation: "Create CSV/PDF exports"
+    webhook_handling: "Process OAuth callbacks"
+    scheduled_sync: "Periodic data cleanup"
+  }
+  
+  @example {
+    ```typescript
+    // Edge function for image processing
+    import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+    import { createClient } from '@supabase/supabase-js'
+    
+    serve(async (req) => {
+      const { record } = await req.json()
+      
+      // Get image from storage
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      )
+      
+      const { data: image } = await supabase.storage
+        .from('receipts')
+        .download(record.image_url)
+      
+      // Process image (resize, optimize)
+      const thumbnail = await processImage(image)
+      
+      // Upload thumbnail
+      const { data: upload } = await supabase.storage
+        .from('thumbnails')
+        .upload(record.thumbnail_url, thumbnail)
+      
+      return new Response(JSON.stringify({ success: true }))
+    })
+    ```
+  }
+}
+
+## Migration Strategy
+@poml:migration {
+  
+  @data_transfer {
+    approach: "Batch upload with validation"
+    batch_size: 100
+    validation: "Checksum verification"
+    
+    ```dart
+    // Migration utility
+    class SupabaseMigrator {
+      Future<void> migrateReceipts(List<Receipt> localReceipts) async {
+        final batches = _createBatches(localReceipts, 100);
+        
+        for (final batch in batches) {
+          // Transform for Supabase
+          final records = batch.map((r) => {
+            ...r.toJson(),
+            'user_id': supabase.auth.currentUser!.id,
+            'local_id': r.id,
+          }).toList();
+          
+          // Batch insert
+          await supabase
+            .from('receipts')
+            .insert(records);
+          
+          // Verify migration
+          final count = await supabase
+            .from('receipts')
+            .select('id')
+            .in_('local_id', batch.map((r) => r.id).toList())
+            .count();
+          
+          if (count != batch.length) {
+            throw Exception('Migration verification failed');
+          }
+        }
+      }
+    }
+    ```
+  }
+}
