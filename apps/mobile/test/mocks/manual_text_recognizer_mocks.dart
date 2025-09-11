@@ -6,8 +6,13 @@ import 'package:flutter/material.dart';
 
 // Manual mock for TextRecognizer since it cannot be auto-generated
 class MockTextRecognizer extends Mock implements TextRecognizer {
-  // Don't override processImage, let Mock handle it completely
-  // This allows the any matcher to work properly
+  @override
+  Future<RecognizedText> processImage(InputImage? inputImage) =>
+      super.noSuchMethod(
+        Invocation.method(#processImage, [inputImage]),
+        returnValue: Future.value(MockRecognizedText()),
+        returnValueForMissingStub: Future.value(MockRecognizedText()),
+      ) as Future<RecognizedText>;
 
   @override
   Future<void> close() => super.noSuchMethod(

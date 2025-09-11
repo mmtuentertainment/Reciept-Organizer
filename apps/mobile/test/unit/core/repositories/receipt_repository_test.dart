@@ -9,6 +9,12 @@ import 'dart:io';
 import '../../../helpers/test_database_helper.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize FFI for testing
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  
   late ReceiptRepository repository;
   late Database database;
 

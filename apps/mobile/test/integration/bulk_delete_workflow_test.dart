@@ -13,6 +13,9 @@ import 'package:receipt_organizer/core/services/undo_service.dart';
 import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_repository.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:async';
+import 'package:flutter/services.dart';
 
 @GenerateMocks([
   IReceiptRepository,
@@ -23,6 +26,12 @@ import 'package:mockito/annotations.dart';
 import 'bulk_delete_workflow_test.mocks.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize FFI for testing
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  
   group('Bulk Delete Workflow Integration Tests', () {
     late MockIReceiptRepository mockRepository;
     late MockAuthorizationService mockAuthService;
@@ -68,11 +77,11 @@ void main() {
         ),
       );
       
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Act - Long press on first receipt
       await tester.longPress(find.text('Test Merchant 0'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Selection mode should be active
       expect(find.text('1 item selected'), findsOneWidget);
@@ -93,11 +102,11 @@ void main() {
         ),
       );
       
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Enter selection mode
       await tester.longPress(find.text('Test Merchant 0'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Toolbar actions should be visible
       expect(find.text('Delete'), findsOneWidget);
@@ -119,17 +128,17 @@ void main() {
         ),
       );
       
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Enter selection mode
       await tester.longPress(find.text('Test Merchant 0'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Select additional items
       await tester.tap(find.text('Test Merchant 1'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.tap(find.text('Test Merchant 2'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Multiple items selected
       expect(find.text('3 items selected'), findsOneWidget);
@@ -150,7 +159,7 @@ void main() {
         ),
       );
       
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Dialog content
       expect(find.text('Delete 3 Receipts'), findsOneWidget);
@@ -183,7 +192,7 @@ void main() {
         operation: 'Deleting',
       ));
       
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Progress shown
       expect(find.text('Deleting Receipts'), findsOneWidget);
@@ -198,7 +207,7 @@ void main() {
         isComplete: true,
       ));
       
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Completion shown
       expect(find.text('Complete!'), findsOneWidget);
@@ -235,7 +244,7 @@ void main() {
       
       // Trigger snackbar
       await tester.tap(find.text('Delete'));
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Undo snackbar shown
       expect(find.text('2 receipts deleted'), findsOneWidget);
@@ -281,19 +290,19 @@ void main() {
         ),
       );
       
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Open filter dialog
       await tester.tap(find.byIcon(Icons.filter_list));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Enable high confidence filter
       await tester.tap(find.text('High Confidence Only'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Apply filters
       await tester.tap(find.text('Apply Filters'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Only high confidence receipt shown
       expect(find.text('Test Merchant 0'), findsOneWidget);
@@ -318,7 +327,7 @@ void main() {
         ),
       );
       
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Only owned receipts should be visible
       expect(find.text('Test Merchant 0'), findsOneWidget);
@@ -345,17 +354,17 @@ void main() {
         ),
       );
       
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Enter selection mode
       await tester.longPress(find.text('Test Merchant 0'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       expect(find.text('1 item selected'), findsOneWidget);
       
       // Press escape key
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert - Selection mode exited
       expect(find.text('1 item selected'), findsNothing);

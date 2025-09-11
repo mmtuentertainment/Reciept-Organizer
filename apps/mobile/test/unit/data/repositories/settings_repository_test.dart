@@ -2,8 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:receipt_organizer/data/repositories/settings_repository.dart';
 import 'package:receipt_organizer/data/models/app_settings.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize FFI for testing
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  
   group('SettingsRepository', () {
     late SettingsRepository repository;
     late SharedPreferences prefs;

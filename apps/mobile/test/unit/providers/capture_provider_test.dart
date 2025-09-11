@@ -227,7 +227,7 @@ void main() {
 
       test('should auto-save session when in retry mode', () async {
         // Given
-        when(mockSessionManager.saveSession(any())).thenAnswer((_) async => true);
+        when(mockSessionManager.saveSession(any)).thenAnswer((_) async => true);
         
         final originalResult = ProcessingResult(
           merchant: FieldData(value: 'Store', confidence: 80.0, originalText: 'Store'),

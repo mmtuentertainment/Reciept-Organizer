@@ -26,8 +26,13 @@ void main() {
       expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
       
       // Verify green color scheme
-      final container = tester.widget<Container>(find.byType(Container).first);
-      final decoration = container.decoration as BoxDecoration;
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
+      expect(container, isNotNull, reason: \'Container should exist\');
+
+      final decoration = container!.decoration as BoxDecoration;
       expect(decoration.border?.top.color, const Color(0xFF388E3C));
     });
 
@@ -52,8 +57,13 @@ void main() {
       expect(find.byIcon(Icons.info_outline), findsOneWidget);
       
       // Verify orange color scheme
-      final container = tester.widget<Container>(find.byType(Container).first);
-      final decoration = container.decoration as BoxDecoration;
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
+      expect(container, isNotNull, reason: \'Container should exist\');
+
+      final decoration = container!.decoration as BoxDecoration;
       expect(decoration.border?.top.color, const Color(0xFFF57C00));
     });
 
@@ -78,8 +88,13 @@ void main() {
       expect(find.byIcon(Icons.warning_amber), findsOneWidget);
       
       // Verify red color scheme
-      final container = tester.widget<Container>(find.byType(Container).first);
-      final decoration = container.decoration as BoxDecoration;
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
+      expect(container, isNotNull, reason: \'Container should exist\');
+
+      final decoration = container!.decoration as BoxDecoration;
       expect(decoration.border?.top.color, const Color(0xFFD32F2F));
     });
 
@@ -184,8 +199,13 @@ void main() {
         );
 
         // Then
-        final container = tester.widget<Container>(find.byType(Container).first);
-        final decoration = container.decoration as BoxDecoration;
+        final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
+        expect(container, isNotNull, reason: \'Container should exist\');
+
+        final decoration = container!.decoration as BoxDecoration;
         expect(decoration.border?.top.color, expectedColors[i], 
             reason: 'Wrong color for confidence ${testConfidences[i]}%');
 
@@ -249,9 +269,12 @@ void main() {
       );
 
       // Then
-      final container = tester.widget<Container>(find.byType(Container).first);
-      expect(container.constraints?.minWidth, customSize);
-      expect(container.constraints?.minHeight, customSize);
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
+      expect(container?.constraints?.minWidth, customSize);
+      expect(container?.constraints?.minHeight, customSize);
     });
 
     group('ConfidenceLevel extension', () {

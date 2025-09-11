@@ -52,7 +52,7 @@ void main() {
       
       // Act
       await tester.pumpWidget(createTestApp(imagePath));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Start gesture monitoring
       performanceMonitor.recordGestureStart('zoom_1mb');
@@ -65,11 +65,11 @@ void main() {
       // Zoom in
       await pointer1.moveBy(const Offset(-50, 0));
       await pointer2.moveBy(const Offset(50, 0));
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Pan around
       await pointer1.moveBy(const Offset(100, 100));
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       await pointer1.up();
       await pointer2.up();
@@ -77,7 +77,7 @@ void main() {
       performanceMonitor.recordGestureEnd('zoom_1mb');
       
       // Wait for metrics
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert
       final metrics = performanceMonitor.getMetrics();
@@ -96,20 +96,20 @@ void main() {
       
       // Act
       await tester.pumpWidget(createTestApp(imagePath));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       performanceMonitor.recordGestureStart('zoom_5mb');
       
       // Perform double tap zoom
       // final center = tester.getCenter(find.byType(ZoomableImageViewer));
       await tester.tap(find.byType(ZoomableImageViewer));
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.tap(find.byType(ZoomableImageViewer));
       
       performanceMonitor.recordGestureEnd('zoom_5mb');
       
       // Wait for animation and metrics
-      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Assert
       final metrics = performanceMonitor.getMetrics();
@@ -132,13 +132,13 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       
       // Wait for progressive loading
-      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Should show low quality version first
       expect(find.byType(Image), findsOneWidget);
       
       // Wait for full quality
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Test gesture performance
       performanceMonitor.recordGestureStart('pan_10mb');
@@ -165,19 +165,19 @@ void main() {
       
       // Act - Load image
       await tester.pumpWidget(createTestApp(imagePath));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Record initial memory
-      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       final initialMetrics = performanceMonitor.getMetrics();
       final initialMemory = initialMetrics.currentMemoryMb;
       
       // Navigate away to dispose widget
       await tester.pumpWidget(Container());
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Force garbage collection (in real app)
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Check memory after disposal
       final finalMetrics = performanceMonitor.getMetrics();
@@ -197,7 +197,7 @@ void main() {
       performanceMonitor.startMonitoring();
       
       await tester.pumpWidget(createTestApp(imagePath));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Act - Perform rapid zoom in/out
       for (int i = 0; i < 5; i++) {
@@ -205,15 +205,15 @@ void main() {
         
         // Double tap to zoom in
         await tester.tap(find.byType(ZoomableImageViewer));
-        await tester.pump(const Duration(milliseconds: 50));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         await tester.tap(find.byType(ZoomableImageViewer));
-        await tester.pump(const Duration(milliseconds: 200));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Double tap to zoom out
         await tester.tap(find.byType(ZoomableImageViewer));
-        await tester.pump(const Duration(milliseconds: 50));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         await tester.tap(find.byType(ZoomableImageViewer));
-        await tester.pump(const Duration(milliseconds: 200));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         performanceMonitor.recordGestureEnd('rapid_zoom_$i');
       }

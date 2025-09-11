@@ -10,11 +10,18 @@ import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 @GenerateNiceMocks([MockSpec<IReceiptRepository>()])
 import 'date_range_selection_performance_test.mocks.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize FFI for testing
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  
   group('Date Range Selection Performance Tests', () {
     late MockIReceiptRepository mockReceiptRepository;
 
@@ -97,7 +104,7 @@ void main() {
       final stopwatch = Stopwatch()..start();
       
       await tester.tap(find.text('This Month'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       stopwatch.stop();
 
@@ -119,19 +126,19 @@ void main() {
           ),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Rapidly switch between presets
       final stopwatch = Stopwatch()..start();
       
       await tester.tap(find.text('This Month'));
-      await tester.pump(); // Don't wait for settle
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Don't wait for settle
       
       await tester.tap(find.text('Last Month'));
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       await tester.tap(find.text('Last 90 Days'));
-      await tester.pumpAndSettle(); // Wait for final state
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Wait for final state
       
       stopwatch.stop();
 
@@ -166,7 +173,7 @@ void main() {
           }),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       stopwatch.stop();
 
@@ -197,19 +204,19 @@ void main() {
           }),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Switch tabs multiple times
       final stopwatch = Stopwatch()..start();
       
       await tester.tap(find.text('Xero'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       await tester.tap(find.text('Generic CSV'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       await tester.tap(find.text('QuickBooks'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       stopwatch.stop();
 
@@ -263,7 +270,7 @@ void main() {
           }),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Perform scroll gesture
       final scrollable = find.byType(SingleChildScrollView).first;
@@ -280,7 +287,7 @@ void main() {
       
       // Measure frame times during animation
       while (tester.hasRunningAnimations) {
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         final now = DateTime.now();
         frameTimings.add(now.difference(lastFrameTime));
         lastFrameTime = now;
@@ -320,17 +327,17 @@ void main() {
           }),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Perform repeated operations
       for (int i = 0; i < 10; i++) {
         // Switch date range presets
         await tester.tap(find.text(i % 2 == 0 ? 'Last Month' : 'This Month'));
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Switch tabs
         await tester.tap(find.text(i % 3 == 0 ? 'Xero' : 'QuickBooks'));
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
       }
 
       // Then - Widget tree should remain stable

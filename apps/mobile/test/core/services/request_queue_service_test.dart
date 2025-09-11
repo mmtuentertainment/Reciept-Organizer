@@ -2,9 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/core/services/request_queue_service.dart';
 import 'package:receipt_organizer/core/services/queue_database_service.dart';
 import 'package:receipt_organizer/core/models/queue_entry.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize FFI for testing
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
   
   group('RequestQueueService', () {
     late RequestQueueService queueService;

@@ -59,7 +59,7 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       // Check app bar
@@ -107,7 +107,7 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.text('No receipts in this date range'), findsOneWidget);
@@ -142,7 +142,7 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - All format options should be visible
       expect(find.text('QuickBooks'), findsNWidgets(2)); // In button and description
@@ -175,14 +175,14 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Generic is selected by default
       expect(find.text('Generic CSV'), findsNWidgets(2)); // In selector and preview
 
       // Select QuickBooks
       await tester.tap(find.text('QuickBooks').first);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Preview should update
       expect(find.text('QuickBooks'), findsNWidgets(2)); // In selector and description
@@ -206,7 +206,7 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.text('Export Preview'), findsOneWidget);
@@ -235,11 +235,11 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Tap export button
       await tester.tap(find.text('Export 15 Receipts'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Confirmation dialog appears
       expect(find.text('Export 15 Receipts?'), findsOneWidget);
@@ -259,7 +259,7 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _ErrorDateRangeNotifier()),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.text('Error loading receipts'), findsOneWidget);
@@ -276,14 +276,14 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _ErrorDateRangeNotifier()),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Verify error state is displayed
       expect(find.text('Retry'), findsOneWidget);
       
       // Tap retry
       await tester.tap(find.text('Retry'));
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Verify refresh logic would be called
       // In real implementation, this would trigger ref.refresh(dateRangeNotifierProvider)
@@ -307,7 +307,7 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Check singular forms
       expect(find.text('1 receipt found'), findsOneWidget);
@@ -333,7 +333,7 @@ void main() {
           dateRangeNotifierProvider.overrideWith(() => _TestDateRangeNotifier(testState)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Verify scrollable
       final scrollable = find.byType(SingleChildScrollView);
@@ -341,7 +341,7 @@ void main() {
 
       // Scroll to bottom
       await tester.drag(scrollable, const Offset(0, -500));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Content should still be visible
       expect(find.text('Export Preview'), findsOneWidget);
@@ -366,7 +366,7 @@ void main() {
           exportFormatNotifierProvider.overrideWith((ref) => _MockExportFormatNotifier(ref, ExportFormat.quickbooks)),
         ],
       ));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - QuickBooks specific info
       expect(find.text('Date format: MM/dd/yyyy'), findsOneWidget);

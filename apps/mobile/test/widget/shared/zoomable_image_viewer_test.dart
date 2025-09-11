@@ -80,8 +80,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         
         // Wait for image to load
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Assert
         expect(find.byType(InteractiveViewer), findsOneWidget);
@@ -118,8 +118,8 @@ void main() {
         ));
         
         // Wait for error to appear
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Assert
         expect(find.text(errorMessage), findsOneWidget);
@@ -139,7 +139,7 @@ void main() {
         ));
         
         // Wait for widget to build
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Assert
         final interactiveViewer = tester.widget<InteractiveViewer>(
@@ -159,7 +159,7 @@ void main() {
         await tester.pumpWidget(createTestWidget(
           onTap: () => wasTapped = true,
         ));
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         await tester.tap(find.byType(GestureDetector).first);
         
@@ -170,7 +170,7 @@ void main() {
       testWidgets('When double-tapped Then zoom animation occurs', (tester) async {
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Get initial transformation
         final interactiveViewer = tester.widget<InteractiveViewer>(
@@ -179,14 +179,14 @@ void main() {
         final initialMatrix = interactiveViewer.transformationController?.value;
         
         // Double tap at center
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         final center = tester.getCenter(find.byType(InteractiveViewer));
         await tester.tapAt(center);
-        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         await tester.tapAt(center);
         
         // Wait for animation
-        await tester.pump(const Duration(milliseconds: 300));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Assert - transformation should have changed
         final newMatrix = interactiveViewer.transformationController?.value;
@@ -198,7 +198,7 @@ void main() {
       testWidgets('When widget is rendered Then RepaintBoundary is present', (tester) async {
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Assert
         expect(find.byType(RepaintBoundary), findsOneWidget);
@@ -211,11 +211,11 @@ void main() {
         await tester.pumpWidget(createTestWidget(
           showFpsOverlay: true,
         ));
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // In test mode, kReleaseMode is false, so overlay should show
         // Wait for FPS timer to tick
-        await tester.pump(const Duration(seconds: 1, milliseconds: 100));
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Assert
         expect(find.textContaining('FPS:'), findsOneWidget);
@@ -226,7 +226,7 @@ void main() {
       testWidgets('When widget is disposed Then resources are cleaned up', (tester) async {
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Replace with empty container to trigger disposal
         await tester.pumpWidget(Container());
@@ -244,7 +244,7 @@ void main() {
         ));
         
         // Just ensure widget builds without error
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Assert
         expect(find.byType(ZoomableImageViewer), findsOneWidget);

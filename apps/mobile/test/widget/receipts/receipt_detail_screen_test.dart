@@ -5,6 +5,7 @@ import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:receipt_organizer/features/receipts/presentation/screens/receipt_detail_screen.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
 import 'package:receipt_organizer/shared/widgets/confidence_score_widget.dart';
+import 'package:receipt_organizer/features/receipts/presentation/widgets/merchant_field_editor_with_normalization.dart';
 
 void main() {
   group('ReceiptDetailScreen', () {
@@ -50,7 +51,7 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.text('Test Store'), findsOneWidget);
@@ -66,7 +67,7 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should show ConfidenceScoreWidget with detailed variant
       expect(find.byType(ConfidenceScoreWidget), findsOneWidget);
@@ -82,7 +83,7 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - High confidence should show positive message
       expect(find.textContaining('High quality data'), findsOneWidget);
@@ -100,7 +101,7 @@ void main() {
           home: ReceiptDetailScreen(receipt: mediumConfidenceReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.textContaining('Good data quality'), findsOneWidget);
@@ -118,7 +119,7 @@ void main() {
           home: ReceiptDetailScreen(receipt: lowConfidenceReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.textContaining('Data needs review'), findsOneWidget);
@@ -131,12 +132,12 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should have field editors for all fields
-      expect(find.byType(MerchantFieldEditor), findsOneWidget);
-      expect(find.byType(DateFieldEditor), findsOneWidget);
-      expect(find.byType(AmountFieldEditor), findsNWidgets(2)); // Total and Tax
+      expect(find.byType(MerchantFieldEditorWithNormalization), findsOneWidget);
+      expect(find.byType(FieldEditor), findsOneWidget);
+      expect(find.byType(FieldEditor), findsNWidgets(2)); // Total and Tax
     });
 
     testWidgets('shows confidence info dialog', (WidgetTester tester) async {
@@ -146,11 +147,11 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Tap the info button
       await tester.tap(find.byIcon(Icons.info_outline));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.text('Confidence Scores'), findsOneWidget);
@@ -174,16 +175,16 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Edit merchant field
       final textFields = find.byType(TextField);
       await tester.enterText(textFields.first, 'Edited Store Name');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Tap save button when it appears
       await tester.tap(find.byIcon(Icons.save));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(updatedReceipt, isNotNull);
@@ -198,7 +199,7 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Initially no save button
       expect(find.byType(FloatingActionButton), findsNothing);
@@ -206,7 +207,7 @@ void main() {
       // Edit a field
       final textFields = find.byType(TextField);
       await tester.enterText(textFields.first, 'Changed Store');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Save button should appear
       expect(find.byType(FloatingActionButton), findsOneWidget);
@@ -220,7 +221,7 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.text('Processing Information'), findsOneWidget);
@@ -244,7 +245,7 @@ void main() {
           home: ReceiptDetailScreen(receipt: processingReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -258,11 +259,11 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Open menu
       await tester.tap(find.byType(PopupMenuButton));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should show menu items
       expect(find.text('Export'), findsOneWidget);
@@ -278,13 +279,13 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Open menu and tap delete
       await tester.tap(find.byType(PopupMenuButton));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.tap(find.text('Delete'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(find.text('Delete Receipt'), findsOneWidget);
@@ -300,12 +301,12 @@ void main() {
           home: ReceiptDetailScreen(receipt: testReceipt),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Edit the total field (which has 40% weight)
       final textFields = find.byType(TextField);
       await tester.enterText(textFields.at(2), '30.00'); // Assuming total is 3rd field
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Overall confidence should be recalculated
       // The confidence display should update to reflect the new calculation

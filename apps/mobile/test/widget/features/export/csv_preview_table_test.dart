@@ -88,7 +88,7 @@ void main() {
 
       // Should show "... 45 more rows" (50 total - 5 displayed)
       expect(find.text('... 45 more rows'), findsOneWidget);
-      expect(find.icon(Icons.more_horiz), findsOneWidget);
+      expect(find.byIcon(Icons.more_horiz), findsOneWidget);
     });
 
     testWidgets('displays warning summary for critical warnings', (tester) async {
@@ -102,7 +102,7 @@ void main() {
 
       // Should show critical warning summary
       expect(find.text('1 critical security warnings detected'), findsOneWidget);
-      expect(find.icon(Icons.warning_amber_rounded), findsWidgets);
+      expect(find.byIcon(Icons.warning_amber_rounded), findsWidgets);
     });
 
     testWidgets('shows loading state', (tester) async {
@@ -130,7 +130,7 @@ void main() {
       ));
 
       expect(find.text(errorMessage), findsOneWidget);
-      expect(find.icon(Icons.error_outline), findsOneWidget);
+      expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
 
     testWidgets('shows empty state when no data', (tester) async {
@@ -142,7 +142,7 @@ void main() {
       ));
 
       expect(find.text('No data to preview'), findsOneWidget);
-      expect(find.icon(Icons.table_chart_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.table_chart_outlined), findsOneWidget);
     });
 
     testWidgets('table is horizontally scrollable', (tester) async {
@@ -195,7 +195,7 @@ void main() {
 
       // Should have warning icons for cells with warnings
       // One in summary, plus one for each warning
-      final warningIcons = find.icon(Icons.warning_amber_rounded);
+      final warningIcons = find.byIcon(Icons.warning_amber_rounded);
       expect(warningIcons, findsWidgets);
     });
 
@@ -258,7 +258,7 @@ void main() {
 
       // Should not show "more rows" indicator
       expect(find.textContaining('more rows'), findsNothing);
-      expect(find.icon(Icons.more_horiz), findsNothing);
+      expect(find.byIcon(Icons.more_horiz), findsNothing);
     });
   });
 }

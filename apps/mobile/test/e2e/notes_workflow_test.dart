@@ -5,6 +5,7 @@ import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/features/capture/widgets/notes_field_editor.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/receipt_card.dart';
 import 'package:flutter/material.dart';
+import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -14,12 +15,12 @@ void main() {
         (WidgetTester tester) async {
       // Given - App is launched
       app.main();
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Scenario 1: Add notes during receipt capture
       // When - Navigate to capture screen
       await tester.tap(find.byIcon(Icons.camera_alt));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Simulate successful capture (in real E2E, this would use camera)
       // For testing, we'll navigate to preview with mock data
@@ -28,14 +29,14 @@ void main() {
       // When - Add notes to the receipt
       const testNotes = 'Business lunch with ABC Corp - discussed Q1 targets';
       await tester.enterText(find.byType(NotesFieldEditor), testNotes);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Verify character counter updates
       expect(find.text('${testNotes.length} / 500'), findsOneWidget);
 
       // When - Save the receipt
       await tester.tap(find.text('Save'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should return to main screen
       expect(find.byType(ReceiptCard), findsWidgets);
@@ -43,7 +44,7 @@ void main() {
       // Scenario 2: View and edit notes in detail screen
       // When - Tap on the receipt to view details
       await tester.tap(find.byType(ReceiptCard).first);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should see the notes in detail view
       expect(find.text(testNotes), findsOneWidget);
@@ -52,20 +53,20 @@ void main() {
       const updatedNotes = '$testNotes\nFollow-up scheduled for next week';
       await tester.tap(find.byType(NotesFieldEditor));
       await tester.enterText(find.byType(NotesFieldEditor), updatedNotes);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Navigate back
       await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Scenario 3: Search by notes content
       // When - Open search
       await tester.tap(find.byIcon(Icons.search));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Search for content in notes
       await tester.enterText(find.byType(TextField), 'ABC Corp');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should find the receipt with matching notes
       expect(find.byType(ReceiptCard), findsOneWidget);
@@ -73,7 +74,7 @@ void main() {
 
       // When - Search for non-existent content
       await tester.enterText(find.byType(TextField), 'XYZ Company');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should show no results
       expect(find.byType(ReceiptCard), findsNothing);
@@ -82,21 +83,21 @@ void main() {
       // Scenario 4: Verify notes in CSV export
       // When - Clear search and navigate to export
       await tester.tap(find.byIcon(Icons.clear));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Navigate to export screen
       await tester.tap(find.byIcon(Icons.more_vert));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.tap(find.text('Export Receipts'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Select receipts and export
       await tester.tap(find.text('Select All'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.tap(find.text('Export to CSV'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Export should complete successfully
       expect(find.text('Export completed'), findsOneWidget);
@@ -110,7 +111,7 @@ void main() {
 
       // When - Try to add more characters (should be prevented)
       await tester.enterText(find.byType(NotesFieldEditor).last, 'A' * 501);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Then - Should still show max length
       expect(find.text('500 / 500'), findsOneWidget);
@@ -120,7 +121,7 @@ void main() {
         (WidgetTester tester) async {
       // Given - App is launched
       app.main();
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Add receipt with special characters in notes
       await _simulateReceiptCapture(tester);
@@ -128,31 +129,31 @@ void main() {
       // Test various special characters
       const specialNotes = r'Receipt for: $50.00 @ Store #123' '\nItems: Coffee & Donuts';
       await tester.enterText(find.byType(NotesFieldEditor), specialNotes);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Save receipt
       await tester.tap(find.text('Save'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // When - Search for special characters
       await tester.tap(find.byIcon(Icons.search));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.enterText(find.byType(TextField), '#123');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should find the receipt
       expect(find.byType(ReceiptCard), findsOneWidget);
 
       // Test sanitization - try to enter script tags
       await tester.tap(find.byIcon(Icons.clear));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       await _simulateReceiptCapture(tester);
       const maliciousNotes = 'Normal text <script>alert("test")</script> more text';
       await tester.enterText(find.byType(NotesFieldEditor), maliciousNotes);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Script tags should be removed
       expect(find.text('Normal text  more text'), findsOneWidget);
@@ -168,16 +169,16 @@ Future<void> _simulateReceiptCapture(WidgetTester tester) async {
   
   // The actual implementation would depend on how the app handles
   // test/demo mode for camera functionality
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 500));
 }
 
 /// Helper to add a receipt with specific notes
 Future<void> _addReceiptWithNotes(WidgetTester tester, String notes) async {
   await tester.tap(find.byIcon(Icons.camera_alt));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 500));
   await _simulateReceiptCapture(tester);
   await tester.enterText(find.byType(NotesFieldEditor), notes);
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 500));
   await tester.tap(find.text('Save'));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 500));
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/features/capture/widgets/notes_field_editor.dart';
+import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
 
 void main() {
   group('NotesFieldEditor', () {
@@ -56,7 +57,7 @@ void main() {
       
       // When
       await tester.enterText(find.byType(TextFormField), 'Hello world');
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Then
       expect(find.text('11 / 500'), findsOneWidget);
@@ -70,7 +71,7 @@ void main() {
       
       // When
       await tester.enterText(find.byType(TextFormField), longText);
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Then
       expect(find.text('500 / 500'), findsOneWidget);
@@ -87,7 +88,7 @@ void main() {
       
       // When
       await tester.enterText(find.byType(TextFormField), maxText);
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Then
       final counterText = tester.widget<Text>(
@@ -118,9 +119,9 @@ void main() {
       
       // When
       await tester.enterText(find.byType(TextFormField), 'First');
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       await tester.enterText(find.byType(TextFormField), 'First Second');
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Then
       // The first onChanged is called with empty string when the field is initialized
@@ -141,7 +142,7 @@ void main() {
       
       // Verify multiline input works
       await tester.enterText(textFieldFinder, 'Line 1\nLine 2\nLine 3');
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       expect(find.text('Line 1\nLine 2\nLine 3'), findsOneWidget);
     });
 
@@ -163,7 +164,7 @@ void main() {
         
         // When - Enter text with null byte and control characters
         await tester.enterText(find.byType(TextFormField), 'Test\x00\x01\x1FNotes');
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Then - Control characters should be removed
         expect(changedTexts.last, equals('TestNotes'));
@@ -179,7 +180,7 @@ void main() {
         
         // When
         await tester.enterText(find.byType(TextFormField), 'Line 1\nLine 2\tTabbed');
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Then
         expect(changedTexts.last, equals('Line 1\nLine 2\tTabbed'));
@@ -194,7 +195,7 @@ void main() {
         
         // When
         await tester.enterText(find.byType(TextFormField), 'Normal text <script>alert("test")</script> more text');
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Then
         expect(changedTexts.last, equals('Normal text  more text'));
@@ -209,7 +210,7 @@ void main() {
         
         // When
         await tester.enterText(find.byType(TextFormField), 'Click javascript:void(0) here');
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Then
         expect(changedTexts.last, equals('Click void(0) here'));
@@ -224,7 +225,7 @@ void main() {
         
         // When - Multiple newlines and spaces
         await tester.enterText(find.byType(TextFormField), 'Text\n\n\n\nwith     spaces');
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Then - Should normalize to max 2 newlines and 2 spaces
         expect(changedTexts.last, equals('Text\n\nwith  spaces'));
@@ -240,7 +241,7 @@ void main() {
         // When
         const normalText = r'This is a normal receipt note with $50.00 and #tags!';
         await tester.enterText(find.byType(TextFormField), normalText);
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Then
         expect(changedTexts.last, equals(normalText));

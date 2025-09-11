@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/merchant_field_editor_with_normalization.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
+import 'package:receipt_organizer/features/receipts/presentation/widgets/field_editor.dart';
 
 void main() {
   group('MerchantFieldEditorWithNormalization', () {
@@ -85,7 +86,7 @@ void main() {
 
       // Tap the normalization indicator
       await tester.tap(find.byIcon(Icons.auto_fix_high));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Assert - Dialog should be shown
       expect(find.text('Merchant Name Normalized'), findsOneWidget);
@@ -96,7 +97,7 @@ void main() {
       
       // Close dialog
       await tester.tap(find.text('OK'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       expect(find.text('Merchant Name Normalized'), findsNothing);
     });
 
@@ -151,7 +152,7 @@ void main() {
 
       // Find text field and enter new text
       await tester.enterText(find.byType(TextField), 'New Store Name');
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Assert
       expect(updatedField, isNotNull);

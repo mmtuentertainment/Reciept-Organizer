@@ -94,8 +94,8 @@ void main() {
     testWidgets('displays confidence badges for receipts with OCR results', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then - Should show confidence badges for completed receipts
       expect(find.text('92%'), findsOneWidget); // High confidence receipt
@@ -108,8 +108,8 @@ void main() {
     testWidgets('shows processing indicator for receipts without OCR results', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then - Processing receipt should show a progress indicator
       expect(find.text('Receipt 3'), findsOneWidget);
@@ -122,8 +122,8 @@ void main() {
 
       // When
       await tester.pumpWidget(createTestWidget(highConfidenceReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then - Should use ConfidenceScoreWidget with inline variant
       expect(find.text('92%'), findsOneWidget);
@@ -136,8 +136,8 @@ void main() {
 
       // When
       await tester.pumpWidget(createTestWidget(lowConfidenceReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then - Should show confidence score widget
       expect(find.text('65%'), findsOneWidget);
@@ -147,8 +147,8 @@ void main() {
     testWidgets('shows receipt information with confidence display', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then
       expect(find.text('High Confidence Store • \$25.47'), findsOneWidget);
@@ -159,8 +159,8 @@ void main() {
     testWidgets('handles receipt expansion with OCR details', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Expansion might be handled differently in this implementation
       // Check that the receipts are displayed properly
@@ -176,8 +176,8 @@ void main() {
     testWidgets('displays correct timestamps', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then - Should show relative timestamps
       expect(find.textContaining('ago'), findsWidgets);
@@ -186,8 +186,8 @@ void main() {
     testWidgets('shows export controls with proper states', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then
       expect(find.text('Add More'), findsOneWidget);
@@ -199,8 +199,8 @@ void main() {
     testWidgets('handles empty batch state', (WidgetTester tester) async {
       // When - Empty batch
       await tester.pumpWidget(createTestWidget([]));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then
       expect(find.text('No receipts to review'), findsOneWidget);
@@ -210,8 +210,8 @@ void main() {
     testWidgets('supports receipt reordering', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then - Should have ReorderableListView
       expect(find.byType(ReorderableListView), findsOneWidget);
@@ -221,8 +221,8 @@ void main() {
     testWidgets('supports receipt deletion via swipe', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then - Should have Dismissible widgets
       expect(find.byType(Dismissible), findsWidgets);
@@ -233,7 +233,7 @@ void main() {
       
       // Perform swipe gesture
       await tester.drag(firstReceipt, const Offset(-200, 0));
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
       
       // Now the delete icon should be visible
       expect(find.byIcon(Icons.delete), findsAny);
@@ -242,8 +242,8 @@ void main() {
     testWidgets('displays confidence-based highlighting consistently', (WidgetTester tester) async {
       // When
       await tester.pumpWidget(createTestWidget(testReceipts));
-      await tester.pump(); // Initial frame
-      await tester.pump(const Duration(milliseconds: 100)); // Animations
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Initial frame
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Animations
 
       // Then - All receipts with OCR results should have ConfidenceScoreWidget
       final confidenceWidgets = find.byType(ConfidenceScoreWidget);

@@ -94,7 +94,7 @@ void main() {
 
       // When - Tab to the segmented button
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - First button should have focus
       final quickBooksButton = find.ancestor(
@@ -133,7 +133,7 @@ void main() {
       ).first;
       
       await tester.longPress(quickBooksButton);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Tooltip should appear
       expect(
@@ -148,7 +148,7 @@ void main() {
 
       // When - Tap on Xero format
       await tester.tap(find.text('Xero'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Selection should be handled (actual state change will be tested with provider)
       // For now, just verify the tap is registered
@@ -161,7 +161,7 @@ void main() {
 
       // When - Tap on Generic CSV format
       await tester.tap(find.text('Generic CSV'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Announcement should be made (actual announcement testing requires semantics)
       // This is a placeholder for integration with screen reader testing
