@@ -1,7 +1,31 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Optimize for production deployment
+  output: 'standalone',
+  
+  // Disable source maps in production
+  productionBrowserSourceMaps: false,
+  
+  // Remove console logs in production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // Optimize package imports
+  experimental: {
+    optimizePackageImports: [
+      '@upstash/ratelimit',
+      '@upstash/redis',
+      'jose',
+      'zod',
+    ],
+    // Disable CSS optimization to avoid critters dependency
+    optimizeCss: false,
+  },
+  
+  // Set output file tracing root
+  outputFileTracingRoot: '/home/matt/FINAPP/Receipt Organizer',
 };
 
 export default nextConfig;

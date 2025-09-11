@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
       });
     }
     
-    return NextResponse.json({
+    const response = NextResponse.json({
       isValid: errors.length === 0,
       errors,
       warnings,
@@ -199,6 +199,16 @@ export async function POST(request: NextRequest) {
         apiValidation: tokens && !tokens.expired,
       },
     });
+    
+    // Add cache headers - cache successful validations for 5 minutes
+    if (errors.length === 0) {
+      response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=60');
+    } else {
+      // Don't cache validation errors
+      response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+    
+    return response;
   } catch (error) {
     console.error('Xero validation error:', error);
     return NextResponse.json(

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  return NextResponse.json({
+  const response = NextResponse.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
     environment: {
@@ -12,4 +12,9 @@ export async function GET() {
       nodeEnv: process.env.NODE_ENV,
     },
   });
+  
+  // Cache health check for 1 minute
+  response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=30');
+  
+  return response;
 }
