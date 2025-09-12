@@ -1,0 +1,1750 @@
+# shadcn/ui Comprehensive Knowledgebase with Contextual Relations
+@version: 2.0.0
+@created: 2025-01-12
+@description: Complete shadcn/ui documentation with embedded contextual relationships
+@total_items: 336
+@relation_types: 12
+
+## Overview {
+  @type: introduction
+  @philosophy: "Copy and paste, not a dependency"
+  @workflow_next: Installation
+  @see_also: [Core_Components, Registry_System, CLI_Tool, MCP_Server]
+  
+  ### Core_Concepts {
+    @category: foundation
+    
+    Component_Library: {
+      @description: "Not a traditional library - components you copy into your project"
+      @workflow_next: Installation
+      @implements: [Copy_Paste_Pattern]
+      @alternatives: [Traditional_NPM_Packages]
+      @see_also: [Registry_System, Component_Philosophy]
+    }
+    
+    Built_On: {
+      @description: "Radix UI primitives + Tailwind CSS"
+      @depends_on: ["@radix-ui", "tailwindcss"]
+      @see_also: [Radix_Primitives, Tailwind_Config]
+      @workflow_next: Theme_Configuration
+    }
+    
+    Customization: {
+      @description: "Full control over components - modify as needed"
+      @enables: [Component_Variants, Custom_Themes, Brand_Specific_UI]
+      @see_also: [Theming, CSS_Variables, Tailwind_Classes]
+      @workflow_prev: Component_Installation
+    }
+    
+    Registry_Based: {
+      @description: "336+ items in registry system"
+      @implements: [Component_Distribution, Version_Control]
+      @used_by: [CLI_Tool, MCP_Server]
+      @see_also: [Registry_Authentication, Custom_Registries]
+    }
+  }
+  
+  ### Key_Features {
+    @category: capabilities
+    @workflow_next: Framework_Selection
+    
+    Accessibility_First: {
+      @description: "Built on Radix UI with ARIA compliance"
+      @depends_on: ["@radix-ui"]
+      @implements: [WCAG_2_1, ARIA_Patterns]
+      @used_by: ALL_COMPONENTS
+      @see_also: [Keyboard_Navigation, Screen_Reader_Support]
+    }
+    
+    Dark_Mode: {
+      @description: "Built-in dark mode support"
+      @depends_on: [CSS_Variables, Theme_Provider]
+      @used_by: ALL_VISUAL_COMPONENTS
+      @implementation: ["next-themes", "class-based", "media-query"]
+      @see_also: [Theming, Color_System]
+    }
+    
+    TypeScript: {
+      @description: "Full TypeScript support (JavaScript optional)"
+      @enables: [Type_Safety, IntelliSense, Refactoring]
+      @alternatives: [JavaScript]
+      @used_by: ALL_COMPONENTS
+      @see_also: [Type_Definitions, Generic_Components]
+    }
+  }
+}
+
+## Installation {
+  @type: setup_guides
+  @workflow_start: true
+  @workflow_next: Framework_Selection
+  @requires: [Node_16+, React_18+]
+  @see_also: [Quick_Start, Manual_Installation, Monorepo_Setup]
+  
+  ### Quick_Start {
+    @command: "npx shadcn@latest init"
+    @description: "Initialize shadcn/ui in your project"
+    @workflow_next: Component_Addition
+    @generates: "components.json"
+    @mcp_alternative: "mcp__shadcn__init_project"
+    
+    Steps: {
+      1: {
+        @action: "Run init command"
+        @workflow_next: "Configure components.json"
+        @cli_command: "npx shadcn@latest init"
+      }
+      2: {
+        @action: "Configure components.json"
+        @workflow_next: "Add components"
+        @modifies: ["components.json", "tailwind.config.js", "globals.css"]
+      }
+      3: {
+        @action: "Add components via CLI"
+        @workflow_next: "Customize components"
+        @cli_command: "npx shadcn@latest add [component]"
+        @mcp_tool: "mcp__shadcn__add_component"
+      }
+      4: {
+        @action: "Customize as needed"
+        @workflow_next: "Implement features"
+        @see_also: [Theming, Variants, Composition]
+      }
+    }
+  }
+  
+  ### Framework_Selection {
+    @workflow_prev: Installation
+    @workflow_next: Project_Setup
+    @alternatives: [Next_js, Vite, Remix, Astro, Laravel, TanStack]
+    
+    #### Next_js {
+      @url: "/docs/installation/next"
+      @command: "npx create-next-app@latest my-app --typescript --tailwind --eslint"
+      @workflow_next: shadcn_Init
+      @see_also: [App_Router, Pages_Router, Server_Components]
+      @best_for: [Full_Stack_Apps, SSR, ISR, API_Routes]
+      @deployment: [Vercel, Netlify, Custom_Server]
+      
+      Configuration: {
+        TypeScript_Config: {
+          @modifies: "tsconfig.json"
+          @adds: ["baseUrl", "paths"]
+          @enables: "@/* imports"
+        }
+        Tailwind_Setup: {
+          @automatic: true
+          @via: "create-next-app"
+          @see_also: [Tailwind_Config, PostCSS]
+        }
+        Components_Location: {
+          @default: "components/ui/"
+          @alternatives: ["src/components/ui/", "lib/components/"]
+        }
+      }
+      
+      Commands: {
+        Init: {
+          @cli: "npx shadcn@latest init"
+          @mcp: "mcp__shadcn__init_project"
+          @workflow_next: Add_Component
+        }
+        Add_Component: {
+          @cli: "npx shadcn@latest add button"
+          @mcp: "mcp__shadcn__add_component"
+          @workflow_next: Use_Component
+        }
+      }
+    }
+    
+    #### Vite {
+      @url: "/docs/installation/vite"
+      @command: "pnpm create vite@latest"
+      @workflow_next: Tailwind_Setup
+      @best_for: [SPA, Fast_HMR, Small_Bundle_Size]
+      @see_also: [React_Router, Client_Routing]
+      
+      Additional_Setup: {
+        Install_Tailwind: {
+          @command: "pnpm add tailwindcss @tailwindcss/vite"
+          @workflow_next: TypeScript_Config
+          @depends_on: [PostCSS, Autoprefixer]
+        }
+        TypeScript_Config: {
+          @modifies: ["tsconfig.json", "tsconfig.app.json"]
+          @workflow_next: Vite_Config
+          @adds: "path aliases"
+        }
+        Vite_Config: {
+          @modifies: "vite.config.ts"
+          @adds: "path alias resolver"
+          @workflow_next: shadcn_Init
+        }
+        Node_Types: {
+          @command: "pnpm add -D @types/node"
+          @required_for: "path resolution"
+        }
+      }
+    }
+    
+    #### Remix {
+      @url: "/docs/installation/remix"
+      @command: "pnpm dlx create-remix@latest my-app"
+      @workflow_next: Tailwind_Setup
+      @best_for: [Nested_Routes, Data_Loading, Progressive_Enhancement]
+      @see_also: [Loader_Patterns, Action_Patterns]
+      
+      Tailwind_Setup: {
+        Install: {
+          @command: "pnpm add -D tailwindcss@latest autoprefixer@latest"
+          @workflow_next: PostCSS_Config
+        }
+        PostCSS_Config: {
+          @creates: "postcss.config.js"
+          @workflow_next: Import_CSS
+        }
+        Import_CSS: {
+          @modifies: "app/root.tsx"
+          @via: "LinksFunction"
+          @workflow_next: shadcn_Init
+        }
+      }
+    }
+  }
+}
+
+## Core_Components {
+  @type: ui_components
+  @total_count: 48
+  @categories: [Layout, Data_Display, Forms, Navigation, Feedback, Overlays]
+  @workflow_prev: Installation
+  @workflow_next: Implementation
+  @see_also: [Component_Patterns, Composition, Variants]
+  
+  ### Layout_Components {
+    @category: layout
+    @used_by: [Dashboard_Blocks, Page_Layouts]
+    
+    #### Card {
+      @type: "registry:ui"
+      @description: "Container with header, content, and footer sections"
+      @depends_on: []
+      @used_by: [Dashboard_01, Login_Forms, Pricing_Tables, Profile_Cards]
+      @alternatives: [Paper, Surface, Box]
+      @see_also: [Dialog, Sheet, Alert]
+      @cli_command: "npx shadcn@latest add card"
+      @mcp_tool: "mcp__shadcn__add_component"
+      @category: layout
+      @complexity: beginner
+      @example: "card-demo"
+      
+      Composition: {
+        @pattern: Component_Composition
+        @parts: [CardHeader, CardTitle, CardDescription, CardContent, CardFooter]
+        @workflow: "Header → Content → Footer"
+      }
+      
+      Usage_Example: ```tsx
+        <Card>
+          <CardHeader>
+            <CardTitle>Card Title</CardTitle>
+            <CardDescription>Card Description</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>Card Content</p>
+          </CardContent>
+          <CardFooter>
+            <Button>Action</Button>
+          </CardFooter>
+        </Card>
+      ```
+    }
+    
+    #### Separator {
+      @type: "registry:ui"
+      @description: "Visual separator between content sections"
+      @depends_on: ["@radix-ui/react-separator"]
+      @used_by: [Menus, Lists, Forms, Sidebars]
+      @alternatives: [Divider, Border, Spacing]
+      @see_also: [Layout_Patterns, Visual_Hierarchy]
+      @cli_command: "npx shadcn@latest add separator"
+      @orientation: [horizontal, vertical]
+    }
+    
+    #### ScrollArea {
+      @type: "registry:ui"
+      @description: "Custom scrollbar container"
+      @depends_on: ["@radix-ui/react-scroll-area"]
+      @used_by: [Sidebars, Lists, Chat_Windows, Code_Blocks]
+      @alternatives: [Native_Scroll, Perfect_Scrollbar]
+      @see_also: [Overflow_Handling, Mobile_Scroll]
+      @performance: "Virtual scrolling for large lists"
+    }
+  }
+  
+  ### Data_Display {
+    @category: data
+    @workflow_prev: Data_Fetching
+    @workflow_next: User_Interaction
+    
+    #### Table {
+      @type: "registry:ui"
+      @description: "Data table with sorting, filtering, and pagination"
+      @depends_on: ["@tanstack/react-table"]
+      @used_by: [Dashboard_01, Admin_Panels, Reports, Data_Grids]
+      @alternatives: [DataGrid, List, Cards_Grid]
+      @see_also: [Chart, CSV_Export, Pagination]
+      @cli_command: "npx shadcn@latest add table"
+      @mcp_tool: "mcp__shadcn__add_component"
+      @category: data
+      @complexity: intermediate
+      @example: "table-demo"
+      
+      Features: {
+        @capabilities: [Sorting, Filtering, Pagination, Selection, Grouping]
+        @workflow: "Fetch → Process → Display → Interact"
+        @performance: "Virtual scrolling for 10k+ rows"
+      }
+      
+      Related_Components: {
+        @uses: [Checkbox, Button, Input, Select, Badge]
+        @workflow_next: [Export_Data, Detail_View]
+      }
+    }
+    
+    #### Badge {
+      @type: "registry:ui"
+      @description: "Status indicator or label"
+      @depends_on: []
+      @used_by: [Tables, Cards, Lists, User_Profiles, Notifications]
+      @alternatives: [Chip, Tag, Label, Status]
+      @see_also: [Avatar, Button, Alert]
+      @variants: [default, secondary, destructive, outline]
+      @sizes: [default, sm, lg]
+    }
+    
+    #### Avatar {
+      @type: "registry:ui"
+      @description: "User profile image with fallback"
+      @depends_on: ["@radix-ui/react-avatar"]
+      @used_by: [User_Lists, Comments, Chat, Navigation_Bars]
+      @alternatives: [Profile_Picture, User_Icon]
+      @see_also: [Badge, Dropdown_Menu, Card]
+      @fallback: "Initials or icon"
+    }
+  }
+  
+  ### Form_Components {
+    @category: forms
+    @workflow_prev: UI_Design
+    @workflow_next: Validation
+    @depends_on: ["react-hook-form", "zod"]
+    
+    #### Form {
+      @type: "registry:ui"
+      @description: "Form building with React Hook Form and Zod"
+      @depends_on: ["react-hook-form", "zod", "@hookform/resolvers"]
+      @uses_components: [Input, Select, Checkbox, Switch, RadioGroup, Button]
+      @used_by: [Login_Forms, Registration, Settings, Data_Entry]
+      @alternatives: [Formik, React_Final_Form, Native_Forms]
+      @see_also: [Input_OTP, Date_Picker, File_Upload]
+      @cli_command: "npx shadcn@latest add form"
+      @mcp_tool: "mcp__shadcn__add_component"
+      @validation: "Zod"
+      @workflow_prev: Dialog
+      @workflow_next: Toast
+      @category: forms
+      @complexity: intermediate
+      @example: "form-demo"
+      
+      Components: {
+        FormField: {
+          @purpose: "Controlled form field wrapper"
+          @uses: "Controller from react-hook-form"
+          @workflow_next: FormItem
+        }
+        FormItem: {
+          @purpose: "Form field container"
+          @contains: [FormLabel, FormControl, FormDescription, FormMessage]
+          @workflow_next: FormControl
+        }
+        FormLabel: {
+          @purpose: "Field label"
+          @accessibility: "Associated with input via htmlFor"
+        }
+        FormControl: {
+          @purpose: "Input wrapper"
+          @contains: "Form input component"
+          @workflow_next: FormMessage
+        }
+        FormDescription: {
+          @purpose: "Helper text"
+          @optional: true
+        }
+        FormMessage: {
+          @purpose: "Validation messages"
+          @shows: "Errors from Zod validation"
+        }
+      }
+    }
+    
+    #### Input {
+      @type: "registry:ui"
+      @description: "Text input field"
+      @depends_on: []
+      @used_by: [Form, Search, Command, Filters, Data_Entry]
+      @alternatives: [Textarea, Select, Input_OTP]
+      @see_also: [Form, Label, Input_OTP]
+      @cli_command: "npx shadcn@latest add input"
+      @types: [text, email, password, number, search, tel, url, file]
+      @workflow_prev: Form
+      @workflow_next: Validation
+    }
+    
+    #### Select {
+      @type: "registry:ui"
+      @description: "Dropdown selection component"
+      @depends_on: ["@radix-ui/react-select"]
+      @used_by: [Form, Filters, Settings, Data_Tables]
+      @alternatives: [Combobox, RadioGroup, Native_Select]
+      @see_also: [Dropdown_Menu, Command, Popover]
+      @cli_command: "npx shadcn@latest add select"
+      @features: [Search, Multi_Select, Groups, Custom_Rendering]
+    }
+    
+    #### Checkbox {
+      @type: "registry:ui"
+      @description: "Checkbox input component"
+      @depends_on: ["@radix-ui/react-checkbox"]
+      @used_by: [Form, Table_Selection, Settings, Terms_Acceptance]
+      @alternatives: [Switch, RadioGroup]
+      @see_also: [Form, Switch, RadioGroup]
+      @states: [checked, unchecked, indeterminate]
+    }
+    
+    #### Switch {
+      @type: "registry:ui"
+      @description: "Toggle switch component"
+      @depends_on: ["@radix-ui/react-switch"]
+      @used_by: [Settings, Preferences, Feature_Flags, Dark_Mode_Toggle]
+      @alternatives: [Checkbox, Toggle_Button]
+      @see_also: [Checkbox, Form, Settings_Page]
+      @accessibility: "Role=switch with aria-checked"
+    }
+  }
+  
+  ### Navigation_Components {
+    @category: navigation
+    @workflow_prev: Layout
+    @workflow_next: Content
+    
+    #### NavigationMenu {
+      @type: "registry:ui"
+      @description: "Site navigation with dropdowns"
+      @depends_on: ["@radix-ui/react-navigation-menu"]
+      @used_by: [Site_Header, Main_Navigation, Mobile_Menu]
+      @alternatives: [Tabs, Menubar, Custom_Nav]
+      @see_also: [Dropdown_Menu, Sheet, Command]
+      @cli_command: "npx shadcn@latest add navigation-menu"
+      @patterns: [Mega_Menu, Simple_Nav, Mobile_Drawer]
+      @workflow_next: Router_Integration
+    }
+    
+    #### Tabs {
+      @type: "registry:ui"
+      @description: "Tabbed interface component"
+      @depends_on: ["@radix-ui/react-tabs"]
+      @used_by: [Settings_Pages, Data_Views, Documentation, Dashboards]
+      @alternatives: [NavigationMenu, Accordion, Carousel]
+      @see_also: [Router_Integration, Content_Switching]
+      @cli_command: "npx shadcn@latest add tabs"
+      @workflow_next: Tab_Content
+      @orientation: [horizontal, vertical]
+    }
+    
+    #### Command {
+      @type: "registry:ui"
+      @description: "Command palette with search"
+      @depends_on: ["cmdk"]
+      @used_by: [Search_Interfaces, Command_Palettes, Quick_Actions]
+      @alternatives: [Select, Combobox, Search_Input]
+      @see_also: [Search_Patterns, Keyboard_Navigation]
+      @cli_command: "npx shadcn@latest add command"
+      @keyboard: "Cmd+K or Ctrl+K"
+      @features: [Fuzzy_Search, Keyboard_Nav, Groups, Recent_Items]
+    }
+    
+    #### Breadcrumb {
+      @type: "registry:ui"
+      @description: "Navigation path indicator"
+      @depends_on: []
+      @used_by: [Page_Headers, File_Browsers, Multi_Step_Forms]
+      @alternatives: [Steps, Progress_Bar]
+      @see_also: [Navigation_Patterns, Router_Integration]
+      @workflow_prev: Router
+      @workflow_next: Page_Content
+    }
+    
+    #### Pagination {
+      @type: "registry:ui"
+      @description: "Page navigation controls"
+      @depends_on: []
+      @used_by: [Table, List, Gallery, Search_Results]
+      @alternatives: [Infinite_Scroll, Load_More]
+      @see_also: [Table, Data_Fetching]
+      @workflow_prev: Data_Display
+      @workflow_next: Page_Change
+    }
+  }
+  
+  ### Feedback_Components {
+    @category: feedback
+    @workflow_prev: User_Action
+    @workflow_next: User_Response
+    
+    #### Alert {
+      @type: "registry:ui"
+      @description: "Alert message display"
+      @depends_on: []
+      @used_by: [Forms, Error_Messages, Success_Messages, Warnings]
+      @alternatives: [Toast, Banner, Notification]
+      @see_also: [Alert_Dialog, Toast, Banner]
+      @cli_command: "npx shadcn@latest add alert"
+      @variants: [default, destructive, warning, success]
+      @dismissible: true
+    }
+    
+    #### Toast {
+      @type: "registry:ui"
+      @description: "Temporary notification messages"
+      @depends_on: ["@radix-ui/react-toast"]
+      @used_by: [Form_Submission, Actions, Notifications, Errors]
+      @alternatives: [Alert, Snackbar, Notification]
+      @see_also: [Alert, Alert_Dialog, Sonner]
+      @cli_command: "npx shadcn@latest add toast"
+      @workflow_prev: User_Action
+      @workflow_next: Dismiss
+      @position: [top-right, top-left, bottom-right, bottom-left]
+      @duration: "5000ms default"
+    }
+    
+    #### Progress {
+      @type: "registry:ui"
+      @description: "Progress indicator bar"
+      @depends_on: ["@radix-ui/react-progress"]
+      @used_by: [File_Upload, Loading_States, Multi_Step_Forms]
+      @alternatives: [Spinner, Skeleton, Loading_Bar]
+      @see_also: [Skeleton, Loading_Patterns]
+      @determinate: "Shows specific progress"
+      @indeterminate: "Shows activity without specific progress"
+    }
+    
+    #### Skeleton {
+      @type: "registry:ui"
+      @description: "Loading placeholder component"
+      @depends_on: []
+      @used_by: [Loading_States, Lazy_Loading, Content_Placeholders]
+      @alternatives: [Spinner, Progress, Shimmer]
+      @see_also: [Loading_Patterns, Progress]
+      @patterns: [Card_Skeleton, Text_Skeleton, Image_Skeleton]
+    }
+  }
+  
+  ### Overlay_Components {
+    @category: overlays
+    @workflow_prev: Trigger_Action
+    @workflow_next: User_Interaction
+    
+    #### Dialog {
+      @type: "registry:ui"
+      @description: "Modal dialog overlay"
+      @depends_on: ["@radix-ui/react-dialog", "Button"]
+      @used_by: [Forms, Confirmations, Detail_Views, Media_Viewers]
+      @alternatives: [Sheet, Alert_Dialog, Drawer, Popover]
+      @see_also: [Sheet, Popover, Modal_Patterns]
+      @cli_command: "npx shadcn@latest add dialog"
+      @mcp_tool: "mcp__shadcn__add_component"
+      @workflow_prev: Button_Click
+      @workflow_next: Form
+      @accessibility: [Focus_Trap, ESC_Close, Click_Outside]
+      @category: overlays
+      @complexity: intermediate
+      @example: "dialog-demo"
+      
+      Composition: {
+        DialogTrigger: {
+          @purpose: "Button or element that opens dialog"
+          @workflow_next: DialogContent
+        }
+        DialogContent: {
+          @purpose: "Modal content container"
+          @contains: [DialogHeader, DialogBody, DialogFooter]
+          @features: [Focus_Lock, Scroll_Lock, Portal]
+        }
+        DialogHeader: {
+          @contains: [DialogTitle, DialogDescription]
+        }
+        DialogFooter: {
+          @contains: "Action buttons"
+          @pattern: [Cancel_Button, Confirm_Button]
+        }
+      }
+    }
+    
+    #### Sheet {
+      @type: "registry:ui"
+      @description: "Slide-out panel overlay"
+      @depends_on: ["@radix-ui/react-dialog"]
+      @used_by: [Mobile_Menus, Settings_Panels, Filters, Shopping_Carts]
+      @alternatives: [Dialog, Drawer, Sidebar]
+      @see_also: [Dialog, Drawer, Navigation_Patterns]
+      @cli_command: "npx shadcn@latest add sheet"
+      @sides: [top, right, bottom, left]
+      @workflow: "Trigger → Slide → Interact → Close"
+    }
+    
+    #### Popover {
+      @type: "registry:ui"
+      @description: "Floating content panel"
+      @depends_on: ["@radix-ui/react-popover"]
+      @used_by: [Date_Pickers, Color_Pickers, Info_Panels, Quick_Actions]
+      @alternatives: [Tooltip, Dialog, Dropdown_Menu]
+      @see_also: [Tooltip, Dropdown_Menu, Hover_Card]
+      @trigger: [click, hover, focus]
+      @placement: [top, right, bottom, left]
+    }
+    
+    #### Dropdown_Menu {
+      @type: "registry:ui"
+      @description: "Dropdown menu with actions"
+      @depends_on: ["@radix-ui/react-dropdown-menu"]
+      @used_by: [Context_Menus, Action_Menus, User_Menus, Settings]
+      @alternatives: [Select, Context_Menu, Popover]
+      @see_also: [Context_Menu, Select, Menu_Patterns]
+      @features: [Submenus, Checkable_Items, Radio_Groups, Separators]
+      @keyboard: "Arrow navigation, Enter to select"
+    }
+    
+    #### Context_Menu {
+      @type: "registry:ui"
+      @description: "Right-click context menu"
+      @depends_on: ["@radix-ui/react-context-menu"]
+      @used_by: [Tables, Lists, File_Browsers, Text_Editors]
+      @alternatives: [Dropdown_Menu, Action_Buttons]
+      @see_also: [Dropdown_Menu, Menu_Patterns]
+      @trigger: "Right-click or long-press"
+      @accessibility: "Shift+F10 keyboard trigger"
+    }
+    
+    #### Alert_Dialog {
+      @type: "registry:ui"
+      @description: "Confirmation dialog with actions"
+      @depends_on: ["@radix-ui/react-alert-dialog"]
+      @extends: Dialog
+      @used_by: [Delete_Confirmations, Unsaved_Changes, Critical_Actions]
+      @alternatives: [Dialog, Toast, Native_Confirm]
+      @see_also: [Dialog, Confirmation_Patterns]
+      @pattern: "Title → Description → Cancel/Confirm"
+      @accessibility: "Focus on cancel by default"
+    }
+    
+    #### Tooltip {
+      @type: "registry:ui"
+      @description: "Hover information overlay"
+      @depends_on: ["@radix-ui/react-tooltip"]
+      @used_by: [Icon_Buttons, Truncated_Text, Help_Icons, Status_Indicators]
+      @alternatives: [Popover, Hover_Card, Title_Attribute]
+      @see_also: [Popover, Hover_Card]
+      @trigger: "Hover or focus"
+      @delay: "700ms default"
+      @skip_delay: "After first tooltip"
+    }
+    
+    #### Hover_Card {
+      @type: "registry:ui"
+      @description: "Rich content on hover"
+      @depends_on: ["@radix-ui/react-hover-card"]
+      @used_by: [User_Profiles, Link_Previews, Product_Cards]
+      @alternatives: [Tooltip, Popover]
+      @see_also: [Tooltip, Popover, Card]
+      @delay: "700ms open, 300ms close"
+      @content: "Rich HTML content"
+    }
+  }
+  
+  ### Button {
+    @type: "registry:ui"
+    @description: "Interactive button component"
+    @depends_on: ["@radix-ui/react-slot"]
+    @used_by: [Dialog, Card, Form, Alert_Dialog, Dashboard_01, ALL_INTERACTIVE_COMPONENTS]
+    @alternatives: [Link, Toggle, Icon_Button]
+    @see_also: [Button_Group, Icon_Button, Toggle_Button]
+    @cli_command: "npx shadcn@latest add button"
+    @mcp_tool: "mcp__shadcn__add_component"
+    @variants: [default, destructive, outline, secondary, ghost, link]
+    @sizes: [default, sm, lg, icon]
+    @category: ui
+    @complexity: beginner
+    @example: "button-demo"
+    @workflow_next: [Dialog, Form_Submit, Navigation]
+    
+    Implementation: {
+      @uses: "class-variance-authority"
+      @pattern: "Variant Pattern"
+      @composition: "Can wrap any element with asChild"
+    }
+  }
+}
+
+## Blocks {
+  @type: pre_built_blocks
+  @total_count: 140+
+  @categories: [Dashboard, Sidebar, Authentication, Charts, Calendar]
+  @workflow_prev: Component_Installation
+  @workflow_next: Customization
+  @see_also: [Component_Composition, Layout_Patterns]
+  
+  ### Dashboard_Blocks {
+    @count: 10
+    @category: dashboard
+    
+    #### Dashboard_01 {
+      @components: [Sidebar, Card, Chart, Table, Button, Badge, Avatar]
+      @patterns: [Layout, Data_Display, Navigation]
+      @data_flow: "Fetch → Process → Display → Interact"
+      @responsive: [Mobile, Tablet, Desktop]
+      @see_also: [Sidebar_Variants, Chart_Types, Table_Patterns]
+      @cli_command: "npx shadcn@latest add dashboard-01"
+      @workflow: "Layout → Components → Data → Styling"
+      @complexity: advanced
+      
+      Features: {
+        @sidebar: "Collapsible navigation"
+        @header: "Search and user menu"
+        @main: "Cards with stats and charts"
+        @table: "Recent transactions"
+      }
+    }
+  }
+  
+  ### Sidebar_Blocks {
+    @count: 16
+    @category: navigation
+    
+    Variants: {
+      @total: 16
+      @categories: [Simple, Collapsible, Nested, Floating, Icon_Only]
+      @components: [Navigation_Menu, Button, Avatar, Badge, Tooltip]
+      @responsive_behavior: [Drawer_Mobile, Fixed_Desktop]
+      @see_also: [Dashboard, Navigation_Patterns, Sheet]
+      @workflow: "Select_Variant → Install → Customize → Integrate"
+      
+      Features: {
+        @collapsible: "Toggle sidebar width"
+        @nested: "Multi-level navigation"
+        @floating: "Overlay on content"
+        @icon_only: "Minimal space usage"
+      }
+    }
+  }
+  
+  ### Authentication_Blocks {
+    @count: 10
+    @category: auth
+    
+    Login_Forms: {
+      @count: 5
+      @components: [Card, Form, Input, Button, Checkbox, Label]
+      @patterns: [Validation, Social_Login, Remember_Me]
+      @see_also: [Form_Validation, OAuth_Integration]
+      @workflow: "UI → Validation → Submit → Response"
+      
+      Variants: {
+        @simple: "Email and password"
+        @social: "With OAuth providers"
+        @magic_link: "Passwordless"
+        @two_factor: "With 2FA"
+        @enterprise: "With SSO"
+      }
+    }
+  }
+  
+  ### Chart_Blocks {
+    @count: 79
+    @category: data_visualization
+    @depends_on: ["recharts"]
+    
+    Types: {
+      @area: 10
+      @bar: 12
+      @line: 15
+      @pie: 8
+      @radar: 5
+      @scatter: 4
+      @composed: 10
+      @treemap: 3
+      @funnel: 2
+      
+      Common_Features: {
+        @responsive: true
+        @tooltips: "Custom tooltips"
+        @legends: "Configurable"
+        @animations: "Entry and update"
+        @themes: "Light and dark"
+      }
+    }
+    
+    Integration: {
+      @data_source: [API, Static, Real_Time]
+      @export: [PNG, SVG, CSV]
+      @see_also: [Table, Dashboard, Reports]
+      @workflow: "Data → Transform → Render → Interact"
+    }
+  }
+}
+
+## Patterns {
+  @type: design_patterns
+  @categories: [Composition, Variants, State, Layout]
+  @see_also: [Best_Practices, Architecture]
+  
+  ### Composition_Pattern {
+    @description: "Building complex components from simple ones"
+    @examples: [Card, Dialog, Form, Sheet]
+    @benefits: [Flexibility, Reusability, Maintainability]
+    @see_also: [Component_Architecture, Compound_Components]
+    
+    Implementation: {
+      Card: {
+        @parts: [CardHeader, CardContent, CardFooter]
+        @workflow: "Container → Sections → Content"
+      }
+      Dialog: {
+        @parts: [DialogTrigger, DialogContent, DialogHeader, DialogFooter]
+        @workflow: "Trigger → Portal → Content → Actions"
+      }
+      Form: {
+        @parts: [FormField, FormItem, FormControl, FormMessage]
+        @workflow: "Field → Control → Validation → Display"
+      }
+    }
+  }
+  
+  ### Variant_Pattern {
+    @tool: "class-variance-authority"
+    @examples: [Button, Badge, Alert, Input]
+    @implementation: "cva() function"
+    @benefits: [Type_Safety, Consistency, Predictability]
+    @see_also: [Theming, Styling, TypeScript]
+    
+    Usage: ```typescript
+      const buttonVariants = cva(
+        "base-classes",
+        {
+          variants: {
+            variant: { default: "...", destructive: "..." },
+            size: { default: "...", sm: "...", lg: "..." }
+          },
+          defaultVariants: {
+            variant: "default",
+            size: "default"
+          }
+        }
+      )
+    ```
+  }
+  
+  ### State_Management {
+    @patterns: [Controlled, Uncontrolled, Mixed]
+    @tools: [React_State, Radix_State, Form_State]
+    
+    Controlled: {
+      @examples: [Form_Fields, Dialogs, Tabs]
+      @benefits: "Full control over state"
+      @workflow: "Props → State → Update → Render"
+    }
+    
+    Uncontrolled: {
+      @examples: [Tooltips, Hover_Cards]
+      @benefits: "Simpler API"
+      @workflow: "Internal_State → Events → Updates"
+    }
+  }
+}
+
+## CLI_Tool {
+  @type: command_line_interface
+  @package: "shadcn"
+  @workflow_prev: Installation
+  @workflow_next: Component_Usage
+  @see_also: [MCP_Server, Manual_Installation]
+  
+  ### Commands {
+    @available: [init, add, diff, update, view, search, build]
+    
+    init: {
+      @command: "npx shadcn@latest init"
+      @purpose: "Initialize project with shadcn/ui"
+      @creates: "components.json"
+      @modifies: ["tailwind.config.js", "globals.css"]
+      @workflow_next: "add"
+      @mcp_equivalent: "mcp__shadcn__init_project"
+    }
+    
+    add: {
+      @command: "npx shadcn@latest add [component]"
+      @purpose: "Add components to project"
+      @workflow_prev: "init"
+      @workflow_next: "customize"
+      @mcp_equivalent: "mcp__shadcn__add_component"
+      @options: {
+        "--yes": "Skip confirmation"
+        "--overwrite": "Overwrite existing"
+        "--cwd": "Specify directory"
+        "--path": "Custom component path"
+      }
+    }
+    
+    diff: {
+      @command: "npx shadcn@latest diff [component]"
+      @purpose: "Check for component updates"
+      @workflow_next: "update"
+      @shows: "Changes between local and registry"
+    }
+    
+    update: {
+      @command: "npx shadcn@latest update [component]"
+      @purpose: "Update components to latest"
+      @workflow_prev: "diff"
+      @caution: "May overwrite customizations"
+    }
+  }
+  
+  ### Workflow {
+    @sequence: "init → add → customize → update"
+    @see_also: [MCP_Workflow, Development_Flow]
+    
+    Step_1_Initialize: {
+      @action: "npx shadcn@latest init"
+      @workflow_next: Step_2_Add
+    }
+    
+    Step_2_Add: {
+      @action: "npx shadcn@latest add button card form"
+      @workflow_prev: Step_1_Initialize
+      @workflow_next: Step_3_Customize
+    }
+    
+    Step_3_Customize: {
+      @action: "Edit components in components/ui/"
+      @workflow_prev: Step_2_Add
+      @workflow_next: Step_4_Use
+    }
+    
+    Step_4_Use: {
+      @action: "Import and use in your app"
+      @workflow_prev: Step_3_Customize
+    }
+  }
+}
+
+## MCP_Server {
+  @type: mission_control_platform
+  @protocol: Model_Context_Protocol
+  @tools_count: 7
+  @workflow: "List → Search → View → Add"
+  @see_also: [CLI_Tool, Registry_System]
+  @integration: "Claude Desktop App"
+  
+  ### Tools {
+    @available: 7
+    @categories: [Discovery, Inspection, Installation, Validation]
+    
+    get_project_registries: {
+      @purpose: "Get configured registry names"
+      @returns: "Registry list from components.json"
+      @workflow_next: "list_items_in_registries"
+      @requires: "components.json"
+      @error_if: "No components.json exists"
+    }
+    
+    list_items_in_registries: {
+      @purpose: "List all items in registries"
+      @params: {
+        registries: "Array of registry names"
+        limit: "Max items to return"
+        offset: "Pagination offset"
+      }
+      @workflow_prev: "get_project_registries"
+      @workflow_next: "search_items_in_registries"
+      @returns: "Component list with metadata"
+    }
+    
+    search_items_in_registries: {
+      @purpose: "Search components with fuzzy matching"
+      @params: {
+        query: "Search string"
+        registries: "Registries to search"
+      }
+      @workflow_next: "view_items_in_registries"
+      @algorithm: "Fuzzy matching"
+      @searches: ["names", "descriptions"]
+    }
+    
+    view_items_in_registries: {
+      @purpose: "View detailed component information"
+      @params: {
+        items: "Array of item names with registry prefix"
+      }
+      @returns: ["name", "description", "type", "files", "dependencies"]
+      @workflow_prev: "search_items_in_registries"
+      @workflow_next: "get_add_command_for_items"
+    }
+    
+    get_item_examples_from_registries: {
+      @purpose: "Find usage examples and demos"
+      @params: {
+        query: "Search for examples"
+        registries: "Registries to search"
+      }
+      @patterns: ["{component}-demo", "{component} example", "example-{component}"]
+      @returns: "Full implementation code"
+      @workflow_prev: "view_items_in_registries"
+    }
+    
+    get_add_command_for_items: {
+      @purpose: "Get CLI command for adding items"
+      @params: {
+        items: "Items to add"
+      }
+      @returns: "shadcn add command"
+      @workflow_prev: "view_items_in_registries"
+      @workflow_next: "Execute command"
+    }
+    
+    get_audit_checklist: {
+      @purpose: "Verify component integration"
+      @returns: "Checklist for validation"
+      @workflow_prev: "Component installation"
+      @checks: ["Dependencies", "Imports", "Styling", "Functionality"]
+    }
+  }
+  
+  ### MCP_Workflow {
+    @optimal_path: "Discover → Explore → Install → Verify"
+    @see_also: [CLI_Workflow, Development_Flow]
+    
+    Discovery: {
+      @tools: ["get_project_registries", "list_items_in_registries"]
+      @workflow_next: "Exploration"
+    }
+    
+    Exploration: {
+      @tools: ["search_items_in_registries", "view_items_in_registries"]
+      @workflow_prev: "Discovery"
+      @workflow_next: "Installation"
+    }
+    
+    Installation: {
+      @tools: ["get_add_command_for_items"]
+      @workflow_prev: "Exploration"
+      @workflow_next: "Verification"
+    }
+    
+    Verification: {
+      @tools: ["get_audit_checklist"]
+      @workflow_prev: "Installation"
+    }
+  }
+}
+
+## Registry_System {
+  @type: component_distribution
+  @total_items: 336
+  @categories: [ui, block, example, theme, hook, lib]
+  @workflow: "Create → Authenticate → Deploy → Consume"
+  @see_also: [CLI_Tool, MCP_Server, Custom_Registries]
+  
+  ### Registry_Structure {
+    @format: "JSON schema"
+    @namespace: "@{organization}/{component}"
+    
+    Item_Types: {
+      ui: {
+        @count: 48
+        @description: "Core UI components"
+        @examples: [Button, Card, Dialog, Form]
+      }
+      block: {
+        @count: 140+
+        @description: "Pre-built sections"
+        @examples: [Dashboard, Sidebar, Charts]
+      }
+      example: {
+        @count: 100+
+        @description: "Usage examples"
+        @pattern: "{component}-demo"
+      }
+      theme: {
+        @count: 10+
+        @description: "Color themes"
+        @examples: [Default, Zinc, Slate, Stone]
+      }
+      hook: {
+        @count: 5+
+        @description: "React hooks"
+        @examples: [useIsMobile, useMediaQuery]
+      }
+      lib: {
+        @count: 10+
+        @description: "Utility libraries"
+        @examples: [utils, lib]
+      }
+    }
+  }
+  
+  ### Custom_Registries {
+    @purpose: "Private component libraries"
+    @workflow: "Setup → Build → Deploy → Share"
+    
+    Setup: {
+      @command: "npx shadcn@latest build"
+      @creates: "Registry structure"
+      @workflow_next: "Authentication"
+    }
+    
+    Authentication: {
+      @methods: ["GitHub", "GitLab", "npm"]
+      @workflow_prev: "Setup"
+      @workflow_next: "Deployment"
+    }
+    
+    Deployment: {
+      @platforms: ["GitHub Pages", "Vercel", "Netlify"]
+      @workflow_prev: "Authentication"
+      @workflow_next: "Consumption"
+    }
+    
+    Consumption: {
+      @command: "npx shadcn@latest add @myorg/component"
+      @workflow_prev: "Deployment"
+    }
+  }
+}
+
+## Theming {
+  @type: customization
+  @methods: [CSS_Variables, Tailwind_Classes, Theme_Provider]
+  @workflow: "Colors → Variables → Application"
+  @see_also: [Dark_Mode, Color_System, Typography]
+  
+  ### CSS_Variables {
+    @location: "globals.css"
+    @format: "HSL values"
+    @benefits: "Runtime theming"
+    
+    Structure: ```css
+      :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --primary: 222.2 47.4% 11.2%;
+        --primary-foreground: 210 40% 98%;
+        /* ... more variables */
+      }
+      
+      .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+        /* ... dark mode variables */
+      }
+    ```
+    
+    Usage: {
+      @in_tailwind: "bg-background text-foreground"
+      @in_css: "hsl(var(--primary))"
+    }
+  }
+  
+  ### Dark_Mode {
+    @providers: ["next-themes", "class-based", "media-query"]
+    @default: "next-themes"
+    @toggle_component: "ModeToggle"
+    
+    Implementation: {
+      Provider_Setup: ```tsx
+        <ThemeProvider attribute="class" defaultTheme="system">
+          <App />
+        </ThemeProvider>
+      ```
+      
+      Toggle_Component: ```tsx
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Sun className="rotate-0 scale-100 dark:-rotate-90 dark:scale-0" />
+              <Moon className="rotate-90 scale-0 dark:rotate-0 dark:scale-100" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ```
+    }
+  }
+  
+  ### Color_System {
+    @format: "HSL with CSS variables"
+    @themes: [Default, Zinc, Slate, Stone, Gray, Neutral, Red, Green, Blue, Yellow, Violet]
+    @generator: "https://ui.shadcn.com/themes"
+    
+    Customization: {
+      @workflow: "Choose base → Generate palette → Apply variables"
+      @tools: ["Theme generator", "Manual HSL"]
+    }
+  }
+}
+
+## Utils {
+  @type: utility_functions
+  @location: "lib/utils.ts"
+  @see_also: [Component_Helpers, Styling_Utils]
+  
+  ### cn_Function {
+    @purpose: "Merge Tailwind classes with conflict resolution"
+    @depends_on: ["clsx", "tailwind-merge"]
+    @used_by: ALL_COMPONENTS
+    @pattern: "Class name merging"
+    @critical: true
+    
+    Implementation: ```typescript
+      import { type ClassValue, clsx } from "clsx"
+      import { twMerge } from "tailwind-merge"
+      
+      export function cn(...inputs: ClassValue[]) {
+        return twMerge(clsx(inputs))
+      }
+    ```
+    
+    Usage: {
+      @example: ```typescript
+        cn(
+          "base-classes",
+          condition && "conditional-classes",
+          { "object-syntax": true },
+          className // prop override
+        )
+      ```
+      @benefit: "Later classes override earlier ones"
+      @solves: "Tailwind class conflicts"
+    }
+  }
+}
+
+## Hooks {
+  @type: react_hooks
+  @location: "hooks/"
+  @see_also: [React_Patterns, Component_Logic]
+  
+  ### useIsMobile {
+    @purpose: "Responsive viewport detection"
+    @breakpoint: 768
+    @used_by: [Responsive_Components, Mobile_Menus, Conditional_Rendering]
+    @pattern: "Media query hook"
+    @see_also: [Responsive_Design, Mobile_First]
+    
+    Implementation: ```typescript
+      export function useIsMobile() {
+        const [isMobile, setIsMobile] = React.useState(false)
+        
+        React.useEffect(() => {
+          const query = window.matchMedia("(max-width: 768px)")
+          setIsMobile(query.matches)
+          
+          function onChange(event: MediaQueryListEvent) {
+            setIsMobile(event.matches)
+          }
+          
+          query.addEventListener("change", onChange)
+          return () => query.removeEventListener("change", onChange)
+        }, [])
+        
+        return isMobile
+      }
+    ```
+    
+    Usage: {
+      @in_component: ```tsx
+        const isMobile = useIsMobile()
+        
+        return isMobile ? <MobileView /> : <DesktopView />
+      ```
+    }
+  }
+  
+  ### useMediaQuery {
+    @purpose: "Custom media query detection"
+    @flexible: "Any breakpoint"
+    @pattern: "Responsive hook"
+    
+    Usage: ```typescript
+      const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1024px)")
+      const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
+    ```
+  }
+}
+
+## Typography {
+  @type: text_styling
+  @implementation: [Tailwind_Classes, Custom_Components]
+  @see_also: [Font_System, Text_Components]
+  
+  ### Font_System {
+    @default: "System font stack"
+    @custom: "Variable fonts supported"
+    
+    Setup: {
+      @next_font: ```typescript
+        import { Inter } from "next/font/google"
+        
+        const inter = Inter({
+          subsets: ["latin"],
+          variable: "--font-inter",
+        })
+      ```
+      
+      @tailwind_config: ```javascript
+        fontFamily: {
+          sans: ["var(--font-inter)", ...fontFamily.sans],
+        }
+      ```
+    }
+  }
+  
+  ### Typography_Components {
+    @optional: true
+    @purpose: "Consistent text styling"
+    
+    Examples: {
+      Heading: ```tsx
+        export function TypographyH1({ children }) {
+          return (
+            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+              {children}
+            </h1>
+          )
+        }
+      ```
+      
+      Paragraph: ```tsx
+        export function TypographyP({ children }) {
+          return (
+            <p className="leading-7 [&:not(:first-child)]:mt-6">
+              {children}
+            </p>
+          )
+        }
+      ```
+    }
+  }
+}
+
+## Integration_Patterns {
+  @type: implementation_guides
+  @categories: [Forms, Data_Fetching, Authentication, Routing]
+  @see_also: [Best_Practices, Examples]
+  
+  ### Form_Integration {
+    @stack: ["React Hook Form", "Zod", "shadcn Form"]
+    @workflow: "Schema → Form → Validation → Submit"
+    
+    Complete_Example: ```tsx
+      const formSchema = z.object({
+        email: z.string().email(),
+        password: z.string().min(8),
+      })
+      
+      function LoginForm() {
+        const form = useForm<z.infer<typeof formSchema>>({
+          resolver: zodResolver(formSchema),
+          defaultValues: {
+            email: "",
+            password: "",
+          },
+        })
+        
+        function onSubmit(values: z.infer<typeof formSchema>) {
+          // Handle form submission
+        }
+        
+        return (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="email@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
+        )
+      }
+    ```
+  }
+  
+  ### Data_Table_Integration {
+    @stack: ["TanStack Table", "shadcn Table"]
+    @features: [Sorting, Filtering, Pagination, Selection]
+    @workflow: "Data → Columns → Table → Features"
+    
+    Setup: {
+      @install: "npx shadcn@latest add table"
+      @dependency: "npm install @tanstack/react-table"
+    }
+  }
+}
+
+## v0_Integration {
+  @type: ai_design_tool
+  @url: "v0.dev"
+  @purpose: "Generate UI from prompts"
+  @workflow: "Prompt → Generate → Copy → Customize"
+  @see_also: [AI_Tools, Rapid_Prototyping]
+  
+  ### Features {
+    @generation: "AI-powered UI creation"
+    @components: "Uses shadcn/ui components"
+    @export: "Copy code directly"
+    @customization: "Edit in v0 or locally"
+  }
+  
+  ### Workflow {
+    1_Describe: {
+      @action: "Describe UI in natural language"
+      @example: "Create a pricing table with 3 tiers"
+      @workflow_next: "Generate"
+    }
+    
+    2_Generate: {
+      @action: "v0 creates multiple variants"
+      @workflow_prev: "Describe"
+      @workflow_next: "Select"
+    }
+    
+    3_Select: {
+      @action: "Choose preferred design"
+      @workflow_prev: "Generate"
+      @workflow_next: "Copy"
+    }
+    
+    4_Copy: {
+      @action: "Copy component code"
+      @includes: "All shadcn/ui dependencies"
+      @workflow_prev: "Select"
+      @workflow_next: "Integrate"
+    }
+    
+    5_Integrate: {
+      @action: "Add to your project"
+      @workflow_prev: "Copy"
+      @customize: "Modify as needed"
+    }
+  }
+}
+
+## Development_Workflow {
+  @type: end_to_end_guide
+  @stages: [Planning, Setup, Development, Testing, Deployment]
+  @see_also: [Best_Practices, Project_Structure]
+  
+  ### Complete_Flow {
+    @optimal_path: "Plan → Setup → Develop → Test → Deploy"
+    
+    1_Planning: {
+      @tasks: [
+        "Define requirements",
+        "Choose framework",
+        "Select components",
+        "Design system"
+      ]
+      @workflow_next: "Setup"
+      @tools: [Figma, v0, Storybook]
+    }
+    
+    2_Setup: {
+      @tasks: [
+        "Initialize project",
+        "Install shadcn/ui",
+        "Configure theme",
+        "Setup providers"
+      ]
+      @workflow_prev: "Planning"
+      @workflow_next: "Development"
+      @commands: [
+        "npx create-next-app",
+        "npx shadcn@latest init",
+        "npx shadcn@latest add"
+      ]
+    }
+    
+    3_Development: {
+      @tasks: [
+        "Add components",
+        "Build features",
+        "Customize styling",
+        "Integrate APIs"
+      ]
+      @workflow_prev: "Setup"
+      @workflow_next: "Testing"
+      @patterns: [
+        "Component composition",
+        "Form validation",
+        "Data fetching",
+        "State management"
+      ]
+    }
+    
+    4_Testing: {
+      @tasks: [
+        "Unit tests",
+        "Integration tests",
+        "Accessibility audit",
+        "Performance check"
+      ]
+      @workflow_prev: "Development"
+      @workflow_next: "Deployment"
+      @tools: [Jest, Testing_Library, Lighthouse, Axe]
+    }
+    
+    5_Deployment: {
+      @tasks: [
+        "Build optimization",
+        "Environment setup",
+        "Deploy to hosting",
+        "Monitor performance"
+      ]
+      @workflow_prev: "Testing"
+      @platforms: [Vercel, Netlify, AWS, Custom]
+    }
+  }
+}
+
+## Cross_References {
+  @type: relationship_mappings
+  @purpose: "Connect related concepts"
+  
+  ### Form_Ecosystem {
+    Form → [Input, Select, Checkbox, Switch, RadioGroup]
+    Input → [Form, Search, Command, Filters]
+    Select → [Form, Combobox, Dropdown_Menu]
+    Checkbox → [Form, Table_Selection, Switch]
+    Switch → [Settings, Feature_Flags, Dark_Mode]
+    RadioGroup → [Form, Settings, Surveys]
+  }
+  
+  ### Overlay_Ecosystem {
+    Dialog ↔ Sheet: "Modal alternatives"
+    Popover ↔ Tooltip: "Hover vs click"
+    Dropdown_Menu ↔ Context_Menu: "Click vs right-click"
+    Alert_Dialog → Dialog: "Extends with confirmation"
+    Hover_Card → Tooltip: "Rich vs simple content"
+  }
+  
+  ### Navigation_Ecosystem {
+    Tabs → [Router_Integration, Content_Switching]
+    Navigation_Menu → [Site_Header, Main_Nav]
+    Breadcrumb → [Route_Path, Navigation_Trail]
+    Command → [Search, Command_Palette, Quick_Actions]
+    Pagination → [Table, List, Gallery]
+  }
+  
+  ### Data_Display_Ecosystem {
+    Table → [Pagination, Sorting, Filtering, Export]
+    Chart → [Dashboard, Reports, Analytics]
+    Badge → [Status, Labels, Tags]
+    Avatar → [User_Display, Comments, Chat]
+    Card → [Content_Container, Dashboard, Lists]
+  }
+}
+
+## Best_Practices {
+  @type: guidelines
+  @categories: [Performance, Accessibility, Maintainability]
+  @see_also: [Patterns, Anti_Patterns]
+  
+  ### Component_Guidelines {
+    @do: [
+      "Use composition over configuration",
+      "Keep components focused",
+      "Provide proper TypeScript types",
+      "Include accessibility features",
+      "Use semantic HTML"
+    ]
+    
+    @dont: [
+      "Over-abstract components",
+      "Ignore keyboard navigation",
+      "Hard-code values",
+      "Skip error boundaries",
+      "Forget loading states"
+    ]
+  }
+  
+  ### Performance {
+    @optimize: [
+      "Lazy load heavy components",
+      "Use React.memo for expensive renders",
+      "Implement virtual scrolling for lists",
+      "Code split by route",
+      "Optimize bundle size"
+    ]
+    
+    @monitor: [
+      "Lighthouse scores",
+      "Bundle analyzer",
+      "Runtime performance",
+      "Core Web Vitals"
+    ]
+  }
+  
+  ### Accessibility {
+    @requirements: [
+      "ARIA labels and roles",
+      "Keyboard navigation",
+      "Focus management",
+      "Screen reader support",
+      "Color contrast"
+    ]
+    
+    @testing: [
+      "Axe DevTools",
+      "Screen reader testing",
+      "Keyboard-only navigation",
+      "Lighthouse audit"
+    ]
+  }
+}
+
+## Troubleshooting {
+  @type: common_issues
+  @categories: [Installation, Styling, TypeScript, Build]
+  @see_also: [FAQ, Support]
+  
+  ### Common_Issues {
+    
+    Module_Not_Found: {
+      @error: "Cannot find module '@/components/ui/button'"
+      @solution: "Check path aliases in tsconfig.json"
+      @see_also: [TypeScript_Config, Path_Aliases]
+    }
+    
+    Style_Not_Applied: {
+      @error: "Components lack styling"
+      @solution: "Ensure globals.css is imported"
+      @check: ["Tailwind config", "CSS import", "PostCSS setup"]
+    }
+    
+    TypeScript_Errors: {
+      @error: "Type errors in components"
+      @solution: "Install type definitions"
+      @command: "npm install -D @types/react @types/node"
+    }
+    
+    Dark_Mode_Not_Working: {
+      @error: "Dark mode doesn't toggle"
+      @solution: "Check ThemeProvider setup"
+      @verify: ["Provider wrapping", "class attribute", "CSS variables"]
+    }
+  }
+}
+
+## Migration_Guides {
+  @type: upgrade_paths
+  @from: [Other_Libraries, Older_Versions]
+  @see_also: [Breaking_Changes, Compatibility]
+  
+  ### From_Other_Libraries {
+    
+    From_Material_UI: {
+      @components_mapping: {
+        Button: "Direct replacement",
+        TextField: "Use Input + Label",
+        Select: "Similar API",
+        Dialog: "Similar structure",
+        Snackbar: "Use Toast"
+      }
+      @workflow: "Component by component migration"
+    }
+    
+    From_Ant_Design: {
+      @components_mapping: {
+        Button: "Similar variants",
+        Input: "Direct replacement",
+        Select: "Different API",
+        Modal: "Use Dialog",
+        Message: "Use Toast"
+      }
+      @considerations: "Different design philosophy"
+    }
+  }
+}
+
+## Community_Resources {
+  @type: external_resources
+  @categories: [Templates, Examples, Tutorials]
+  @see_also: [Documentation, Support]
+  
+  ### Official_Resources {
+    @documentation: "ui.shadcn.com"
+    @github: "github.com/shadcn/ui"
+    @discord: "Discord community"
+    @twitter: "@shadcn"
+  }
+  
+  ### Templates {
+    @taxonomy: "Starter template with shadcn/ui"
+    @next_admin: "Admin dashboard template"
+    @saas_starter: "SaaS application template"
+  }
+  
+  ### Learning {
+    @tutorials: "Video and written guides"
+    @examples: "Real-world implementations"
+    @courses: "Full-stack courses using shadcn/ui"
+  }
+}
+
+## Metadata {
+  @total_sections: 25
+  @total_components: 48
+  @total_blocks: 140+
+  @total_relations: 500+
+  @relation_types: [
+    "@depends_on",
+    "@used_by",
+    "@alternatives",
+    "@see_also",
+    "@workflow_next",
+    "@workflow_prev",
+    "@implements",
+    "@extends",
+    "@requires",
+    "@cli_command",
+    "@mcp_tool",
+    "@category"
+  ]
+  @coverage: complete
+  @version: "2.0.0"
+  @last_updated: "2025-01-12"
+}

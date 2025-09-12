@@ -1,0 +1,2098 @@
+# shadcn/ui Comprehensive Knowledgebase
+@version: 1.0.0
+@created: 2025-01-12
+@description: Complete shadcn/ui documentation, components, patterns, and implementation guide
+
+## Overview {
+  @type: introduction
+  @philosophy: "Copy and paste, not a dependency"
+  
+  ### Core_Concepts {
+    - Component_Library: "Not a traditional library - components you copy into your project"
+    - Built_On: "Radix UI primitives + Tailwind CSS"
+    - Customization: "Full control over components - modify as needed"
+    - Registry_Based: "336+ items in registry system"
+    - Framework_Agnostic: "Works with any React framework"
+  }
+  
+  ### Key_Features {
+    - Accessibility_First: "Built on Radix UI with ARIA compliance"
+    - Dark_Mode: "Built-in dark mode support"
+    - TypeScript: "Full TypeScript support (JavaScript optional)"
+    - CLI_Tool: "Powerful CLI for component management"
+    - MCP_Server: "Mission Control Platform integration"
+    - Theming: "CSS variables or utility classes"
+  }
+}
+
+## Installation {
+  @type: setup_guides
+  
+  ### Quick_Start {
+    @command: "npx shadcn@latest init"
+    @description: "Initialize shadcn/ui in your project"
+    
+    Steps: [
+      "1. Run init command",
+      "2. Configure components.json",
+      "3. Add components via CLI",
+      "4. Customize as needed"
+    ]
+  }
+  
+  ### Framework_Guides {
+    
+    #### Next_js {
+      @url: "/docs/installation/next"
+      @command: "npx create-next-app@latest my-app --typescript --tailwind --eslint"
+      
+      Configuration: {
+        - TypeScript_Config: "Add baseUrl and paths for @/* imports"
+        - Tailwind_Setup: "Automatic with create-next-app"
+        - Components_Location: "components/ui/"
+      }
+      
+      Init_Command: "npx shadcn@latest init"
+      Add_Component: "npx shadcn@latest add button"
+    }
+    
+    #### Vite {
+      @url: "/docs/installation/vite"
+      @command: "pnpm create vite@latest"
+      
+      Additional_Setup: {
+        - Install_Tailwind: "pnpm add tailwindcss @tailwindcss/vite"
+        - TypeScript_Config: "Configure paths in tsconfig.json and tsconfig.app.json"
+        - Vite_Config: "Add path alias resolver"
+        - Node_Types: "pnpm add -D @types/node"
+      }
+    }
+    
+    #### Remix {
+      @url: "/docs/installation/remix"
+      @command: "pnpm dlx create-remix@latest my-app"
+      
+      Tailwind_Setup: {
+        - Install: "pnpm add -D tailwindcss@latest autoprefixer@latest"
+        - PostCSS_Config: "Create postcss.config.js"
+        - Import_CSS: "Add to app/root.tsx via LinksFunction"
+      }
+    }
+    
+    #### Astro {
+      @url: "/docs/installation/astro"
+      @command: "pnpm dlx create-astro@latest astro-app --template with-tailwindcss --add react"
+      
+      React_Integration: "Required for components"
+      Path_Aliases: "Configure in tsconfig.json"
+    }
+    
+    #### Laravel {
+      @url: "/docs/installation/laravel"
+      @command: "laravel new my-app --react"
+      
+      Stack: "Laravel + Inertia.js + React"
+      Components_Path: "resources/js/components/ui/"
+    }
+    
+    #### TanStack_Start {
+      @url: "/docs/installation/tanstack"
+      @requires: "Build from scratch following TanStack guide"
+      
+      Tailwind_Setup: {
+        - Install: "pnpm add tailwindcss @tailwindcss/postcss postcss"
+        - PostCSS_Config: "Create postcss.config.ts"
+        - Import_CSS: "Add to __root.tsx"
+      }
+    }
+    
+    #### TanStack_Router {
+      @url: "/docs/installation/tanstack-router"
+      @command: "pnpm dlx create-tsrouter-app@latest my-app --template file-router --tailwind --add-ons shadcn"
+      
+      Features: "File-based routing with TypeScript"
+      Direct_Setup: "Includes shadcn in project creation"
+    }
+    
+    #### Manual {
+      @url: "/docs/installation/manual"
+      @description: "Manual setup without framework template"
+      
+      Dependencies: [
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge",
+        "lucide-react",
+        "tw-animate-css"
+      ]
+      
+      Utils_Function: ```typescript
+        import { clsx, type ClassValue } from "clsx"
+        import { twMerge } from "tailwind-merge"
+        
+        export function cn(...inputs: ClassValue[]) {
+          return twMerge(clsx(inputs))
+        }
+      ```
+    }
+  }
+}
+
+## Configuration {
+  @type: project_configuration
+  
+  ### components_json {
+    @description: "Project configuration file for shadcn/ui"
+    @required: true
+    
+    Schema: {
+      $schema: "https://ui.shadcn.com/schema.json"
+      style: "new-york | default"  # Cannot change after init
+      rsc: boolean  # React Server Components support
+      tsx: boolean  # TypeScript or JavaScript
+      tailwind: {
+        config: "path/to/tailwind.config.js"
+        css: "path/to/global.css"
+        baseColor: "gray | neutral | slate | stone | zinc"
+        cssVariables: boolean  # Use CSS variables vs utility classes
+        prefix: ""  # Tailwind class prefix
+      }
+      aliases: {
+        components: "@/components"
+        utils: "@/lib/utils"
+        ui: "@/components/ui"
+        lib: "@/lib"
+        hooks: "@/hooks"
+      }
+      registries: []  # Multiple registry support
+    }
+  }
+  
+  ### Theming {
+    @type: design_system
+    
+    #### CSS_Variables {
+      @recommended: true
+      @description: "Semantic color system with background/foreground convention"
+      
+      Color_Structure: ```css
+        :root {
+          --background: oklch(1 0 0);
+          --foreground: oklch(0.145 0 0);
+          --primary: oklch(0.205 0 0);
+          --primary-foreground: oklch(0.985 0 0);
+          /* Additional semantic colors */
+        }
+        
+        .dark {
+          /* Inverted color values */
+        }
+      ```
+      
+      Base_Colors: [
+        "neutral",
+        "stone", 
+        "zinc",
+        "gray",
+        "slate"
+      ]
+    }
+    
+    #### Dark_Mode {
+      @provider: "next-themes"
+      
+      Implementation: {
+        - Install: "pnpm add next-themes"
+        - Create_Provider: "ThemeProvider component"
+        - Wrap_Root: "Add to layout/app root"
+        - Mode_Toggle: "Theme switcher component"
+      }
+    }
+  }
+}
+
+## CLI {
+  @type: command_line_interface
+  @package: "shadcn"
+  
+  ### Commands {
+    
+    #### init {
+      @usage: "npx shadcn@latest init"
+      @description: "Initialize configuration and dependencies"
+      
+      Options: {
+        "-t, --template": "Project template (next, next-monorepo)"
+        "-b, --base-color": "Base color scheme"
+        "-y, --yes": "Skip confirmation"
+        "-f, --force": "Overwrite existing config"
+        "--src-dir": "Use src directory"
+        "--css-variables": "Use CSS variables for theming"
+      }
+    }
+    
+    #### add {
+      @usage: "npx shadcn@latest add [component]"
+      @description: "Add components to project"
+      
+      Options: {
+        "-y, --yes": "Skip confirmation"
+        "-o, --overwrite": "Overwrite existing files"
+        "-a, --all": "Add all components"
+        "-p, --path": "Custom installation path"
+      }
+      
+      Examples: [
+        "npx shadcn@latest add button",
+        "npx shadcn@latest add button card dialog",
+        "npx shadcn@latest add --all"
+      ]
+    }
+    
+    #### view {
+      @usage: "npx shadcn@latest view [items]"
+      @description: "Preview registry items before installation"
+    }
+    
+    #### search {
+      @usage: "npx shadcn@latest search [query]"
+      @description: "Search registry items"
+      
+      Options: {
+        "-q, --query": "Search query"
+        "--limit": "Result limit"
+      }
+    }
+    
+    #### build {
+      @usage: "npx shadcn@latest build"
+      @description: "Generate registry JSON files"
+    }
+  }
+}
+
+## Components {
+  @type: ui_components
+  @total: 48
+  @source: "registry:ui"
+  
+  ### Core_Components {
+    
+    #### Accordion {
+      @type: "registry:ui"
+      @description: "Vertically stacked interactive headings"
+      @dependencies: ["@radix-ui/react-accordion"]
+      
+      Implementation: ```typescript
+        "use client"
+        
+        import * as React from "react"
+        import * as AccordionPrimitive from "@radix-ui/react-accordion"
+        import { ChevronDown } from "lucide-react"
+        import { cn } from "@/lib/utils"
+        
+        const Accordion = AccordionPrimitive.Root
+        
+        const AccordionItem = React.forwardRef<
+          React.ElementRef<typeof AccordionPrimitive.Item>,
+          React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
+        >(({ className, ...props }, ref) => (
+          <AccordionPrimitive.Item
+            ref={ref}
+            className={cn("border-b", className)}
+            {...props}
+          />
+        ))
+      ```
+      
+      Usage: ```tsx
+        <Accordion type="single" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>Is it accessible?</AccordionTrigger>
+            <AccordionContent>
+              Yes. It adheres to the WAI-ARIA design pattern.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      ```
+    }
+    
+    #### Alert {
+      @type: "registry:ui"
+      @description: "Displays a callout for user attention"
+      @dependencies: []
+      
+      Implementation: ```typescript
+        import * as React from "react"
+        import { cva, type VariantProps } from "class-variance-authority"
+        import { cn } from "@/lib/utils"
+        
+        const alertVariants = cva(
+          "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
+          {
+            variants: {
+              variant: {
+                default: "bg-background text-foreground",
+                destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+              },
+            },
+            defaultVariants: {
+              variant: "default",
+            },
+          }
+        )
+      ```
+    }
+    
+    #### Button {
+      @type: "registry:ui"
+      @description: "Interactive element that triggers an action"
+      @dependencies: ["@radix-ui/react-slot"]
+      
+      Variants: {
+        default: "Primary button style"
+        destructive: "Destructive action style"
+        outline: "Outlined button"
+        secondary: "Secondary action"
+        ghost: "Minimal style"
+        link: "Link-like button"
+      }
+      
+      Sizes: ["default", "sm", "lg", "icon"]
+      
+      Implementation: ```typescript
+        const buttonVariants = cva(
+          "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          {
+            variants: {
+              variant: { /* ... */ },
+              size: { /* ... */ }
+            }
+          }
+        )
+      ```
+    }
+    
+    #### Card {
+      @type: "registry:ui"
+      @description: "Container for grouped content"
+      @dependencies: []
+      
+      Subcomponents: [
+        "Card",
+        "CardHeader",
+        "CardTitle",
+        "CardDescription",
+        "CardContent",
+        "CardFooter"
+      ]
+      
+      Implementation: ```typescript
+        const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+          ({ className, ...props }, ref) => (
+            <div
+              ref={ref}
+              className={cn("rounded-xl border bg-card text-card-foreground shadow", className)}
+              {...props}
+            />
+          )
+        )
+      ```
+    }
+    
+    #### Checkbox {
+      @type: "registry:ui"
+      @description: "Checkbox input with checked state"
+      @dependencies: ["@radix-ui/react-checkbox"]
+      
+      Implementation: ```typescript
+        const Checkbox = React.forwardRef<
+          React.ElementRef<typeof CheckboxPrimitive.Root>,
+          React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
+        >(({ className, ...props }, ref) => (
+          <CheckboxPrimitive.Root
+            ref={ref}
+            className={cn(
+              "peer h-4 w-4 shrink-0 rounded-sm border border-primary shadow",
+              className
+            )}
+            {...props}
+          >
+            <CheckboxPrimitive.Indicator>
+              <Check className="h-4 w-4" />
+            </CheckboxPrimitive.Indicator>
+          </CheckboxPrimitive.Root>
+        ))
+      ```
+      
+      Usage_Example: ```tsx
+        <div className="flex items-center gap-3">
+          <Checkbox id="terms" />
+          <Label htmlFor="terms">Accept terms and conditions</Label>
+        </div>
+      ```
+    }
+    
+    #### Dialog {
+      @type: "registry:ui"
+      @description: "Modal dialog overlay"
+      @dependencies: ["@radix-ui/react-dialog"]
+      
+      Components: [
+        "Dialog",
+        "DialogTrigger",
+        "DialogContent",
+        "DialogHeader",
+        "DialogFooter",
+        "DialogTitle",
+        "DialogDescription",
+        "DialogClose"
+      ]
+      
+      Usage_Example: ```tsx
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Open Dialog</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit profile</DialogTitle>
+              <DialogDescription>
+                Make changes to your profile here.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+              {/* Form fields */}
+            </div>
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      ```
+    }
+    
+    #### Dropdown_Menu {
+      @type: "registry:ui"
+      @description: "Dropdown menu with submenus and shortcuts"
+      @dependencies: ["@radix-ui/react-dropdown-menu"]
+      
+      Features: [
+        "Submenus",
+        "Keyboard shortcuts",
+        "Icons",
+        "Separators",
+        "Disabled items",
+        "Radio/checkbox items"
+      ]
+      
+      Usage_Example: ```tsx
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">Open</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuItem>
+              Profile
+              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem>Email</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ```
+    }
+    
+    #### Input {
+      @type: "registry:ui"
+      @description: "Text input field"
+      @dependencies: []
+      
+      Implementation: ```typescript
+        const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
+          ({ className, type, ...props }, ref) => {
+            return (
+              <input
+                type={type}
+                className={cn(
+                  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1",
+                  className
+                )}
+                ref={ref}
+                {...props}
+              />
+            )
+          }
+        )
+      ```
+      
+      Variants: [
+        "text",
+        "email",
+        "password",
+        "number",
+        "search",
+        "tel",
+        "url",
+        "file"
+      ]
+    }
+    
+    #### Select {
+      @type: "registry:ui"
+      @description: "Select dropdown component"
+      @dependencies: ["@radix-ui/react-select"]
+      
+      Usage_Example: ```tsx
+        <Select>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a fruit" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Fruits</SelectLabel>
+              <SelectItem value="apple">Apple</SelectItem>
+              <SelectItem value="banana">Banana</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      ```
+    }
+    
+    #### Switch {
+      @type: "registry:ui"
+      @description: "Toggle switch component"
+      @dependencies: ["@radix-ui/react-switch"]
+      
+      Implementation: ```typescript
+        const Switch = React.forwardRef<
+          React.ElementRef<typeof SwitchPrimitives.Root>,
+          React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
+        >(({ className, ...props }, ref) => (
+          <SwitchPrimitives.Root
+            className={cn(
+              "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full",
+              className
+            )}
+            {...props}
+            ref={ref}
+          >
+            <SwitchPrimitives.Thumb className="block h-4 w-4 rounded-full" />
+          </SwitchPrimitives.Root>
+        ))
+      ```
+    }
+    
+    #### Tabs {
+      @type: "registry:ui"
+      @description: "Tabbed interface component"
+      @dependencies: ["@radix-ui/react-tabs"]
+      
+      Usage_Example: ```tsx
+        <Tabs defaultValue="account">
+          <TabsList>
+            <TabsTrigger value="account">Account</TabsTrigger>
+            <TabsTrigger value="password">Password</TabsTrigger>
+          </TabsList>
+          <TabsContent value="account">
+            <Card>
+              <CardHeader>
+                <CardTitle>Account</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Account settings */}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      ```
+    }
+    
+    #### Tooltip {
+      @type: "registry:ui"
+      @description: "Tooltip overlay on hover"
+      @dependencies: ["@radix-ui/react-tooltip"]
+      
+      Implementation: ```typescript
+        const TooltipContent = React.forwardRef<
+          React.ElementRef<typeof TooltipPrimitive.Content>,
+          React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
+        >(({ className, sideOffset = 4, ...props }, ref) => (
+          <TooltipPrimitive.Portal>
+            <TooltipPrimitive.Content
+              ref={ref}
+              sideOffset={sideOffset}
+              className={cn(
+                "z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs",
+                className
+              )}
+              {...props}
+            />
+          </TooltipPrimitive.Portal>
+        ))
+      ```
+      
+      Usage_Example: ```tsx
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Hover</Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Add to library</p>
+          </TooltipContent>
+        </Tooltip>
+      ```
+    }
+  }
+  
+  ### Form_Components {
+    
+    #### Form {
+      @type: "registry:ui"
+      @description: "Form building with React Hook Form and Zod"
+      @dependencies: ["react-hook-form", "zod", "@hookform/resolvers"]
+      
+      Components: {
+        FormField: "Controlled form field wrapper"
+        FormItem: "Form field container"
+        FormLabel: "Field label"
+        FormControl: "Input wrapper"
+        FormDescription: "Helper text"
+        FormMessage: "Validation messages"
+      }
+      
+      Validation_Example: ```typescript
+        const formSchema = z.object({
+          username: z.string().min(2, {
+            message: "Username must be at least 2 characters.",
+          }),
+        })
+      ```
+    }
+    
+    #### Input {
+      @type: "registry:ui"
+      @description: "Text input field"
+      @dependencies: []
+      
+      Types: [
+        "text",
+        "email",
+        "password",
+        "number",
+        "search",
+        "tel",
+        "url"
+      ]
+    }
+    
+    #### Input_OTP {
+      @type: "registry:ui"
+      @description: "One-time password input"
+      @dependencies: ["input-otp"]
+      
+      Usage_Example: ```tsx
+        <InputOTP maxLength={6}>
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+          </InputOTPGroup>
+          <InputOTPSeparator />
+          <InputOTPGroup>
+            <InputOTPSlot index={3} />
+            <InputOTPSlot index={4} />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </InputOTP>
+      ```
+    }
+  }
+  
+  ### Data_Display {
+    
+    #### Table {
+      @type: "registry:ui"
+      @description: "Data table with TanStack Table"
+      @dependencies: ["@tanstack/react-table"]
+      
+      Features: [
+        "Sorting",
+        "Filtering",
+        "Pagination",
+        "Row selection",
+        "Column visibility",
+        "Custom cell rendering"
+      ]
+      
+      Full_Example: ```tsx
+        export const columns: ColumnDef<Payment>[] = [
+          {
+            id: "select",
+            header: ({ table }) => (
+              <Checkbox
+                checked={table.getIsAllPageRowsSelected()}
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+              />
+            ),
+            cell: ({ row }) => (
+              <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+              />
+            ),
+          },
+          {
+            accessorKey: "email",
+            header: ({ column }) => {
+              return (
+                <Button
+                  variant="ghost"
+                  onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                  Email
+                  <ArrowUpDown />
+                </Button>
+              )
+            },
+          },
+          {
+            accessorKey: "amount",
+            header: () => <div className="text-right">Amount</div>,
+            cell: ({ row }) => {
+              const amount = parseFloat(row.getValue("amount"))
+              const formatted = new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(amount)
+              return <div className="text-right font-medium">{formatted}</div>
+            },
+          },
+        ]
+        
+        // Table implementation with filtering, sorting, pagination
+        const table = useReactTable({
+          data,
+          columns,
+          getCoreRowModel: getCoreRowModel(),
+          getPaginationRowModel: getPaginationRowModel(),
+          getSortedRowModel: getSortedRowModel(),
+          getFilteredRowModel: getFilteredRowModel(),
+        })
+      ```
+    }
+    
+    #### Chart {
+      @type: "registry:ui"
+      @description: "Data visualization with Recharts"
+      @dependencies: ["recharts"]
+      
+      Chart_Types: {
+        Bar: "79 variations available"
+        Line: "Multiple line chart patterns"
+        Area: "Area charts with gradients"
+        Pie: "Pie and donut charts"
+        Radar: "Radar chart patterns"
+        Radial: "Radial bar charts"
+      }
+    }
+    
+    #### Sonner {
+      @type: "registry:ui"
+      @description: "Toast notifications with Sonner"
+      @dependencies: ["sonner"]
+      
+      Usage_Example: ```tsx
+        // In your root layout
+        <Toaster />
+        
+        // Show a toast
+        toast("Event has been created", {
+          description: "Sunday, December 03, 2023 at 9:00 AM",
+          action: {
+            label: "Undo",
+            onClick: () => console.log("Undo"),
+          },
+        })
+      ```
+      
+      Toast_Types: [
+        "toast() - Default",
+        "toast.success() - Success",
+        "toast.error() - Error",
+        "toast.warning() - Warning",
+        "toast.info() - Info",
+        "toast.loading() - Loading",
+        "toast.promise() - Promise"
+      ]
+    }
+    
+    #### Badge {
+      @type: "registry:ui"
+      @description: "Badge for status and labels"
+      @dependencies: []
+      
+      Variants: [
+        "default",
+        "secondary",
+        "destructive",
+        "outline"
+      ]
+    }
+    
+    #### Avatar {
+      @type: "registry:ui"
+      @description: "User avatar with fallback"
+      @dependencies: ["@radix-ui/react-avatar"]
+      
+      Usage_Example: ```tsx
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      ```
+    }
+    
+    #### Progress {
+      @type: "registry:ui"
+      @description: "Progress bar indicator"
+      @dependencies: ["@radix-ui/react-progress"]
+      
+      Usage_Example: ```tsx
+        <Progress value={33} className="w-[60%]" />
+      ```
+    }
+    
+    #### Skeleton {
+      @type: "registry:ui"
+      @description: "Loading placeholder"
+      @dependencies: []
+      
+      Usage_Example: ```tsx
+        <div className="flex items-center space-x-4">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+        </div>
+      ```
+    }
+  }
+  
+  ### Layout_Components {
+    
+    #### Sheet {
+      @type: "registry:ui"
+      @description: "Slide-out panel overlay"
+      @dependencies: ["@radix-ui/react-dialog"]
+      
+      Positions: ["top", "right", "bottom", "left"]
+      
+      Usage_Example: ```tsx
+        <Sheet>
+          <SheetTrigger>Open</SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Are you sure absolutely sure?</SheetTitle>
+              <SheetDescription>
+                This action cannot be undone.
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+      ```
+    }
+    
+    #### Drawer {
+      @type: "registry:ui"
+      @description: "Bottom sheet drawer"
+      @dependencies: ["vaul"]
+      
+      Features: [
+        "Touch gestures",
+        "Snap points",
+        "Scrollable content",
+        "Nested drawers"
+      ]
+    }
+    
+    #### Separator {
+      @type: "registry:ui"
+      @description: "Visual separator line"
+      @dependencies: ["@radix-ui/react-separator"]
+      
+      Orientations: ["horizontal", "vertical"]
+    }
+    
+    #### Scroll_Area {
+      @type: "registry:ui"
+      @description: "Custom scrollable area"
+      @dependencies: ["@radix-ui/react-scroll-area"]
+      
+      Usage_Example: ```tsx
+        <ScrollArea className="h-[200px] w-[350px] rounded-md border p-4">
+          {/* Long content */}
+        </ScrollArea>
+      ```
+    }
+    
+    #### Aspect_Ratio {
+      @type: "registry:ui"
+      @description: "Maintain aspect ratio container"
+      @dependencies: ["@radix-ui/react-aspect-ratio"]
+      
+      Usage_Example: ```tsx
+        <AspectRatio ratio={16 / 9}>
+          <img src="..." className="rounded-md object-cover" />
+        </AspectRatio>
+      ```
+    }
+  }
+  
+  ### Navigation_Components {
+    
+    #### Navigation_Menu {
+      @type: "registry:ui"
+      @description: "Horizontal navigation menu"
+      @dependencies: ["@radix-ui/react-navigation-menu"]
+      
+      Features: [
+        "Dropdown menus",
+        "Indicators",
+        "Links",
+        "Viewport"
+      ]
+    }
+    
+    #### Breadcrumb {
+      @type: "registry:ui"
+      @description: "Breadcrumb navigation"
+      @dependencies: []
+      
+      Usage_Example: ```tsx
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/docs">Documentation</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Components</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      ```
+    }
+    
+    #### Menubar {
+      @type: "registry:ui"
+      @description: "Application menubar"
+      @dependencies: ["@radix-ui/react-menubar"]
+      
+      Features: [
+        "Submenus",
+        "Checkboxes",
+        "Radio groups",
+        "Shortcuts"
+      ]
+    }
+    
+    #### Pagination {
+      @type: "registry:ui"
+      @description: "Pagination controls"
+      @dependencies: []
+      
+      Usage_Example: ```tsx
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      ```
+    }
+    
+    #### Command {
+      @type: "registry:ui"
+      @description: "Command palette interface"
+      @dependencies: ["cmdk"]
+      
+      Features: [
+        "Search",
+        "Keyboard navigation",
+        "Groups",
+        "Loading states",
+        "Empty states"
+      ]
+      
+      Usage_Example: ```tsx
+        <Command>
+          <CommandInput placeholder="Type a command or search..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup heading="Suggestions">
+              <CommandItem>Calendar</CommandItem>
+              <CommandItem>Search Emoji</CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      ```
+    }
+  }
+  
+  ### Feedback_Components {
+    
+    #### Alert {
+      @type: "registry:ui"
+      @description: "Alert message display"
+      @dependencies: []
+      
+      Variants: ["default", "destructive"]
+      
+      Usage_Example: ```tsx
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            You can add components using the CLI.
+          </AlertDescription>
+        </Alert>
+      ```
+    }
+    
+    #### Alert_Dialog {
+      @type: "registry:ui"
+      @description: "Confirmation dialog"
+      @dependencies: ["@radix-ui/react-alert-dialog"]
+      
+      Usage_Example: ```tsx
+        <AlertDialog>
+          <AlertDialogTrigger>Open</AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      ```
+    }
+  }
+  
+  ### Utility_Components {
+    
+    #### Collapsible {
+      @type: "registry:ui"
+      @description: "Collapsible content panel"
+      @dependencies: ["@radix-ui/react-collapsible"]
+      
+      Usage_Example: ```tsx
+        <Collapsible>
+          <CollapsibleTrigger>Can I use this in my project?</CollapsibleTrigger>
+          <CollapsibleContent>
+            Yes. It's open source.
+          </CollapsibleContent>
+        </Collapsible>
+      ```
+    }
+    
+    #### Context_Menu {
+      @type: "registry:ui"
+      @description: "Right-click context menu"
+      @dependencies: ["@radix-ui/react-context-menu"]
+      
+      Usage_Example: ```tsx
+        <ContextMenu>
+          <ContextMenuTrigger>Right click</ContextMenuTrigger>
+          <ContextMenuContent>
+            <ContextMenuItem>Profile</ContextMenuItem>
+            <ContextMenuItem>Settings</ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
+      ```
+    }
+    
+    #### Hover_Card {
+      @type: "registry:ui"
+      @description: "Card shown on hover"
+      @dependencies: ["@radix-ui/react-hover-card"]
+      
+      Usage_Example: ```tsx
+        <HoverCard>
+          <HoverCardTrigger>@nextjs</HoverCardTrigger>
+          <HoverCardContent>
+            The React Framework – created and maintained by @vercel.
+          </HoverCardContent>
+        </HoverCard>
+      ```
+    }
+    
+    #### Popover {
+      @type: "registry:ui"
+      @description: "Popover overlay"
+      @dependencies: ["@radix-ui/react-popover"]
+      
+      Usage_Example: ```tsx
+        <Popover>
+          <PopoverTrigger>Open popover</PopoverTrigger>
+          <PopoverContent>
+            Place content for the popover here.
+          </PopoverContent>
+        </Popover>
+      ```
+    }
+    
+    #### Radio_Group {
+      @type: "registry:ui"
+      @description: "Radio button group"
+      @dependencies: ["@radix-ui/react-radio-group"]
+      
+      Usage_Example: ```tsx
+        <RadioGroup defaultValue="option-one">
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="option-one" id="option-one" />
+            <Label htmlFor="option-one">Option One</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="option-two" id="option-two" />
+            <Label htmlFor="option-two">Option Two</Label>
+          </div>
+        </RadioGroup>
+      ```
+    }
+    
+    #### Slider {
+      @type: "registry:ui"
+      @description: "Range slider input"
+      @dependencies: ["@radix-ui/react-slider"]
+      
+      Usage_Example: ```tsx
+        <Slider defaultValue={[50]} max={100} step={1} />
+      ```
+    }
+    
+    #### Toggle {
+      @type: "registry:ui"
+      @description: "Toggle button"
+      @dependencies: ["@radix-ui/react-toggle"]
+      
+      Variants: ["default", "outline"]
+      
+      Usage_Example: ```tsx
+        <Toggle aria-label="Toggle italic">
+          <FontItalicIcon className="h-4 w-4" />
+        </Toggle>
+      ```
+    }
+    
+    #### Toggle_Group {
+      @type: "registry:ui"
+      @description: "Group of toggle buttons"
+      @dependencies: ["@radix-ui/react-toggle-group"]
+      
+      Types: ["single", "multiple"]
+      
+      Usage_Example: ```tsx
+        <ToggleGroup type="single">
+          <ToggleGroupItem value="bold" aria-label="Toggle bold">
+            <FontBoldIcon className="h-4 w-4" />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="italic" aria-label="Toggle italic">
+            <FontItalicIcon className="h-4 w-4" />
+          </ToggleGroupItem>
+        </ToggleGroup>
+      ```
+    }
+    
+    #### Resizable {
+      @type: "registry:ui"
+      @description: "Resizable panel layout"
+      @dependencies: ["react-resizable-panels"]
+      
+      Usage_Example: ```tsx
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel>One</ResizablePanel>
+          <ResizableHandle />
+          <ResizablePanel>Two</ResizablePanel>
+        </ResizablePanelGroup>
+      ```
+    }
+    
+    #### Carousel {
+      @type: "registry:ui"
+      @description: "Image/content carousel"
+      @dependencies: ["embla-carousel-react"]
+      
+      Features: [
+        "Auto-play",
+        "Loop",
+        "Indicators",
+        "Thumbnails",
+        "Multiple slides"
+      ]
+      
+      Usage_Example: ```tsx
+        <Carousel>
+          <CarouselContent>
+            <CarouselItem>Slide 1</CarouselItem>
+            <CarouselItem>Slide 2</CarouselItem>
+            <CarouselItem>Slide 3</CarouselItem>
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      ```
+    }
+    
+    #### Textarea {
+      @type: "registry:ui"
+      @description: "Multi-line text input"
+      @dependencies: []
+      
+      Usage_Example: ```tsx
+        <Textarea placeholder="Type your message here." />
+      ```
+    }
+    
+    #### Label {
+      @type: "registry:ui"
+      @description: "Form field label"
+      @dependencies: ["@radix-ui/react-label"]
+      
+      Usage_Example: ```tsx
+        <Label htmlFor="email">Your email address</Label>
+      ```
+    }
+  }
+}
+
+## Blocks {
+  @type: pre_built_patterns
+  @description: "Complete UI patterns ready to use"
+  
+  ### Dashboard_Blocks {
+    
+    #### dashboard_01 {
+      @type: "registry:block"
+      @description: "Dashboard with sidebar, charts and data table"
+      @files: 4
+      
+      Features: [
+        "Responsive sidebar",
+        "Chart integration",
+        "Data table",
+        "Metrics cards"
+      ]
+    }
+  }
+  
+  ### Sidebar_Blocks {
+    @total: 16
+    
+    Variations: {
+      sidebar_01: "Simple with grouped navigation"
+      sidebar_02: "With collapsible sections"
+      sidebar_03: "With submenus"
+      sidebar_04: "Floating with submenus"
+      sidebar_05: "With collapsible submenus"
+      sidebar_06: "Submenus as dropdowns"
+      sidebar_07: "Collapses to icons"
+      sidebar_08: "Inset with secondary nav"
+      sidebar_09: "Collapsible nested"
+      sidebar_10: "In a popover"
+      sidebar_11: "With file tree"
+      sidebar_12: "With calendar"
+      sidebar_13: "In a dialog"
+      sidebar_14: "Right-side placement"
+      sidebar_15: "Left and right sidebars"
+      sidebar_16: "With sticky header"
+    }
+  }
+  
+  ### Authentication_Blocks {
+    @total: 5
+    
+    Login_Forms: {
+      login_01: "Simple login form"
+      login_02: "Two-column with cover image"
+      login_03: "With muted background"
+      login_04: "With form and image"
+      login_05: "Email-only login"
+    }
+  }
+  
+  ### Calendar_Blocks {
+    @total: 38
+    
+    Variations: {
+      Basic: "Single month selection"
+      Multi_Month: "Multiple months display"
+      Range_Selection: "Date range picker"
+      With_Time: "Time picker integration"
+      Disabled_Days: "Custom disabled dates"
+      Localized: "i18n support"
+      With_Presets: "Quick date selections"
+    }
+  }
+  
+  ### Chart_Blocks {
+    @total: 79
+    
+    Categories: {
+      Bar_Charts: "16+ variations"
+      Line_Charts: "Multiple styles"
+      Area_Charts: "With gradients"
+      Pie_Charts: "Including donut"
+      Radar_Charts: "Various grid styles"
+      Radial_Charts: "Progress indicators"
+    }
+  }
+}
+
+## Registry_System {
+  @type: distribution_platform
+  @description: "Code distribution and sharing system"
+  
+  ### Registry_Types {
+    ui: "UI components"
+    block: "Complete patterns"
+    example: "Usage examples"
+    theme: "Color themes"
+    hook: "React hooks"
+    lib: "Utility libraries"
+    style: "Style configurations"
+  }
+  
+  ### MCP_Server {
+    @description: "Mission Control Platform for registry management"
+    
+    Tools: {
+      get_project_registries: "Get configured registries"
+      list_items_in_registries: "List registry items"
+      search_items_in_registries: "Search with fuzzy matching"
+      view_items_in_registries: "View item details"
+      get_item_examples_from_registries: "Get usage examples"
+      get_add_command_for_items: "Get CLI commands"
+      get_audit_checklist: "Verify implementation"
+    }
+  }
+  
+  ### Custom_Registries {
+    @description: "Create and share custom component registries"
+    
+    Configuration: {
+      Namespaces: "Organize with @namespace prefix"
+      Authentication: "Private registry support"
+      Distribution: "Share via registry.json"
+    }
+  }
+}
+
+## Patterns {
+  @type: development_patterns
+  
+  ### Component_Patterns {
+    
+    #### Composition {
+      @description: "Component composition over configuration"
+      
+      Example: ```tsx
+        <Card>
+          <CardHeader>
+            <CardTitle>Title</CardTitle>
+            <CardDescription>Description</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* Content */}
+          </CardContent>
+          <CardFooter>
+            <Button>Action</Button>
+          </CardFooter>
+        </Card>
+      ```
+    }
+    
+    #### Variants {
+      @tool: "class-variance-authority (CVA)"
+      @description: "Type-safe component variants"
+      
+      Pattern: ```typescript
+        const variants = cva("base-classes", {
+          variants: {
+            variant: { /* options */ },
+            size: { /* options */ }
+          },
+          defaultVariants: {
+            variant: "default",
+            size: "default"
+          }
+        })
+      ```
+    }
+    
+    #### Forwarding_Refs {
+      @description: "Proper ref forwarding for DOM access"
+      
+      Pattern: ```typescript
+        const Component = React.forwardRef<
+          HTMLDivElement,
+          React.HTMLAttributes<HTMLDivElement>
+        >(({ className, ...props }, ref) => (
+          <div ref={ref} className={cn("classes", className)} {...props} />
+        ))
+        Component.displayName = "Component"
+      ```
+    }
+  }
+  
+  ### State_Management {
+    
+    #### Controlled_Components {
+      @description: "Form state with React Hook Form"
+      
+      Pattern: ```tsx
+        <FormField
+          control={form.control}
+          name="fieldName"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      ```
+    }
+    
+    #### Uncontrolled_Components {
+      @description: "Using Radix UI primitives"
+      @benefits: "Accessibility built-in"
+    }
+  }
+  
+  ### Styling_Patterns {
+    
+    #### Utility_Merger {
+      @function: "cn()"
+      @description: "Merge Tailwind classes safely"
+      
+      Implementation: ```typescript
+        export function cn(...inputs: ClassValue[]) {
+          return twMerge(clsx(inputs))
+        }
+      ```
+    }
+    
+    #### Theme_Variables {
+      @description: "Semantic color system"
+      
+      Convention: {
+        Background: "Component background"
+        Foreground: "Component text color"
+        Primary: "Primary brand color"
+        Secondary: "Secondary color"
+        Muted: "Muted elements"
+        Accent: "Accent elements"
+        Destructive: "Error states"
+      }
+    }
+  }
+}
+
+## Accessibility {
+  @type: a11y_guidelines
+  @foundation: "Radix UI Primitives"
+  
+  ### Built_In_Features {
+    - ARIA_Attributes: "Automatic ARIA labels and roles"
+    - Keyboard_Navigation: "Full keyboard support"
+    - Focus_Management: "Proper focus trapping"
+    - Screen_Reader: "Optimized announcements"
+    - Motion_Preferences: "Respects prefers-reduced-motion"
+  }
+  
+  ### Component_Accessibility {
+    
+    Dialog: {
+      - Focus_Trap: "Traps focus within dialog"
+      - Escape_Key: "Closes on ESC"
+      - Click_Outside: "Closes on backdrop click"
+      - Inert_Background: "Background becomes non-interactive"
+    }
+    
+    Form: {
+      - Label_Association: "Proper label-input association"
+      - Error_Messages: "Connected via aria-describedby"
+      - Required_Fields: "aria-required attributes"
+      - Validation_States: "aria-invalid for errors"
+    }
+    
+    Navigation: {
+      - Skip_Links: "Skip to main content"
+      - Landmark_Roles: "Proper ARIA landmarks"
+      - Current_Page: "aria-current for active items"
+    }
+  }
+}
+
+## Performance {
+  @type: optimization_guidelines
+  
+  ### Bundle_Size {
+    @strategy: "Copy-paste reduces bundle size"
+    
+    Benefits: [
+      "No library overhead",
+      "Tree-shaking friendly",
+      "Only import what you use",
+      "Dead code elimination"
+    ]
+  }
+  
+  ### Code_Splitting {
+    @description: "Component-level code splitting"
+    
+    Lazy_Loading: ```typescript
+      const Dialog = lazy(() => import('@/components/ui/dialog'))
+    ```
+  }
+  
+  ### CSS_Optimization {
+    - Tailwind_Purge: "Removes unused styles"
+    - CSS_Variables: "Efficient theming"
+    - No_Runtime: "No CSS-in-JS runtime"
+  }
+}
+
+## Integrations {
+  @type: third_party_integrations
+  
+  ### Design_Tools {
+    
+    #### Figma {
+      @description: "Design to code workflow"
+      
+      Resources: {
+        Paid: "shadcn/ui kit by Matt Wierzbicki"
+        Free: [
+          "shadcn/ui design system by Pietro Schirano",
+          "Obra shadcn/ui by Obra Studio"
+        ]
+      }
+    }
+    
+    #### v0 {
+      @description: "AI-powered customization platform"
+      @integration: "Open components in v0 for modification"
+    }
+  }
+  
+  ### Development_Tools {
+    
+    #### Monorepo {
+      @support: "Full monorepo support"
+      @tool: "Turborepo recommended"
+      
+      Structure: {
+        apps: "Application workspaces"
+        packages: "Shared UI components"
+      }
+    }
+    
+    #### Testing {
+      @frameworks: ["Jest", "Testing Library", "Cypress", "Playwright"]
+      
+      Component_Testing: ```typescript
+        import { render, screen } from '@testing-library/react'
+        import { Button } from '@/components/ui/button'
+        
+        test('renders button', () => {
+          render(<Button>Click me</Button>)
+          expect(screen.getByRole('button')).toBeInTheDocument()
+        })
+      ```
+    }
+  }
+}
+
+## Migration {
+  @type: version_updates
+  
+  ### Changelog_Highlights {
+    
+    v3_0: {
+      @date: "August 2025"
+      Features: [
+        "Namespaced registries",
+        "Private registry support",
+        "MCP server",
+        "Improved error handling"
+      ]
+    }
+    
+    Tailwind_v4: {
+      @status: "Preview"
+      Changes: [
+        "OKLCH color format",
+        "New configuration format",
+        "React 19 support"
+      ]
+    }
+  }
+  
+  ### Breaking_Changes {
+    @description: "Minimal breaking changes due to copy-paste nature"
+    
+    Strategy: "Components are copied, so updates are opt-in"
+  }
+}
+
+## Best_Practices {
+  @type: recommendations
+  
+  ### Development {
+    - Start_Small: "Add components as needed"
+    - Customize_Freely: "Modify components to fit your needs"
+    - Consistent_Patterns: "Follow established patterns"
+    - Type_Safety: "Use TypeScript when possible"
+  }
+  
+  ### Project_Structure {
+    components/
+    ├── ui/           # shadcn components
+    ├── layouts/      # Layout components
+    ├── features/     # Feature-specific components
+    └── shared/       # Shared components
+  }
+  
+  ### Naming_Conventions {
+    - Components: "PascalCase"
+    - Files: "kebab-case"
+    - CSS_Variables: "--kebab-case"
+    - Utility_Functions: "camelCase"
+  }
+}
+
+## Utilities_and_Hooks {
+  @type: helper_functions
+  
+  ### Utils {
+    @type: "registry:lib"
+    @dependencies: ["clsx", "tailwind-merge"]
+    
+    #### cn_Function {
+      @description: "Merge Tailwind classes safely with conflict resolution"
+      
+      Implementation: ```typescript
+        import { clsx, type ClassValue } from "clsx"
+        import { twMerge } from "tailwind-merge"
+        
+        export function cn(...inputs: ClassValue[]) {
+          return twMerge(clsx(inputs))
+        }
+      ```
+      
+      Purpose: [
+        "Merge multiple className strings",
+        "Handle conditional classes",
+        "Resolve Tailwind conflicts",
+        "Support dynamic styling"
+      ]
+      
+      Usage_Examples: ```typescript
+        // Basic merge
+        cn("px-2 py-1", "p-3") // Result: "p-3"
+        
+        // Conditional classes
+        cn("text-gray-500", isActive && "text-blue-600")
+        
+        // With arrays
+        cn(["text-sm", "font-medium"], className)
+        
+        // Complex conditions
+        cn(
+          "rounded-lg border",
+          variant === "destructive" && "border-red-500",
+          size === "lg" && "p-4",
+          className
+        )
+      ```
+    }
+  }
+  
+  ### Hooks {
+    
+    #### use_mobile {
+      @type: "registry:hook"
+      @description: "Detect mobile device viewport"
+      
+      Implementation: ```typescript
+        import * as React from "react"
+        
+        const MOBILE_BREAKPOINT = 768
+        
+        export function useIsMobile() {
+          const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+          
+          React.useEffect(() => {
+            const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+            const onChange = () => {
+              setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+            }
+            mql.addEventListener("change", onChange)
+            setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+            return () => mql.removeEventListener("change", onChange)
+          }, [])
+          
+          return !!isMobile
+        }
+      ```
+      
+      Usage: ```tsx
+        function MyComponent() {
+          const isMobile = useIsMobile()
+          
+          return isMobile ? <MobileView /> : <DesktopView />
+        }
+      ```
+    }
+  }
+}
+
+## Typography {
+  @type: text_styling
+  @description: "Utility-based text styling approach"
+  @note: "No default typography styles shipped"
+  
+  ### Text_Elements {
+    
+    #### Headings {
+      h1: "text-4xl font-extrabold tracking-tight scroll-m-20 lg:text-5xl"
+      h2: "text-3xl font-semibold tracking-tight scroll-m-20 border-b pb-2"
+      h3: "text-2xl font-semibold tracking-tight scroll-m-20"
+      h4: "text-xl font-semibold tracking-tight scroll-m-20"
+    }
+    
+    #### Body_Text {
+      paragraph: "leading-7 [&:not(:first-child)]:mt-6"
+      lead: "text-xl text-muted-foreground"
+      large: "text-lg font-semibold"
+      small: "text-sm font-medium leading-none"
+      muted: "text-sm text-muted-foreground"
+    }
+    
+    #### Special_Elements {
+      blockquote: "mt-6 border-l-2 pl-6 italic"
+      inline_code: "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+      list: "my-6 ml-6 list-disc [&>li]:mt-2"
+      table: "w-full"
+      table_row: "m-0 border-t p-0 even:bg-muted"
+      table_cell: "border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right"
+    }
+  }
+  
+  ### Typography_Examples {
+    @available: 15
+    
+    Components: [
+      "typography-h1",
+      "typography-h2", 
+      "typography-h3",
+      "typography-h4",
+      "typography-p",
+      "typography-blockquote",
+      "typography-table",
+      "typography-list",
+      "typography-inline-code",
+      "typography-lead",
+      "typography-large",
+      "typography-small",
+      "typography-muted"
+    ]
+  }
+}
+
+## Registry_Advanced {
+  @type: custom_registry_creation
+  
+  ### Creating_Custom_Registry {
+    
+    #### Getting_Started {
+      @template: "https://github.com/shadcn-ui/registry-template"
+      
+      Requirements: [
+        "JSON files conforming to registry-item schema",
+        "Proper file structure",
+        "Valid component exports"
+      ]
+      
+      Structure: ```json
+        {
+          "name": "my-component",
+          "type": "registry:block",
+          "title": "My Component",
+          "description": "A custom component",
+          "files": [
+            {
+              "path": "registry/my-component.tsx",
+              "type": "registry:component"
+            }
+          ],
+          "dependencies": ["@radix-ui/react-dialog"],
+          "registryDependencies": ["button", "dialog"]
+        }
+      ```
+    }
+    
+    #### Authentication {
+      @purpose: "Secure private registries"
+      
+      Methods: {
+        Token_Based: ```json
+          {
+            "registries": {
+              "@private": {
+                "url": "https://registry.company.com/{name}.json",
+                "headers": {
+                  "Authorization": "Bearer ${REGISTRY_TOKEN}"
+                }
+              }
+            }
+          }
+        ```
+        
+        API_Key: ```json
+          {
+            "registries": {
+              "@company": {
+                "url": "https://api.company.com/registry/{name}.json",
+                "headers": {
+                  "X-API-Key": "${API_KEY}"
+                }
+              }
+            }
+          }
+        ```
+        
+        Query_Params: ```json
+          {
+            "registries": {
+              "@internal": {
+                "url": "https://registry.company.com/{name}.json",
+                "params": {
+                  "token": "${ACCESS_TOKEN}"
+                }
+              }
+            }
+          }
+        ```
+      }
+      
+      Security_Best_Practices: [
+        "Use environment variables for secrets",
+        "HTTPS only",
+        "Implement rate limiting",
+        "Regular token rotation",
+        "Access logging",
+        "Never commit tokens"
+      ]
+    }
+    
+    #### Namespaces {
+      @description: "Organize registries by namespace"
+      
+      Benefits: [
+        "Avoid naming conflicts",
+        "Organize by team/project",
+        "Separate public/private components",
+        "Version management"
+      ]
+      
+      Usage: ```bash
+        # Add from namespaced registry
+        npx shadcn@latest add @acme/button
+        
+        # Configure in components.json
+        {
+          "registries": {
+            "@acme": {
+              "url": "https://acme.com/registry/{name}.json"
+            }
+          }
+        }
+      ```
+    }
+  }
+}
+
+## v0_Integration {
+  @type: ai_customization_platform
+  @provider: "Vercel"
+  @url: "v0.dev"
+  
+  ### Features {
+    - Natural_Language_Editing: "Customize components using natural language"
+    - Direct_Integration: "Edit components directly from ui.shadcn.com"
+    - AI_Powered: "Uses AI to understand and implement changes"
+    - Free_Access: "Available with free Vercel account"
+  }
+  
+  ### Workflow {
+    1: "Sign up for Vercel account"
+    2: "Open component in v0 from shadcn docs"
+    3: "Describe changes in natural language"
+    4: "Review generated code"
+    5: "Copy and paste into your app"
+  }
+  
+  ### Use_Cases {
+    - Quick_Customization: "Rapidly modify component styles"
+    - Variant_Creation: "Generate new component variants"
+    - Theme_Adaptation: "Adapt components to brand colors"
+    - Layout_Adjustments: "Modify component structure"
+  }
+}
+
+## Version_Information {
+  @type: versioning_and_migration
+  
+  ### Current_Version {
+    @tailwind: "v4"
+    @status: "Active"
+    @docs: "https://ui.shadcn.com"
+    
+    Key_Changes: [
+      "OKLCH color format",
+      "New Tailwind v4 configuration",
+      "React 19 support",
+      "Improved performance"
+    ]
+  }
+  
+  ### Legacy_Version {
+    @tailwind: "v3"
+    @status: "Maintained"
+    @docs: "https://v3.shadcn.com"
+    
+    Migration_Notes: [
+      "Color format change from HSL to OKLCH",
+      "Tailwind config updates required",
+      "Some component API changes",
+      "CSS variable naming updates"
+    ]
+  }
+  
+  ### Changelog_Highlights {
+    
+    September_2025: {
+      Feature: "Registry Index"
+      Details: "Search and add from registries without configuration"
+    }
+    
+    August_2025: {
+      Feature: "shadcn CLI 3.0"
+      Details: [
+        "Namespaced registries",
+        "Private registry support",
+        "MCP server",
+        "Faster dependency resolution"
+      ]
+    }
+    
+    July_2025: {
+      Feature: "Universal registry items"
+      Details: "Local file support for CLI"
+    }
+    
+    February_2025: {
+      Feature: "Tailwind v4 Preview"
+      Details: "React 19 support, OKLCH colors"
+    }
+  }
+}
+
+## Resources {
+  @type: learning_materials
+  
+  ### Documentation {
+    Official_Docs: "https://ui.shadcn.com"
+    GitHub: "https://github.com/shadcn-ui/ui"
+    Discord: "Community support"
+    v0_Platform: "https://v0.dev"
+    Legacy_Docs: "https://v3.shadcn.com"
+  }
+  
+  ### Examples {
+    - Taxonomy: "Next.js app built with shadcn/ui"
+    - Mail: "Email client interface"
+    - Dashboard: "Analytics dashboard"
+    - Tasks: "Task management app"
+  }
+  
+  ### Community {
+    - Registry_Index: "https://ui.shadcn.com/r"
+    - Blocks_Library: "Community-contributed patterns"
+    - Templates: "Starter templates"
+  }
+}
+
+## Summary {
+  @type: conclusion
+  
+  Philosophy: "Not a component library, but a collection of reusable components that you can copy and paste into your apps"
+  
+  Key_Advantages: [
+    "Full control and customization",
+    "No dependency lock-in",
+    "Accessible by default",
+    "Production-ready components",
+    "Active community",
+    "Framework flexibility"
+  ]
+  
+  Use_Cases: [
+    "Rapid prototyping",
+    "Production applications",
+    "Design systems",
+    "Enterprise applications",
+    "Personal projects"
+  ]
+  
+  Getting_Started: {
+    1: "Choose your framework"
+    2: "Run npx shadcn@latest init"
+    3: "Add components as needed"
+    4: "Customize to match your design"
+    5: "Ship to production"
+  }
+}
