@@ -1,0 +1,13 @@
+{
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet ./apps/mobile",
+  "projects": {
+    "api": {
+      "root": "apps/api",
+      "framework": "nextjs"
+    },
+    "web": {
+      "root": "apps/web",
+      "framework": "nextjs"
+    }
+  }
+}
