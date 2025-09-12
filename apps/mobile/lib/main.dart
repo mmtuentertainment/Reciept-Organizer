@@ -24,17 +24,25 @@ void main() async {
     // Load environment variables (optional - can also use const values)
     await dotenv.load(fileName: '.env.local');
     
-    // Initialize Supabase with credentials
-    await Supabase.initialize(
-      url: dotenv.env['SUPABASE_URL'] ?? 'https://yxpkogyljbvbkipiephe.supabase.co',
-      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? 
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4cGtvZ3lsamJ2YmtpcGllcGhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MzY5NTYsImV4cCI6MjA3MzIxMjk1Nn0.Y_7YSbUc2Tq6Tzy2E8G6kGpX3nz0P5onPedFs0xtkdg',
-      authOptions: const FlutterAuthClientOptions(
-        authFlowType: AuthFlowType.pkce,
-        autoRefreshToken: true,
-      ),
-    );
-    print('✅ Supabase initialized successfully');
+    // Initialize Supabase with credentials from environment
+    final supabaseUrl = dotenv.env['SUPABASE_URL'];
+    final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+    
+    if (supabaseUrl == null || supabaseAnonKey == null) {
+      print('⚠️ Supabase credentials not found in .env.local file');
+      print('   Please create .env.local file from .env.example');
+      // Continue without Supabase for local-only mode
+    } else {
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseAnonKey,
+        authOptions: const FlutterAuthClientOptions(
+          authFlowType: AuthFlowType.pkce,
+          autoRefreshToken: true,
+        ),
+      );
+      print('✅ Supabase initialized successfully');
+    }
   } catch (e) {
     print('⚠️ Failed to initialize Supabase: $e');
     // Continue without Supabase for local-only mode

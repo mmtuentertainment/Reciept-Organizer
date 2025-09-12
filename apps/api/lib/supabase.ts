@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase configuration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://yxpkogyljbvbkipiephe.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!
+// Supabase configuration from environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 
-if (!supabaseAnonKey) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable')
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing required Supabase environment variables. Please check .env.local configuration.')
 }
 
 // Create a Supabase client for public/client-side operations
