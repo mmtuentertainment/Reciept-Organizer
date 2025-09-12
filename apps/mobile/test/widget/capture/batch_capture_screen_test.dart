@@ -35,7 +35,7 @@ void main() {
 
     testWidgets('should display batch capture screen with initial elements', (WidgetTester tester) async {
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('Batch Capture'), findsOneWidget);
       expect(find.byIcon(Icons.camera_alt), findsOneWidget);
@@ -48,13 +48,13 @@ void main() {
           .thenAnswer((_) async => CaptureResult.success('/path/to/image.jpg'));
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       final captureButton = find.byIcon(Icons.camera_alt);
       expect(captureButton, findsOneWidget);
 
       await tester.tap(captureButton);
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       verify(mockCameraService.captureReceipt(batchMode: true)).called(1);
     });
@@ -64,13 +64,13 @@ void main() {
           .thenAnswer((_) async => CaptureResult.success('/path/to/image.jpg'));
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('0'), findsOneWidget);
 
       final captureButton = find.byIcon(Icons.camera_alt);
       await tester.tap(captureButton);
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('1'), findsOneWidget);
     });
@@ -80,13 +80,13 @@ void main() {
           .thenAnswer((_) async => CaptureResult.success('/path/to/image.jpg'));
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('Finish Batch (1)'), findsNothing);
 
       final captureButton = find.byIcon(Icons.camera_alt);
       await tester.tap(captureButton);
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('Finish Batch (1)'), findsOneWidget);
     });
@@ -96,13 +96,13 @@ void main() {
           .thenAnswer((_) async => CaptureResult.success('/path/to/image.jpg'));
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('Review'), findsNothing);
 
       final captureButton = find.byIcon(Icons.camera_alt);
       await tester.tap(captureButton);
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('Review'), findsOneWidget);
     });
@@ -114,11 +114,11 @@ void main() {
           .thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       final captureButton = find.byIcon(Icons.camera_alt);
       await tester.tap(captureButton);
-      await tester.pump(); // Start the capture
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Start the capture
 
       // Verify loading state
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -126,7 +126,7 @@ void main() {
 
       // Complete the future to clean up
       completer.complete(CaptureResult.success('/path/to/image.jpg'));
-      await tester.pump(); // Process completion
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Process completion
     });
 
     testWidgets('should show success snackbar after successful capture', (WidgetTester tester) async {
@@ -134,11 +134,11 @@ void main() {
           .thenAnswer((_) async => CaptureResult.success('/path/to/image.jpg'));
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       final captureButton = find.byIcon(Icons.camera_alt);
       await tester.tap(captureButton);
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('Receipt captured! (1 total)'), findsOneWidget);
     });
@@ -148,14 +148,14 @@ void main() {
           .thenAnswer((_) async => CaptureResult.success('/path/to/image.jpg'));
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       final captureButton = find.byIcon(Icons.camera_alt);
       
       await tester.tap(captureButton);
       await tester.tap(captureButton);
       await tester.tap(captureButton);
-      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // The count '3' appears in multiple places, so check the specific widget
       expect(find.byType(CaptureCounterWidget), findsOneWidget);
@@ -171,11 +171,11 @@ void main() {
           .thenAnswer((_) async => CaptureResult.error('Camera failed'));
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       final captureButton = find.byIcon(Icons.camera_alt);
       await tester.tap(captureButton);
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(find.text('0'), findsOneWidget);
       expect(find.text('Finish Batch (0)'), findsNothing);
@@ -186,18 +186,18 @@ void main() {
           .thenAnswer((_) async => CaptureResult.success('/path/to/image.jpg'));
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       final captureButton = find.byIcon(Icons.camera_alt);
       await tester.tap(captureButton);
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       final finishButton = find.text('Finish Batch (1)');
       expect(finishButton, findsOneWidget);
 
       await tester.tap(finishButton);
-      await tester.pump(); // Process tap
-      await tester.pump(const Duration(milliseconds: 300)); // Wait for navigation
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Process tap
+      await tester.pumpAndSettle(const Duration(milliseconds: 500)); // Wait for navigation
 
       // Check that navigation was triggered - the button should still be present
       // as navigation is mocked in tests

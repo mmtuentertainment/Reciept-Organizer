@@ -21,7 +21,10 @@ void main() {
       expect(find.text('92'), findsOneWidget);
       
       // Verify circular container with green background
-      final container = tester.widget<Container>(find.byType(Container).first);
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.shape, BoxShape.circle);
       expect(decoration.color, const Color(0xFF388E3C)); // Green
@@ -44,7 +47,10 @@ void main() {
       expect(find.text('78'), findsOneWidget);
       
       // Verify orange background
-      final container = tester.widget<Container>(find.byType(Container).first);
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.color, const Color(0xFFF57C00)); // Orange
     });
@@ -66,7 +72,10 @@ void main() {
       expect(find.text('60'), findsOneWidget);
       
       // Verify red background
-      final container = tester.widget<Container>(find.byType(Container).first);
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.color, const Color(0xFFD32F2F)); // Red
     });
@@ -107,7 +116,10 @@ void main() {
       );
 
       // Then
-      final container = tester.widget<Container>(find.byType(Container).first);
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
       expect(container.constraints?.minWidth, customSize);
       expect(container.constraints?.minHeight, customSize);
     });
@@ -147,7 +159,10 @@ void main() {
       );
 
       // Then
-      final container = tester.widget<Container>(find.byType(Container).first);
+      final containerFinder = find.byType(Container);
+      final container = containerFinder.evaluate().isNotEmpty 
+          ? tester.widget<Container>(containerFinder.first) 
+          : null;
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.boxShadow, isNotEmpty);
       expect(decoration.boxShadow?.first.color, Colors.black.withAlpha((0.2 * 255).round()));
@@ -173,7 +188,10 @@ void main() {
       );
 
       // Then
-      expect(find.byType(Stack), findsOneWidget);
+      expect(find.descendant(
+        of: find.byType(PositionedConfidenceBadge),
+        matching: find.byType(Stack),
+      ), findsOneWidget);
       expect(find.byType(Positioned), findsOneWidget);
       expect(find.byType(ConfidenceBadge), findsOneWidget);
       expect(find.byType(Placeholder), findsOneWidget);

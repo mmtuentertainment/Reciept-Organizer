@@ -2,14 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:receipt_organizer/data/repositories/settings_repository.dart';
 import 'package:receipt_organizer/data/models/app_settings.dart';
+import '../../../test_config/test_setup.dart';
 
 void main() {
-  group('SettingsRepository', () {
+  testWithSetup('SettingsRepository', () {
     late SettingsRepository repository;
     late SharedPreferences prefs;
 
     setUp(() async {
-      SharedPreferences.setMockInitialValues({});
+      // Test setup already initializes SharedPreferences mock
       prefs = await SharedPreferences.getInstance();
       repository = SettingsRepository(prefs);
     });

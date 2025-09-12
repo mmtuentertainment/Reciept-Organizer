@@ -145,7 +145,7 @@ void main() {
       // Tap on first corner handle
       final firstHandle = find.byIcon(Icons.drag_indicator).first;
       await tester.tap(firstHandle);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Should show guidelines after selection
       expect(find.byType(CustomPaint), findsWidgets); // Guidelines are drawn with CustomPaint
@@ -172,7 +172,7 @@ void main() {
       final firstHandle = find.byIcon(Icons.drag_indicator).first;
       await tester.tap(firstHandle);
       await tester.drag(firstHandle, const Offset(50, 50));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       expect(changedResult, isNotNull);
       expect(changedResult!.success, isTrue);
@@ -273,7 +273,7 @@ void main() {
       // Make a change by dragging a corner
       final firstHandle = find.byIcon(Icons.drag_indicator).first;
       await tester.drag(firstHandle, const Offset(10, 10));
-      await tester.pump();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Reset button should still be present after changes
       expect(find.text('Reset'), findsOneWidget);
@@ -334,7 +334,7 @@ void main() {
       // Tap a corner to select it
       final firstHandle = find.byIcon(Icons.drag_indicator).first;
       await tester.tap(firstHandle);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // The selected corner should have different visual styling
       // This would be tested through the AnimatedContainer properties

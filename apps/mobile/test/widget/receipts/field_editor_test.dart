@@ -65,7 +65,7 @@ void main() {
       );
 
       // Wait for animations to complete
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should show success icon for high confidence
       expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
@@ -93,7 +93,7 @@ void main() {
       );
 
       // Wait for animations to complete
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should show warning icon for low confidence
       expect(find.byIcon(Icons.warning_amber), findsOneWidget);
@@ -119,7 +119,7 @@ void main() {
 
       // When - User edits the field
       await tester.enterText(find.byType(TextField), 'Edited Store Name');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then
       expect(updatedFieldData, isNotNull);
@@ -153,7 +153,7 @@ void main() {
 
       // When - Enter invalid date format
       await tester.enterText(find.byType(TextField), '13/32/2024');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should show error validation status
       expect(updatedFieldData, isNotNull);
@@ -187,7 +187,7 @@ void main() {
 
       // When - Enter negative amount
       await tester.enterText(find.byType(TextField), '-10.50');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should show warning validation status
       expect(updatedFieldData, isNotNull);
@@ -212,10 +212,10 @@ void main() {
       await tester.enterText(find.byType(TextField), 'New Store Name');
       
       // Pump multiple frames to test animation
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 200));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Animation should complete without errors
       expect(find.byType(Transform), findsWidgets);
@@ -241,7 +241,7 @@ void main() {
 
       // When - Clear the field
       await tester.enterText(find.byType(TextField), '');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should show error status for empty field
       expect(updatedFieldData, isNotNull);
@@ -268,7 +268,7 @@ void main() {
 
       // When - Edit the field
       await tester.enterText(find.byType(TextField), 'Edited Store');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should preserve original text
       expect(updatedFieldData, isNotNull);
@@ -296,7 +296,7 @@ void main() {
 
       // When - Enter lowercase merchant name
       await tester.enterText(find.byType(TextField), 'walmart store');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should capitalize words
       expect(updatedFieldData, isNotNull);
@@ -356,7 +356,7 @@ void main() {
 
       // When - Try to enter multiple decimal points
       await tester.enterText(find.byType(TextField), '25.99.00');
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
       // Then - Should prevent multiple decimal points
       final textField = tester.widget<TextField>(find.byType(TextField));

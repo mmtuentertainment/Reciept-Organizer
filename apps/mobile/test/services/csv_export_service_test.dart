@@ -3,29 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
-// Mock PathProvider for testing
-class MockPathProviderPlatform extends Fake
-    with MockPlatformInterfaceMixin
-    implements PathProviderPlatform {
-
-  @override
-  Future<String?> getApplicationDocumentsPath() async {
-    return '/tmp/test_documents';
-  }
-}
+import '../test_config/test_setup.dart';
 
 void main() {
-  group('CSVExportService', () {
+  testWithSetup('CSVExportService', () {
     late ICSVExportService csvService;
     late List<Receipt> testReceipts;
 
     setUp(() async {
-      // Set up mock path provider
-      PathProviderPlatform.instance = MockPathProviderPlatform();
-      
+      // Test setup already configures path provider mock
       csvService = CSVExportService();
       
       // Create test receipts with OCR data

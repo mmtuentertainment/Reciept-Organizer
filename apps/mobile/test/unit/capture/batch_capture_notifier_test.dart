@@ -102,8 +102,12 @@ void main() {
     });
 
     test('reorderReceipts should change receipt order', () async {
+      int callCount = 0;
       when(mockCameraService.captureReceipt(batchMode: true))
-          .thenAnswer((_) async => CaptureResult.success('/path/to/image1.jpg'));
+          .thenAnswer((_) async {
+            callCount++;
+            return CaptureResult.success('/path/to/image$callCount.jpg');
+          });
 
       notifier.startBatchMode();
       await notifier.captureReceipt();
@@ -112,7 +116,8 @@ void main() {
       final firstReceiptId = notifier.state.receipts.first.id;
       final secondReceiptId = notifier.state.receipts.last.id;
 
-      notifier.reorderReceipts(0, 1);
+      // ReorderableListView semantics: to move item from index 0 to after index 1, use newIndex=2
+      notifier.reorderReceipts(0, 2);
 
       expect(notifier.state.receipts.first.id, secondReceiptId);
       expect(notifier.state.receipts.last.id, firstReceiptId);

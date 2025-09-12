@@ -135,7 +135,7 @@ void main() {
           container.dy - 300 + 90,  // center - half height + scaled y
         );
         await tester.tapAt(tapPoint);
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
         
         // Assert
         expect(tappedField, equals('merchant'));

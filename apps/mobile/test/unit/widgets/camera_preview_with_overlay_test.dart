@@ -37,7 +37,7 @@ class MockCameraService extends CameraService {
 
   @override
   Future<EdgeDetectionResult> detectEdges(CameraFrame frame) async {
-    await Future.delayed(const Duration(milliseconds: 10)); // Simulate processing
+    await Future.delayed(const Duration(milliseconds: 200)); // Simulate longer processing
     return _mockEdgeResult ?? EdgeDetectionResult(success: false, confidence: 0.0);
   }
 
@@ -83,13 +83,14 @@ void main() {
             home: Scaffold(
               body: CameraPreviewWithOverlay(
                 cameraService: mockCameraService,
+                // Don't use testMode - we want to test loading state
               ),
             ),
           ),
         ),
       );
 
-      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
@@ -98,32 +99,56 @@ void main() {
       final controller = StreamController<CameraFrame>();
       mockCameraService.setMockPreviewStream(controller.stream);
       
+      // Make detectEdges take longer so we can see the processing state
+      mockCameraService.setMockEdgeResult(EdgeDetectionResult(
+        success: false, 
+        confidence: 0.0,
+      ));
+      
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
               body: CameraPreviewWithOverlay(
                 cameraService: mockCameraService,
+                testMode: true,
               ),
             ),
           ),
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
-      // Add a frame to trigger processing
-      controller.add(CameraFrame(
-        imageData: Uint8List.fromList([1, 2, 3]),
-        timestamp: DateTime.now(),
-      ));
-
-      await tester.pump(const Duration(milliseconds: 50));
+      // Add 3 frames to trigger processing (widget processes every 3rd frame)
+      for (int i = 0; i < 3; i++) {
+        controller.add(CameraFrame(
+          imageData: Uint8List.fromList([1, 2, 3]),
+          timestamp: DateTime.now(),
+        ));
+        await tester.pump(const Duration(milliseconds: 5));
+      }
       
-      // Should show processing indicator briefly
+      // Debug: Print widget tree to see what's actually rendered
+      final widgetFinder = find.byType(CameraPreviewWithOverlay);
+      expect(widgetFinder, findsOneWidget);
+      
+      // Debug: Check if any text widgets exist
+      final textWidgets = find.byType(Text);
+      if (textWidgets.evaluate().isNotEmpty) {
+        for (final element in textWidgets.evaluate()) {
+          final Text widget = element.widget as Text;
+          debugPrint('Found text: ${widget.data}');
+        }
+      } else {
+        debugPrint('No text widgets found');
+      }
+      
+      // Should show processing indicator
       expect(find.text('Detecting...'), findsOneWidget);
 
-      await tester.pumpAndSettle();
+      // Wait for detectEdges to complete (200ms)
+      await tester.pump(const Duration(milliseconds: 200));
       controller.close();
     });
 
@@ -144,12 +169,17 @@ void main() {
 
       EdgeDetectionResult? receivedResult;
       
+      // Create a stream controller for frames
+      final controller = StreamController<CameraFrame>();
+      mockCameraService.setMockPreviewStream(controller.stream);
+      
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
               body: CameraPreviewWithOverlay(
                 cameraService: mockCameraService,
+                testMode: true,
                 onEdgeDetectionResult: (result) {
                   receivedResult = result;
                 },
@@ -159,14 +189,25 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
       
-      // Trigger a frame to start edge detection
-      await tester.pump(const Duration(milliseconds: 200));
+      // Send 3 frames to trigger edge detection (processes every 3rd frame)
+      for (int i = 0; i < 3; i++) {
+        controller.add(CameraFrame(
+          imageData: Uint8List.fromList([1, 2, 3]),
+          timestamp: DateTime.now(),
+        ));
+        await tester.pump(const Duration(milliseconds: 5));
+      }
+      
+      // Wait for processing to complete (detectEdges takes 200ms)
+      await tester.pump(const Duration(milliseconds: 250));
       
       expect(receivedResult, isNotNull);
       expect(receivedResult!.success, isTrue);
       expect(find.text('Receipt detected'), findsOneWidget);
+      
+      controller.close();
     });
 
     testWidgets('should handle manual corner adjustment', (tester) async {
@@ -185,12 +226,17 @@ void main() {
       mockCameraService.setMockEdgeResult(initialResult);
       EdgeDetectionResult? adjustedResult;
 
+      // Create a stream controller for frames
+      final controller = StreamController<CameraFrame>();
+      mockCameraService.setMockPreviewStream(controller.stream);
+
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
               body: CameraPreviewWithOverlay(
                 cameraService: mockCameraService,
+                testMode: true,
                 enableManualAdjustment: true,
                 onEdgeDetectionResult: (result) {
                   adjustedResult = result;
@@ -201,10 +247,24 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Send 3 frames to trigger edge detection
+      for (int i = 0; i < 3; i++) {
+        controller.add(CameraFrame(
+          imageData: Uint8List.fromList([1, 2, 3]),
+          timestamp: DateTime.now(),
+        ));
+        await tester.pump(const Duration(milliseconds: 5));
+      }
+      
+      // Wait for processing to complete (detectEdges takes 200ms)
+      await tester.pump(const Duration(milliseconds: 250));
 
       // Find corner handles should be available
       expect(find.byIcon(Icons.touch_app), findsOneWidget);
+      
+      controller.close();
     });
 
     testWidgets('should disable manual adjustment when specified', (tester) async {
@@ -228,6 +288,7 @@ void main() {
             home: Scaffold(
               body: CameraPreviewWithOverlay(
                 cameraService: mockCameraService,
+                testMode: true,
                 enableManualAdjustment: false,
               ),
             ),
@@ -235,13 +296,17 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Touch app icon should not be present
       expect(find.byIcon(Icons.touch_app), findsNothing);
     });
 
     testWidgets('should show appropriate status for different detection results', (tester) async {
+      // Create a stream controller for frames
+      final controller = StreamController<CameraFrame>();
+      mockCameraService.setMockPreviewStream(controller.stream);
+      
       // Test failed detection
       final failedResult = EdgeDetectionResult(success: false, confidence: 0.2);
       mockCameraService.setMockEdgeResult(failedResult);
@@ -252,17 +317,31 @@ void main() {
             home: Scaffold(
               body: CameraPreviewWithOverlay(
                 cameraService: mockCameraService,
+                testMode: true,
               ),
             ),
           ),
         ),
       );
 
-      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 100));
+      
+      // Send 3 frames to trigger edge detection
+      for (int i = 0; i < 3; i++) {
+        controller.add(CameraFrame(
+          imageData: Uint8List.fromList([1, 2, 3]),
+          timestamp: DateTime.now(),
+        ));
+        await tester.pump(const Duration(milliseconds: 5));
+      }
+      
+      // Wait for processing to complete (detectEdges takes 200ms)
+      await tester.pump(const Duration(milliseconds: 250));
+      
       expect(find.text('No receipt detected'), findsOneWidget);
       expect(find.byIcon(Icons.warning), findsOneWidget);
 
-      // Test partial detection
+      // Test partial detection (confidence < 0.8)
       final partialResult = EdgeDetectionResult(
         success: true,
         confidence: 0.7,
@@ -271,21 +350,23 @@ void main() {
       );
       mockCameraService.setMockEdgeResult(partialResult);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(
-              body: CameraPreviewWithOverlay(
-                cameraService: mockCameraService,
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+      // Send more frames to trigger new detection with partial result
+      // Need to send 3 more frames (6 total, processes on 6th frame)
+      for (int i = 0; i < 3; i++) {
+        controller.add(CameraFrame(
+          imageData: Uint8List.fromList([4, 5, 6]),
+          timestamp: DateTime.now(),
+        ));
+        await tester.pump(const Duration(milliseconds: 5));
+      }
+      
+      // Wait for processing to complete (detectEdges takes 200ms)
+      await tester.pump(const Duration(milliseconds: 250));
+      
       expect(find.text('Partial detection'), findsOneWidget);
       expect(find.byIcon(Icons.info), findsOneWidget);
+      
+      controller.close();
     });
 
     testWidgets('should throttle edge detection processing', (tester) async {
@@ -305,13 +386,14 @@ void main() {
             home: Scaffold(
               body: CameraPreviewWithOverlay(
                 cameraService: testService,
+                testMode: true,
               ),
             ),
           ),
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Send multiple rapid frames
       for (int i = 0; i < 10; i++) {
@@ -319,10 +401,10 @@ void main() {
           imageData: Uint8List.fromList([i]),
           timestamp: DateTime.now(),
         ));
-        await tester.pump(const Duration(milliseconds: 10));
+        await tester.pump(const Duration(milliseconds: 100));
       }
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
       controller.close();
 
       // Should have throttled the processing (not process all 10 frames)
