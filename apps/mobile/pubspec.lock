@@ -222,6 +222,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  convenient_test:
+    dependency: "direct dev"
+    description:
+      name: convenient_test
+      sha256: "604a3661a6d65e3444f195651badee75ac5e2bce44a60522825f9ac8c69a4102"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.2"
   convert:
     dependency: transitive
     description:

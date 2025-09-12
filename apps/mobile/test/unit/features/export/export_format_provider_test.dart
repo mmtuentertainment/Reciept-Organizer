@@ -32,16 +32,16 @@ void main() {
       container.dispose();
     });
 
-    test('should initialize with generic format when no saved preference', () {
-      // Given - Default settings with no saved format
+    test('should initialize with quickbooks format from default settings', () {
+      // Given - Default settings (which defaults to quickbooks)
       mockSettingsNotifier.state = AppSettings();
 
       // When
       final state = container.read(exportFormatNotifierProvider);
 
       // Then
-      expect(state.selectedFormat, ExportFormat.generic);
-      expect(state.lastUsedFormat, isNull);
+      expect(state.selectedFormat, ExportFormat.quickbooks);
+      expect(state.lastUsedFormat, ExportFormat.quickbooks);
       expect(state.isLoading, isFalse);
       expect(state.hasChanges, isFalse);
     });

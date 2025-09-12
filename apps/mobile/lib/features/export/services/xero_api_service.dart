@@ -118,16 +118,17 @@ class XeroAPIService {
       // For now, throw unimplemented since the proxy needs to handle this
       throw UnimplementedError('Expense bill creation should be implemented via Vercel proxy');
       
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        results.add(json.decode(response.body));
-      } else if (response.statusCode == 401) {
-        // Token expired, try refreshing
-        await refreshAccessToken();
-        // Retry the request
-        return createExpenseBills(receipts);
-      } else {
-        throw Exception('Failed to create expense bills: ${response.body}');
-      }
+      // Unreachable code after throw - commented out
+      // if (response.statusCode == 200 || response.statusCode == 201) {
+      //   results.add(json.decode(response.body));
+      // } else if (response.statusCode == 401) {
+      //   // Token expired, try refreshing
+      //   await refreshAccessToken();
+      //   // Retry the request
+      //   return createExpenseBills(receipts);
+      // } else {
+      //   throw Exception('Failed to create expense bills: ${response.body}');
+      // }
     }
     
     return {'batches': results};

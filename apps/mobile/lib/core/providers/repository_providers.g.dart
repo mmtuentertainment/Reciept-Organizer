@@ -6,14 +6,16 @@ part of 'repository_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$receiptRepositoryHash() => r'089df55749e9ea9310259f3866343f29206aef1a';
+String _$receiptRepositoryHash() => r'cf54bf26bb2bbd00bbf89cde8e23ee35387866d1';
 
 /// Provider for ReceiptRepository instance
+/// NOTE: Currently returns concrete ReceiptRepository due to model mismatch
+/// TODO: Fix once Receipt models are consolidated
 ///
 /// Copied from [receiptRepository].
 @ProviderFor(receiptRepository)
 final receiptRepositoryProvider =
-    AutoDisposeFutureProvider<IReceiptRepository>.internal(
+    AutoDisposeFutureProvider<ReceiptRepository>.internal(
   receiptRepository,
   name: r'receiptRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -25,6 +27,6 @@ final receiptRepositoryProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef ReceiptRepositoryRef = AutoDisposeFutureProviderRef<IReceiptRepository>;
+typedef ReceiptRepositoryRef = AutoDisposeFutureProviderRef<ReceiptRepository>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

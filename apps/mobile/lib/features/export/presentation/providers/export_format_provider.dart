@@ -31,7 +31,7 @@ class ExportFormatState {
   }
 
   factory ExportFormatState.initial() => const ExportFormatState(
-        selectedFormat: ExportFormat.generic,
+        selectedFormat: ExportFormat.quickbooks,
         lastUsedFormat: null,
         isLoading: false,
         hasChanges: false,

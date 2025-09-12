@@ -95,6 +95,9 @@ dev_dependencies:
   sqflite_common_ffi: ^2.3.3
   mocktail: ^1.0.4
   freezed: ^2.5.7
+  
+  # Test debugging
+  convenient_test: ^1.5.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
