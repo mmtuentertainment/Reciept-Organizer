@@ -5,6 +5,26 @@ apps/mobile/tmp/
 .gemini/
 gha-creds-*.json
 
+# Environment files with secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.env.local
+*.env.production
+*.env.development
+.env.mcp
+
+# PDF files and documents
+*.pdf
+*.doc
+*.docx
+
+# Shell scripts with potential secrets
+setup-mcp-env.sh
+add-supabase-env.sh
+*-env.sh
+
 # Large files that shouldn't be committed
 **/*.tar.xz
 **/*.tar.gz
@@ -56,3 +76,15 @@ WIP_*.md
 # Story documents (work in progress, not for commit)
 docs/stories/*.story.poml
 docs/stories/*-SUMMARY.poml
+# Never commit .env.local files
+.env.local
+.env
+*.env.*
+!.env.example
+
+# Never commit API keys
+*_KEYS_*
+SUPABASE_*
+*api-keys*
+*credentials*
+.env.mcp
