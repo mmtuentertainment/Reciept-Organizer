@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Receipt Organizer MVP** project focused on building a mom-and-pop business receipt capture, OCR, and CSV export application. The project is in the **research and planning phase** - no code has been written yet.
+This is a **Receipt Organizer MVP** project focused on building a mom-and-pop business receipt capture, OCR, and CSV export application. The project is now in **active development** with a Flutter mobile app, API backend, and cloud infrastructure.
 
 ## Project Architecture
 
@@ -76,6 +76,39 @@ From `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md`:
 4. **CSV as Contract**: Publish schemas and validate pre-export
 5. **Honest OCR UX**: Visible confidence scores + fast correction over perfect automation
 
+## CRITICAL: Test Suite Management
+
+### ⚠️ IMPORTANT: Simplified Test Strategy (15 Tests Only)
+**DO NOT ADD MORE TESTS WITHOUT EXPLICIT DISCUSSION**
+
+This project uses a **minimal test strategy** following the CleanArchitectureTodoApp pattern:
+- **Original**: 571 tests (way too many, 131 failing)
+- **Current**: 15 critical tests only
+- **Location**: `apps/mobile/test/`
+- **Strategy**: See `apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md`
+
+#### The 15 Critical Tests:
+1. **Core Tests** (`test/core_tests/`):
+   - Receipt repository operations
+   - CSV export functionality
+   - App launch verification
+
+2. **Integration Tests** (`test/integration_tests/`):
+   - Critical user flows only
+   - Capture → OCR → Export workflow
+
+### Why Only 15 Tests?
+- Industry best practice: Most successful Flutter apps have 50-200 tests, not 500+
+- CleanArchitectureTodoApp (a reference implementation) uses only 12 tests
+- Maintenance burden of 571 tests was unsustainable
+- Focus on critical business logic, not edge cases
+
+### Before Adding ANY Test:
+1. Read `apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md`
+2. Justify why it's critical for MVP
+3. Consider if existing tests already cover it
+4. Get explicit approval in the conversation
+
 ## Getting Started
 
 When beginning development:
@@ -85,6 +118,15 @@ When beginning development:
 4. Use the CSV compatibility analysis for export format specifications
 5. Follow the OCR baseline study for accuracy measurement protocols
 
-No build, test, or development commands exist yet - this project is in the planning phase.
+### Build & Test Commands
+```bash
+# Flutter app (from apps/mobile/)
+flutter test test/core_tests/ test/integration_tests/  # Run ONLY the 15 critical tests
+flutter run                                             # Run the app
+
+# API (from apps/api/)
+npm run dev                                            # Start development server
+npm run build                                          # Build for production
+```
 - doc-out
 - risk
