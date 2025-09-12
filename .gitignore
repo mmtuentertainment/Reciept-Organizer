@@ -4,3 +4,65 @@ apps/mobile/tmp/
 
 .gemini/
 gha-creds-*.json
+
+# Large files that shouldn't be committed
+**/*.tar.xz
+**/*.tar.gz
+**/*.zip
+**/flutter_*_stable.*
+**/flutter_*_beta.*
+**/flutter_*_dev.*
+**/*.dmg
+**/*.exe
+**/*.deb
+**/*.rpm
+**/*.iso
+*.bfg-report/
+bfg.jar
+
+# Files larger than 50MB
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.sql
+*.sqlite
+*.db
+
+# Environment files with secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.env.local
+*.env.production
+*.env.development
+.env.mcp
+
+# PDF files and documents
+*.pdf
+*.doc
+*.docx
+
+# Shell scripts with potential secrets
+setup-mcp-env.sh
+add-supabase-env.sh
+*-env.sh
+clean-git-history.sh
+
+# Internal documentation and knowledgebase
+**/knowledgebase/
+**/knowledgebase*.md
+**/knowledgebase*.poml
+docs/shadcn-*
+docs/web-ui-knowledgebase/
+docs/hybrid-sync/
+
+# Test artifacts and scripts
+test_results_*.txt
+test_module_results.md
+fix_*.py
+fix_*.sh
+
+# Release artifacts
+releases/
