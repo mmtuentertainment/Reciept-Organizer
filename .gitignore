@@ -57,6 +57,9 @@ clean-git-history.sh
 docs/shadcn-*
 docs/web-ui-knowledgebase/
 docs/hybrid-sync/
+docs/stories/*.poml
+docs/stories/TRACK-*.poml
+docs/setup/
 
 # Test artifacts and scripts
 test_results_*.txt
@@ -64,5 +67,13 @@ test_module_results.md
 fix_*.py
 fix_*.sh
 
+# Security documentation
+SECURITY_*.md
+CREDENTIAL_*.md
+apps/api/CREDENTIAL_*.md
+
 # Release artifacts
 releases/
+
+# Web app (temporary/test)
+apps/web/
