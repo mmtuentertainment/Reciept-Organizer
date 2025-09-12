@@ -1,0 +1,49 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "receipt-organizer",
+  "homepage": "http://localhost:3000",
+  "items": [
+    {
+      "name": "receipt-card",
+      "type": "registry:block",
+      "title": "Receipt Card",
+      "description": "A card component for displaying receipt information with merchant, amount, date, and category.",
+      "registryDependencies": [],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "registry/receipt-card/receipt-card.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "export-button",
+      "type": "registry:block",
+      "title": "Export Button",
+      "description": "A button component for exporting data in various formats (CSV, PDF, JSON).",
+      "registryDependencies": ["button"],
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/export-button/export-button.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "receipt-capture",
+      "type": "registry:block",
+      "title": "Receipt Capture",
+      "description": "A component for capturing and processing receipt images with OCR.",
+      "registryDependencies": ["button", "card"],
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/receipt-capture/receipt-capture.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "export-button",
+  "type": "registry:block",
+  "title": "Export Button",
+  "description": "A button component for exporting data in various formats (CSV, PDF, JSON).",
+  "registryDependencies": ["button"],
+  "dependencies": ["lucide-react"],
+  "files": [
+    {
+      "path": "registry/export-button/export-button.tsx",
+      "type": "registry:component",
+      "content": "import * as React from \"react\"\nimport { cn } from \"@/lib/utils\"\nimport { Button } from \"@/components/ui/button\"\nimport { Download } from \"lucide-react\"\n\nexport interface ExportButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {\n  format?: \"csv\" | \"pdf\" | \"json\"\n  onExport?: (format: string) => void\n}\n\nconst ExportButton = React.forwardRef<HTMLButtonElement, ExportButtonProps>(\n  ({ className, format = \"csv\", onExport, children, ...props }, ref) => {\n    const handleClick = () => {\n      onExport?.(format)\n    }\n\n    return (\n      <Button\n        ref={ref}\n        className={cn(\"gap-2\", className)}\n        onClick={handleClick}\n        {...props}\n      >\n        <Download className=\"h-4 w-4\" />\n        {children || `Export as ${format.toUpperCase()}`}\n      </Button>\n    )\n  }\n)\nExportButton.displayName = \"ExportButton\"\n\nexport { ExportButton }\n"
+    }
+  ]
+}

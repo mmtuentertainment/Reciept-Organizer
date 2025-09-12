@@ -1,0 +1,16 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "receipt-card",
+  "type": "registry:block",
+  "title": "Receipt Card",
+  "description": "A card component for displaying receipt information with merchant, amount, date, and category.",
+  "registryDependencies": [],
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/receipt-card/receipt-card.tsx",
+      "type": "registry:component",
+      "content": "import * as React from \"react\"\nimport { cn } from \"@/lib/utils\"\n\nexport interface ReceiptCardProps extends React.HTMLAttributes<HTMLDivElement> {\n  merchant: string\n  amount: string\n  date: string\n  category?: string\n}\n\nconst ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(\n  ({ className, merchant, amount, date, category, ...props }, ref) => {\n    return (\n      <div\n        ref={ref}\n        className={cn(\n          \"rounded-lg border bg-card text-card-foreground shadow-sm\",\n          className\n        )}\n        {...props}\n      >\n        <div className=\"p-6\">\n          <div className=\"flex items-center justify-between mb-2\">\n            <h3 className=\"text-lg font-semibold\">{merchant}</h3>\n            <span className=\"text-lg font-bold\">{amount}</span>\n          </div>\n          <div className=\"flex items-center justify-between text-sm text-muted-foreground\">\n            <span>{date}</span>\n            {category && (\n              <span className=\"px-2 py-1 rounded-md bg-secondary\">\n                {category}\n              </span>\n            )}\n          </div>\n        </div>\n      </div>\n    )\n  }\n)\nReceiptCard.displayName = \"ReceiptCard\"\n\nexport { ReceiptCard }\n"
+    }
+  ]
+}
