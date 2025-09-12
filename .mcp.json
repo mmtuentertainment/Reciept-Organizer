@@ -6,6 +6,227 @@
         "shadcn@latest",
         "mcp"
       ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/matt/FINAPP/Receipt Organizer"],
+      "disabled": false
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase",
+        "--read-only",
+        "--project-ref=yxpkogyljbvbkipiephe"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      },
+      "disabled": false
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "disabled": true
     }
+  },
+  "projectContext": {
+    "name": "Receipt Organizer MVP",
+    "description": "Flutter mobile app with OCR receipt processing and Supabase backend",
+    "type": "fullstack",
+    "phase": "Cloud Infrastructure Setup (Track 2)",
+    "stack": {
+      "frontend": {
+        "framework": "Flutter 3.24+",
+        "language": "Dart 3.2+",
+        "stateManagement": "Riverpod 2.4+",
+        "ui": "Material Design 3"
+      },
+      "backend": {
+        "api": "Next.js 15.5.2",
+        "runtime": "Vercel Edge Functions",
+        "database": "Supabase PostgreSQL",
+        "storage": "Supabase Storage",
+        "auth": "Supabase Auth"
+      },
+      "ocr": {
+        "primary": "Google ML Kit",
+        "fallback": "TensorFlow Lite",
+        "processing": "On-device"
+      },
+      "deployment": {
+        "api": "Vercel",
+        "mobile": "App Stores",
+        "database": "Supabase Cloud"
+      }
+    },
+    "structure": {
+      "mobile": "apps/mobile",
+      "api": "apps/api",
+      "infrastructure": "infrastructure/supabase",
+      "documentation": "docs",
+      "tests": "apps/mobile/test",
+      "bmadCore": ".bmad-core"
+    },
+    "keyFiles": [
+      "CLAUDE.md",
+      "docs/setup/SUPABASE_SETUP.md",
+      "infrastructure/supabase/schema-safe.sql",
+      "infrastructure/supabase/storage-safe.sql",
+      "apps/mobile/lib/main.dart",
+      "apps/mobile/lib/infrastructure/supabase/supabase_client.dart",
+      "apps/api/.env.local",
+      "apps/mobile/.env.local"
+    ]
+  },
+  "developmentGuidelines": {
+    "codeStandards": {
+      "dart": {
+        "style": "flutter analyze",
+        "formatter": "dart format",
+        "linter": "analysis_options.yaml"
+      },
+      "typescript": {
+        "style": "prettier",
+        "linter": "eslint",
+        "formatter": "prettier --write"
+      },
+      "sql": {
+        "dialect": "PostgreSQL",
+        "casing": "snake_case",
+        "migrations": "infrastructure/supabase/migrations"
+      }
+    },
+    "testing": {
+      "mobile": {
+        "unit": "flutter test",
+        "widget": "flutter test test/widget",
+        "integration": "flutter test test/integration",
+        "coverage": "flutter test --coverage"
+      },
+      "api": {
+        "test": "npm test",
+        "coverage": "npm run test:coverage"
+      },
+      "targetCoverage": "90%"
+    },
+    "security": {
+      "secrets": "Never commit API keys, use .env.local",
+      "authentication": "Supabase Auth with RLS",
+      "storage": "User-scoped bucket policies",
+      "api": "Rate limiting with Upstash Redis"
+    },
+    "git": {
+      "mainBranch": "main",
+      "featureBranch": "story-{epic}.{story}",
+      "commitStyle": "conventional",
+      "protected": [".env.local", "*.key", "*credentials*"]
+    }
+  },
+  "currentProgress": {
+    "track": "Track 2 - Cloud Infrastructure",
+    "completed": [
+      "T2.1 - Supabase Foundation (Database + Storage)",
+      "T2.2 - Security & Auth Setup"
+    ],
+    "inProgress": "T2.3 - Vercel API Gateway",
+    "upcoming": [
+      "T2.4 - Real-time Configuration",
+      "Track 3 - Feature Implementation"
+    ],
+    "environment": {
+      "supabase": {
+        "projectId": "yxpkogyljbvbkipiephe",
+        "url": "https://yxpkogyljbvbkipiephe.supabase.co",
+        "status": "configured"
+      },
+      "vercel": {
+        "project": "api",
+        "status": "ready-to-deploy"
+      },
+      "flutter": {
+        "version": "3.24.0",
+        "dartVersion": "3.2.0"
+      }
+    }
+  },
+  "devOpsCommands": {
+    "setup": {
+      "all": "npm install && cd apps/mobile && flutter pub get && cd ../api && npm install",
+      "mobile": "cd apps/mobile && flutter pub get",
+      "api": "cd apps/api && npm install"
+    },
+    "development": {
+      "mobile": "cd apps/mobile && flutter run",
+      "api": "cd apps/api && npm run dev",
+      "supabase": "supabase start"
+    },
+    "build": {
+      "mobileDebug": "cd apps/mobile && flutter build apk --debug",
+      "mobileRelease": "cd apps/mobile && flutter build appbundle",
+      "api": "cd apps/api && npm run build"
+    },
+    "deploy": {
+      "api": "cd apps/api && vercel --prod",
+      "supabaseDb": "supabase db push",
+      "supabaseFunctions": "supabase functions deploy"
+    },
+    "testing": {
+      "all": "cd apps/mobile && flutter test && cd ../api && npm test",
+      "mobile": "cd apps/mobile && ./test_modules.sh --all",
+      "api": "cd apps/api && npm test"
+    },
+    "maintenance": {
+      "updateDeps": "cd apps/mobile && flutter pub upgrade && cd ../api && npm update",
+      "analyze": "cd apps/mobile && flutter analyze",
+      "format": "cd apps/mobile && dart format lib test",
+      "clean": "cd apps/mobile && flutter clean && cd ../api && rm -rf node_modules"
+    },
+    "supabase": {
+      "types": "supabase gen types typescript --project-id yxpkogyljbvbkipiephe > apps/api/types/supabase.ts",
+      "migrate": "supabase db push",
+      "reset": "supabase db reset",
+      "status": "supabase status"
+    }
+  },
+  "cicd": {
+    "github": {
+      "workflows": ".github/workflows",
+      "actions": ["test", "build", "deploy"]
+    },
+    "vercel": {
+      "autoDeployment": true,
+      "branch": "main",
+      "previewBranches": true
+    },
+    "monitoring": {
+      "sentry": "optional",
+      "analytics": "optional"
+    }
+  },
+  "assistantInstructions": {
+    "priorities": [
+      "Security first - never expose secrets",
+      "Follow existing patterns in codebase",
+      "Test all changes before committing",
+      "Update CLAUDE.md when making structural changes",
+      "Use modular test runner for Flutter tests"
+    ],
+    "doNotModify": [
+      "Production environment variables",
+      "Supabase service keys",
+      "OAuth credentials"
+    ],
+    "bestPractices": [
+      "Use Riverpod for state management",
+      "Implement repository pattern for data access",
+      "Follow clean architecture principles",
+      "Write tests for new features",
+      "Document API endpoints"
+    ]
   }
 }
