@@ -1,15 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:receipt_organizer/features/capture/screens/capture_screen.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
 import 'package:receipt_organizer/features/receipts/presentation/providers/image_viewer_provider.dart';
+import 'package:receipt_organizer/features/receipts/providers/realtime_sync_provider.dart';
+import 'package:receipt_organizer/features/receipts/providers/presence_provider.dart';
+import 'package:receipt_organizer/features/receipts/widgets/sync_status_widget.dart';
+import 'package:receipt_organizer/features/auth/providers/auth_provider.dart';
+import 'package:receipt_organizer/features/auth/screens/login_screen.dart';
+import 'package:receipt_organizer/features/auth/widgets/auth_guard.dart';
 import 'package:receipt_organizer/core/services/background_sync_service.dart';
 import 'package:receipt_organizer/core/services/network_connectivity_service.dart';
 import 'package:receipt_organizer/core/services/request_queue_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Supabase
+  try {
+    // Load environment variables (optional - can also use const values)
+    await dotenv.load(fileName: '.env.local');
+    
+    // Initialize Supabase with credentials
+    await Supabase.initialize(
+      url: dotenv.env['SUPABASE_URL'] ?? 'https://yxpkogyljbvbkipiephe.supabase.co',
+      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? 
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4cGtvZ3lsamJ2YmtpcGllcGhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MzY5NTYsImV4cCI6MjA3MzIxMjk1Nn0.Y_7YSbUc2Tq6Tzy2E8G6kGpX3nz0P5onPedFs0xtkdg',
+      authOptions: const FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.pkce,
+        autoRefreshToken: true,
+      ),
+    );
+    print('✅ Supabase initialized successfully');
+  } catch (e) {
+    print('⚠️ Failed to initialize Supabase: $e');
+    // Continue without Supabase for local-only mode
+  }
   
   // EXPERIMENT: Phase 4 - Initialize background sync
   await BackgroundSyncService.initialize();
@@ -40,36 +69,102 @@ void main() async {
   );
 }
 
-class ReceiptOrganizerApp extends StatelessWidget {
+class ReceiptOrganizerApp extends ConsumerWidget {
   const ReceiptOrganizerApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    
     return MaterialApp(
       title: 'Receipt Organizer',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      home: authState.isLoading 
+        ? const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : authState.isAuthenticated 
+          ? const HomeScreen() 
+          : const LoginScreen(),
       routes: {
-        '/capture': (context) => const BatchCaptureScreen(),
-        '/capture/batch': (context) => const BatchCaptureScreen(),
+        '/home': (context) => const AuthGuard(
+          allowOffline: true,
+          child: HomeScreen(),
+        ),
+        '/login': (context) => const LoginScreen(),
+        '/capture': (context) => const AuthGuard(
+          allowOffline: true,
+          child: BatchCaptureScreen(),
+        ),
+        '/capture/batch': (context) => const AuthGuard(
+          allowOffline: true,
+          child: BatchCaptureScreen(),
+        ),
       },
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Auto-initialize real-time sync and presence
+    ref.watch(realtimeSyncInitializerProvider);
+    ref.watch(presenceInitializerProvider);
+    
+    final authState = ref.watch(authProvider);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receipt Organizer'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
+        actions: [
+          const SyncStatusIndicator(),
+          if (authState.isAuthenticated) 
+            PopupMenuButton<String>(
+              icon: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  authState.user?.email?.substring(0, 1).toUpperCase() ?? 'U',
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                ),
+              ),
+              onSelected: (value) async {
+                if (value == 'signout') {
+                  await ref.read(authProvider.notifier).signOut();
+                  if (context.mounted) {
+                    Navigator.of(context).pushReplacementNamed('/login');
+                  }
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'profile',
+                  child: ListTile(
+                    leading: const Icon(Icons.person),
+                    title: Text(authState.user?.email ?? 'User'),
+                    subtitle: const Text('View profile'),
+                  ),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(
+                  value: 'signout',
+                  child: ListTile(
+                    leading: Icon(Icons.logout),
+                    title: Text('Sign Out'),
+                  ),
+                ),
+              ],
+            ),
+        ],
       ),
       body: Center(
         child: Column(

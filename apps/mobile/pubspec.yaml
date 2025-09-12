@@ -73,6 +73,8 @@ dependencies:
   
   # Background Processing
   workmanager: ^0.5.2
+  supabase_flutter: ^2.10.0
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
