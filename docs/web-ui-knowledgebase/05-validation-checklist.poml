@@ -1,0 +1,368 @@
+# Validation Checklist - Receipt Organizer Web UI
+@type: quality_assurance
+@purpose: "Ensure implementation meets requirements"
+@for: claude_code_validation
+
+## Pre_Implementation_Checklist {
+  @phase: before_coding
+  
+  Environment_Setup: {
+    □_Node_Version: "Node.js 18+ installed"
+    □_Project_Structure: "apps/web directory exists"
+    □_Dependencies: "package.json configured"
+    □_TypeScript: "tsconfig.json configured"
+    □_Tailwind: "tailwind.config.js exists"
+    □_Next_Config: "next.config.js configured"
+  }
+  
+  shadcn_Setup: {
+    □_Initialize: "npx shadcn@latest init completed"
+    □_Components_JSON: "components.json created"
+    □_Globals_CSS: "globals.css has Tailwind directives"
+    □_Utils: "lib/utils.ts with cn() function"
+    □_Components_Dir: "components/ui/ directory created"
+  }
+  
+  Assets_Check: {
+    □_Images: "All 15 images in public/images/"
+    □_Icons: "lucide-react installed"
+    □_Fonts: "Font configuration complete"
+  }
+}
+
+## Component_Implementation_Checklist {
+  @phase: during_coding
+  
+  Landing_Page: {
+    □_Hero_Section: {
+      implemented: false,
+      components: ["Card", "Button", "Badge"],
+      image: "hero-product-mockup.png",
+      responsive: false
+    }
+    □_Features_Grid: {
+      implemented: false,
+      components: ["Card", "Icon"],
+      grid_layout: false
+    }
+    □_Pricing_Table: {
+      implemented: false,
+      components: ["Card", "Button", "Badge"],
+      tiers: 3
+    }
+    □_Testimonials: {
+      implemented: false,
+      components: ["Card", "Avatar"],
+      count: 3
+    }
+    □_Integration_Display: {
+      implemented: false,
+      logos: 8
+    }
+    □_Security_Section: {
+      implemented: false,
+      badges: 6
+    }
+    □_CTA_Section: {
+      implemented: false,
+      components: ["Button"]
+    }
+    □_Footer: {
+      implemented: false,
+      links: true
+    }
+  }
+  
+  Dashboard: {
+    □_Layout: {
+      sidebar: false,
+      header: false,
+      responsive: false
+    }
+    □_Stats_Cards: {
+      implemented: false,
+      count: 4,
+      real_data: false
+    }
+    □_Receipt_Table: {
+      implemented: false,
+      sorting: false,
+      filtering: false,
+      pagination: false
+    }
+    □_Charts: {
+      implemented: false,
+      types: ["line", "bar", "pie"]
+    }
+  }
+  
+  Forms: {
+    □_Receipt_Upload: {
+      implemented: false,
+      validation: false,
+      file_handling: false
+    }
+    □_Export_Config: {
+      implemented: false,
+      date_range: false,
+      format_selection: false
+    }
+    □_Settings: {
+      implemented: false,
+      sections: 4
+    }
+  }
+}
+
+## Functionality_Checklist {
+  @phase: testing
+  
+  User_Flows: {
+    □_Landing_Navigation: "All links work"
+    □_CTA_Buttons: "Lead to signup/login"
+    □_Dashboard_Access: "Protected route"
+    □_Receipt_Upload: "File handling works"
+    □_Export_Process: "Downloads CSV"
+    □_Settings_Save: "Persists changes"
+  }
+  
+  Responsive_Design: {
+    □_Mobile_View: "< 768px works"
+    □_Tablet_View: "768-1024px works"
+    □_Desktop_View: "> 1024px works"
+    □_Touch_Targets: "44px minimum"
+    □_Sidebar_Mobile: "Converts to sheet"
+    □_Table_Mobile: "Scrollable or cards"
+  }
+  
+  Dark_Mode: {
+    □_Toggle_Works: "Theme switches"
+    □_Colors_Adapt: "All components update"
+    □_Persistence: "Theme saved"
+    □_System_Default: "Respects OS setting"
+  }
+}
+
+## Performance_Checklist {
+  @phase: optimization
+  
+  Loading_Performance: {
+    □_First_Paint: "< 1.5s"
+    □_Interactive: "< 3.5s"
+    □_Bundle_Size: "< 200kb initial"
+    □_Image_Optimization: "WebP/AVIF used"
+    □_Code_Splitting: "Routes split"
+    □_Lazy_Loading: "Below fold deferred"
+  }
+  
+  Core_Web_Vitals: {
+    □_LCP: "< 2.5s (Largest Contentful Paint)"
+    □_FID: "< 100ms (First Input Delay)"
+    □_CLS: "< 0.1 (Cumulative Layout Shift)"
+  }
+  
+  SEO: {
+    □_Meta_Tags: "All pages have meta"
+    □_OG_Images: "Social cards configured"
+    □_Sitemap: "Generated"
+    □_Robots_txt: "Configured"
+  }
+}
+
+## Accessibility_Checklist {
+  @phase: compliance
+  
+  WCAG_Compliance: {
+    □_Keyboard_Nav: "All interactive elements accessible"
+    □_Focus_Indicators: "Visible focus rings"
+    □_ARIA_Labels: "Descriptive labels"
+    □_Alt_Text: "All images described"
+    □_Color_Contrast: "4.5:1 minimum"
+    □_Screen_Reader: "Tested with NVDA/JAWS"
+  }
+  
+  Forms: {
+    □_Labels: "Associated with inputs"
+    □_Errors: "Clear error messages"
+    □_Required: "Marked clearly"
+    □_Validation: "Inline feedback"
+  }
+}
+
+## Integration_Checklist {
+  @phase: api_connection
+  
+  API_Endpoints: {
+    □_Auth: "/api/oauth working"
+    □_Validate: "/api/validate working"
+    □_Export: "/api/export working"
+    □_CORS: "Configured correctly"
+  }
+  
+  OAuth: {
+    □_QuickBooks: "Flow complete"
+    □_Xero: "Flow complete"
+    □_Tokens: "Stored securely"
+    □_Refresh: "Auto-refresh works"
+  }
+}
+
+## Security_Checklist {
+  @phase: security_review
+  
+  Authentication: {
+    □_JWT: "Tokens implemented"
+    □_Refresh: "Refresh tokens work"
+    □_Logout: "Clears all tokens"
+    □_Protected: "Routes protected"
+  }
+  
+  Data_Protection: {
+    □_HTTPS: "SSL configured"
+    □_Input_Validation: "All inputs validated"
+    □_XSS: "Prevented"
+    □_CSRF: "Protected"
+  }
+}
+
+## Deployment_Checklist {
+  @phase: pre_deployment
+  
+  Build: {
+    □_Type_Check: "npm run type-check passes"
+    □_Lint: "npm run lint passes"
+    □_Tests: "npm test passes"
+    □_Build: "npm run build succeeds"
+  }
+  
+  Environment: {
+    □_ENV_Variables: "All configured"
+    □_API_URL: "Points to production"
+    □_OAuth_Keys: "Production keys set"
+  }
+  
+  Vercel: {
+    □_Project_Created: "Vercel project exists"
+    □_Domain: "Custom domain configured"
+    □_Analytics: "Enabled"
+    □_Speed_Insights: "Enabled"
+  }
+}
+
+## Post_Launch_Checklist {
+  @phase: monitoring
+  
+  Monitoring: {
+    □_Error_Tracking: "Sentry configured"
+    □_Analytics: "GA4 or Posthog"
+    □_Performance: "Web Vitals tracking"
+    □_Uptime: "Status page"
+  }
+  
+  User_Feedback: {
+    □_Support_Channel: "Contact form works"
+    □_Bug_Reports: "System in place"
+    □_Feature_Requests: "Collection method"
+  }
+}
+
+## Testing_Commands {
+  @location: apps/web
+  
+  Commands: {
+    Type_Check: "npm run type-check"
+    Lint: "npm run lint"
+    Test: "npm test"
+    Build: "npm run build"
+    Analyze: "npm run analyze"
+    Lighthouse: "npx lighthouse http://localhost:3000"
+  }
+}
+
+## Validation_Tools {
+  
+  Browser_Tools: {
+    React_DevTools: "Component inspection"
+    Lighthouse: "Performance audit"
+    WAVE: "Accessibility check"
+    Redux_DevTools: "State debugging"
+  }
+  
+  CLI_Tools: {
+    Bundle_Analyzer: "npm run analyze"
+    Type_Coverage: "npx type-coverage"
+    Dependency_Check: "npx depcheck"
+  }
+}
+
+## Success_Criteria {
+  @must_have: [
+    "Landing page complete with all sections",
+    "Dashboard with stats and table",
+    "Receipt upload working",
+    "Export to CSV functional",
+    "Mobile responsive",
+    "Dark mode support"
+  ]
+  
+  @nice_to_have: [
+    "Analytics charts",
+    "Advanced filtering",
+    "Batch operations",
+    "Keyboard shortcuts"
+  ]
+  
+  @performance: {
+    page_load: "< 3s",
+    interaction: "< 100ms",
+    bundle_size: "< 500kb total"
+  }
+}
+
+## Common_Issues {
+  @troubleshooting: true
+  
+  Component_Not_Styled: {
+    @check: [
+      "globals.css imported in layout",
+      "Tailwind config correct",
+      "Component added via CLI"
+    ]
+  }
+  
+  Type_Errors: {
+    @check: [
+      "@types packages installed",
+      "tsconfig paths configured",
+      "Import paths correct"
+    ]
+  }
+  
+  Build_Fails: {
+    @check: [
+      "All imports valid",
+      "No circular dependencies",
+      "Environment variables set"
+    ]
+  }
+}
+
+## Final_Review {
+  @sign_off: {
+    Developer: {
+      name: "",
+      date: "",
+      checklist_complete: false
+    }
+    QA: {
+      name: "",
+      date: "",
+      tested: false
+    }
+    Product: {
+      name: "",
+      date: "",
+      approved: false
+    }
+  }
+}

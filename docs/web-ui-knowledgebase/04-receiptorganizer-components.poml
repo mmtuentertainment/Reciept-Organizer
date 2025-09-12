@@ -1,0 +1,518 @@
+# Receipt Organizer Specific Components
+@type: app_specific_mappings
+@purpose: "Map Receipt Organizer features to shadcn components"
+@images_location: apps/web/public/images
+
+## Landing_Page_Components {
+  @priority: 1
+  @status: "Images ready, needs implementation"
+  
+  Hero_Section: {
+    @image: "hero-product-mockup.png"
+    @components: {
+      Container: "div with max-w-7xl mx-auto"
+      Badge: "@shadcn/badge for 'No Credit Card Required'"
+      Title: "h1 with text-5xl font-bold"
+      Subtitle: "p with text-xl text-muted-foreground"
+      CTA_Buttons: "@shadcn/button with size='lg'"
+      Product_Image: "next/image with optimization"
+    }
+    @content: {
+      Title: "Organize Your Receipts Effortlessly"
+      Subtitle: "AI-powered OCR processing with 95% accuracy. Export to QuickBooks & Xero in seconds."
+      Primary_CTA: "Start Free Trial"
+      Secondary_CTA: "Watch Demo"
+    }
+  }
+  
+  OCR_Visualization: {
+    @image: "ocr-technology-illustration.png"
+    @components: {
+      Card: "@shadcn/card for container"
+      Badge: "Confidence percentages (95%, 98%, 92%)"
+      Progress: "@shadcn/progress for scanning animation"
+      Code: "For extracted data display"
+    }
+    @features: [
+      "Receipt image preview",
+      "Scanning animation overlay",
+      "Extracted fields display",
+      "Confidence badges"
+    ]
+  }
+  
+  Features_Grid: {
+    @images: ["receipt-scanning-animation.png", "analytics-dashboard.png"]
+    @components: {
+      Grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+      Card: "@shadcn/card for each feature"
+      Icon: "lucide-react icons"
+      Title: "CardTitle"
+      Description: "CardDescription"
+    }
+    @features: [
+      {
+        icon: "ScanLine",
+        title: "Smart OCR Processing",
+        description: "95% accuracy with AI-powered extraction"
+      },
+      {
+        icon: "Upload",
+        title: "Batch Upload",
+        description: "Process multiple receipts at once"
+      },
+      {
+        icon: "Link",
+        title: "QuickBooks & Xero",
+        description: "Seamless accounting integration"
+      },
+      {
+        icon: "ChartBar",
+        title: "Advanced Analytics",
+        description: "Insights into spending patterns"
+      }
+    ]
+  }
+  
+  Integration_Ecosystem: {
+    @image: "integration-ecosystem-visualization.png"
+    @components: {
+      Central_Hub: "Card with glassmorphism"
+      Connection_Lines: "SVG paths with animation"
+      Service_Logos: "Image components"
+      Badges: "For 'Real-time Sync', 'Auto Export'"
+    }
+    @integrations: [
+      "QuickBooks",
+      "Xero",
+      "Google Drive",
+      "Dropbox",
+      "Slack",
+      "Excel",
+      "Zapier",
+      "FreshBooks"
+    ]
+  }
+  
+  Pricing_Table: {
+    @components: {
+      Container: "grid grid-cols-1 md:grid-cols-3 gap-6"
+      Card: "@shadcn/card for each tier"
+      Badge: "For 'Popular' indicator"
+      Button: "CTA buttons"
+      Check_Icon: "lucide-react Check"
+    }
+    @tiers: [
+      {
+        name: "Starter",
+        price: "$9",
+        period: "/month",
+        features: [
+          "100 receipts per month",
+          "Basic OCR processing",
+          "CSV export",
+          "Email support"
+        ],
+        cta: "Start Free Trial"
+      },
+      {
+        name: "Professional",
+        price: "$29",
+        period: "/month",
+        popular: true,
+        features: [
+          "1,000 receipts per month",
+          "Advanced OCR with 95% accuracy",
+          "QuickBooks & Xero integration",
+          "Priority support",
+          "Custom categories"
+        ],
+        cta: "Start Free Trial"
+      },
+      {
+        name: "Enterprise",
+        price: "Custom",
+        period: "",
+        features: [
+          "Unlimited receipts",
+          "API access",
+          "Custom integrations",
+          "Dedicated account manager",
+          "SLA guarantee"
+        ],
+        cta: "Contact Sales"
+      }
+    ]
+  }
+  
+  Testimonials: {
+    @images: ["customer-avatar-1.png", "customer-avatar-2.png", "customer-avatar-3.png"]
+    @components: {
+      Container: "grid grid-cols-1 md:grid-cols-3 gap-6"
+      Card: "@shadcn/card"
+      Avatar: "@shadcn/avatar"
+      Quote: "blockquote with italic"
+      Rating: "Star icons"
+    }
+    @testimonials: [
+      {
+        name: "Sarah Chen",
+        role: "CFO, TechStart Inc",
+        avatar: "customer-avatar-1.png",
+        quote: "ReceiptVault saved us 10+ hours per week on expense management.",
+        rating: 5
+      },
+      {
+        name: "Michael Torres",
+        role: "Accounting Manager",
+        avatar: "customer-avatar-2.png",
+        quote: "The OCR accuracy is incredible. QuickBooks sync works flawlessly.",
+        rating: 5
+      },
+      {
+        name: "Linda Johnson",
+        role: "Small Business Owner",
+        avatar: "customer-avatar-3.png",
+        quote: "Simple, efficient, and reliable. Exactly what we needed.",
+        rating: 5
+      }
+    ]
+  }
+  
+  Security_Features: {
+    @image: "security-features-illustration.png"
+    @components: {
+      Card: "With metallic gradient background"
+      Badge: "Security certifications"
+      Shield_Icon: "lucide-react Shield"
+      Lock_Icon: "lucide-react Lock"
+    }
+    @features: [
+      "256-bit encryption",
+      "SOC 2 compliant",
+      "GDPR compliant",
+      "Daily backups",
+      "Two-factor authentication",
+      "SSL/HTTPS"
+    ]
+  }
+}
+
+## Dashboard_Components {
+  @priority: 2
+  @location: "app/dashboard"
+  
+  Sidebar_Navigation: {
+    @components: {
+      Container: "@shadcn/sidebar or custom"
+      Nav_Items: "Button with ghost variant"
+      Icons: "lucide-react icons"
+      User_Menu: "Avatar + DropdownMenu"
+    }
+    @navigation: [
+      { icon: "Home", label: "Dashboard", href: "/dashboard" },
+      { icon: "Receipt", label: "Receipts", href: "/dashboard/receipts" },
+      { icon: "ChartBar", label: "Analytics", href: "/dashboard/analytics" },
+      { icon: "Download", label: "Export", href: "/dashboard/export" },
+      { icon: "Settings", label: "Settings", href: "/dashboard/settings" }
+    ]
+  }
+  
+  Stats_Cards: {
+    @components: {
+      Grid: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+      Card: "@shadcn/card"
+      Trend_Indicator: "Arrow icons with colors"
+    }
+    @metrics: [
+      {
+        label: "Total Receipts",
+        value: "2,847",
+        change: "+20.1%",
+        trend: "up",
+        icon: "Receipt"
+      },
+      {
+        label: "This Month",
+        value: "$4,326.89",
+        change: "+8.2%",
+        trend: "up",
+        icon: "DollarSign"
+      },
+      {
+        label: "Pending Review",
+        value: "12",
+        change: "-3",
+        trend: "down",
+        icon: "Clock"
+      },
+      {
+        label: "Export Ready",
+        value: "94",
+        change: "+15",
+        trend: "up",
+        icon: "Download"
+      }
+    ]
+  }
+  
+  Receipt_Table: {
+    @components: {
+      Table: "@shadcn/table with @tanstack/react-table"
+      Badge: "For status indicators"
+      DropdownMenu: "For row actions"
+      Checkbox: "For selection"
+      Button: "For actions"
+    }
+    @columns: [
+      { key: "select", type: "checkbox" },
+      { key: "date", label: "Date", sortable: true },
+      { key: "merchant", label: "Merchant", sortable: true },
+      { key: "category", label: "Category", filterable: true },
+      { key: "amount", label: "Amount", sortable: true },
+      { key: "status", label: "Status", component: "Badge" },
+      { key: "actions", label: "", component: "DropdownMenu" }
+    ]
+    @actions: ["View", "Edit", "Delete", "Export"]
+    @statuses: {
+      pending: { variant: "secondary", label: "Pending" },
+      processed: { variant: "default", label: "Processed" },
+      exported: { variant: "success", label: "Exported" }
+    }
+  }
+  
+  Analytics_Charts: {
+    @library: "recharts"
+    @components: {
+      Container: "Card"
+      Chart_Components: ["LineChart", "BarChart", "PieChart"]
+      Legend: "recharts Legend"
+      Tooltip: "recharts Tooltip"
+    }
+    @charts: [
+      {
+        type: "LineChart",
+        title: "Monthly Spending Trend",
+        data: "Last 12 months"
+      },
+      {
+        type: "PieChart",
+        title: "Category Breakdown",
+        data: "Current month"
+      },
+      {
+        type: "BarChart",
+        title: "Top 10 Merchants",
+        data: "By spend amount"
+      }
+    ]
+  }
+}
+
+## Receipt_Management {
+  @location: "app/dashboard/receipts"
+  
+  Receipt_Card: {
+    @components: {
+      Card: "@shadcn/card"
+      Image: "next/image for receipt thumbnail"
+      Badge: "For category and status"
+      DropdownMenu: "For actions"
+    }
+    @layout: "Grid view or List view toggle"
+    @data: {
+      thumbnail: "Receipt image preview",
+      merchant: "string",
+      date: "Date",
+      amount: "number",
+      category: "string",
+      confidence: "number (OCR confidence)"
+    }
+  }
+  
+  Receipt_Detail_Modal: {
+    @components: {
+      Dialog: "@shadcn/dialog"
+      Form: "For editing fields"
+      Image: "Full receipt image"
+      Badge: "Confidence indicators"
+    }
+    @sections: [
+      "Receipt image viewer",
+      "Extracted fields (editable)",
+      "OCR confidence scores",
+      "Action buttons"
+    ]
+  }
+  
+  Batch_Upload: {
+    @components: {
+      Card: "Upload area"
+      Progress: "Upload progress"
+      List: "File list"
+      Button: "Actions"
+    }
+    @features: [
+      "Drag and drop",
+      "Multiple file selection",
+      "Progress indicators",
+      "Batch processing status"
+    ]
+  }
+}
+
+## Export_Features {
+  @location: "app/dashboard/export"
+  
+  Export_Configuration: {
+    @components: {
+      Form: "@shadcn/form"
+      Select: "Format selection"
+      DatePicker: "Date range"
+      Checkbox: "Category filters"
+      Button: "Export action"
+    }
+    @formats: [
+      { value: "csv", label: "CSV", icon: "FileText" },
+      { value: "quickbooks", label: "QuickBooks", icon: "Link" },
+      { value: "xero", label: "Xero", icon: "Link" }
+    ]
+  }
+  
+  Export_Preview: {
+    @components: {
+      Dialog: "Preview modal"
+      Table: "Sample data"
+      Badge: "Row count"
+      Button: "Confirm/Cancel"
+    }
+    @features: [
+      "Sample data preview",
+      "Column selection",
+      "Format preview"
+    ]
+  }
+}
+
+## Settings_Pages {
+  @location: "app/dashboard/settings"
+  
+  Profile_Settings: {
+    @components: {
+      Form: "Profile form"
+      Input: "Text fields"
+      Avatar: "Profile picture"
+      Button: "Save changes"
+    }
+    @fields: ["name", "email", "company", "phone"]
+  }
+  
+  Integration_Settings: {
+    @components: {
+      Card: "Integration cards"
+      Switch: "Enable/disable"
+      Button: "Connect/Disconnect"
+      Badge: "Connection status"
+    }
+    @integrations: [
+      {
+        name: "QuickBooks",
+        status: "connected",
+        lastSync: "2 hours ago"
+      },
+      {
+        name: "Xero",
+        status: "disconnected",
+        action: "Connect"
+      }
+    ]
+  }
+  
+  OCR_Settings: {
+    @components: {
+      Slider: "Confidence threshold"
+      Switch: "Auto-process"
+      Select: "Default category"
+    }
+    @settings: [
+      "OCR confidence threshold",
+      "Auto-categorization",
+      "Default export format"
+    ]
+  }
+}
+
+## Mobile_Responsive {
+  @breakpoints: {
+    mobile: "< 768px",
+    tablet: "768px - 1024px",
+    desktop: "> 1024px"
+  }
+  
+  Mobile_Adaptations: {
+    Sidebar: "Converts to Sheet on mobile"
+    Table: "Horizontal scroll or card view"
+    Grid: "Stacks to single column"
+    Charts: "Simplified view"
+  }
+  
+  Touch_Optimizations: {
+    Buttons: "min-height: 44px"
+    Spacing: "Increased padding"
+    Modals: "Full screen on mobile"
+  }
+}
+
+## Performance_Features {
+  
+  Image_Optimization: {
+    Receipt_Thumbnails: {
+      @size: "200x300"
+      @format: "WebP"
+      @lazy: true
+    }
+    Landing_Images: {
+      @responsive: true
+      @priority: "above fold only"
+    }
+  }
+  
+  Data_Loading: {
+    Tables: "Virtual scrolling for large datasets"
+    Images: "Progressive loading"
+    Charts: "Debounced updates"
+  }
+}
+
+## Accessibility {
+  @wcag_level: "AA"
+  
+  Features: {
+    Keyboard_Navigation: "All interactive elements"
+    Screen_Readers: "ARIA labels and roles"
+    Color_Contrast: "4.5:1 minimum"
+    Focus_Indicators: "Visible focus rings"
+  }
+}
+
+## Brand_Consistency {
+  @colors: {
+    primary: "#2563EB",
+    background: "#F3F4F6",
+    foreground: "#111827",
+    success: "#10B981",
+    error: "#EF4444"
+  }
+  
+  Typography: {
+    Headings: "font-bold tracking-tight"
+    Body: "text-gray-600"
+    Captions: "text-sm text-muted-foreground"
+  }
+  
+  Spacing: {
+    Container: "max-w-7xl mx-auto px-4"
+    Sections: "py-12 md:py-20"
+    Cards: "p-6"
+  }
+}

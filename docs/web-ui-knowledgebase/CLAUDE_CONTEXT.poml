@@ -1,0 +1,312 @@
+# Claude Code Context - Receipt Organizer Web UI
+@type: optimized_context
+@priority: LOAD_FIRST
+@project: Receipt_Organizer_Web
+@location: /home/matt/FINAPP/Receipt Organizer/apps/web
+
+## Essential_Context {
+  @description: "Minimal context for maximum Claude Code efficiency"
+  
+  Project_Structure: {
+    Root: "/home/matt/FINAPP/Receipt Organizer/"
+    Web_App: "apps/web/"
+    Components: "apps/web/components/ui/"
+    Public_Assets: "apps/web/public/images/"
+    API: "apps/api/"
+  }
+  
+  Current_State: {
+    @status: "Web app scaffolded, needs UI implementation"
+    @framework: "Next.js 15.5.2"
+    @ui_library: "shadcn/ui ready to install"
+    @images: "15 landing page images ready in public/images/"
+  }
+  
+  Immediate_Tasks: {
+    Landing_Page: {
+      @priority: 1
+      @components_needed: ["Hero", "Features", "Pricing", "Testimonials"]
+      @images_available: true
+    }
+    Dashboard: {
+      @priority: 2
+      @components_needed: ["Sidebar", "Cards", "Table", "Charts"]
+    }
+    Forms: {
+      @priority: 3
+      @needed_for: ["Settings", "Export", "Authentication"]
+    }
+  }
+}
+
+## Quick_Commands {
+  @execute_from: "cd apps/web"
+  
+  Setup: {
+    Initialize: "npx shadcn@latest init"
+    Add_Essential: "npx shadcn@latest add button card form dialog table"
+    Add_Dashboard: "npx shadcn@latest add dashboard-01"
+    Add_Charts: "npx shadcn@latest add chart"
+  }
+  
+  Component_Addition: {
+    @pattern: "npx shadcn@latest add [component]"
+    @location: "Creates in components/ui/"
+    @then: "Import and use in pages/components"
+  }
+  
+  MCP_Discovery: {
+    List_All: "mcp__shadcn__list_items_in_registries(['@shadcn'])"
+    Search: "mcp__shadcn__search_items_in_registries('dashboard', ['@shadcn'])"
+    Get_Command: "mcp__shadcn__get_add_command_for_items(['@shadcn/button'])"
+  }
+}
+
+## Component_Mappings {
+  @purpose: "Receipt Organizer specific component usage"
+  
+  Landing_Page: {
+    Hero_Section: {
+      @components: ["Card", "Button", "Badge"]
+      @content: "Receipt management dashboard mockup"
+      @image: "public/images/hero-product-mockup.png"
+    }
+    
+    Features_Grid: {
+      @components: ["Card", "Icon", "Grid"]
+      @features: [
+        "OCR Processing",
+        "Batch Upload",
+        "QuickBooks Sync",
+        "Analytics"
+      ]
+    }
+    
+    Pricing_Section: {
+      @components: ["Card", "Button", "Badge", "Check"]
+      @tiers: ["Starter", "Professional", "Enterprise"]
+    }
+    
+    Testimonials: {
+      @components: ["Card", "Avatar", "Quote"]
+      @testimonials: 3
+    }
+  }
+  
+  Dashboard: {
+    Layout: {
+      @pattern: "Sidebar + Main Content"
+      @components: ["Dashboard_01", "Sidebar", "Header"]
+    }
+    
+    Stats_Cards: {
+      @components: ["Card", "Badge", "Trend"]
+      @metrics: [
+        "Total Receipts",
+        "This Month",
+        "Pending Review",
+        "Export Ready"
+      ]
+    }
+    
+    Receipt_Table: {
+      @components: ["Table", "Badge", "Button", "Dropdown"]
+      @features: ["Sort", "Filter", "Pagination", "Actions"]
+    }
+    
+    Analytics: {
+      @components: ["Chart", "Card", "Select"]
+      @charts: ["Line", "Bar", "Pie"]
+    }
+  }
+  
+  Forms: {
+    Receipt_Upload: {
+      @components: ["Form", "Input", "FileInput", "Button"]
+      @validation: "Zod schema"
+    }
+    
+    Export_Config: {
+      @components: ["Form", "Select", "DatePicker", "Checkbox"]
+      @formats: ["CSV", "QuickBooks", "Xero"]
+    }
+    
+    Settings: {
+      @components: ["Form", "Input", "Switch", "Select"]
+      @sections: ["Profile", "Preferences", "Integrations"]
+    }
+  }
+}
+
+## Brand_Guidelines {
+  @source: "Landing page designs"
+  
+  Colors: {
+    Primary: "#2563EB"  // Blue
+    Background: "#F3F4F6"  // Light gray
+    Foreground: "#111827"  // Dark gray
+    Success: "#10B981"  // Green
+    Error: "#EF4444"  // Red
+  }
+  
+  Typography: {
+    Font: "System font stack"
+    Headings: "font-bold tracking-tight"
+    Body: "text-gray-600 leading-relaxed"
+  }
+  
+  Components_Style: {
+    Buttons: "Rounded with shadow"
+    Cards: "White background with border"
+    Inputs: "Gray border with focus ring"
+  }
+}
+
+## Implementation_Workflow {
+  @optimized_for: "Rapid development"
+  
+  Phase_1_Setup: {
+    Steps: [
+      "cd apps/web",
+      "npx shadcn@latest init",
+      "Configure components.json",
+      "Add base components"
+    ]
+    @time: "15 minutes"
+  }
+  
+  Phase_2_Landing: {
+    Steps: [
+      "Create layout structure",
+      "Add Hero section",
+      "Implement Features grid",
+      "Add Pricing table",
+      "Include Testimonials"
+    ]
+    @time: "2 hours"
+  }
+  
+  Phase_3_Dashboard: {
+    Steps: [
+      "Add dashboard layout",
+      "Implement sidebar navigation",
+      "Create stats cards",
+      "Add receipt table",
+      "Include charts"
+    ]
+    @time: "3 hours"
+  }
+  
+  Phase_4_Forms: {
+    Steps: [
+      "Setup form validation",
+      "Create upload form",
+      "Add export configuration",
+      "Implement settings"
+    ]
+    @time: "2 hours"
+  }
+}
+
+## Key_Patterns {
+  @use: "Consistent implementation across app"
+  
+  Component_Pattern: {
+    @location: "components/ui/"
+    @naming: "kebab-case.tsx"
+    @exports: "Named exports"
+    @styling: "Tailwind classes with cn()"
+  }
+  
+  Page_Pattern: {
+    @location: "app/[page]/page.tsx"
+    @structure: "Server components by default"
+    @client: "'use client' when needed"
+  }
+  
+  Form_Pattern: {
+    @validation: "Zod schema"
+    @handling: "React Hook Form"
+    @feedback: "Toast notifications"
+  }
+  
+  Data_Pattern: {
+    @fetching: "Server components"
+    @caching: "Next.js cache"
+    @updates: "Server actions"
+  }
+}
+
+## Available_Resources {
+  
+  Images: {
+    @location: "apps/web/public/images/"
+    @count: 15
+    @types: [
+      "Product mockups",
+      "Feature illustrations",
+      "Security badges",
+      "Integration logos"
+    ]
+  }
+  
+  Icons: {
+    @library: "lucide-react"
+    @usage: "import { Icon } from 'lucide-react'"
+  }
+  
+  Documentation: {
+    Component_Registry: "02-component-registry.poml"
+    Workflows: "03-implementation-workflows.poml"
+    App_Specific: "04-receiptorganizer-components.poml"
+  }
+}
+
+## Critical_Paths {
+  @important: "Follow these exactly"
+  
+  Working_Directory: "Always cd apps/web before shadcn commands"
+  Component_Location: "components/ui/ for all shadcn components"
+  Import_Pattern: "@/components/ui/[component]"
+  Style_Import: "Ensure globals.css imported in layout.tsx"
+}
+
+## Performance_Considerations {
+  
+  Optimization: {
+    Images: "Use next/image with optimization"
+    Components: "Lazy load heavy components"
+    Bundle: "Analyze with next bundle-analyzer"
+  }
+  
+  Best_Practices: {
+    Code_Splitting: "Dynamic imports for large components"
+    Caching: "Use Next.js caching strategies"
+    SEO: "Add metadata to all pages"
+  }
+}
+
+## Troubleshooting {
+  
+  Common_Issues: {
+    Module_Not_Found: "Check tsconfig.json paths"
+    Styles_Missing: "Verify globals.css import"
+    Types_Error: "Install @types/react"
+  }
+  
+  Solutions: {
+    Clean_Install: "rm -rf node_modules && npm install"
+    Clear_Cache: "rm -rf .next"
+    Verify_Setup: "npx shadcn@latest init"
+  }
+}
+
+## Next_Actions {
+  @immediate: [
+    "1. cd apps/web",
+    "2. npx shadcn@latest init",
+    "3. Add essential components",
+    "4. Start with landing page",
+    "5. Test in browser"
+  ]
+}

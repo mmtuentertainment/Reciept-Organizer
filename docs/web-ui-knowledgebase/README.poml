@@ -1,0 +1,375 @@
+# Web UI Development Knowledgebase
+@type: receipt_organizer_web_ui
+@version: 1.0.0
+@optimized_for: claude_code
+@project_root: /home/matt/FINAPP/Receipt Organizer
+@web_app_location: apps/web
+
+## Purpose {
+  @description: "Comprehensive web UI development guide for Receipt Organizer using shadcn/ui"
+  @optimization: "Structured for rapid Claude Code consumption and context loading"
+  @primary_use: "Building landing page, dashboard, and web components"
+}
+
+## Directory_Structure {
+  @location: docs/web-ui-knowledgebase/
+  
+  Files: {
+    README.poml: {
+      @purpose: "Navigation and quick reference"
+      @load_priority: 1
+    }
+    CLAUDE_CONTEXT.poml: {
+      @purpose: "Optimized context for Claude Code"
+      @load_priority: 2
+      @contains: ["Essential patterns", "Project mappings", "Quick commands"]
+    }
+    "01-quick-reference.poml": {
+      @purpose: "Commands, tools, and patterns"
+      @load_priority: 3
+      @use_when: "Starting any UI task"
+    }
+    "02-component-registry.poml": {
+      @purpose: "Complete shadcn component documentation"
+      @load_priority: 4
+      @use_when: "Implementing specific components"
+    }
+    "03-implementation-workflows.poml": {
+      @purpose: "Step-by-step implementation guides"
+      @load_priority: 5
+      @use_when: "Building features"
+    }
+    "04-receiptorganizer-components.poml": {
+      @purpose: "App-specific component mappings"
+      @load_priority: 6
+      @use_when: "Building Receipt Organizer features"
+    }
+    "05-validation-checklist.poml": {
+      @purpose: "Quality assurance and testing"
+      @load_priority: 7
+      @use_when: "Validating implementations"
+    }
+  }
+}
+
+## Quick_Start {
+  @for: claude_code
+  
+  Load_Sequence: [
+    "1. Load CLAUDE_CONTEXT.poml first",
+    "2. Reference 01-quick-reference.poml for commands",
+    "3. Use 02-component-registry.poml for component details",
+    "4. Apply 04-receiptorganizer-components.poml for app features"
+  ]
+  
+  Context_Commands: {
+    @initial_load: "Read docs/web-ui-knowledgebase/CLAUDE_CONTEXT.poml"
+    @component_lookup: "Search in 02-component-registry.poml"
+    @app_specific: "Reference 04-receiptorganizer-components.poml"
+  }
+}
+
+## Technology_Stack {
+  @location: apps/web
+  
+  Core: {
+    Framework: {
+      @name: "Next.js"
+      @version: "15.5.2"
+      @location: "apps/web"
+      @config: "next.config.js"
+    }
+    UI_Library: {
+      @name: "shadcn/ui"
+      @philosophy: "Copy-paste components"
+      @not: "npm dependency"
+      @location: "apps/web/components/ui"
+    }
+    Styling: {
+      @primary: "Tailwind CSS v4"
+      @theme: "CSS variables"
+      @dark_mode: "next-themes"
+      @config: "tailwind.config.js"
+    }
+    Validation: {
+      @forms: "React Hook Form"
+      @schema: "Zod"
+      @integration: "shadcn Form component"
+    }
+  }
+  
+  Tools: {
+    CLI: {
+      @command: "npx shadcn@latest"
+      @operations: ["init", "add", "diff", "update"]
+      @location: "Run from apps/web"
+    }
+    MCP_Server: {
+      @tools: 7
+      @purpose: "Component discovery and management"
+      @integration: "Claude Desktop"
+    }
+  }
+}
+
+## Key_Use_Cases {
+  @priority: high
+  
+  Landing_Page: {
+    @status: "Images ready, needs implementation"
+    @images: "apps/web/public/images/"
+    @components_needed: [
+      "Hero section",
+      "Features grid",
+      "Pricing table",
+      "Testimonials",
+      "OCR visualization",
+      "Integration ecosystem"
+    ]
+    @reference: "04-receiptorganizer-components.poml → Landing_Page"
+  }
+  
+  Dashboard: {
+    @status: "Ready to implement"
+    @components_needed: [
+      "Sidebar navigation",
+      "Stats cards",
+      "Receipt table",
+      "Charts",
+      "Export controls"
+    ]
+    @reference: "02-component-registry.poml → Dashboard_Blocks"
+  }
+  
+  Forms: {
+    @status: "Patterns defined"
+    @stack: ["React Hook Form", "Zod", "shadcn Form"]
+    @use_cases: [
+      "Receipt upload",
+      "Export configuration",
+      "Settings",
+      "Authentication"
+    ]
+    @reference: "03-implementation-workflows.poml → Form_Workflow"
+  }
+}
+
+## Component_Registry {
+  @total: 336
+  @categories: {
+    UI_Components: {
+      @count: 48
+      @examples: ["Button", "Card", "Dialog", "Form", "Table"]
+    }
+    Dashboard_Blocks: {
+      @count: 10
+      @examples: ["Dashboard_01", "Dashboard_02"]
+    }
+    Sidebar_Variants: {
+      @count: 16
+      @types: ["Simple", "Collapsible", "Nested", "Floating"]
+    }
+    Chart_Types: {
+      @count: 79
+      @library: "recharts"
+      @types: ["Line", "Bar", "Pie", "Area", "Composed"]
+    }
+    Authentication: {
+      @count: 10
+      @types: ["Login", "Signup", "OAuth", "Magic Link"]
+    }
+  }
+}
+
+## Receipt_Organizer_Brand {
+  @defined_in: "apps/web/public/images/"
+  
+  Colors: {
+    Primary: {
+      @hex: "#2563EB"
+      @name: "blue"
+      @css_var: "--primary"
+    }
+    Background: {
+      @hex: "#F3F4F6"
+      @name: "light gray"
+      @css_var: "--background"
+    }
+    Text: {
+      @hex: "#111827"
+      @name: "dark gray"
+      @css_var: "--foreground"
+    }
+    Success: {
+      @hex: "#10B981"
+      @name: "green"
+      @use: "Successful operations"
+    }
+    Error: {
+      @hex: "#EF4444"
+      @name: "red"
+      @use: "Error states"
+    }
+  }
+  
+  Features_To_Implement: {
+    Priority_1: [
+      "Receipt capture visualization",
+      "OCR confidence display",
+      "Batch processing UI"
+    ]
+    Priority_2: [
+      "Analytics dashboard",
+      "Export workflow",
+      "CSV preview"
+    ]
+    Priority_3: [
+      "Integration settings",
+      "QuickBooks/Xero config",
+      "Security features"
+    ]
+  }
+}
+
+## Workflow_Commands {
+  @execute_from: "apps/web"
+  
+  Initialize: {
+    @command: "npx shadcn@latest init"
+    @creates: "components.json"
+    @modifies: ["tailwind.config.js", "globals.css"]
+  }
+  
+  Add_Components: {
+    @command: "npx shadcn@latest add [component]"
+    @example: "npx shadcn@latest add button card form"
+    @location: "Creates in components/ui/"
+  }
+  
+  Update_Check: {
+    @command: "npx shadcn@latest diff [component]"
+    @purpose: "Check for updates"
+  }
+  
+  MCP_Tools: {
+    @list: "mcp__shadcn__list_items_in_registries"
+    @search: "mcp__shadcn__search_items_in_registries"
+    @view: "mcp__shadcn__view_items_in_registries"
+    @add: "mcp__shadcn__get_add_command_for_items"
+  }
+}
+
+## Implementation_Patterns {
+  @for: receipt_organizer
+  
+  Landing_Page_Pattern: {
+    @workflow: [
+      "1. Setup Next.js app structure",
+      "2. Add shadcn components",
+      "3. Create layout components",
+      "4. Implement sections",
+      "5. Add interactions",
+      "6. Optimize performance"
+    ]
+    @components: {
+      Hero: ["Button", "Badge", "Card"],
+      Features: ["Card", "Icon", "Grid"],
+      Pricing: ["Card", "Button", "Badge", "Check"],
+      Testimonials: ["Avatar", "Card", "Rating"]
+    }
+  }
+  
+  Dashboard_Pattern: {
+    @workflow: [
+      "1. Setup layout with Sidebar",
+      "2. Add navigation structure",
+      "3. Implement data cards",
+      "4. Add tables and charts",
+      "5. Connect to API",
+      "6. Add real-time updates"
+    ]
+    @components: {
+      Layout: ["Sidebar", "Header", "ScrollArea"],
+      Data: ["Table", "Chart", "Card", "Badge"],
+      Actions: ["Button", "Dropdown", "Dialog"]
+    }
+  }
+  
+  Form_Pattern: {
+    @workflow: [
+      "1. Define Zod schema",
+      "2. Setup React Hook Form",
+      "3. Add Form components",
+      "4. Implement validation",
+      "5. Handle submission",
+      "6. Show feedback"
+    ]
+    @components: {
+      Structure: ["Form", "FormField", "FormItem"],
+      Inputs: ["Input", "Select", "Checkbox", "Switch"],
+      Feedback: ["FormMessage", "Toast", "Alert"]
+    }
+  }
+}
+
+## Claude_Code_Notes {
+  @important: [
+    "All paths relative to /home/matt/FINAPP/Receipt Organizer/",
+    "Web app in apps/web/",
+    "Components go in apps/web/components/ui/",
+    "Images in apps/web/public/images/",
+    "Use POML format for structured docs",
+    "Prioritize offline-first features"
+  ]
+  
+  File_References: {
+    Project_Context: "/CLAUDE.md"
+    Architecture: "/docs/sharded-architecture/"
+    PRD: "/docs/sharded-prd/"
+    API: "/apps/api/"
+    Mobile: "/apps/mobile/"
+  }
+  
+  Best_Practices: {
+    Component_Addition: "Always use CLI from apps/web directory"
+    Customization: "Modify components after adding"
+    Theming: "Use CSS variables for consistency"
+    TypeScript: "Maintain type safety"
+    Accessibility: "Preserve ARIA attributes"
+  }
+}
+
+## Quick_Component_Lookup {
+  @use: "Fast reference for common components"
+  
+  Essential: {
+    Button: "npx shadcn@latest add button"
+    Card: "npx shadcn@latest add card"
+    Form: "npx shadcn@latest add form"
+    Dialog: "npx shadcn@latest add dialog"
+    Table: "npx shadcn@latest add table"
+  }
+  
+  Landing: {
+    Hero: "Use Card + Button + Badge"
+    Features: "Use Card grid"
+    Pricing: "Use Card + Table"
+    Testimonials: "Use Card + Avatar"
+  }
+  
+  Dashboard: {
+    Layout: "npx shadcn@latest add dashboard-01"
+    Sidebar: "Choose from 16 variants"
+    Charts: "npx shadcn@latest add chart"
+    Stats: "Use Card + Badge"
+  }
+}
+
+## Metadata {
+  @last_updated: "2025-01-12"
+  @total_components: 336
+  @ui_components: 48
+  @blocks: 140+
+  @optimized_for: "Claude Code rapid context loading"
+  @project: "Receipt Organizer Web App"
+}
