@@ -16,14 +16,19 @@ void main() {
 
     test('should generate QuickBooks CSV format', () {
       // Given
-      final receipts = [
+      final receipts = <Receipt>[
         Receipt(
           id: 'test-1',
           imageUri: '/image1.jpg',
           capturedAt: DateTime(2024, 12, 6),
-          merchantName: 'Test Store',
-          totalAmount: 25.99,
-          receiptDate: '12/06/2024',
+          ocrResults: ProcessingResult(
+            merchant: FieldData(value: 'Test Store', confidence: 0.95),
+            total: FieldData(value: '25.99', confidence: 0.98),
+            date: FieldData(value: '12/06/2024', confidence: 0.92),
+            overallConfidence: 0.95,
+            processingDurationMs: 100,
+            allText: ['Test Store', '25.99', '12/06/2024'],
+          ),
         ),
       ];
 
@@ -39,14 +44,19 @@ void main() {
 
     test('should generate Xero CSV format', () {
       // Given
-      final receipts = [
+      final receipts = <Receipt>[
         Receipt(
           id: 'test-1',
           imageUri: '/image1.jpg',
           capturedAt: DateTime(2024, 12, 6),
-          merchantName: 'Coffee Shop',
-          totalAmount: 4.50,
-          receiptDate: '12/06/2024',
+          ocrResults: ProcessingResult(
+            merchant: FieldData(value: 'Coffee Shop', confidence: 0.95),
+            total: FieldData(value: '4.50', confidence: 0.98),
+            date: FieldData(value: '12/06/2024', confidence: 0.92),
+            overallConfidence: 0.95,
+            processingDurationMs: 100,
+            allText: ['Coffee Shop', '4.50', '12/06/2024'],
+          ),
         ),
       ];
 
@@ -62,12 +72,12 @@ void main() {
 
     test('should handle missing data gracefully', () {
       // Given - Receipt with minimal data
-      final receipts = [
+      final receipts = <Receipt>[
         Receipt(
           id: 'test-1',
           imageUri: '/image1.jpg',
           capturedAt: DateTime.now(),
-          // No merchant name, amount, or date
+          // No OCR results
         ),
       ];
 
