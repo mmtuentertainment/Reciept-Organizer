@@ -509,6 +509,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
     final shouldExport = await showValidationReportDialog(
       context: context,
       validationResult: validationResult,
+      exportFormat: format.toString(),
     );
     
     if (!shouldExport) {

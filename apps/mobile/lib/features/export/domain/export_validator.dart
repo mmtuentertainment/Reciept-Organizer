@@ -362,6 +362,63 @@ class ExportValidator {
       }
     }
   }
+  
+  /// Validate receipts using real API services
+  Future<ValidationResult?> _validateWithAPI(
+    List<Receipt> receipts,
+    ExportFormat format,
+  ) async {
+    try {
+      switch (format) {
+        case ExportFormat.quickbooks:
+          // Use QuickBooks API for validation
+          final result = await _quickBooksService.validateReceipts(receipts);
+          return _convertAPIResultToValidationResult(result, 'QuickBooks');
+          
+        case ExportFormat.xero:
+          // Use Xero API for validation
+          final result = await _xeroService.validateReceipts(receipts);
+          return _convertAPIResultToValidationResult(result, 'Xero');
+          
+        case ExportFormat.generic:
+          // No API validation for generic format
+          return null;
+      }
+    } catch (e) {
+      // If API validation fails, log and fall back to local validation
+      print('API validation failed, falling back to local: $e');
+      return null;
+    }
+  }
+  
+  /// Convert API validation result to our ValidationResult format
+  ValidationResult _convertAPIResultToValidationResult(
+    dynamic apiResult,
+    String source,
+  ) {
+    // Add metadata about the validation source
+    final metadata = <String, dynamic>{};
+    metadata['validationSource'] = '$source API';
+    metadata['apiValidation'] = true;
+    metadata['timestamp'] = DateTime.now().toIso8601String();
+    
+    // Add info message about API validation
+    final infoList = <ValidationIssue>[];
+    infoList.add(ValidationIssue(
+      id: 'API_VALIDATION',
+      field: 'system',
+      message: 'Validated against live $source API',
+      severity: ValidationSeverity.info,
+    ));
+    
+    return ValidationResult(
+      isValid: true,
+      errors: [],
+      warnings: [],
+      info: infoList,
+      metadata: metadata,
+    );
+  }
 }
 
 /// Base class for format-specific validators
@@ -378,15 +435,20 @@ class _QuickBooksValidator extends _FormatValidator {
     // QuickBooks requires MM/DD/YYYY date format
     // Date format will be handled during export, just validate date exists
     if (receipt.date != null) {
-      final year = receipt.date!.year;
-      if (year < 1900 || year > 2100) {
-        issues.add(ValidationIssue(
-          id: 'QB_INVALID_DATE_RANGE',
-          field: 'date',
-          message: 'Receipt #${index + 1}: Date year must be between 1900 and 2100',
-          severity: ValidationSeverity.error,
-          actualValue: year,
-        ));
+      // Check year range
+      try {
+        final year = receipt.date!.year;
+        if (year < 1900 || year > 2100) {
+          issues.add(ValidationIssue(
+            id: 'QB_INVALID_DATE_RANGE',
+            field: 'date',
+            message: 'Receipt #${index + 1}: Date year must be between 1900 and 2100',
+            severity: ValidationSeverity.error,
+            actualValue: year,
+          ));
+        }
+      } catch (e) {
+        // Date parsing failed, will be caught by required field validation
       }
     }
     
@@ -414,15 +476,20 @@ class _XeroValidator extends _FormatValidator {
     // Xero requires DD/MM/YYYY date format
     // Date format will be handled during export, just validate date exists
     if (receipt.date != null) {
-      final year = receipt.date!.year;
-      if (year < 1900 || year > 2100) {
-        issues.add(ValidationIssue(
-          id: 'XERO_INVALID_DATE_RANGE',
-          field: 'date',
-          message: 'Receipt #${index + 1}: Date year must be between 1900 and 2100',
-          severity: ValidationSeverity.error,
-          actualValue: year,
-        ));
+      // Check year range
+      try {
+        final year = receipt.date!.year;
+        if (year < 1900 || year > 2100) {
+          issues.add(ValidationIssue(
+            id: 'XERO_INVALID_DATE_RANGE',
+            field: 'date',
+            message: 'Receipt #${index + 1}: Date year must be between 1900 and 2100',
+            severity: ValidationSeverity.error,
+            actualValue: year,
+          ));
+        }
+      } catch (e) {
+        // Date parsing failed, will be caught by required field validation
       }
     }
     
@@ -488,60 +555,22 @@ class _GenericValidator extends _FormatValidator {
     return issues;
   }
   
-  /// Validate receipts using real API services
-  Future<ValidationResult?> _validateWithAPI(
-    List<Receipt> receipts,
-    ExportFormat format,
-  ) async {
-    try {
-      switch (format) {
-        case ExportFormat.quickbooks:
-          // Use QuickBooks API for validation
-          final result = await _quickBooksService.validateReceipts(receipts);
-          return _convertAPIResultToValidationResult(result, 'QuickBooks');
-          
-        case ExportFormat.xero:
-          // Use Xero API for validation
-          final result = await _xeroService.validateReceipts(receipts);
-          return _convertAPIResultToValidationResult(result, 'Xero');
-          
-        case ExportFormat.generic:
-          // No API validation for generic format
-          return null;
-      }
-    } catch (e) {
-      // If API validation fails, log and fall back to local validation
-      print('API validation failed, falling back to local: $e');
-      return null;
+  /// Helper method to format date based on export format
+  static String formatDate(DateTime date, ExportFormat format) {
+    switch (format) {
+      case ExportFormat.quickbooks:
+        // QuickBooks uses MM/DD/YYYY
+        return '${date.month.toString().padLeft(2, '0')}/'
+               '${date.day.toString().padLeft(2, '0')}/'
+               '${date.year}';
+      case ExportFormat.xero:
+        // Xero uses DD/MM/YYYY
+        return '${date.day.toString().padLeft(2, '0')}/'
+               '${date.month.toString().padLeft(2, '0')}/'
+               '${date.year}';
+      default:
+        // Generic uses ISO format
+        return date.toIso8601String().split('T')[0];
     }
-  }
-  
-  /// Convert API validation result to our ValidationResult format
-  ValidationResult _convertAPIResultToValidationResult(
-    ValidationResult apiResult,
-    String source,
-  ) {
-    // Add metadata about the validation source
-    final metadata = Map<String, dynamic>.from(apiResult.metadata);
-    metadata['validationSource'] = '$source API';
-    metadata['apiValidation'] = true;
-    metadata['timestamp'] = DateTime.now().toIso8601String();
-    
-    // Add info message about API validation
-    final infoList = List<ValidationIssue>.from(apiResult.info);
-    infoList.add(ValidationIssue(
-      id: 'API_VALIDATION',
-      field: 'system',
-      message: 'Validated against live $source API',
-      severity: ValidationSeverity.info,
-    ));
-    
-    return ValidationResult(
-      isValid: apiResult.isValid,
-      errors: apiResult.errors,
-      warnings: apiResult.warnings,
-      info: infoList,
-      metadata: metadata,
-    );
   }
 }

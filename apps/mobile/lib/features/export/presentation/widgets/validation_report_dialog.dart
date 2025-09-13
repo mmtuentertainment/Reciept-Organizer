@@ -1,122 +1,204 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/export_validator.dart';
+import '../providers/export_validation_provider.dart';
 
 /// Dialog showing validation results before export
-class ValidationReportDialog extends ConsumerWidget {
+class ValidationReportDialog extends ConsumerStatefulWidget {
   final ValidationResult validationResult;
   final VoidCallback onConfirmExport;
   final VoidCallback onCancel;
+  final VoidCallback? onFixIssues;
+  final String? exportFormat;
   
   const ValidationReportDialog({
     super.key,
     required this.validationResult,
     required this.onConfirmExport,
     required this.onCancel,
+    this.onFixIssues,
+    this.exportFormat,
   });
   
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ValidationReportDialog> createState() => _ValidationReportDialogState();
+}
+
+class _ValidationReportDialogState extends ConsumerState<ValidationReportDialog> {
+  bool _isValidating = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Start validation animation
+    _startValidation();
+  }
+  
+  void _startValidation() {
+    setState(() {
+      _isValidating = true;
+    });
+    // Simulate validation process
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          _isValidating = false;
+        });
+      }
+    });
+  }
+  
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.enter && widget.validationResult.canExport) {
+        widget.onConfirmExport();
+      } else if (event.logicalKey == LogicalKeyboardKey.escape) {
+        widget.onCancel();
+      } else if (event.logicalKey == LogicalKeyboardKey.keyF && widget.onFixIssues != null) {
+        widget.onFixIssues!();
+      }
+    }
+  }
+  
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    return AlertDialog(
+    return KeyboardListener(
+      focusNode: FocusNode()..requestFocus(),
+      onKeyEvent: _handleKeyEvent,
+      child: AlertDialog(
       title: Row(
         children: [
-          Icon(
-            _getOverallIcon(),
-            color: _getOverallColor(colorScheme),
-          ),
+          if (_isValidating)
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+              ),
+            )
+          else
+            Icon(
+              _getOverallIcon(),
+              color: _getOverallColor(colorScheme),
+            ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              _getTitle(),
+              _isValidating ? 'Validating...' : _getTitle(),
               style: theme.textTheme.headlineSmall,
             ),
           ),
         ],
       ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Summary section
-            _buildSummaryCard(context),
-            
-            const SizedBox(height: 16),
-            
-            // Errors section
-            if (validationResult.errors.isNotEmpty) ...[
-              _buildIssueSection(
-                context,
-                'Errors (Must Fix)',
-                validationResult.errors,
-                Icons.error,
-                colorScheme.error,
+      content: _isValidating
+        ? const SizedBox(
+            height: 100,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Checking export compatibility...'),
+                ],
               ),
-              const SizedBox(height: 12),
-            ],
-            
-            // Warnings section
-            if (validationResult.warnings.isNotEmpty) ...[
-              _buildIssueSection(
-                context,
-                'Warnings (Review Recommended)',
-                validationResult.warnings,
-                Icons.warning,
-                colorScheme.tertiary,
-              ),
-              const SizedBox(height: 12),
-            ],
-            
-            // Info section
-            if (validationResult.info.isNotEmpty) ...[
-              _buildIssueSection(
-                context,
-                'Information',
-                validationResult.info,
-                Icons.info,
-                colorScheme.primary,
-              ),
-            ],
-            
-            // Security notice
-            if (_hasSecurityIssues()) ...[
-              const SizedBox(height: 16),
-              _buildSecurityNotice(context),
-            ],
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: onCancel,
-          child: const Text('Cancel'),
-        ),
-        if (validationResult.canExport)
-          FilledButton.icon(
-            onPressed: onConfirmExport,
-            icon: Icon(
-              validationResult.warnings.isEmpty
-                  ? Icons.check_circle
-                  : Icons.warning,
             ),
-            label: Text(
-              validationResult.warnings.isEmpty
-                  ? 'Export'
-                  : 'Export Anyway',
+          )
+        : SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Summary section
+                _buildSummaryCard(context),
+                
+                const SizedBox(height: 16),
+                
+                // Errors section
+                if (widget.validationResult.errors.isNotEmpty) ...[
+                  _buildIssueSection(
+                    context,
+                    'Errors (Must Fix)',
+                    widget.validationResult.errors,
+                    Icons.error,
+                    colorScheme.error,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                
+                // Warnings section
+                if (widget.validationResult.warnings.isNotEmpty) ...[
+                  _buildIssueSection(
+                    context,
+                    'Warnings (Review Recommended)',
+                    widget.validationResult.warnings,
+                    Icons.warning,
+                    colorScheme.tertiary,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                
+                // Info section
+                if (widget.validationResult.info.isNotEmpty) ...[
+                  _buildIssueSection(
+                    context,
+                    'Information',
+                    widget.validationResult.info,
+                    Icons.info,
+                    colorScheme.primary,
+                  ),
+                ],
+                
+                // Security notice
+                if (_hasSecurityIssues()) ...[
+                  const SizedBox(height: 16),
+                  _buildSecurityNotice(context),
+                ],
+              ],
             ),
           ),
-      ],
+      actions: _isValidating
+        ? []
+        : [
+            TextButton(
+              onPressed: widget.onCancel,
+              child: const Text('Cancel (Esc)'),
+            ),
+            if (widget.onFixIssues != null && widget.validationResult.errors.isNotEmpty)
+              TextButton.icon(
+                onPressed: widget.onFixIssues,
+                icon: const Icon(Icons.build),
+                label: const Text('Fix Issues (F)'),
+              ),
+            if (widget.validationResult.canExport)
+              FilledButton.icon(
+                onPressed: widget.onConfirmExport,
+                icon: Icon(
+                  widget.validationResult.warnings.isEmpty
+                      ? Icons.check_circle
+                      : Icons.warning,
+                ),
+                label: Text(
+                  widget.validationResult.warnings.isEmpty
+                      ? 'Export (Enter)'
+                      : 'Export Anyway (Enter)',
+                ),
+              ),
+          ],
+      ),
     );
   }
   
   Widget _buildSummaryCard(BuildContext context) {
     final theme = Theme.of(context);
-    final metadata = validationResult.metadata;
+    final metadata = widget.validationResult.metadata;
     final receiptCount = metadata['receiptCount'] ?? 0;
-    final format = metadata['format'] ?? 'Unknown';
+    final format = widget.exportFormat ?? metadata['format'] ?? 'Unknown';
     
     return Card(
       child: Padding(
@@ -133,9 +215,34 @@ class ValidationReportDialog extends ConsumerWidget {
                   style: theme.textTheme.titleMedium,
                 ),
                 const Spacer(),
-                Chip(
-                  label: Text(format.toString().split('.').last.toUpperCase()),
-                  avatar: const Icon(Icons.file_present, size: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _getFormatColor(format.toString()).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: _getFormatColor(format.toString()).withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _getFormatIcon(format.toString()),
+                        size: 16,
+                        color: _getFormatColor(format.toString()),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        format.toString().split('.').last.toUpperCase(),
+                        style: TextStyle(
+                          color: _getFormatColor(format.toString()),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -282,31 +389,60 @@ class ValidationReportDialog extends ConsumerWidget {
   }
   
   IconData _getOverallIcon() {
-    if (!validationResult.isValid) return Icons.error;
-    if (validationResult.warnings.isNotEmpty) return Icons.warning;
+    if (!widget.validationResult.isValid) return Icons.error;
+    if (widget.validationResult.warnings.isNotEmpty) return Icons.warning;
     return Icons.check_circle;
   }
   
   Color _getOverallColor(ColorScheme colorScheme) {
-    if (!validationResult.isValid) return colorScheme.error;
-    if (validationResult.warnings.isNotEmpty) return colorScheme.tertiary;
+    if (!widget.validationResult.isValid) return colorScheme.error;
+    if (widget.validationResult.warnings.isNotEmpty) return colorScheme.tertiary;
     return colorScheme.primary;
   }
   
   String _getTitle() {
-    if (!validationResult.isValid) {
+    if (!widget.validationResult.isValid) {
       return 'Export Blocked - Issues Found';
     }
-    if (validationResult.warnings.isNotEmpty) {
+    if (widget.validationResult.warnings.isNotEmpty) {
       return 'Export Ready with Warnings';
     }
     return 'Export Ready';
   }
   
+  IconData _getFormatIcon(String format) {
+    final formatLower = format.toLowerCase();
+    if (formatLower.contains('quickbooks') || formatLower.contains('qbo')) {
+      return Icons.account_balance;
+    } else if (formatLower.contains('xero')) {
+      return Icons.cloud_sync;
+    } else if (formatLower.contains('csv')) {
+      return Icons.table_chart;
+    } else if (formatLower.contains('excel') || formatLower.contains('xlsx')) {
+      return Icons.grid_on;
+    }
+    return Icons.file_present;
+  }
+  
+  Color _getFormatColor(String format) {
+    final theme = Theme.of(context);
+    final formatLower = format.toLowerCase();
+    if (formatLower.contains('quickbooks') || formatLower.contains('qbo')) {
+      return Colors.green;
+    } else if (formatLower.contains('xero')) {
+      return Colors.blue;
+    } else if (formatLower.contains('csv')) {
+      return theme.colorScheme.primary;
+    } else if (formatLower.contains('excel') || formatLower.contains('xlsx')) {
+      return Colors.orange;
+    }
+    return theme.colorScheme.secondary;
+  }
+  
   double _calculateHealthScore() {
-    final totalIssues = validationResult.errors.length * 3 +
-        validationResult.warnings.length * 2 +
-        validationResult.info.length;
+    final totalIssues = widget.validationResult.errors.length * 3 +
+        widget.validationResult.warnings.length * 2 +
+        widget.validationResult.info.length;
     
     if (totalIssues == 0) return 1.0;
     
@@ -323,8 +459,8 @@ class ValidationReportDialog extends ConsumerWidget {
   }
   
   bool _hasSecurityIssues() {
-    return validationResult.errors.any((e) => e.id.startsWith('SEC_')) ||
-        validationResult.warnings.any((e) => e.id.startsWith('SEC_'));
+    return widget.validationResult.errors.any((e) => e.id.startsWith('SEC_')) ||
+        widget.validationResult.warnings.any((e) => e.id.startsWith('SEC_'));
   }
 }
 
@@ -332,6 +468,8 @@ class ValidationReportDialog extends ConsumerWidget {
 Future<bool> showValidationReportDialog({
   required BuildContext context,
   required ValidationResult validationResult,
+  String? exportFormat,
+  VoidCallback? onFixIssues,
 }) async {
   final result = await showDialog<bool>(
     context: context,
@@ -340,6 +478,8 @@ Future<bool> showValidationReportDialog({
       validationResult: validationResult,
       onConfirmExport: () => Navigator.of(context).pop(true),
       onCancel: () => Navigator.of(context).pop(false),
+      exportFormat: exportFormat,
+      onFixIssues: onFixIssues,
     ),
   );
   

@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/models/receipt.dart';
-import 'quickbooks_api_service.dart';
+import 'api_credentials.dart';
 
 /// Service for interacting with Xero API via Vercel proxy
 class XeroAPIService {
