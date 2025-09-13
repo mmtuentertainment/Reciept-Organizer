@@ -5,6 +5,11 @@ apps/mobile/tmp/
 .gemini/
 gha-creds-*.json
 
+# Environment files with sensitive data
+.env.mcp
+.env.local
+.env.production
+
 # Large files that shouldn't be committed
 **/*.tar.xz
 **/*.tar.gz

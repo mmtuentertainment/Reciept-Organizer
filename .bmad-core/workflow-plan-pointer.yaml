@@ -1,0 +1,72 @@
+# BMad Workflow Plan Pointer
+# This file points to active workflow plans and their status
+
+active_workflow:
+  type: production_deployment
+  location: /PRODUCTION_DEPLOYMENT_WORKFLOW.poml
+  format: POML
+  version: 3.0.0
+  status_tracker: .bmad-core/workflow-status.md
+
+workflow_metadata:
+  id: receipt-organizer-production-deployment
+  title: Complete Production Deployment with MCP shadcn Integration
+  created: 2025-01-09
+  last_accessed: 2025-01-13
+  orchestrator: infrastructure-specialist
+
+execution_state:
+  current_phase: null
+  current_step: null
+  status: NOT_STARTED
+  progress: 0%
+
+phases:
+  - id: phase_1
+    name: Production Infrastructure
+    status: not_started
+    priority: P0-CRITICAL
+  - id: phase_2
+    name: Authentication UI
+    status: not_started
+    priority: P0-CRITICAL
+  - id: phase_3
+    name: Sync Status Indicators
+    status: not_started
+    priority: P1-HIGH
+  - id: phase_4
+    name: Landing Page
+    status: not_started
+    priority: P1-HIGH
+  - id: phase_5
+    name: Dashboard
+    status: not_started
+    priority: P1-HIGH
+  - id: phase_6
+    name: CI/CD Pipeline
+    status: not_started
+    priority: P2-MEDIUM
+  - id: phase_7
+    name: User Testing
+    status: not_started
+    priority: P2-MEDIUM
+
+commands:
+  view_plan: cat PRODUCTION_DEPLOYMENT_WORKFLOW.poml
+  view_status: cat .bmad-core/workflow-status.md
+  update_status: "*plan-update"
+  start_workflow: "*workflow production-deployment"
+
+integrations:
+  - supabase
+  - shadcn-mcp
+  - flutter
+  - nextjs
+
+success_metrics:
+  defined: true
+  location: "PRODUCTION_DEPLOYMENT_WORKFLOW.poml#L955"
+
+rollback_procedures:
+  defined: true
+  location: "PRODUCTION_DEPLOYMENT_WORKFLOW.poml#L930"
