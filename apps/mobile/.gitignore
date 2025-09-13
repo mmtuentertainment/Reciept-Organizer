@@ -41,3 +41,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment configuration
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Supabase
+supabase/.env
+supabase/.env.local

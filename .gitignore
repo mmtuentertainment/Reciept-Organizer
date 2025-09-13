@@ -77,3 +77,8 @@ releases/
 
 # Web app (temporary/test)
 apps/web/
+# gemini-cli settings
+.gemini/
+
+# GitHub App credentials
+gha-creds-*.json

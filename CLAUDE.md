@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Receipt Organizer MVP** project focused on building a mom-and-pop business receipt capture, OCR, and CSV export application. The project is now in **active development** with a Flutter mobile app, API backend, and cloud infrastructure.
+This is a **Receipt Organizer MVP** project for mom-and-pop businesses, providing offline-first receipt capture, OCR processing, and CSV export. The project has completed Flutter 3.35.3 migration and uses a simplified 15-test strategy.
 
 ## Project Architecture
 
@@ -14,15 +14,16 @@ This is a **Receipt Organizer MVP** project focused on building a mom-and-pop bu
 - **Core Workflow**: Photo capture → OCR extraction → CSV export
 - **Key Fields**: Merchant, Date, Total, Tax (4 fields only for MVP)
 
-### Technical Stack (Recommended)
-Based on comprehensive research in `COMPREHENSIVE_FEASIBLE_TECH_STACK_RECOMMENDATION_2025.md`:
+### Technical Stack (Implemented)
+Based on architecture in `docs/sharded-architecture/tech-stack.md`:
 
-- **Frontend**: Flutter (cross-platform mobile)
-- **OCR Engine**: PaddleOCR (local processing, 89-92% accuracy target)
-- **Image Processing**: OpenCV (edge detection, preprocessing)
-- **Database**: RxDB (offline-first, reactive)
-- **CSV Generation**: Papa Parse (RFC 4180 compliant)
-- **Background Processing**: BullMQ (async job processing)
+- **Frontend**: Flutter 3.35.3 with Dart 3.2+
+- **State Management**: Riverpod 2.4+
+- **OCR Engine**: Google ML Kit (primary) + TensorFlow Lite (fallback)
+- **Database**: SQLite via sqflite with RxDB reactive layer
+- **Image Processing**: Flutter camera plugin with edge detection
+- **CSV Generation**: Built-in Dart CSV library (RFC 4180 compliant)
+- **Architecture**: Offline-first with progressive cloud enhancement
 
 ### Success Metrics
 From `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md`:
@@ -34,21 +35,25 @@ From `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md`:
 - **Offline reliability**: Full functionality without network
 - **Stability**: ≥ 99.5% crash-free sessions
 
-## File Organization
+## Documentation Structure
 
 ### Core Documents
-- `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md` - Primary MVP specification
-- `COMPREHENSIVE_FEASIBLE_TECH_STACK_RECOMMENDATION_2025.md` - Detailed architecture analysis
+- `README.md` - Project overview and navigation
+- `PROJECT_STATUS.md` - Current state and next steps
+- `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md` - Original MVP specification
 
-### Research & Analysis
-- `analysis/` - Evidence audits and compatibility specifications
-  - `EVIDENCE_BACKED_REQUIREMENTS.md` - Fact-checked requirements analysis
-  - `CSV_COMPATIBILITY_ANALYSIS.md` - QuickBooks/Xero compatibility specs
-- `studies/` - Research protocols
-  - `RECEIPT_OCR_BASELINE_STUDY.md` - OCR accuracy measurement methodology
-- `research/` - Market analysis and supporting data
-  - `Receipt_Organizer_Evidence_Based_MVP_2025.md` - MVP analysis
-  - `receipt_organizer_analysis_2025.json` - Structured research findings
+### Architecture & Technical
+- `docs/sharded-architecture/` - Complete technical architecture (20 sections)
+  - `tech-stack.md` - Technology decisions and rationale
+  - `database-schema.md` - SQLite schema design
+  - `frontend-architecture.md` - Flutter app structure
+  - `high-level-architecture.md` - System overview
+
+### Product & Features
+- `docs/sharded-prd/` - Product requirements in POML format
+- `docs/stories/` - User stories (1.1 through 3.12)
+- `docs/epics/` - Epic definitions
+- `docs/qa/` - Quality gates and assessments
 
 ## Development Constraints
 
@@ -87,15 +92,16 @@ This project uses a **minimal test strategy** following the CleanArchitectureTod
 - **Location**: `apps/mobile/test/`
 - **Strategy**: See `apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md`
 
-#### The 15 Critical Tests:
-1. **Core Tests** (`test/core_tests/`):
-   - Receipt repository operations
-   - CSV export functionality
-   - App launch verification
+#### The 15 Critical Tests (Currently 11 Active):
+1. **Core Tests** (`test/core_tests/`) - 8 tests:
+   - Receipt repository operations (3 tests)
+   - CSV export functionality (3 tests)
+   - App launch verification (2 tests)
 
-2. **Integration Tests** (`test/integration_tests/`):
+2. **Integration Tests** (`test/integration_tests/`) - 3 tests:
    - Critical user flows only
-   - Capture → OCR → Export workflow
+   - Navigation between screens
+   - Settings access
 
 ### Why Only 15 Tests?
 - Industry best practice: Most successful Flutter apps have 50-200 tests, not 500+
@@ -109,24 +115,147 @@ This project uses a **minimal test strategy** following the CleanArchitectureTod
 3. Consider if existing tests already cover it
 4. Get explicit approval in the conversation
 
-## Getting Started
+## Current Project Status
 
-When beginning development:
-1. Review the project brief for core requirements
-2. Check the tech stack recommendation for architectural guidance  
-3. Reference the evidence-backed requirements to avoid fabricated assumptions
-4. Use the CSV compatibility analysis for export format specifications
-5. Follow the OCR baseline study for accuracy measurement protocols
+### Completed ✅
+- Flutter 3.35.3 migration (Android Gradle Plugin 8.6.0, Kotlin 1.9.0)
+- Test suite simplified from 571 to 15 critical tests
+- Documentation consolidated and organized
+- Offline-first architecture with cloud-ready interfaces
+- Story 3.12: Export validation with 13 integration tests
+- Track 1: Test infrastructure interfaces (ISyncService, IAuthService) implemented
+- Track 2: Supabase cloud infrastructure fully configured
+  - Local Supabase running at http://127.0.0.1:54321
+  - Database migrations applied (4 tables with RLS)
+  - Auth and sync services implemented with current 2025 API
+  - Integration tests configured and passing
+
+### In Progress 🚧
+- Hybrid features implementation
+- Production Supabase deployment preparation
+
+### Next Steps 📋
+1. Deploy Supabase to production environment
+2. Implement progressive cloud enhancement features
+3. Add user authentication UI components
+4. Enable cloud sync with offline queue
 
 ### Build & Test Commands
 ```bash
 # Flutter app (from apps/mobile/)
 flutter test test/core_tests/ test/integration_tests/  # Run ONLY the 15 critical tests
 flutter run                                             # Run the app
+flutter analyze --no-pub                                # Check for issues
+flutter build apk --debug                               # Build Android APK
 
 # API (from apps/api/)
 npm run dev                                            # Start development server
 npm run build                                          # Build for production
+npm test                                               # Run API tests
+
+# Supabase (from infrastructure/supabase/)
+npx supabase start                                     # Start local Supabase
+npx supabase stop                                      # Stop local Supabase
+npx supabase status                                    # Check Supabase status
+npx supabase db push                                   # Apply migrations
+npx supabase db seed                                   # Seed test data
+
+# Supabase Integration Tests
+CI=true flutter test test/infrastructure/supabase_integration_test.dart
+
+# Utility Scripts (from root)
+bash CLEANUP_PROJECT.sh                                # Remove orphaned files
+bash apps/mobile/test/PROTECT_TESTS.sh                # Verify test count
 ```
-- doc-out
-- risk
+## Important Reminders
+
+### Test Discipline
+- **NEVER** add tests without explicit discussion
+- Run `PROTECT_TESTS.sh` to verify test count stays at ~15
+- See `apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md` for rationale
+
+### Code Quality
+- All code changes must pass `flutter analyze`
+- Tests must pass before any PR/merge
+- Follow patterns in existing codebase
+
+### Documentation
+- Keep `PROJECT_STATUS.md` updated with progress
+- Document significant decisions in appropriate docs/ section
+- Update this file when project structure changes
+
+## Supabase Infrastructure
+
+### Local Development Setup
+The project includes a fully configured Supabase setup for cloud features:
+
+- **Local URL**: http://127.0.0.1:54321
+- **Dashboard**: http://127.0.0.1:54323  
+- **Database**: PostgreSQL on port 54322
+- **Migrations**: Located in `infrastructure/supabase/migrations/`
+
+### Key Services Implemented
+1. **SupabaseAuthService** (`lib/infrastructure/services/supabase_auth_service.dart`)
+   - Anonymous authentication for quick start
+   - Email/password registration and sign-in
+   - Session management and token refresh
+   - Implements IAuthService interface
+
+2. **SupabaseSyncService** (`lib/infrastructure/services/supabase_sync_service.dart`)
+   - Bidirectional data sync
+   - Realtime subscriptions using channels
+   - Conflict resolution (Last Write Wins + field merging)
+   - Offline queue management
+   - Implements ISyncService interface
+
+### Database Schema
+- `receipts` - Main receipt storage with user isolation via RLS
+- `sync_metadata` - Track sync state per device
+- `export_history` - CSV export audit trail
+- `user_preferences` - User-specific settings
+
+### Environment Configuration
+The app uses standard Supabase local development credentials which are safe for local use:
+```dart
+// Environment.isDevelopment determines which config to use
+const String _localDevUrl = 'http://127.0.0.1:54321';
+const String _localDevAnonKey = 'eyJhb...'; // Standard local dev key
+```
+
+For production, use environment variables:
+```bash
+flutter build apk \
+  --dart-define=SUPABASE_URL=https://your-project.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=your-anon-key
+```
+
+## Recent Enhancements (January 2025)
+
+### Story 3.12: Export Validation ✅
+Complete implementation of pre-flight validation before CSV export:
+
+#### Features Implemented:
+- **Validation Engine**: Format-specific validators for QuickBooks, Xero, and Generic CSV
+- **Security**: Comprehensive CSV injection prevention (OWASP patterns)
+- **UI Enhancements**: 
+  - Progress indicators during validation
+  - Format-specific badges with icons and colors
+  - Keyboard shortcuts (Enter/Esc/F)
+- **Data Integration**: Properly fetches real receipts from repository
+- **Error Handling**: Categorized issues (errors, warnings, info)
+
+#### Key Files:
+- `lib/features/export/domain/export_validator.dart` - Core validation logic
+- `lib/features/export/presentation/widgets/validation_report_dialog.dart` - Enhanced UI
+- `lib/features/export/domain/receipt_converter.dart` - Data model conversion
+- `lib/features/export/presentation/pages/export_screen.dart` - Integration point
+
+#### Testing Status:
+- **Integration Tests Added**: 13 comprehensive tests using real merchant data
+- **Test Data Source**: Discovered and utilized existing test CSVs with 50+ real merchants
+- **Coverage**: Date format confusion, CSV injection, performance benchmarks, edge cases
+- **Files Created**:
+  - `test/integration/export_validation_flow_test.dart` - Full integration test suite
+  - `lib/features/export/services/api_credentials.dart` - API credentials stub
+- **All tests passing**: 11 core tests + 13 new integration tests = 24 total passing
+- CSV injection prevention verified
