@@ -20,9 +20,12 @@ Based on architecture in `docs/sharded-architecture/tech-stack.md`:
 - **Frontend**: Flutter 3.35.3 with Dart 3.2+
 - **State Management**: Riverpod 2.4+
 - **OCR Engine**: Google ML Kit (primary) + TensorFlow Lite (fallback)
-- **Database**: SQLite via sqflite with RxDB reactive layer
+- **Local Database**: SQLite via sqflite with RxDB reactive layer
+- **Cloud Database**: PostgreSQL via Supabase with RLS
+- **Authentication**: Supabase Auth (anonymous + email/password)
+- **Realtime Sync**: Supabase Realtime channels
 - **Image Processing**: Flutter camera plugin with edge detection
-- **CSV Generation**: Built-in Dart CSV library (RFC 4180 compliant)
+- **CSV Generation**: Built-in Dart CSV library (RFC 4180 compliant with BOM)
 - **Architecture**: Offline-first with progressive cloud enhancement
 
 ### Success Metrics
@@ -40,6 +43,7 @@ From `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md`:
 ### Core Documents
 - `README.md` - Project overview and navigation
 - `PROJECT_STATUS.md` - Current state and next steps
+- `CLAUDE.md` - This file, AI assistant instructions
 - `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md` - Original MVP specification
 
 ### Architecture & Technical
@@ -48,12 +52,19 @@ From `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md`:
   - `database-schema.md` - SQLite schema design
   - `frontend-architecture.md` - Flutter app structure
   - `high-level-architecture.md` - System overview
+- `docs/integration/` - Integration guides for external services
+- `docs/testing/` - Testing strategy and procedures
 
 ### Product & Features
 - `docs/sharded-prd/` - Product requirements in POML format
 - `docs/stories/` - User stories (1.1 through 3.12)
 - `docs/epics/` - Epic definitions
 - `docs/qa/` - Quality gates and assessments
+
+### Infrastructure
+- `infrastructure/supabase/` - Cloud backend configuration
+  - `migrations/` - Database schema migrations
+  - `SETUP.md` - Supabase setup instructions
 
 ## Development Constraints
 
@@ -66,8 +77,8 @@ From `project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md`:
 6. Batch capture and simple organizing aids
 
 ### What we will NOT build (v1)
-- Cloud accounts/multi-user sync
-- Bank/ERP integrations
+- ~~Cloud accounts/multi-user sync~~ (NOW IMPLEMENTED via Supabase)
+- Bank/ERP integrations (API stubs ready for future)
 - Line-item extraction
 - Complex approvals/workflows
 - Heavy ML training
@@ -92,16 +103,26 @@ This project uses a **minimal test strategy** following the CleanArchitectureTod
 - **Location**: `apps/mobile/test/`
 - **Strategy**: See `apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md`
 
-#### The 15 Critical Tests (Currently 11 Active):
-1. **Core Tests** (`test/core_tests/`) - 8 tests:
-   - Receipt repository operations (3 tests)
-   - CSV export functionality (3 tests)
-   - App launch verification (2 tests)
+#### Test Categories:
+1. **Core Tests** (`test/core_tests/`) - Unit tests for business logic
+   - Receipt repository operations
+   - CSV export functionality
+   - App launch verification
 
-2. **Integration Tests** (`test/integration_tests/`) - 3 tests:
-   - Critical user flows only
+2. **Integration Tests** (`test/integration_tests/`) - User flow tests
+   - Critical user flows
    - Navigation between screens
    - Settings access
+
+3. **Export Validation** (`test/integration/export_validation_flow_test.dart`) - 13 tests
+   - QuickBooks/Xero format validation
+   - CSV injection prevention
+   - Performance benchmarks
+
+4. **Infrastructure Tests** (`test/infrastructure/`) - Cloud integration
+   - Supabase auth service tests
+   - Sync service tests
+   - Integration tests (skipped when not configured)
 
 ### Why Only 15 Tests?
 - Industry best practice: Most successful Flutter apps have 50-200 tests, not 500+
@@ -115,12 +136,12 @@ This project uses a **minimal test strategy** following the CleanArchitectureTod
 3. Consider if existing tests already cover it
 4. Get explicit approval in the conversation
 
-## Current Project Status
+## Current Project Status (January 2025)
 
 ### Completed ✅
 - Flutter 3.35.3 migration (Android Gradle Plugin 8.6.0, Kotlin 1.9.0)
 - Test suite simplified from 571 to 15 critical tests
-- Documentation consolidated and organized
+- Documentation consolidated and organized (removed 46 obsolete files)
 - Offline-first architecture with cloud-ready interfaces
 - Story 3.12: Export validation with 13 integration tests
 - Track 1: Test infrastructure interfaces (ISyncService, IAuthService) implemented
@@ -129,16 +150,21 @@ This project uses a **minimal test strategy** following the CleanArchitectureTod
   - Database migrations applied (4 tables with RLS)
   - Auth and sync services implemented with current 2025 API
   - Integration tests configured and passing
+- Project cleanup and organization (6 clean atomic commits pushed to GitHub)
+- Documentation created for integration and testing procedures
 
 ### In Progress 🚧
-- Hybrid features implementation
 - Production Supabase deployment preparation
+- Progressive cloud enhancement features
+- User authentication UI components
 
 ### Next Steps 📋
 1. Deploy Supabase to production environment
-2. Implement progressive cloud enhancement features
-3. Add user authentication UI components
-4. Enable cloud sync with offline queue
+2. Implement user authentication UI (login/signup screens)
+3. Enable cloud sync with offline queue
+4. Add sync status indicators to UI
+5. Implement conflict resolution UI
+6. Set up CI/CD pipeline for automated deployments
 
 ### Build & Test Commands
 ```bash
@@ -164,8 +190,7 @@ npx supabase db seed                                   # Seed test data
 CI=true flutter test test/infrastructure/supabase_integration_test.dart
 
 # Utility Scripts (from root)
-bash CLEANUP_PROJECT.sh                                # Remove orphaned files
-bash apps/mobile/test/PROTECT_TESTS.sh                # Verify test count
+bash apps/mobile/test/PROTECT_TESTS.sh                # Verify test count stays at ~15
 ```
 ## Important Reminders
 
@@ -173,6 +198,7 @@ bash apps/mobile/test/PROTECT_TESTS.sh                # Verify test count
 - **NEVER** add tests without explicit discussion
 - Run `PROTECT_TESTS.sh` to verify test count stays at ~15
 - See `apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md` for rationale
+- Use real data fixtures from `lib/test/fixtures/real_data_loader.dart`
 
 ### Code Quality
 - All code changes must pass `flutter analyze`
@@ -228,6 +254,24 @@ flutter build apk \
   --dart-define=SUPABASE_URL=https://your-project.supabase.co \
   --dart-define=SUPABASE_ANON_KEY=your-anon-key
 ```
+
+## Recent Work (January 9, 2025)
+
+### Git Repository Cleanup ✅
+Successfully organized and cleaned up the entire repository:
+- **Removed**: 46 obsolete documentation and analysis files (16,878 lines)
+- **Organized**: Changes into 6 clean, atomic commits
+- **Added**: Comprehensive documentation for integration and testing
+- **Fixed**: Pre-commit hook issues with Supabase configuration
+- **Result**: Clean working tree with all changes pushed to GitHub
+
+### Commit History (Latest):
+1. `chore: Clean up project and add documentation`
+2. `docs: Update project documentation and status`
+3. `test: Update test fixtures and improve test infrastructure`
+4. `feat: Implement comprehensive export validation (Story 3.12)`
+5. `feat: Add Supabase infrastructure for cloud features`
+6. `chore: Remove obsolete documentation and analysis files`
 
 ## Recent Enhancements (January 2025)
 
