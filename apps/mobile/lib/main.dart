@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:receipt_organizer/infrastructure/config/supabase_config.dart';
 import 'package:receipt_organizer/features/capture/screens/capture_screen.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
 import 'package:receipt_organizer/features/receipts/presentation/providers/image_viewer_provider.dart';
@@ -10,22 +10,21 @@ import 'package:receipt_organizer/features/receipts/presentation/providers/image
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Load environment variables
-  await dotenv.load(fileName: ".env");
+  // Load environment variables (optional for local dev)
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    print('ℹ️ .env file not found, using default configuration');
+  }
   
-  // Initialize Supabase
-  final supabaseUrl = dotenv.env['SUPABASE_URL'];
-  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
-  
-  if (supabaseUrl != null && supabaseAnonKey != null) {
-    await Supabase.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseAnonKey,
-    );
+  // Initialize Supabase using our config
+  try {
+    await SupabaseConfig.initialize();
     print('✅ Supabase initialized successfully');
-  } else {
-    print('⚠️ Supabase credentials not found in .env file');
-    print('   Please create .env file from .env.example and add your credentials');
+    print('   URL: ${SupabaseConfig.supabaseUrl}');
+  } catch (e) {
+    print('⚠️ Supabase initialization failed: $e');
+    print('   Running in offline mode');
   }
   
   // Initialize SharedPreferences

@@ -59,7 +59,7 @@ void main() {
       await tester.pumpAndSettle();
       
       // Then - Main action buttons exist
-      expect(find.text('Batch Capture'), findsOneWidget);
+      expect(find.text('Capture Receipt'), findsOneWidget);
       expect(find.byIcon(Icons.receipt_long), findsOneWidget);
     });
   });

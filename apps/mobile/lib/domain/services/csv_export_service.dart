@@ -199,7 +199,7 @@ class CSVExportService implements ICSVExportService {
         _formatAmount(receipt.totalAmount) ?? '0.00',
         _sanitizeForCSV(receipt.merchantName ?? 'Unknown Merchant'),
         'Business Expenses', // Default category
-        'Receipt #${receipt.id.substring(0, 8)}',
+        'Receipt #${receipt.id.substring(0, receipt.id.length >= 8 ? 8 : receipt.id.length)}',
         _formatAmount(receipt.taxAmount) ?? '0.00',
         _sanitizeForCSV(receipt.notes),
       ]);
@@ -218,7 +218,7 @@ class CSVExportService implements ICSVExportService {
         _formatDate(receipt.receiptDate) ?? '',
         _formatAmount(receipt.totalAmount) ?? '0.00',
         _sanitizeForCSV(receipt.merchantName ?? 'Unknown Merchant'),
-        'Business expense - Receipt #${receipt.id.substring(0, 8)}',
+        'Business expense - Receipt #${receipt.id.substring(0, receipt.id.length >= 8 ? 8 : receipt.id.length)}',
         '400', // Default expense account code
         _formatAmount(receipt.taxAmount) ?? '0.00',
         _sanitizeForCSV(receipt.notes),

@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/data/repositories/receipt_repository.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
+import 'package:receipt_organizer/domain/services/ocr_service.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
@@ -53,21 +54,36 @@ void main() {
         id: 'yesterday',
         imageUri: '/image1.jpg',
         capturedAt: yesterday,
-        receiptDate: '12/05/2024',
+        ocrResults: ProcessingResult(
+          date: FieldData(value: '${yesterday.month.toString().padLeft(2, '0')}/${yesterday.day.toString().padLeft(2, '0')}/${yesterday.year}', confidence: 0.9, originalText: 'date'),
+          overallConfidence: 0.9,
+          processingDurationMs: 100,
+          allText: [],
+        ),
       ));
       
       await repository.createReceipt(Receipt(
         id: 'today',
         imageUri: '/image2.jpg', 
         capturedAt: now,
-        receiptDate: '12/06/2024',
+        ocrResults: ProcessingResult(
+          date: FieldData(value: '${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}', confidence: 0.9, originalText: 'date'),
+          overallConfidence: 0.9,
+          processingDurationMs: 100,
+          allText: [],
+        ),
       ));
       
       await repository.createReceipt(Receipt(
         id: 'tomorrow',
         imageUri: '/image3.jpg',
         capturedAt: tomorrow,
-        receiptDate: '12/07/2024',
+        ocrResults: ProcessingResult(
+          date: FieldData(value: '${tomorrow.month.toString().padLeft(2, '0')}/${tomorrow.day.toString().padLeft(2, '0')}/${tomorrow.year}', confidence: 0.9, originalText: 'date'),
+          overallConfidence: 0.9,
+          processingDurationMs: 100,
+          allText: [],
+        ),
       ));
 
       // When - Query for today's receipts

@@ -54,10 +54,22 @@ class Receipt {
   }
 
   // Convenience getters for OCR data
-  String? get merchantName => ocrResults?.merchant?.value as String?;
-  String? get receiptDate => ocrResults?.date?.value as String?;
-  double? get totalAmount => ocrResults?.total?.value as double?;
-  double? get taxAmount => ocrResults?.tax?.value as double?;
+  String? get merchantName => ocrResults?.merchant?.value?.toString();
+  String? get receiptDate => ocrResults?.date?.value?.toString();
+  double? get totalAmount {
+    final value = ocrResults?.total?.value;
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
+  double? get taxAmount {
+    final value = ocrResults?.tax?.value;
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
 
   bool get hasOCRResults => ocrResults != null;
   bool get isComplete => 

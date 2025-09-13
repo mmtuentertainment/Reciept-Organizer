@@ -1,0 +1,61 @@
+Date,Merchant,Total,Tax,Category,Notes
+01/15/2024,Office Depot,45.99,3.68,Office Supplies,Printer paper and pens
+01/16/2024,Starbucks,12.50,1.00,Food & Beverage,Morning coffee meeting
+01/17/2024,Best Buy,250.00,20.00,Electronics,Laptop charger replacement
+01/18/2024,Dollar Tree,5.99,0.48,General Merchandise,Cleaning supplies
+01/19/2024,Costco,487.32,38.99,Wholesale,Monthly bulk shopping
+01/20/2024,Walmart,89.99,7.20,General Merchandise,Groceries and household items
+01/21/2024,Target,156.78,12.54,General Merchandise,Clothing and home goods
+01/22/2024,Home Depot,234.56,18.76,Hardware,Paint and tools
+01/23/2024,CVS Pharmacy,42.00,3.36,Healthcare,Prescriptions
+01/24/2024,Shell Gas Station,65.43,5.23,Transportation,Fuel
+01/25/2024,McDonald's,18.67,1.49,Food & Beverage,Quick lunch
+01/26/2024,Amazon.com,543.21,43.46,Online Shopping,Various items
+01/27/2024,Whole Foods,127.89,10.23,Groceries,Organic produce
+01/28/2024,Uber,24.50,1.96,Transportation,Ride to airport
+01/29/2024,Netflix,15.99,1.28,Entertainment,Monthly subscription
+01/30/2024,Trader Joe's,78.34,6.27,Groceries,Weekly groceries
+01/31/2024,Walgreens,35.67,2.85,Healthcare,Cold medicine
+02/01/2024,7-Eleven,12.89,1.03,Convenience Store,Snacks and drinks
+02/02/2024,Lowe's,189.45,15.16,Hardware,Garden supplies
+02/03/2024,Panera Bread,28.74,2.30,Food & Beverage,Lunch meeting
+02/04/2024,FedEx Office,45.00,3.60,Business Services,Printing and shipping
+02/05/2024,Safeway,167.23,13.38,Groceries,Weekly shopping
+02/06/2024,Chevron,72.15,5.77,Transportation,Fuel
+02/07/2024,Chipotle,14.85,1.19,Food & Beverage,Dinner
+02/08/2024,Apple Store,199.00,15.92,Electronics,AirPods
+02/09/2024,Kroger,98.76,7.90,Groceries,Weekend shopping
+02/10/2024,AT&T Store,125.00,10.00,Utilities,Phone bill
+02/11/2024,Subway,9.50,0.76,Food & Beverage,Quick lunch
+02/12/2024,Barnes & Noble,54.99,4.40,Books & Media,Business books
+02/13/2024,Petco,87.43,6.99,Pet Supplies,Dog food and toys
+02/14/2024,Olive Garden,76.50,6.12,Food & Beverage,Valentine's dinner
+02/15/2024,UPS Store,23.45,1.88,Business Services,Package shipping
+02/16/2024,Publix,134.67,10.77,Groceries,Weekend shopping
+02/17/2024,BP Gas Station,58.90,4.71,Transportation,Fuel
+02/18/2024,Dunkin',8.75,0.70,Food & Beverage,Coffee and donut
+02/19/2024,Sam's Club,298.54,23.88,Wholesale,Bulk shopping
+02/20/2024,Verizon Store,145.00,11.60,Utilities,Phone upgrade
+02/21/2024,Pizza Hut,32.99,2.64,Food & Beverage,Family dinner
+02/22/2024,Ace Hardware,67.89,5.43,Hardware,Home repairs
+02/23/2024,Macy's,189.99,15.20,Clothing,New outfit
+02/24/2024,Exxon,61.23,4.90,Transportation,Fuel
+02/25/2024,Panda Express,11.50,0.92,Food & Beverage,Quick dinner
+02/26/2024,Office Max,78.45,6.28,Office Supplies,Printer ink
+02/27/2024,PetSmart,65.32,5.23,Pet Supplies,Cat litter
+02/28/2024,Texas Roadhouse,89.76,7.18,Food & Beverage,Birthday dinner
+03/01/2024,Aldi,76.54,6.12,Groceries,Budget shopping
+03/02/2024,AutoZone,145.67,11.65,Automotive,Car parts
+03/03/2024,Taco Bell,15.43,1.23,Food & Beverage,Late night snack
+03/04/2024,Best Buy,899.99,72.00,Electronics,New TV
+03/05/2024,Rite Aid,28.90,2.31,Healthcare,Vitamins
+03/06/2024,Speedway,54.32,4.35,Transportation,Fuel
+03/07/2024,Wendy's,12.87,1.03,Food & Beverage,Lunch
+03/08/2024,Harbor Freight,234.56,18.76,Tools,Power tools
+03/09/2024,Kohl's,167.89,13.43,Clothing,Spring wardrobe
+03/10/2024,Circle K,9.99,0.80,Convenience Store,Snacks
+03/11/2024,Five Guys,18.95,1.52,Food & Beverage,Burger and fries
+03/12/2024,Menards,345.67,27.65,Hardware,Lumber for project
+03/13/2024,Bath & Body Works,45.00,3.60,Personal Care,Candles and soap
+03/14/2024,Chick-fil-A,11.49,0.92,Food & Beverage,Chicken sandwich
+03/15/2024,GameStop,59.99,4.80,Entertainment,Video game
