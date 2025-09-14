@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../infrastructure/config/supabase_config.dart';
+import '../services/offline_auth_service.dart';
+import '../services/inactivity_monitor.dart';
 import 'signup_screen.dart';
 import 'forgot_password_screen.dart';
 
@@ -18,12 +20,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isOfflineMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOfflineMode();
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkOfflineMode() async {
+    final isOnline = await OfflineAuthService.isOnline();
+    if (!isOnline && mounted) {
+      final hasOfflineAuth = await OfflineAuthService.isOfflineModeAvailable();
+      setState(() {
+        _isOfflineMode = !isOnline && hasOfflineAuth;
+      });
+    }
   }
 
   Future<void> _signIn() async {
@@ -35,15 +54,66 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     try {
-      final response = await SupabaseConfig.client.auth.signInWithPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+      // Check network connectivity
+      final isOnline = await OfflineAuthService.isOnline();
 
-      if (response.user != null && mounted) {
-        Navigator.of(context).pushReplacementNamed('/');
+      if (isOnline) {
+        // Online authentication
+        final response = await SupabaseConfig.client.auth.signInWithPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+
+        if (response.user != null && response.session != null) {
+          // Cache credentials for offline access
+          await OfflineAuthService.cacheCredentials(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+          await OfflineAuthService.cacheSession(response.session!);
+
+          if (mounted) {
+            Navigator.of(context).pushReplacementNamed('/');
+          }
+        }
+      } else {
+        // Offline authentication
+        final isValid = await OfflineAuthService.verifyOfflineCredentials(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+
+        if (isValid) {
+          final session = await OfflineAuthService.getCachedSession();
+          if (session != null && mounted) {
+            // Show offline mode notification
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Signed in offline. Data will sync when online.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            Navigator.of(context).pushReplacementNamed('/');
+          } else {
+            setState(() {
+              _errorMessage = 'Offline session expired. Please connect to internet.';
+            });
+          }
+        } else {
+          setState(() {
+            _errorMessage = 'Invalid offline credentials';
+          });
+        }
       }
     } on AuthException catch (e) {
+      // Try offline auth if network error
+      if (e.message.toLowerCase().contains('network') ||
+          e.message.toLowerCase().contains('connection')) {
+        // Recursively try offline auth
+        _isOfflineMode = true;
+        await _signIn();
+        return;
+      }
       setState(() {
         _errorMessage = e.message;
       });
@@ -114,14 +184,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Sign in to your account',
-                  style: TextStyle(
+                Text(
+                  _isOfflineMode
+                      ? 'Sign in offline to access cached receipts'
+                      : 'Sign in to your account',
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
                   ),
                   textAlign: TextAlign.center,
                 ),
+                if (_isOfflineMode) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.orange),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.cloud_off, color: Colors.orange, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Offline Mode',
+                          style: TextStyle(color: Colors.orange),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 48),
                 Form(
                   key: _formKey,
