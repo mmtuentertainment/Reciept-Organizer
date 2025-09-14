@@ -1,0 +1,8 @@
+webpack.js?v=1757821473097:1367 Fetch finished loading: GET "http://localhost:3005/_next/static/webpack/c432537e38dc7159.webpack.hot-update.json".
+__webpack_require__.hmrM @ webpack.js?v=1757821473097:1367
+Promise.then
+hotCheck @ webpack.js?v=1757821473097:553
+tryApplyUpdates @ hot-reloader-client.js:161
+handleHotUpdate @ hot-reloader-client.js:200
+processMessage @ hot-reloader-client.js:292
+handler @ hot-reloader-client.js:508
