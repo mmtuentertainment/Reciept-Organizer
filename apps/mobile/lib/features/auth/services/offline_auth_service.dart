@@ -60,7 +60,7 @@ class OfflineAuthService {
       return credentials['email'] == email &&
              credentials['passwordHash'] == passwordHash;
     } catch (e) {
-      print('Error verifying offline credentials: $e');
+      // Error verifying credentials - return false
       return false;
     }
   }
@@ -79,15 +79,16 @@ class OfflineAuthService {
       }
 
       // Reconstruct session from cached data
+      final user = User.fromJson(data['user']);
       return Session(
         accessToken: data['access_token'],
         refreshToken: data['refresh_token'],
-        expiresAt: data['expires_at'],
+        expiresIn: data['expires_at'] - (DateTime.now().millisecondsSinceEpoch ~/ 1000),
         tokenType: 'bearer',
-        user: User.fromJson(data['user']),
+        user: user,
       );
     } catch (e) {
-      print('Error getting cached session: $e');
+      // Error getting cached session - return null
       return null;
     }
   }
@@ -175,7 +176,7 @@ class OfflineAuthService {
         await _secureStorage.delete(key: oldSessionKey);
       }
     } catch (e) {
-      print('Migration error (non-critical): $e');
+      // Migration error - non-critical, continue
     }
   }
 }
