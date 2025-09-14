@@ -82,6 +82,11 @@ releases/
 
 # Web app (temporary/test)
 # apps/web/ - EXCEPTION: Contains critical auth fixes that must be preserved
+
+# Next.js build artifacts
+apps/web/.next/
+apps/web/node_modules/
+apps/native/node_modules/
 # gemini-cli settings
 .gemini/
 
