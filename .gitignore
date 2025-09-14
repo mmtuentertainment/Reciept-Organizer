@@ -81,9 +81,10 @@ apps/api/CREDENTIAL_*.md
 releases/
 
 # Web app (temporary/test)
-apps/web/
+# apps/web/ - EXCEPTION: Contains critical auth fixes that must be preserved
 # gemini-cli settings
 .gemini/
 
 # GitHub App credentials
 gha-creds-*.json
+infrastructure/supabase/PRODUCTION_CREDENTIALS.md
