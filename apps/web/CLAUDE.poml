@@ -1,0 +1,132 @@
+<document>
+  <section name="UniversalDirectives">
+    <directive type="InstructionAdherence">ALL instructions within the CLAUDE.md document MUST BE FOLLOWED.</directive>
+    <directive type="ClarificationProtocol">If there is any uncertainty regarding anything within the document, ASK FOR CLARIFICATION before proceeding.</directive>
+    <directive type="CodeModificationPrinciples">Edit no more code than absolutely necessary to complete the task.</directive>
+    <directive type="TokenEfficiency">Keep all outputs succinct and do not waste tokens.</directive>
+    <description>This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.</description>
+  </section>
+
+  <section name="ProjectOverview">
+    <title>Receipt Organizer MVP</title>
+    <description>For mom-and-pop businesses, providing offline-first receipt capture, OCR processing, and CSV export. Flutter 3.35.3 with simplified 15-test strategy.</description>
+  </section>
+
+  <section name="CoreRequirements">
+    <requirement name="TargetUsers">Owner-operators, mom-and-pop businesses, solo bookkeepers (100-500 receipts/month)</requirement>
+    <requirement name="OfflineFirst">All processing must work without network connectivity</requirement>
+    <requirement name="CoreWorkflow">Photo capture → OCR extraction → CSV export</requirement>
+    <requirement name="KeyFields">Merchant, Date, Total, Tax (4 fields only for MVP)</requirement>
+  </section>
+
+  <section name="TechnicalStack">
+    <technology name="Frontend">Flutter 3.35.3 with Dart 3.2+</technology>
+    <technology name="StateManagement">Riverpod 2.4+</technology>
+    <technology name="OCREngine">Google ML Kit (primary) + TensorFlow Lite (fallback)</technology>
+    <technology name="LocalDatabase">SQLite via sqflite with RxDB reactive layer</technology>
+    <technology name="Cloud">Supabase (PostgreSQL, Auth, Realtime)</technology>
+    <technology name="Architecture">Offline-first with progressive cloud enhancement</technology>
+    <reference>See docs/sharded-architecture/tech-stack.md for complete details.</reference>
+  </section>
+
+  <section name="KeyPrinciples">
+    <principle number="1" name="KISS/YAGNI/DIW">Each change must be reversible, minimal, and measured</principle>
+    <principle number="2" name="OfflineFirst">All functionality must work without internet</principle>
+    <principle number="3" name="EvidenceBased">All technical decisions backed by research data</principle>
+    <principle number="4" name="CSVContract">Publish schemas and validate pre-export</principle>
+    <principle number="5" name="HonestOCRUX">Visible confidence scores + fast correction over perfect automation</principle>
+  </section>
+
+  <section name="TestSuiteManagement" priority="CRITICAL">
+    <warning>DO NOT ADD MORE TESTS WITHOUT EXPLICIT DISCUSSION</warning>
+    <status>Current: 15 critical tests only (down from 571)</status>
+    <location>apps/mobile/test/</location>
+    <rule>Before Adding ANY Test: Read apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md</rule>
+    <reference>For full testing strategy, see docs/TESTING_STRATEGY.md</reference>
+  </section>
+
+  <section name="EssentialCommands">
+    <commandGroup name="FlutterApp">
+      <command name="test">flutter test test/core_tests/ test/integration_tests/  # Run ONLY the 15 critical tests</command>
+      <command name="run">flutter run                                             # Run the app</command>
+      <command name="analyze">flutter analyze --no-pub                            # Check for issues</command>
+      <command name="build">flutter build apk --debug                             # Build Android APK</command>
+    </commandGroup>
+    <commandGroup name="API">
+      <command name="dev">npm run dev                                            # Start development server</command>
+      <command name="build">npm run build                                        # Build for production</command>
+      <command name="test">npm test                                              # Run API tests</command>
+    </commandGroup>
+    <commandGroup name="Supabase">
+      <command name="start">npx supabase start                                   # Start local Supabase</command>
+      <command name="stop">npx supabase stop                                     # Stop local Supabase</command>
+    </commandGroup>
+  </section>
+
+  <section name="DocumentationStructure">
+    <category name="EssentialDocuments">
+      <doc path="README.md">Project overview and navigation</doc>
+      <doc path="PROJECT_STATUS.md">Current state and next steps</doc>
+      <doc path="project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md">Original MVP specification</doc>
+    </category>
+    <category name="ArchitectureTechnical">
+      <doc path="docs/sharded-architecture/">Complete technical architecture (20 sections)</doc>
+      <doc path="docs/integration/">Integration guides for external services</doc>
+      <doc path="docs/testing/">Testing strategy and procedures</doc>
+    </category>
+    <category name="ProductFeatures">
+      <doc path="docs/sharded-prd/">Product requirements in POML format</doc>
+      <doc path="docs/stories/">User stories (1.1 through 3.12)</doc>
+      <doc path="docs/epics/">Epic definitions</doc>
+      <doc path="docs/qa/">Quality gates and assessments</doc>
+    </category>
+    <category name="Infrastructure">
+      <doc path="infrastructure/supabase/">Cloud backend configuration</doc>
+      <doc path="docs/SUPABASE_INFRASTRUCTURE.md">Detailed Supabase setup and configuration</doc>
+    </category>
+  </section>
+
+  <section name="DevelopmentConstraints">
+    <scope name="WillBuild">
+      <item number="1">Smart edge detection with manual override</item>
+      <item number="2">Confidence-based OCR with quick edit (4 fields only)</item>
+      <item number="3">Basic vendor normalization</item>
+      <item number="4">Pre-flight CSV validation with templates</item>
+      <item number="5">Offline-first local storage</item>
+      <item number="6">Batch capture and simple organizing aids</item>
+    </scope>
+    <scope name="WillNotBuild">
+      <item status="implemented">Cloud accounts/multi-user sync (NOW IMPLEMENTED via Supabase)</item>
+      <item>Bank/ERP integrations (API stubs ready for future)</item>
+      <item>Line-item extraction</item>
+      <item>Complex approvals/workflows</item>
+      <item>Heavy ML training</item>
+      <item>Multi-device support beyond one Android and one iPhone</item>
+    </scope>
+  </section>
+
+  <section name="ImportantReminders">
+    <category name="TestDiscipline">
+      <rule>NEVER add tests without explicit discussion</rule>
+      <rule>Run PROTECT_TESTS.sh to verify test count stays at ~15</rule>
+      <rule>Use real data fixtures from lib/test/fixtures/real_data_loader.dart</rule>
+    </category>
+    <category name="CodeQuality">
+      <rule>All code changes must pass flutter analyze</rule>
+      <rule>Tests must pass before any PR/merge</rule>
+      <rule>Follow patterns in existing codebase</rule>
+    </category>
+    <category name="Documentation">
+      <rule>Keep PROJECT_STATUS.md updated with progress</rule>
+      <rule>Document significant decisions in appropriate docs/ section</rule>
+      <rule>Update this file when project structure changes</rule>
+    </category>
+  </section>
+
+  <section name="AdditionalResources">
+    <resource name="ProjectHistory">docs/PROJECT_HISTORY.md</resource>
+    <resource name="TestingStrategy">docs/TESTING_STRATEGY.md</resource>
+    <resource name="SupabaseInfrastructure">docs/SUPABASE_INFRASTRUCTURE.md</resource>
+    <resource name="SuccessMetrics">project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md</resource>
+  </section>
+</document>
