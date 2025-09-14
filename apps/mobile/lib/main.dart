@@ -9,6 +9,8 @@ import 'package:receipt_organizer/features/receipts/presentation/providers/image
 import 'package:receipt_organizer/features/auth/screens/login_screen.dart';
 import 'package:receipt_organizer/features/auth/providers/auth_provider.dart';
 import 'package:receipt_organizer/features/auth/services/session_manager.dart';
+import 'package:receipt_organizer/features/auth/services/offline_auth_service.dart';
+import 'package:receipt_organizer/features/auth/services/inactivity_monitor.dart';
 import 'package:receipt_organizer/features/receipts/screens/receipts_list_screen.dart';
 
 void main() async {
@@ -35,9 +37,24 @@ void main() async {
 
     // Initialize session manager for auto-refresh
     SessionManager.initialize();
+
+    // Migrate old storage format if needed
+    await OfflineAuthService.migrateStorageIfNeeded();
+
+    // Check offline mode availability
+    final hasOfflineMode = await OfflineAuthService.isOfflineModeAvailable();
+    if (hasOfflineMode) {
+      print('✅ Offline authentication available');
+    }
   } catch (e) {
     print('⚠️ Supabase initialization failed: $e');
     print('   Running in offline mode');
+
+    // Check if we can use offline authentication
+    final hasOfflineMode = await OfflineAuthService.isOfflineModeAvailable();
+    if (hasOfflineMode) {
+      print('✅ Offline authentication available from cache');
+    }
   }
 
   // Initialize SharedPreferences
@@ -69,7 +86,15 @@ class ReceiptOrganizerApp extends ConsumerWidget {
       home: authState.when(
         data: (state) {
           if (state.session != null) {
-            return const HomeScreen();
+            // Wrap home screen with inactivity monitoring
+            return InactivityWrapper(
+              timeout: const Duration(hours: 2),
+              onTimeout: () async {
+                // Sign out on inactivity
+                await ref.read(authNotifierProvider.notifier).signOut();
+              },
+              child: const HomeScreen(),
+            );
           } else {
             return const LoginScreen();
           }
