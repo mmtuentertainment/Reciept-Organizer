@@ -9,6 +9,8 @@ gha-creds-*.json
 .env.mcp
 .env.local
 .env.production
+apps/native/.env.local
+apps/web/.env.local
 
 # Large files that shouldn't be committed
 **/*.tar.xz
