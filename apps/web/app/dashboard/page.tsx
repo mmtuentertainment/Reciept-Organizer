@@ -1,80 +1,125 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { UserMenu } from '@/components/user-menu'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Camera, FileText, Upload, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/login')
+    redirect('/auth/login')
   }
+
+  // Fetch user statistics
+  const { data: receipts } = await supabase
+    .from('receipts')
+    .select('id, total_amount, date')
+    .eq('user_id', user.id)
+    .is('deleted_at', null)
+
+  const totalReceipts = receipts?.length || 0
+  const totalAmount = receipts?.reduce((sum, r) => sum + (Number(r.total_amount) || 0), 0) || 0
+  const thisMonthReceipts = receipts?.filter(r => {
+    const receiptDate = new Date(r.date)
+    const now = new Date()
+    return receiptDate.getMonth() === now.getMonth() &&
+           receiptDate.getFullYear() === now.getFullYear()
+  }).length || 0
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b">
-        <div className="flex h-16 items-center px-4">
-          <h1 className="text-xl font-semibold">Receipt Organizer Dashboard</h1>
-          <div className="ml-auto flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user.email}</span>
-            <form action="/auth/signout" method="post">
-              <Button variant="outline" type="submit">
-                Sign Out
-              </Button>
-            </form>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-semibold">Receipt Organizer</h1>
+            </div>
+            <UserMenu />
           </div>
         </div>
       </header>
-      <main className="flex-1 p-8">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-2xl font-bold tracking-tight">Welcome back!</h2>
-          <p className="text-muted-foreground mt-2">
-            Your receipt management dashboard is being set up.
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Welcome back, {user.user_metadata?.full_name || 'User'}!
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Here's your receipt overview
           </p>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-lg border p-6">
-              <h3 className="font-semibold">Total Receipts</h3>
-              <p className="text-3xl font-bold">0</p>
-            </div>
-            <div className="rounded-lg border p-6">
-              <h3 className="font-semibold">This Month</h3>
-              <p className="text-3xl font-bold">$0</p>
-            </div>
-            <div className="rounded-lg border p-6">
-              <h3 className="font-semibold">Categories</h3>
-              <p className="text-3xl font-bold">0</p>
-            </div>
-            <div className="rounded-lg border p-6">
-              <h3 className="font-semibold">Pending</h3>
-              <p className="text-3xl font-bold">0</p>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <a
-              href="/receipts"
-              className="rounded-lg border p-6 hover:bg-accent transition-colors cursor-pointer"
-            >
-              <h3 className="font-semibold">📄 View Receipts</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Browse and manage your receipt collection
-              </p>
-            </a>
-            <div className="rounded-lg border p-6 opacity-50">
-              <h3 className="font-semibold">📸 Capture Receipt</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Coming soon: Capture receipts with your camera
-              </p>
-            </div>
-            <div className="rounded-lg border p-6 opacity-50">
-              <h3 className="font-semibold">📊 Export Data</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Coming soon: Export to CSV for accounting
-              </p>
-            </div>
-          </div>
         </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Receipts</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalReceipts}</div>
+              <p className="text-xs text-muted-foreground">All time</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">${totalAmount.toFixed(2)}</div>
+              <p className="text-xs text-muted-foreground">All time</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Month</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{thisMonthReceipts}</div>
+              <p className="text-xs text-muted-foreground">Receipts added</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>
+              Get started with managing your receipts
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link href="/capture">
+              <Button className="w-full" size="lg">
+                <Camera className="mr-2 h-5 w-5" />
+                Capture Receipt
+              </Button>
+            </Link>
+            <Link href="/upload">
+              <Button className="w-full" size="lg" variant="outline">
+                <Upload className="mr-2 h-5 w-5" />
+                Upload Receipt
+              </Button>
+            </Link>
+            <Link href="/receipts">
+              <Button className="w-full" size="lg" variant="outline">
+                <FileText className="mr-2 h-5 w-5" />
+                View All Receipts
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       </main>
     </div>
   )
