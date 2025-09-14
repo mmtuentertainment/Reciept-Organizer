@@ -6,30 +6,43 @@ import 'package:receipt_organizer/infrastructure/config/supabase_config.dart';
 import 'package:receipt_organizer/features/capture/screens/capture_screen.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
 import 'package:receipt_organizer/features/receipts/presentation/providers/image_viewer_provider.dart';
+import 'package:receipt_organizer/features/auth/screens/login_screen.dart';
+import 'package:receipt_organizer/features/auth/providers/auth_provider.dart';
+import 'package:receipt_organizer/features/auth/services/session_manager.dart';
+import 'package:receipt_organizer/features/receipts/screens/receipts_list_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Load environment variables (optional for local dev)
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
     print('ℹ️ .env file not found, using default configuration');
   }
-  
+
   // Initialize Supabase using our config
   try {
     await SupabaseConfig.initialize();
     print('✅ Supabase initialized successfully');
     print('   URL: ${SupabaseConfig.supabaseUrl}');
+
+    // Check for existing session
+    final session = SupabaseConfig.client.auth.currentSession;
+    if (session != null) {
+      print('✅ Existing session found for: ${session.user.email}');
+    }
+
+    // Initialize session manager for auto-refresh
+    SessionManager.initialize();
   } catch (e) {
     print('⚠️ Supabase initialization failed: $e');
     print('   Running in offline mode');
   }
-  
+
   // Initialize SharedPreferences
   final sharedPreferences = await SharedPreferences.getInstance();
-  
+
   runApp(
     ProviderScope(
       overrides: [
@@ -40,36 +53,64 @@ void main() async {
   );
 }
 
-class ReceiptOrganizerApp extends StatelessWidget {
+class ReceiptOrganizerApp extends ConsumerWidget {
   const ReceiptOrganizerApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+
     return MaterialApp(
       title: 'Receipt Organizer',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      home: authState.when(
+        data: (state) {
+          if (state.session != null) {
+            return const HomeScreen();
+          } else {
+            return const LoginScreen();
+          }
+        },
+        loading: () => const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+        error: (error, _) => const LoginScreen(),
+      ),
       routes: {
         '/capture': (context) => const BatchCaptureScreen(),
         '/capture/batch': (context) => const BatchCaptureScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const HomeScreen(),
       },
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receipt Organizer'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await ref.read(authNotifierProvider.notifier).signOut();
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -97,6 +138,16 @@ class HomeScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
+            if (user != null) ...[
+              const SizedBox(height: 24),
+              Text(
+                'Logged in as: ${user.email}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
             const SizedBox(height: 48),
             ElevatedButton.icon(
               onPressed: () {
@@ -120,7 +171,13 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ReceiptsListScreen(),
+                  ),
+                );
+              },
               icon: const Icon(Icons.folder),
               label: const Text('View Receipts'),
               style: OutlinedButton.styleFrom(
