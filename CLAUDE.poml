@@ -10,6 +10,8 @@
   <section name="ProjectOverview">
     <title>Receipt Organizer MVP</title>
     <description>For mom-and-pop businesses, providing offline-first receipt capture, OCR processing, and CSV export. Flutter 3.35.3 with simplified 15-test strategy.</description>
+    <status>Phase 2C Complete - Full authentication infrastructure deployed to production</status>
+    <lastUpdated>2025-01-13</lastUpdated>
   </section>
 
   <section name="CoreRequirements">
@@ -20,12 +22,14 @@
   </section>
 
   <section name="TechnicalStack">
-    <technology name="Frontend">Flutter 3.35.3 with Dart 3.2+</technology>
-    <technology name="StateManagement">Riverpod 2.4+</technology>
+    <technology name="MobileApp">Flutter 3.35.3 with Dart 3.2+ (Running on Chrome)</technology>
+    <technology name="WebApp">Next.js 15.1.3 with TypeScript, shadcn UI components</technology>
+    <technology name="StateManagement">Riverpod 2.4+ (Mobile), React Hooks (Web)</technology>
     <technology name="OCREngine">Google ML Kit (primary) + TensorFlow Lite (fallback)</technology>
     <technology name="LocalDatabase">SQLite via sqflite with RxDB reactive layer</technology>
-    <technology name="Cloud">Supabase (PostgreSQL, Auth, Realtime)</technology>
-    <technology name="Architecture">Offline-first with progressive cloud enhancement</technology>
+    <technology name="Cloud">Supabase Production (PostgreSQL, Auth, Realtime) - Project: xbadaalqaeszooyxuoac</technology>
+    <technology name="Authentication">Supabase Auth with email/password, OAuth (Google), session management</technology>
+    <technology name="Architecture">Offline-first with progressive cloud enhancement, SSR-compatible auth</technology>
     <reference>See docs/sharded-architecture/tech-stack.md for complete details.</reference>
   </section>
 
@@ -47,20 +51,48 @@
 
   <section name="EssentialCommands">
     <commandGroup name="FlutterApp">
-      <command name="test">flutter test test/core_tests/ test/integration_tests/  # Run ONLY the 15 critical tests</command>
-      <command name="run">flutter run                                             # Run the app</command>
-      <command name="analyze">flutter analyze --no-pub                            # Check for issues</command>
-      <command name="build">flutter build apk --debug                             # Build Android APK</command>
+      <command name="test">cd apps/mobile && flutter test test/core_tests/ test/integration_tests/  # Run ONLY the 15 critical tests</command>
+      <command name="run">cd apps/mobile && flutter run -d chrome --dart-define=PRODUCTION=true  # Run with production DB</command>
+      <command name="analyze">cd apps/mobile && flutter analyze --no-pub                          # Check for issues</command>
+      <command name="build">cd apps/mobile && flutter build apk --debug                           # Build Android APK</command>
+    </commandGroup>
+    <commandGroup name="WebApp">
+      <command name="dev">cd apps/web && npm run dev                             # Start Next.js dev server (port 3001)</command>
+      <command name="build">cd apps/web && npm run build                         # Build for production</command>
+      <command name="test">cd apps/web && npm test                               # Run web tests</command>
+      <command name="shadcn">cd apps/web && npx shadcn@latest add               # Add UI components</command>
     </commandGroup>
     <commandGroup name="API">
-      <command name="dev">npm run dev                                            # Start development server</command>
-      <command name="build">npm run build                                        # Build for production</command>
-      <command name="test">npm test                                              # Run API tests</command>
+      <command name="dev">cd apps/api && npm run dev                             # Start API server</command>
+      <command name="build">cd apps/api && npm run build                         # Build for production</command>
+      <command name="test">cd apps/api && npm test                               # Run API tests</command>
     </commandGroup>
     <commandGroup name="Supabase">
-      <command name="start">npx supabase start                                   # Start local Supabase</command>
-      <command name="stop">npx supabase stop                                     # Stop local Supabase</command>
+      <command name="status">Production URL: https://xbadaalqaeszooyxuoac.supabase.co</command>
+      <command name="dashboard">https://supabase.com/dashboard/project/xbadaalqaeszooyxuoac</command>
     </commandGroup>
+  </section>
+
+  <section name="CurrentStatus" priority="HIGH">
+    <phase>Phase 2C Complete - Authentication Infrastructure</phase>
+    <completed>
+      <item>Epic 5.3: Database Migration to Production Supabase</item>
+      <item>Epic 5.4: Security Configuration with RLS policies</item>
+      <item>Phase 2A: Web Dashboard Authentication (Next.js + shadcn)</item>
+      <item>Phase 2B: Mobile Flutter Authentication</item>
+      <item>Phase 2C: Enhanced Auth Features (password reset, email verification, OAuth, session management)</item>
+    </completed>
+    <running>
+      <app name="WebApp">http://localhost:3001 (Next.js with full auth)</app>
+      <app name="MobileApp">http://localhost:46131 (Flutter on Chrome with auth)</app>
+      <database>Production Supabase: xbadaalqaeszooyxuoac</database>
+    </running>
+    <nextSteps>
+      <step>Build receipt management features</step>
+      <step>Configure Supabase email templates</step>
+      <step>Deploy web app to Vercel</step>
+      <step>User acceptance testing</step>
+    </nextSteps>
   </section>
 
   <section name="DocumentationStructure">
@@ -68,6 +100,9 @@
       <doc path="README.md">Project overview and navigation</doc>
       <doc path="PROJECT_STATUS.md">Current state and next steps</doc>
       <doc path="project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md">Original MVP specification</doc>
+      <doc path="PHASE_2B_COMPLETION_REPORT.md">Mobile auth implementation report</doc>
+      <doc path="PHASE_2C_COMPLETION_REPORT.md">Enhanced auth features report</doc>
+      <doc path="WEB_AUTH_COMPLETION_REPORT.md">Web dashboard auth report</doc>
     </category>
     <category name="ArchitectureTechnical">
       <doc path="docs/sharded-architecture/">Complete technical architecture (20 sections)</doc>

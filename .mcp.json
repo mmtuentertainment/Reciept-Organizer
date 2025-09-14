@@ -11,7 +11,7 @@
       "command": "bash",
       "args": [
         "-c",
-        "source .env.mcp && npx -y @supabase/mcp-server-supabase --read-only --project-ref=$SUPABASE_PROJECT_REF"
+        "source .env.mcp && npx -y @supabase/mcp-server-supabase --project-ref=$SUPABASE_PROJECT_REF"
       ],
       "env": {
         "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
