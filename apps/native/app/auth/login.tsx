@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Alert, ScrollView, Pressable } from 'react-native';
 import { Link, router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../lib/contexts/AuthContext';
 import {
   Button,
   ButtonText,
@@ -16,13 +16,16 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { signIn, isOffline } = useAuth();
 
   async function signInWithEmail() {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter email and password');
+      return;
+    }
+
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
+    const { error } = await signIn(email, password);
 
     if (error) {
       Alert.alert('Error', error.message);
@@ -42,6 +45,13 @@ export default function LoginScreen() {
               <Text className="text-muted-foreground">
                 Sign in to manage your receipts
               </Text>
+              {isOffline && (
+                <View className="bg-yellow-100 p-2 rounded">
+                  <Text className="text-yellow-800 text-sm">
+                    Offline mode - Using cached credentials
+                  </Text>
+                </View>
+              )}
             </VStack>
 
             <VStack space="md">
