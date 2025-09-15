@@ -1,0 +1,340 @@
+# Epic 5.3: Database Migration
+@type: brownfield_epic
+@phase: production_infrastructure
+@priority: P0-CRITICAL
+@duration: 45 minutes
+@risk: HIGH
+
+## Epic Overview {
+  @goal: "Safely apply all database migrations from local development to production Supabase"
+  @outcome: "Production database schema matches local development with all tables, RLS policies, and functions"
+  @integration_requirements: "Must preserve data integrity and provide rollback capability"
+}
+
+## Background Context {
+  @current_state: "Empty production Supabase project, local migrations tested and working"
+  @problem: "Need to apply complex schema with RLS policies, triggers, and functions to production"
+  @solution: "Systematic migration with validation at each step and rollback capability"
+}
+
+## Stories {
+
+  ### Story 5.3.1: Link Production Project {
+    @type: infrastructure_story
+    @effort: 5 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a Database Administrator,
+      I want to link the Supabase CLI to the production project,
+      so that I can manage migrations and deployments.
+
+    Acceptance_Criteria: [
+      "1. Supabase CLI linked to production project",
+      "2. Connection verified with db status",
+      "3. Project ref stored in config",
+      "4. Database password securely provided"
+    ]
+
+    Integration_Verification: [
+      "IV1: Can connect to production database",
+      "IV2: CLI version compatible with production",
+      "IV3: Local project structure recognized"
+    ]
+
+    Technical_Steps: {
+      @command: |
+        cd /home/matt/FINAPP/Receipt\ Organizer/infrastructure/supabase
+        npx supabase link --project-ref YOUR_PROJECT_REF
+        # Enter database password when prompted
+        npx supabase db remote list
+      @verification: "Connection successful message"
+      @troubleshooting: [
+        "Ensure correct project ref from dashboard",
+        "Verify database password is correct",
+        "Check network connectivity"
+      ]
+    }
+  }
+
+  ### Story 5.3.2: Migration Dry Run {
+    @type: validation_story
+    @effort: 10 minutes
+    @risk: MEDIUM
+
+    User_Story: |
+      As a Database Engineer,
+      I want to perform a dry run of all migrations,
+      so that I can identify any issues before applying changes.
+
+    Acceptance_Criteria: [
+      "1. Dry run executed successfully",
+      "2. Migration plan documented",
+      "3. No destructive operations without approval",
+      "4. All migrations in correct order",
+      "5. Estimated impact assessed"
+    ]
+
+    Integration_Verification: [
+      "IV1: Migration order preserves dependencies",
+      "IV2: No conflicts with Supabase default schema",
+      "IV3: RLS policies will apply correctly"
+    ]
+
+    Validation_Steps: {
+      @command: |
+        # Generate migration plan
+        npx supabase db push --dry-run > migration_plan.txt
+
+        # Review the plan
+        cat migration_plan.txt
+
+        # Check for dangerous operations
+        grep -E "DROP|DELETE|TRUNCATE" migration_plan.txt || echo "No destructive operations found"
+
+        # Count migrations to apply
+        ls -la migrations/*.sql | wc -l
+      @review_checklist: [
+        "Check table creation order",
+        "Verify foreign key constraints",
+        "Review RLS policy creation",
+        "Confirm trigger definitions",
+        "Validate function creation"
+      ]
+      @abort_conditions: [
+        "Unexpected DROP commands",
+        "Missing critical migrations",
+        "Circular dependencies detected"
+      ]
+    }
+  }
+
+  ### Story 5.3.3: Apply Migrations {
+    @type: deployment_story
+    @effort: 15 minutes
+    @risk: HIGH
+
+    User_Story: |
+      As a DevOps Engineer,
+      I want to apply all migrations to production,
+      so that the database schema is ready for the application.
+
+    Acceptance_Criteria: [
+      "1. Pre-migration backup created",
+      "2. All migrations applied successfully",
+      "3. No errors during migration",
+      "4. Schema verification passed",
+      "5. Rollback plan documented"
+    ]
+
+    Integration_Verification: [
+      "IV1: All tables created as expected",
+      "IV2: RLS policies active on all tables",
+      "IV3: Functions and triggers operational",
+      "IV4: No data loss (empty tables expected)"
+    ]
+
+    Deployment_Process: {
+      @pre_deployment: |
+        # Create backup point (production will be empty, but good practice)
+        npx supabase db dump > pre_migration_backup_$(date +%Y%m%d_%H%M%S).sql
+        echo "Backup created"
+
+      @deployment: |
+        # Apply migrations
+        echo "Starting migration..."
+        npx supabase db push
+
+        # Check status
+        npx supabase db remote list
+
+      @post_deployment: |
+        # Verify schema
+        npx supabase db diff --use-migra
+
+        # Should show: "No differences detected"
+
+      @rollback_command: |
+        # If migration fails
+        npx supabase db reset --db-url $PROD_DATABASE_URL
+        psql $PROD_DATABASE_URL < pre_migration_backup_*.sql
+    }
+
+    Expected_Tables: [
+      "receipts",
+      "sync_metadata",
+      "export_history",
+      "user_preferences",
+      "export_configurations",
+      "export_field_mappings"
+    ]
+  }
+
+  ### Story 5.3.4: Verify Schema Integrity {
+    @type: validation_story
+    @effort: 10 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a QA Engineer,
+      I want to verify the production schema matches expectations,
+      so that I can confirm the migration was successful.
+
+    Acceptance_Criteria: [
+      "1. All expected tables exist",
+      "2. RLS enabled on all tables",
+      "3. Policies created and active",
+      "4. Functions callable",
+      "5. Triggers attached to tables"
+    ]
+
+    Integration_Verification: [
+      "IV1: Schema matches local development exactly",
+      "IV2: No missing constraints or indexes",
+      "IV3: Permissions correctly configured"
+    ]
+
+    Verification_Queries: {
+      @sql_checks: |
+        -- Check tables exist
+        SELECT tablename FROM pg_tables
+        WHERE schemaname = 'public'
+        ORDER BY tablename;
+
+        -- Verify RLS enabled
+        SELECT tablename, rowsecurity
+        FROM pg_tables
+        WHERE schemaname = 'public' AND rowsecurity = true;
+
+        -- Check policies
+        SELECT tablename, policyname, cmd
+        FROM pg_policies
+        WHERE schemaname = 'public'
+        ORDER BY tablename, policyname;
+
+        -- Verify functions
+        SELECT routine_name
+        FROM information_schema.routines
+        WHERE routine_schema = 'public';
+
+        -- Check triggers
+        SELECT trigger_name, event_object_table
+        FROM information_schema.triggers
+        WHERE trigger_schema = 'public';
+
+      @expected_results: {
+        tables_count: ">= 6",
+        rls_enabled_count: "= tables_count",
+        policies_per_table: ">= 4",
+        functions_count: ">= 2",
+        triggers_count: ">= 1"
+      }
+    }
+  }
+
+  ### Story 5.3.5: Create Migration Documentation {
+    @type: documentation_story
+    @effort: 5 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a Technical Lead,
+      I want migration documentation created,
+      so that we have a record of what was deployed.
+
+    Acceptance_Criteria: [
+      "1. Migration manifest created",
+      "2. Schema version documented",
+      "3. Rollback procedures included",
+      "4. Known issues noted",
+      "5. Next steps defined"
+    ]
+
+    Integration_Verification: [
+      "IV1: Documentation references actual migration files",
+      "IV2: Matches production state",
+      "IV3: Accessible to team"
+    ]
+
+    Documentation_Template: {
+      @file: "docs/deployment/migration-log-{{date}}.md"
+      @content: |
+        # Production Migration Log
+
+        ## Migration Details
+        - Date: {{current_date}}
+        - Project Ref: {{project_ref}}
+        - Migration Count: {{migration_count}}
+        - Schema Version: {{version}}
+
+        ## Applied Migrations
+        {{list_of_migrations}}
+
+        ## Verification Results
+        - Tables Created: {{table_count}}
+        - RLS Policies: {{policy_count}}
+        - Functions: {{function_count}}
+
+        ## Rollback Information
+        - Backup Location: {{backup_file}}
+        - Rollback Command: See Story 5.3.3
+
+        ## Next Steps
+        - Apply security verification (Epic 5.4)
+        - Configure application connections
+        - Begin testing
+    }
+  }
+}
+
+## Success Metrics {
+  @technical: [
+    "100% migrations applied successfully",
+    "Zero errors during migration",
+    "Schema diff shows no differences",
+    "All RLS policies active"
+  ]
+  @operational: [
+    "Backup created and verified",
+    "Rollback tested (if time permits)",
+    "Documentation complete",
+    "Team can connect to production"
+  ]
+}
+
+## Dependencies {
+  @requires: [
+    "Epic 5.2 completed (Supabase project exists)",
+    "Project credentials available",
+    "Migrations tested locally",
+    "Supabase CLI installed and configured"
+  ]
+  @blocks: ["Epic 5.4: Security Configuration"]
+}
+
+## Rollback Plan {
+  @trigger: "Migration failure or schema issues"
+  @procedure: [
+    "1. Stop application connections",
+    "2. Document failure point and error",
+    "3. Execute rollback command",
+    "4. Restore from backup if needed",
+    "5. Investigate and fix issue",
+    "6. Re-attempt migration"
+  ]
+  @time_to_rollback: "< 10 minutes"
+}
+
+## Risk Mitigation {
+  @high_risk_items: [
+    "Production data modification (none expected in empty DB)",
+    "RLS policy conflicts",
+    "Migration order dependencies"
+  ]
+  @mitigation: [
+    "Dry run validates before applying",
+    "Backup taken before migration",
+    "Incremental validation after each major object type",
+    "Ability to reset and retry"
+  ]
+}

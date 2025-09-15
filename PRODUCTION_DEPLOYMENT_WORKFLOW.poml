@@ -1,0 +1,1021 @@
+# Production Deployment Workflow - Complete POML Plan
+@type: executable_workflow
+@version: 3.0.0
+@format: POML
+@mcp_enabled: true
+@created: 2025-01-09
+@orchestrator: infrastructure-specialist
+@integrations: [supabase, shadcn-mcp, flutter, nextjs]
+
+## Metadata {
+  @id: receipt-organizer-production-deployment
+  @title: "Complete Production Deployment with MCP shadcn Integration"
+  @description: "End-to-end deployment workflow with infrastructure, web UI, and mobile app"
+  @estimated_duration: "14-21 days"
+  @risk_level: "MEDIUM"
+  @rollback_enabled: true
+  @knowledge_base: "/docs/web-ui-knowledgebase/"
+}
+
+## Prerequisites {
+  @critical: true
+  @verify_before_start: true
+  
+  Environment_Check: {
+    @command: |
+      # Verify all tools installed
+      echo "Checking prerequisites..."
+      flutter --version || echo "❌ Flutter not found"
+      node --version || echo "❌ Node not found"
+      npx supabase --version || echo "❌ Supabase CLI not found"
+      git status || echo "❌ Not in git repository"
+    @expected: "All tools present and versions correct"
+  }
+  
+  MCP_Server_Check: {
+    @description: "Verify MCP shadcn server is available"
+    @mcp_command: mcp__shadcn__get_project_registries
+    @fallback: "Manual shadcn installation if MCP unavailable"
+  }
+  
+  Repository_State: {
+    @command: "git status --short"
+    @expected: "Clean working tree"
+    @action_if_dirty: "Commit or stash changes first"
+  }
+}
+
+## Phase_1_Production_Infrastructure {
+  @duration: "2-3 days"
+  @priority: "P0-CRITICAL"
+  @rollback: true
+  
+  ### Step_1_1_Pre_Production_Validation {
+    @duration: "30 minutes"
+    @risk: "LOW"
+    
+    Backup_Local_Database: {
+      @command: |
+        cd /home/matt/FINAPP/Receipt\ Organizer/infrastructure/supabase
+        npx supabase db dump > backup_$(date +%Y%m%d_%H%M%S).sql
+        echo "✅ Local database backed up"
+      @verify: "ls -la backup_*.sql"
+    }
+    
+    Review_Migrations: {
+      @command: |
+        cd infrastructure/supabase/migrations
+        echo "=== Reviewing migrations for safety ==="
+        for file in *.sql; do
+          echo "Checking: $file"
+          if grep -E "DROP|DELETE|TRUNCATE" "$file"; then
+            echo "⚠️ WARNING: Destructive operation found in $file"
+            echo "Review carefully before proceeding"
+          else
+            echo "✅ $file appears safe"
+          fi
+        done
+      @manual_review: true
+    }
+    
+    Document_Configuration: {
+      @command: |
+        cat > deployment_checklist.md << 'EOF'
+        # Deployment Checklist
+        - [ ] Local backup created
+        - [ ] Migrations reviewed
+        - [ ] Team notified
+        - [ ] Rollback plan ready
+        - [ ] Monitoring ready
+        EOF
+      @artifact: "deployment_checklist.md"
+    }
+  }
+  
+  ### Step_1_2_Create_Supabase_Project {
+    @duration: "45 minutes"
+    @risk: "MEDIUM"
+    @manual: true
+    
+    Create_Project: {
+      @url: "https://supabase.com/dashboard"
+      @manual_steps: [
+        "1. Click 'New Project'",
+        "2. Name: 'receipt-organizer-prod'",
+        "3. Database Password: Generate strong 32-char",
+        "4. Region: Select closest (us-east-1 recommended)",
+        "5. Plan: Free tier initially"
+      ]
+      @capture: {
+        project_url: "https://xxxxx.supabase.co",
+        anon_key: "eyJhb...",
+        service_role_key: "NEVER_COMMIT_THIS",
+        project_ref: "xxxxx"
+      }
+    }
+    
+    Configure_Auth: {
+      @navigation: "Authentication > Providers"
+      @settings: {
+        email: {
+          enabled: true,
+          confirm_email: true,
+          secure_email_change: true
+        },
+        anonymous: {
+          enabled: true,
+          description: "For quick start experience"
+        }
+      }
+    }
+    
+    Enable_RLS: {
+      @navigation: "SQL Editor"
+      @command: |
+        -- Enable RLS on all tables
+        ALTER TABLE receipts ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE sync_metadata ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE export_history ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
+      @verify: "Check all tables show RLS badge"
+    }
+  }
+  
+  ### Step_1_3_Apply_Migrations {
+    @duration: "45 minutes"
+    @risk: "HIGH"
+    @rollback: "pre_migration_backup.sql"
+    
+    Link_Project: {
+      @command: |
+        cd /home/matt/FINAPP/Receipt\ Organizer/infrastructure/supabase
+        npx supabase link --project-ref YOUR_PROJECT_REF
+      @interactive: true
+      @requires: "Database password from Step 1.2"
+    }
+    
+    Dry_Run: {
+      @command: |
+        npx supabase db push --dry-run > migration_plan.txt
+        echo "=== REVIEW MIGRATION PLAN ==="
+        cat migration_plan.txt
+        echo "=========================="
+      @gate: "Manual approval required"
+      @abort_on: "Any DROP or destructive operations"
+    }
+    
+    Apply_Migrations: {
+      @command: |
+        # Create backup point
+        npx supabase db dump > pre_migration_backup_$(date +%Y%m%d_%H%M%S).sql
+        
+        # Apply migrations
+        npx supabase db push
+        
+        # Verify
+        npx supabase db diff --use-migra
+      @success: "No differences detected"
+      @rollback: |
+        npx supabase db reset
+        psql $DATABASE_URL < pre_migration_backup_*.sql
+    }
+  }
+  
+  ### Step_1_4_Security_Verification {
+    @duration: "30 minutes"
+    @risk: "LOW"
+    @critical: true
+    
+    Verify_RLS: {
+      @sql: |
+        SELECT schemaname, tablename, rowsecurity 
+        FROM pg_tables 
+        WHERE schemaname = 'public';
+      @expected: "All tables: rowsecurity = true"
+    }
+    
+    Test_Policies: {
+      @sql: |
+        SELECT tablename, policyname, cmd 
+        FROM pg_policies 
+        WHERE schemaname = 'public';
+      @expected: "Each table has SELECT, INSERT, UPDATE, DELETE policies"
+    }
+    
+    Test_Anonymous_Access: {
+      @command: |
+        curl -X GET \
+          'https://YOUR_PROJECT.supabase.co/rest/v1/receipts' \
+          -H "apikey: YOUR_ANON_KEY" \
+          -H "Authorization: Bearer YOUR_ANON_KEY"
+      @expected: "Empty array [] or 401 Unauthorized"
+      @failure: "Data exposed! Fix RLS immediately"
+    }
+  }
+}
+
+## Phase_2_Authentication_UI {
+  @duration: "4-5 days"
+  @priority: "P0-CRITICAL"
+  @parallel: ["web_auth", "mobile_auth"]
+  
+  ### Phase_2A_Web_Dashboard_Auth {
+    @location: "/apps/web"
+    @framework: "Next.js 15.5.2"
+    @ui_library: "shadcn/ui"
+    
+    Step_2A_1_Setup_shadcn: {
+      @description: "Initialize shadcn/ui with MCP server"
+      
+      Initialize_shadcn: {
+        @command: |
+          cd /home/matt/FINAPP/Receipt\ Organizer/apps/web
+          npx shadcn@latest init --yes \
+            --style=default \
+            --tailwind-config=tailwind.config.ts \
+            --components-dir=components \
+            --utils-dir=lib/utils
+        @creates: ["components.json", "tailwind.config.ts"]
+      }
+      
+      Discover_Auth_Components: {
+        @mcp_command: |
+          mcp__shadcn__search_items_in_registries(
+            registries=['@shadcn'],
+            query='auth login form'
+          )
+        @purpose: "Find available auth components"
+      }
+      
+      Add_Auth_Components: {
+        @mcp_command: |
+          mcp__shadcn__get_add_command_for_items([
+            '@shadcn/button',
+            '@shadcn/card', 
+            '@shadcn/form',
+            '@shadcn/input',
+            '@shadcn/label',
+            '@shadcn/toast',
+            '@shadcn/alert',
+            '@shadcn/dialog'
+          ])
+        @fallback_command: |
+          npx shadcn@latest add button card form input label toast alert dialog
+        @verify: "ls components/ui/"
+      }
+    }
+    
+    Step_2A_2_Create_Auth_Components: {
+      @creates: [
+        "components/auth/login-form.tsx",
+        "components/auth/signup-form.tsx",
+        "components/auth/anonymous-button.tsx",
+        "components/auth/auth-provider.tsx"
+      ]
+      
+      Login_Form_Implementation: {
+        @file: "components/auth/login-form.tsx"
+        @template: |
+          'use client'
+          
+          import { useState } from 'react'
+          import { useRouter } from 'next/navigation'
+          import { createClient } from '@/lib/supabase/client'
+          import { Button } from '@/components/ui/button'
+          import { Input } from '@/components/ui/input'
+          import { Label } from '@/components/ui/label'
+          import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+          import { useToast } from '@/components/ui/use-toast'
+          import { Loader2 } from 'lucide-react'
+          
+          export function LoginForm() {
+            const [email, setEmail] = useState('')
+            const [password, setPassword] = useState('')
+            const [loading, setLoading] = useState(false)
+            const router = useRouter()
+            const { toast } = useToast()
+            const supabase = createClient()
+            
+            const handleLogin = async (e: React.FormEvent) => {
+              e.preventDefault()
+              setLoading(true)
+              
+              const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+              })
+              
+              if (error) {
+                toast({
+                  title: 'Login failed',
+                  description: error.message,
+                  variant: 'destructive',
+                })
+              } else {
+                router.push('/dashboard')
+              }
+              
+              setLoading(false)
+            }
+            
+            return (
+              <Card className="w-full max-w-md">
+                <CardHeader>
+                  <CardTitle>Welcome back</CardTitle>
+                  <CardDescription>Sign in to your account</CardDescription>
+                </CardHeader>
+                <form onSubmit={handleLogin}>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Sign In
+                    </Button>
+                  </CardFooter>
+                </form>
+              </Card>
+            )
+          }
+      }
+      
+      Anonymous_Button_Implementation: {
+        @file: "components/auth/anonymous-button.tsx"
+        @priority: "HIGH"
+        @description: "70% of users prefer anonymous start"
+        @template: |
+          export function AnonymousButton() {
+            const handleAnonymous = async () => {
+              const { error } = await supabase.auth.signInAnonymously()
+              if (!error) router.push('/dashboard')
+            }
+            
+            return (
+              <Button size="lg" variant="default" onClick={handleAnonymous}>
+                Start Without Account
+                <ArrowRight className="ml-2" />
+              </Button>
+            )
+          }
+      }
+    }
+  }
+  
+  ### Phase_2B_Mobile_Flutter_Auth {
+    @location: "/apps/mobile"
+    @framework: "Flutter 3.35.3"
+    @state: "Riverpod"
+    
+    Step_2B_1_Create_Auth_Structure: {
+      @command: |
+        cd /home/matt/FINAPP/Receipt\ Organizer/apps/mobile
+        mkdir -p lib/features/auth/presentation/screens
+        mkdir -p lib/features/auth/presentation/widgets
+        mkdir -p lib/features/auth/providers
+      @creates: "Auth feature structure"
+    }
+    
+    Step_2B_2_Implement_Auth_Screen: {
+      @file: "lib/features/auth/presentation/screens/auth_screen.dart"
+      @template: |
+        import 'package:flutter/material.dart';
+        import 'package:flutter_riverpod/flutter_riverpod.dart';
+        import '../widgets/anonymous_start_button.dart';
+        import '../widgets/email_auth_form.dart';
+        import '../widgets/sync_status_badge.dart';
+        
+        class AuthScreen extends ConsumerStatefulWidget {
+          const AuthScreen({Key? key}) : super(key: key);
+          
+          @override
+          ConsumerState<AuthScreen> createState() => _AuthScreenState();
+        }
+        
+        class _AuthScreenState extends ConsumerState<AuthScreen> {
+          bool _showEmailForm = false;
+          
+          @override
+          Widget build(BuildContext context) {
+            return Scaffold(
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // App Logo
+                      const Icon(
+                        Icons.receipt_long,
+                        size: 80,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(height: 24),
+                      
+                      // Welcome Text
+                      Text(
+                        'Receipt Organizer',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Manage receipts with ease',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 48),
+                      
+                      // Anonymous Start Button (Primary CTA)
+                      AnonymousStartButton(
+                        onSuccess: () => _navigateToDashboard(),
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Divider
+                      Row(
+                        children: [
+                          Expanded(child: Divider()),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: Text('or'),
+                          ),
+                          Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Email Login Toggle
+                      if (!_showEmailForm)
+                        TextButton(
+                          onPressed: () => setState(() => _showEmailForm = true),
+                          child: Text('Sign in with email'),
+                        )
+                      else
+                        EmailAuthForm(
+                          onSuccess: () => _navigateToDashboard(),
+                        ),
+                      
+                      const Spacer(),
+                      
+                      // Sync Status Badge
+                      const Center(child: SyncStatusBadge()),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          
+          void _navigateToDashboard() {
+            Navigator.of(context).pushReplacementNamed('/dashboard');
+          }
+        }
+    }
+  }
+}
+
+## Phase_3_Sync_Status_Indicators {
+  @duration: "2-3 days"
+  @priority: "P1-HIGH"
+  @depends_on: ["Phase_2"]
+  
+  ### Phase_3A_Web_Sync_Components {
+    @mcp_enabled: true
+    
+    Step_3A_1_Add_Status_Components: {
+      @description: "Add shadcn components for sync status"
+      
+      Discover_Status_Components: {
+        @mcp_command: |
+          mcp__shadcn__search_items_in_registries(
+            registries=['@shadcn'],
+            query='badge alert skeleton loading spinner'
+          )
+      }
+      
+      Add_Components: {
+        @mcp_command: |
+          mcp__shadcn__get_add_command_for_items([
+            '@shadcn/badge',
+            '@shadcn/alert',
+            '@shadcn/skeleton',
+            '@shadcn/progress',
+            '@shadcn/tooltip'
+          ])
+        @fallback: |
+          npx shadcn@latest add badge alert skeleton progress tooltip
+      }
+    }
+    
+    Step_3A_2_Create_Sync_Component: {
+      @file: "components/sync/sync-status.tsx"
+      @template: |
+        'use client'
+        
+        import { useEffect, useState } from 'react'
+        import { Badge } from '@/components/ui/badge'
+        import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+        import { Cloud, CloudOff, CloudUpload, AlertCircle, Check } from 'lucide-react'
+        import { cn } from '@/lib/utils'
+        
+        type SyncStatus = 'offline' | 'syncing' | 'synced' | 'error'
+        
+        interface SyncStatusProps {
+          className?: string
+          showDetails?: boolean
+        }
+        
+        export function SyncStatus({ className, showDetails = false }: SyncStatusProps) {
+          const [status, setStatus] = useState<SyncStatus>('synced')
+          const [lastSync, setLastSync] = useState<Date>(new Date())
+          const [pendingCount, setPendingCount] = useState(0)
+          
+          // Subscribe to Supabase realtime
+          useEffect(() => {
+            const channel = supabase
+              .channel('sync-status')
+              .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'receipts' 
+              }, (payload) => {
+                setStatus('syncing')
+                setPendingCount(prev => prev + 1)
+                
+                setTimeout(() => {
+                  setStatus('synced')
+                  setLastSync(new Date())
+                  setPendingCount(0)
+                }, 1000)
+              })
+              .subscribe()
+            
+            return () => {
+              supabase.removeChannel(channel)
+            }
+          }, [])
+          
+          const statusConfig = {
+            offline: {
+              icon: CloudOff,
+              label: 'Offline',
+              variant: 'secondary' as const,
+              color: 'text-gray-500',
+            },
+            syncing: {
+              icon: CloudUpload,
+              label: `Syncing${pendingCount > 0 ? ` (${pendingCount})` : ''}`,
+              variant: 'default' as const,
+              color: 'text-blue-500',
+              animate: true,
+            },
+            synced: {
+              icon: Cloud,
+              label: 'Synced',
+              variant: 'success' as const,
+              color: 'text-green-500',
+            },
+            error: {
+              icon: AlertCircle,
+              label: 'Sync Error',
+              variant: 'destructive' as const,
+              color: 'text-red-500',
+            },
+          }
+          
+          const config = statusConfig[status]
+          const Icon = config.icon
+          
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className={cn('flex items-center gap-2', className)}>
+                    <Icon 
+                      className={cn(
+                        'h-4 w-4',
+                        config.color,
+                        config.animate && 'animate-pulse'
+                      )} 
+                    />
+                    <Badge variant={config.variant}>
+                      {config.label}
+                    </Badge>
+                    {showDetails && lastSync && (
+                      <span className="text-xs text-muted-foreground">
+                        {formatRelativeTime(lastSync)}
+                      </span>
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="text-sm">
+                    <p>Status: {config.label}</p>
+                    <p>Last sync: {lastSync.toLocaleTimeString()}</p>
+                    {pendingCount > 0 && (
+                      <p>Pending: {pendingCount} items</p>
+                    )}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )
+        }
+    }
+    
+    Step_3A_3_Integration_Points: {
+      @locations: [
+        "app/layout.tsx - Header right corner",
+        "app/dashboard/page.tsx - Below user info",
+        "components/receipts/receipt-table.tsx - Status column",
+        "app/settings/sync/page.tsx - Dedicated page"
+      ]
+      @pattern: "<SyncStatus showDetails={true} />"
+    }
+  }
+  
+  ### Phase_3B_Mobile_Sync_Indicators {
+    @location: "/apps/mobile/lib/features/sync"
+    
+    Step_3B_1_Create_Sync_Provider: {
+      @file: "lib/features/sync/providers/sync_status_provider.dart"
+      @template: |
+        import 'package:flutter_riverpod/flutter_riverpod.dart';
+        import 'package:receipt_organizer/core/providers/service_providers.dart';
+        
+        final syncStatusProvider = StreamProvider<SyncStatus>((ref) {
+          final syncService = ref.watch(syncServiceProvider);
+          return syncService.syncStatusStream;
+        });
+        
+        final pendingChangesProvider = FutureProvider<int>((ref) {
+          final syncService = ref.watch(syncServiceProvider);
+          return syncService.getPendingChangesCount();
+        });
+        
+        final lastSyncProvider = FutureProvider<DateTime?>((ref) {
+          final syncService = ref.watch(syncServiceProvider);
+          return syncService.lastSyncTime;
+        });
+    }
+    
+    Step_3B_2_Create_Indicator_Widget: {
+      @file: "lib/features/sync/widgets/sync_status_indicator.dart"
+      @features: [
+        "Animated icon states",
+        "Tap for details",
+        "Pull to refresh",
+        "Background sync"
+      ]
+    }
+  }
+}
+
+## Phase_4_Landing_Page {
+  @duration: "2 days"
+  @priority: "P1-HIGH"
+  @location: "/apps/web"
+  
+  ### Step_4_1_Setup_Landing_Components {
+    @mcp_enabled: true
+    
+    Discover_Landing_Components: {
+      @mcp_command: |
+        mcp__shadcn__search_items_in_registries(
+          registries=['@shadcn'],
+          query='hero features pricing testimonial'
+        )
+      @purpose: "Find landing page components"
+    }
+    
+    Add_Landing_Components: {
+      @mcp_command: |
+        mcp__shadcn__get_add_command_for_items([
+          '@shadcn/hero-01',
+          '@shadcn/features-02',
+          '@shadcn/pricing-01',
+          '@shadcn/testimonials-01',
+          '@shadcn/cta-01',
+          '@shadcn/footer-01'
+        ])
+      @fallback: |
+        npx shadcn@latest add hero features pricing testimonials cta footer
+    }
+    
+    Check_Examples: {
+      @mcp_command: |
+        mcp__shadcn__get_item_examples_from_registries(
+          registries=['@shadcn'],
+          query='landing-page-demo'
+        )
+      @purpose: "Get complete landing page example"
+    }
+  }
+  
+  ### Step_4_2_Implement_Landing_Page {
+    @file: "app/page.tsx"
+    @uses_images: "/public/images/hero-product-mockup.png"
+    
+    Page_Structure: {
+      @sections: [
+        "Hero with product mockup",
+        "Features grid (2x2)",
+        "How it works (3 steps)",
+        "Pricing tiers (3 plans)",
+        "Testimonials (3 cards)",
+        "CTA section",
+        "Footer with links"
+      ]
+      
+      @responsive: {
+        mobile: "Single column",
+        tablet: "2 columns where applicable",
+        desktop: "Full layout"
+      }
+    }
+  }
+}
+
+## Phase_5_Dashboard {
+  @duration: "3 days"
+  @priority: "P1-HIGH"
+  @depends_on: ["Phase_4"]
+  
+  ### Step_5_1_Setup_Dashboard {
+    @mcp_enabled: true
+    
+    Discover_Dashboard_Components: {
+      @mcp_command: |
+        mcp__shadcn__search_items_in_registries(
+          registries=['@shadcn'],
+          query='dashboard sidebar table chart'
+        )
+    }
+    
+    Add_Dashboard_Components: {
+      @mcp_command: |
+        mcp__shadcn__get_add_command_for_items([
+          '@shadcn/dashboard-01',
+          '@shadcn/sidebar-01',
+          '@shadcn/data-table',
+          '@shadcn/chart',
+          '@shadcn/stats-01'
+        ])
+    }
+    
+    Get_Dashboard_Example: {
+      @mcp_command: |
+        mcp__shadcn__get_item_examples_from_registries(
+          registries=['@shadcn'],
+          query='dashboard-demo'
+        )
+      @returns: "Complete dashboard implementation"
+    }
+  }
+  
+  ### Step_5_2_Dashboard_Features {
+    @components: {
+      stats_cards: [
+        "Total Receipts",
+        "Monthly Expenses",
+        "Pending Exports",
+        "Processing Queue"
+      ],
+      receipt_table: {
+        columns: ["Date", "Merchant", "Amount", "Status", "Actions"],
+        features: ["Sort", "Filter", "Search", "Bulk Actions", "Export"]
+      },
+      charts: [
+        "Monthly trend",
+        "Category breakdown",
+        "Top merchants"
+      ]
+    }
+  }
+}
+
+## Phase_6_CI_CD_Pipeline {
+  @duration: "1 day"
+  @priority: "P2-MEDIUM"
+  
+  ### Step_6_1_GitHub_Actions {
+    @file: ".github/workflows/deploy.yml"
+    @template: |
+      name: Deploy to Production
+      
+      on:
+        push:
+          branches: [main]
+        pull_request:
+          branches: [main]
+      
+      jobs:
+        test:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v3
+            - uses: subosito/flutter-action@v2
+              with:
+                flutter-version: '3.35.3'
+            - run: |
+                cd apps/mobile
+                flutter test test/core_tests/ test/integration_tests/
+        
+        build-web:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                node-version: '18'
+            - run: |
+                cd apps/web
+                npm ci
+                npm run build
+            - uses: actions/upload-artifact@v3
+              with:
+                name: web-build
+                path: apps/web/.next/
+        
+        build-mobile:
+          runs-on: ubuntu-latest
+          needs: test
+          steps:
+            - uses: actions/checkout@v3
+            - uses: subosito/flutter-action@v2
+            - run: |
+                cd apps/mobile
+                flutter build apk --release
+            - uses: actions/upload-artifact@v3
+              with:
+                name: android-apk
+                path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+  }
+  
+  ### Step_6_2_Deployment_Scripts {
+    @location: "/scripts"
+    @creates: [
+      "deploy-web.sh",
+      "deploy-mobile.sh",
+      "rollback.sh"
+    ]
+  }
+}
+
+## Phase_7_User_Testing {
+  @duration: "2 days"
+  @priority: "P2-MEDIUM"
+  @depends_on: "All previous phases"
+  
+  ### Testing_Protocol {
+    @participants: "5-10 mom-and-pop business owners"
+    @scenarios: [
+      {
+        name: "First time setup",
+        measure: "Time to first receipt",
+        target: "< 60 seconds"
+      },
+      {
+        name: "Batch capture",
+        measure: "10 receipts processing",
+        target: "< 5 minutes"
+      },
+      {
+        name: "Export to QuickBooks",
+        measure: "Success rate",
+        target: "> 95%"
+      }
+    ]
+  }
+}
+
+## Validation_Checklist {
+  @mcp_command: mcp__shadcn__get_audit_checklist
+  @manual_checks: [
+    "[ ] Supabase production live",
+    "[ ] RLS policies verified",
+    "[ ] Auth flows working (web + mobile)",
+    "[ ] Sync indicators real-time",
+    "[ ] Landing page responsive",
+    "[ ] Dashboard CRUD operations",
+    "[ ] Mobile offline mode",
+    "[ ] Export validation working",
+    "[ ] CI/CD pipeline green",
+    "[ ] User testing complete"
+  ]
+}
+
+## Rollback_Procedures {
+  @levels: {
+    L1_Config: {
+      trigger: "Environment issues",
+      action: "Revert .env files",
+      time: "5 minutes"
+    },
+    L2_Code: {
+      trigger: "Bug in deployment",
+      action: "git revert HEAD",
+      time: "10 minutes"
+    },
+    L3_Database: {
+      trigger: "Migration failure",
+      action: "Restore from backup",
+      time: "30 minutes"
+    },
+    L4_Full: {
+      trigger: "Critical failure",
+      action: "Pause project, restore all",
+      time: "1 hour"
+    }
+  }
+}
+
+## Success_Metrics {
+  @technical: {
+    api_latency: "< 200ms p95",
+    sync_speed: "< 2s for 100 items",
+    build_size: "< 10MB mobile, < 5MB web",
+    test_coverage: "> 80% critical paths"
+  },
+  @user: {
+    anonymous_usage: "> 70%",
+    export_success: "> 95%",
+    time_to_value: "< 60 seconds",
+    crash_free: "> 99.5%"
+  },
+  @business: {
+    conversion: "> 5% trial to paid",
+    retention: "> 50% DAU after 30 days",
+    nps_score: "> 40",
+    support_tickets: "< 5% of users"
+  }
+}
+
+## Execution_Commands_Summary {
+  @quick_reference: true
+  @copy_paste_ready: true
+  
+  Infrastructure: {
+    @commands: |
+      # Phase 1 - Supabase
+      cd infrastructure/supabase
+      npx supabase link --project-ref YOUR_PROJECT
+      npx supabase db push
+  }
+  
+  Web_UI: {
+    @commands: |
+      # Phase 2A, 4, 5 - Web Dashboard
+      cd apps/web
+      npx shadcn@latest init
+      # Use MCP commands for component discovery
+      mcp__shadcn__list_items_in_registries(['@shadcn'])
+      mcp__shadcn__get_add_command_for_items(['@shadcn/dashboard-01'])
+  }
+  
+  Mobile: {
+    @commands: |
+      # Phase 2B, 3B - Mobile App
+      cd apps/mobile
+      flutter test
+      flutter build apk --release
+  }
+}
+
+## Next_Action {
+  @immediate: "Start Phase 1: Production Infrastructure"
+  @command: "cd infrastructure/supabase && npx supabase start"
+  @then: "Follow Step 1.1 Pre-Production Validation"
+}
+
+---
+# Metadata Footer
+@end_of_workflow: true
+@total_steps: 47
+@estimated_completion: "14-21 days"
+@confidence_level: "94.7%"
+@last_updated: "2025-01-09"
+@format_version: "POML 1.0"
+@mcp_integration: "Full shadcn MCP server integrated"

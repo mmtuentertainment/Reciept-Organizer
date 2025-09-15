@@ -1,0 +1,210 @@
+<document>
+  <section name="UniversalDirectives">
+    <directive type="InstructionAdherence">ALL instructions within the CLAUDE.md document MUST BE FOLLOWED.</directive>
+    <directive type="ClarificationProtocol">If there is any uncertainty regarding anything within the document, ASK FOR CLARIFICATION before proceeding.</directive>
+    <directive type="CodeModificationPrinciples">Edit no more code than absolutely necessary to complete the task.</directive>
+    <directive type="TokenEfficiency">Keep all outputs succinct and do not waste tokens.</directive>
+    <description>This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.</description>
+  </section>
+
+  <section name="ProjectOverview">
+    <title>Receipt Organizer MVP</title>
+    <description>For mom-and-pop businesses, providing offline-first receipt capture, OCR processing, and CSV export. Flutter 3.35.3 with simplified 15-test strategy.</description>
+    <status>Phase 1 Complete - Database Foundation & Storage infrastructure deployed to production</status>
+    <lastUpdated>2025-09-14</lastUpdated>
+    <currentPhase>Phase 1: Database Foundation & Storage - COMPLETE</currentPhase>
+    <nextPhase>Phase 2: Authentication & User Management - READY TO START</nextPhase>
+  </section>
+
+  <section name="CoreRequirements">
+    <requirement name="TargetUsers">Owner-operators, mom-and-pop businesses, solo bookkeepers (100-500 receipts/month)</requirement>
+    <requirement name="OfflineFirst">All processing must work without network connectivity</requirement>
+    <requirement name="CoreWorkflow">Photo capture → OCR extraction → CSV export</requirement>
+    <requirement name="KeyFields">Merchant, Date, Total, Tax (4 fields only for MVP)</requirement>
+  </section>
+
+  <section name="TechnicalStack">
+    <technology name="MobileApp">Flutter 3.35.3 with Dart 3.2+ (Running on Chrome)</technology>
+    <technology name="NativeApp">React Native with Expo SDK 52, NativeWind for styling</technology>
+    <technology name="WebApp">Next.js 15.1.3 with TypeScript, shadcn UI components, Tailwind CSS</technology>
+    <technology name="StateManagement">Riverpod 2.4+ (Mobile), React Hooks (Web), React Context (Native)</technology>
+    <technology name="OCREngine">Google Vision API for both web and mobile (1000 free requests/month)</technology>
+    <technology name="LocalDatabase">SQLite via sqflite with RxDB reactive layer</technology>
+    <technology name="Cloud">Supabase Production (PostgreSQL, Auth, Realtime) - Project: xbadaalqaeszooyxuoac</technology>
+    <technology name="Database">Enhanced schema with 6 tables, 100+ columns, 25 indexes, 16 RLS policies</technology>
+    <technology name="Storage">Supabase Storage with secure buckets, quota tracking, signed URLs</technology>
+    <technology name="Categories">12 default business categories with auto-seeding (52 total in production)</technology>
+    <technology name="Authentication">Supabase Auth with email/password, OAuth (Google), session management, base64 cookie support</technology>
+    <technology name="Architecture">Offline-first with progressive cloud enhancement, SSR-compatible auth</technology>
+    <technology name="Debugging">VS Code configurations for Next.js, React Native, and full-stack debugging</technology>
+    <reference>See docs/sharded-architecture/tech-stack.md for complete details.</reference>
+  </section>
+
+  <section name="KeyPrinciples">
+    <principle number="1" name="KISS/YAGNI/DIW">Each change must be reversible, minimal, and measured</principle>
+    <principle number="2" name="OfflineFirst">All functionality must work without internet</principle>
+    <principle number="3" name="EvidenceBased">All technical decisions backed by research data</principle>
+    <principle number="4" name="CSVContract">Publish schemas and validate pre-export</principle>
+    <principle number="5" name="HonestOCRUX">Visible confidence scores + fast correction over perfect automation</principle>
+  </section>
+
+  <section name="TestSuiteManagement" priority="CRITICAL">
+    <warning>DO NOT ADD MORE TESTS WITHOUT EXPLICIT DISCUSSION</warning>
+    <status>Current: 15 critical tests only (down from 571)</status>
+    <location>apps/mobile/test/</location>
+    <rule>Before Adding ANY Test: Read apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md</rule>
+    <reference>For full testing strategy, see docs/TESTING_STRATEGY.md</reference>
+  </section>
+
+  <section name="EssentialCommands">
+    <commandGroup name="FlutterApp">
+      <command name="test">cd apps/mobile && flutter test test/core_tests/ test/integration_tests/  # Run ONLY the 15 critical tests</command>
+      <command name="run">cd apps/mobile && flutter run -d chrome --dart-define=PRODUCTION=true  # Run with production DB</command>
+      <command name="analyze">cd apps/mobile && flutter analyze --no-pub                          # Check for issues</command>
+      <command name="build">cd apps/mobile && flutter build apk --debug                           # Build Android APK</command>
+    </commandGroup>
+    <commandGroup name="WebApp">
+      <command name="dev">cd apps/web && npm run dev                             # Start Next.js dev server (port 3001)</command>
+      <command name="build">cd apps/web && npm run build                         # Build for production</command>
+      <command name="test">cd apps/web && npm test                               # Run web tests</command>
+      <command name="debug">cd apps/web && npm run dev:debug                     # Start with Node.js debugging</command>
+      <command name="shadcn">cd apps/web && npx shadcn@latest add               # Add UI components</command>
+    </commandGroup>
+    <commandGroup name="NativeApp">
+      <command name="start">cd apps/native && npm start                          # Start Expo development server</command>
+      <command name="ios">cd apps/native && npm run ios                          # Run on iOS simulator</command>
+      <command name="android">cd apps/native && npm run android                  # Run on Android emulator</command>
+      <command name="web">cd apps/native && npm run web                          # Run in web browser</command>
+    </commandGroup>
+    <commandGroup name="API">
+      <command name="dev">cd apps/api && npm run dev                             # Start API server</command>
+      <command name="build">cd apps/api && npm run build                         # Build for production</command>
+      <command name="test">cd apps/api && npm test                               # Run API tests</command>
+    </commandGroup>
+    <commandGroup name="Supabase">
+      <command name="status">Production URL: https://xbadaalqaeszooyxuoac.supabase.co</command>
+      <command name="dashboard">https://supabase.com/dashboard/project/xbadaalqaeszooyxuoac</command>
+    </commandGroup>
+  </section>
+
+  <section name="CurrentStatus" priority="HIGH">
+    <phase>Phase 1 Complete - Database Foundation & Storage Infrastructure</phase>
+    <completed>
+      <item>Phase 1: Database Foundation & Storage (3 stories, 100% complete)</item>
+      <item>Story 1.1: Enhanced Database Schema (30 fields, categories table, RLS)</item>
+      <item>Story 1.2: Storage Configuration (6 helper functions, quota tracking)</item>
+      <item>Story 1.3: Default Categories Seeding (12 business categories, auto-seeding)</item>
+      <item>Database: 6 tables, 100+ columns, 25 indexes deployed</item>
+      <item>Security: 16 RLS policies active, user isolation complete</item>
+      <item>Performance: Query speeds 0.156ms (target <200ms achieved)</item>
+      <item>Categories: 52 categories seeded for 5 production users</item>
+      <item>Storage: Secure buckets, 100MB quotas, path validation</item>
+      <item>Testing: 29 tests passing, 7 risks mitigated</item>
+    </completed>
+    <running>
+      <app name="WebApp">http://localhost:3001 (Next.js with working authentication)</app>
+      <app name="MobileApp">http://localhost:46131 (Flutter on Chrome with auth)</app>
+      <app name="NativeApp">Expo React Native app with receipt capture</app>
+      <database>Production Supabase: xbadaalqaeszooyxuoac</database>
+    </running>
+    <securityNote>
+      <warning>Google Vision API key was exposed in commits - MUST BE ROTATED</warning>
+      <fixed>Removed from git history, added .env.example templates</fixed>
+    </securityNote>
+    <mobileIntegrationGaps>
+      <gap priority="HIGH">Categories: 52 in database, 0 mobile support</gap>
+      <gap priority="HIGH">Fields: 14 new fields unmapped in Flutter models</gap>
+      <gap priority="MEDIUM">Storage: Helper functions unused in mobile</gap>
+      <gap priority="MEDIUM">Field names: merchantName vs vendor_name mismatch</gap>
+      <reference>See docs/MOBILE_INTEGRATION_TODO.md for implementation plan</reference>
+    </mobileIntegrationGaps>
+    <nextSteps>
+      <step>Phase 2: Authentication & User Management</step>
+      <step>Mobile: Implement category support (critical)</step>
+      <step>Mobile: Map new database fields to Flutter models</step>
+      <step>Mobile: Integrate Supabase storage functions</step>
+      <step>Monitor: Storage quota usage in production</step>
+    </nextSteps>
+  </section>
+
+  <section name="DocumentationStructure">
+    <category name="EssentialDocuments">
+      <doc path="README.md">Project overview and navigation</doc>
+      <doc path="PROJECT_STATUS.md">Current state and next steps</doc>
+      <doc path="project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md">Original MVP specification</doc>
+      <doc path="PHASE_1_EXECUTIVE_SUMMARY.md">Phase 1 completion executive summary</doc>
+      <doc path="docs/phases/PHASE_1_COMPLETION_REPORT.md">Detailed Phase 1 completion report</doc>
+      <doc path="docs/qa/PHASE_1_AUDIT_REPORT.md">Phase 1 comprehensive audit</doc>
+      <doc path="docs/qa/FULL_STACK_INTEGRATION_AUDIT.md">Full stack integration analysis</doc>
+      <doc path="docs/MOBILE_INTEGRATION_TODO.md">Mobile app integration requirements</doc>
+    </category>
+    <category name="ArchitectureTechnical">
+      <doc path="docs/sharded-architecture/">Complete technical architecture (20 sections)</doc>
+      <doc path="docs/integration/">Integration guides for external services</doc>
+      <doc path="docs/testing/">Testing strategy and procedures</doc>
+    </category>
+    <category name="ProductFeatures">
+      <doc path="docs/sharded-prd/">Product requirements in POML format</doc>
+      <doc path="docs/stories/">User stories (1.1 through 3.12)</doc>
+      <doc path="docs/epics/">Epic definitions</doc>
+      <doc path="docs/qa/">Quality gates and assessments</doc>
+    </category>
+    <category name="Infrastructure">
+      <doc path="infrastructure/supabase/">Cloud backend configuration</doc>
+      <doc path="infrastructure/supabase/migrations/">Database migrations (002-004 complete)</doc>
+      <doc path="docs/SUPABASE_INFRASTRUCTURE.md">Detailed Supabase setup and configuration</doc>
+    </category>
+    <category name="Phase1Artifacts">
+      <doc path="docs/stories/1.1-enhanced-database-schema.md">Story 1.1: Enhanced schema implementation</doc>
+      <doc path="docs/stories/1.2-storage-configuration.md">Story 1.2: Storage configuration</doc>
+      <doc path="docs/stories/1.3-default-categories-seeding.md">Story 1.3: Categories seeding</doc>
+      <doc path="infrastructure/supabase/migrations/002_enhanced_receipt_schema.sql">Enhanced schema migration</doc>
+      <doc path="infrastructure/supabase/migrations/003_storage_configuration.sql">Storage functions migration</doc>
+      <doc path="infrastructure/supabase/migrations/004_default_categories_seeding.sql">Categories migration</doc>
+    </category>
+  </section>
+
+  <section name="DevelopmentConstraints">
+    <scope name="WillBuild">
+      <item number="1">Smart edge detection with manual override</item>
+      <item number="2">Confidence-based OCR with quick edit (4 fields only)</item>
+      <item number="3">Basic vendor normalization</item>
+      <item number="4">Pre-flight CSV validation with templates</item>
+      <item number="5">Offline-first local storage</item>
+      <item number="6">Batch capture and simple organizing aids</item>
+    </scope>
+    <scope name="WillNotBuild">
+      <item status="implemented">Cloud accounts/multi-user sync (NOW IMPLEMENTED via Supabase)</item>
+      <item>Bank/ERP integrations (API stubs ready for future)</item>
+      <item>Line-item extraction</item>
+      <item>Complex approvals/workflows</item>
+      <item>Heavy ML training</item>
+      <item>Multi-device support beyond one Android and one iPhone</item>
+    </scope>
+  </section>
+
+  <section name="ImportantReminders">
+    <category name="TestDiscipline">
+      <rule>NEVER add tests without explicit discussion</rule>
+      <rule>Run PROTECT_TESTS.sh to verify test count stays at ~15</rule>
+      <rule>Use real data fixtures from lib/test/fixtures/real_data_loader.dart</rule>
+    </category>
+    <category name="CodeQuality">
+      <rule>All code changes must pass flutter analyze</rule>
+      <rule>Tests must pass before any PR/merge</rule>
+      <rule>Follow patterns in existing codebase</rule>
+    </category>
+    <category name="Documentation">
+      <rule>Keep PROJECT_STATUS.md updated with progress</rule>
+      <rule>Document significant decisions in appropriate docs/ section</rule>
+      <rule>Update this file when project structure changes</rule>
+    </category>
+  </section>
+
+  <section name="AdditionalResources">
+    <resource name="ProjectHistory">docs/PROJECT_HISTORY.md</resource>
+    <resource name="TestingStrategy">docs/TESTING_STRATEGY.md</resource>
+    <resource name="SupabaseInfrastructure">docs/SUPABASE_INFRASTRUCTURE.md</resource>
+    <resource name="SuccessMetrics">project_brief_mom_and_pop_receipt_organizer_mvp_v_1.md</resource>
+  </section>
+</document>

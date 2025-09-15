@@ -1,0 +1,55 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js Web: debug server-side",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/apps/web"
+    },
+    {
+      "name": "Next.js Web: debug client-side",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3002"
+    },
+    {
+      "name": "Next.js Web: debug client-side (Firefox)",
+      "type": "firefox",
+      "request": "launch",
+      "url": "http://localhost:3002",
+      "reAttach": true,
+      "pathMappings": [
+        {
+          "url": "webpack://_N_E",
+          "path": "${workspaceFolder}/apps/web"
+        }
+      ]
+    },
+    {
+      "name": "Next.js Web: debug full stack",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/web/node_modules/next/dist/bin/next",
+      "args": ["dev", "-p", "3002"],
+      "cwd": "${workspaceFolder}/apps/web",
+      "runtimeArgs": ["--inspect"],
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "action": "debugWithEdge",
+        "killOnServerStop": true,
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "webRoot": "${workspaceFolder}/apps/web"
+      }
+    },
+    {
+      "name": "React Native: debug",
+      "type": "reactnative",
+      "request": "launch",
+      "platform": "android",
+      "cwd": "${workspaceFolder}/apps/native"
+    }
+  ]
+}
