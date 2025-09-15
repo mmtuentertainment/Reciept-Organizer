@@ -5,11 +5,17 @@
 class ProductionConfig {
   ProductionConfig._();
 
-  /// Production Supabase URL
-  static const String supabaseUrl = 'https://xbadaalqaeszooyxuoac.supabase.co';
+  /// Production Supabase URL - MUST be provided via --dart-define
+  static const String supabaseUrl = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: '',
+  );
 
-  /// Production Supabase Anon Key (safe to expose - RLS protected)
-  static const String supabaseAnonKey = '[REDACTED_SUPABASE_ANON_KEY]';
+  /// Production Supabase Anon Key - MUST be provided via --dart-define
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue: '',
+  );
 
   /// Production API URL (if using separate API)
   static const String apiUrl = 'https://receipt-organizer-api.vercel.app';
