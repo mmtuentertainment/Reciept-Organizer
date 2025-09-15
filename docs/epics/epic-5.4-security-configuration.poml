@@ -1,0 +1,349 @@
+# Epic 5.4: Security Configuration
+@type: brownfield_epic
+@phase: production_infrastructure
+@priority: P0-CRITICAL
+@duration: 30 minutes
+@risk: LOW
+
+## Epic Overview {
+  @goal: "Verify and strengthen security configuration for production Supabase deployment"
+  @outcome: "Production environment secured with verified RLS, tested policies, and documented security posture"
+  @integration_requirements: "Must maintain compatibility with mobile and web applications while enforcing security"
+}
+
+## Background Context {
+  @current_state: "Migrations applied, basic RLS enabled, authentication configured"
+  @problem: "Need to verify security is properly enforced and no data leaks exist"
+  @solution: "Comprehensive security verification and hardening process"
+}
+
+## Stories {
+
+  ### Story 5.4.1: Verify RLS Enforcement {
+    @type: security_story
+    @effort: 10 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a Security Engineer,
+      I want to verify RLS is enforced on all tables,
+      so that no unauthorized data access is possible.
+
+    Acceptance_Criteria: [
+      "1. All public tables have RLS enabled",
+      "2. No tables accessible without authentication",
+      "3. Service role access documented",
+      "4. Verification queries executed successfully"
+    ]
+
+    Integration_Verification: [
+      "IV1: Application can still access authorized data",
+      "IV2: Anonymous users properly restricted",
+      "IV3: Cross-user data isolation confirmed"
+    ]
+
+    Verification_Queries: {
+      @sql: |
+        -- Verify RLS is enabled on all tables
+        SELECT
+          schemaname,
+          tablename,
+          rowsecurity,
+          CASE
+            WHEN rowsecurity = true THEN '✅ Protected'
+            ELSE '❌ EXPOSED - FIX IMMEDIATELY'
+          END as status
+        FROM pg_tables
+        WHERE schemaname = 'public'
+        ORDER BY tablename;
+
+        -- Check for any tables without policies
+        SELECT
+          t.tablename,
+          COUNT(p.policyname) as policy_count,
+          CASE
+            WHEN COUNT(p.policyname) = 0 THEN '❌ No policies!'
+            WHEN COUNT(p.policyname) < 4 THEN '⚠️ Limited policies'
+            ELSE '✅ Policies configured'
+          END as status
+        FROM pg_tables t
+        LEFT JOIN pg_policies p ON t.tablename = p.tablename
+        WHERE t.schemaname = 'public'
+        GROUP BY t.tablename
+        ORDER BY policy_count, t.tablename;
+
+      @expected: {
+        all_tables_rls: true,
+        min_policies_per_table: 4,
+        no_exposed_tables: true
+      }
+    }
+  }
+
+  ### Story 5.4.2: Test Anonymous Access {
+    @type: security_story
+    @effort: 10 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a Security Auditor,
+      I want to test anonymous access to the API,
+      so that I can confirm data is properly protected.
+
+    Acceptance_Criteria: [
+      "1. Anonymous API calls tested",
+      "2. No data returned without auth",
+      "3. Proper error messages returned",
+      "4. Results documented"
+    ]
+
+    Integration_Verification: [
+      "IV1: Anonymous auth still works for allowed operations",
+      "IV2: API returns appropriate status codes",
+      "IV3: No sensitive data in error messages"
+    ]
+
+    Security_Tests: {
+      @test_anonymous_read: |
+        # Test reading receipts without auth
+        curl -X GET \
+          'https://YOUR_PROJECT.supabase.co/rest/v1/receipts' \
+          -H "apikey: YOUR_ANON_KEY" \
+          -H "Authorization: Bearer YOUR_ANON_KEY"
+
+        # Expected: [] (empty array) or 401
+
+      @test_anonymous_write: |
+        # Test writing without auth
+        curl -X POST \
+          'https://YOUR_PROJECT.supabase.co/rest/v1/receipts' \
+          -H "apikey: YOUR_ANON_KEY" \
+          -H "Authorization: Bearer YOUR_ANON_KEY" \
+          -H "Content-Type: application/json" \
+          -d '{"merchant": "Test", "amount": 100}'
+
+        # Expected: 401 Unauthorized or 403 Forbidden
+
+      @test_user_isolation: |
+        # Test that authenticated users can't see each other's data
+        # This requires creating test users and will be done in app testing
+
+      @expected_results: [
+        "No data exposed to anonymous users",
+        "Write operations blocked",
+        "Appropriate error codes returned"
+      ]
+    }
+  }
+
+  ### Story 5.4.3: Validate Policy Logic {
+    @type: security_story
+    @effort: 5 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a Database Administrator,
+      I want to validate all RLS policies are correctly configured,
+      so that the security model works as designed.
+
+    Acceptance_Criteria: [
+      "1. All policies reviewed for logic errors",
+      "2. User ID checks confirmed in policies",
+      "3. Anonymous user policies validated",
+      "4. Service role bypass understood"
+    ]
+
+    Integration_Verification: [
+      "IV1: Policies match application requirements",
+      "IV2: No overly permissive policies",
+      "IV3: Policies align with user stories"
+    ]
+
+    Policy_Review: {
+      @sql: |
+        -- Review all policies with their definitions
+        SELECT
+          tablename,
+          policyname,
+          cmd as operation,
+          qual as check_condition,
+          with_check as insert_condition,
+          roles
+        FROM pg_policies
+        WHERE schemaname = 'public'
+        ORDER BY tablename, policyname;
+
+        -- Specifically check user isolation
+        SELECT
+          tablename,
+          policyname,
+          CASE
+            WHEN qual::text LIKE '%auth.uid()%' THEN '✅ User isolated'
+            WHEN qual IS NULL THEN '⚠️ No check condition'
+            ELSE '⚠️ Review needed'
+          END as isolation_status
+        FROM pg_policies
+        WHERE schemaname = 'public'
+        AND cmd IN ('SELECT', 'UPDATE', 'DELETE')
+        ORDER BY tablename;
+
+      @checklist: [
+        "All SELECT policies check auth.uid()",
+        "INSERT policies validate user ownership",
+        "UPDATE policies restrict to owner",
+        "DELETE policies restrict to owner",
+        "Anonymous policies properly limited"
+      ]
+    }
+  }
+
+  ### Story 5.4.4: Configure API Security {
+    @type: configuration_story
+    @effort: 5 minutes
+    @risk: LOW
+
+    User_Story: |
+      As an API Security Engineer,
+      I want to verify API security settings,
+      so that the API is protected against common attacks.
+
+    Acceptance_Criteria: [
+      "1. Rate limiting understood and documented",
+      "2. CORS settings appropriate",
+      "3. API key rotation schedule defined",
+      "4. Monitoring approach documented"
+    ]
+
+    Integration_Verification: [
+      "IV1: Web app can make CORS requests",
+      "IV2: Mobile app can connect",
+      "IV3: Rate limits don't impact normal usage"
+    ]
+
+    Security_Configuration: {
+      @verify_settings: [
+        "Check rate limits in Supabase dashboard",
+        "Verify CORS allows production domains",
+        "Confirm JWT expiry appropriate",
+        "Review API logs for anomalies"
+      ]
+
+      @document: {
+        rate_limits: {
+          free_tier: "300 requests per hour per IP",
+          authenticated: "Counted against project limits",
+          recommendation: "Implement client-side throttling"
+        },
+        cors: {
+          allowed_origins: ["https://your-domain.com", "app://"],
+          credentials: true
+        },
+        key_rotation: {
+          schedule: "Every 90 days",
+          procedure: "Update env vars and redeploy"
+        }
+      }
+    }
+  }
+
+  ### Story 5.4.5: Create Security Runbook {
+    @type: documentation_story
+    @effort: 5 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a Security Operations Engineer,
+      I want a security runbook created,
+      so that we can respond to security incidents quickly.
+
+    Acceptance_Criteria: [
+      "1. Common security scenarios documented",
+      "2. Response procedures defined",
+      "3. Escalation path clear",
+      "4. Key rotation procedure included"
+    ]
+
+    Integration_Verification: [
+      "IV1: Runbook references actual infrastructure",
+      "IV2: Procedures tested where possible",
+      "IV3: Team aware of runbook location"
+    ]
+
+    Runbook_Template: {
+      @file: "docs/security/production-security-runbook.md"
+      @sections: [
+        "## Incident Response",
+        "### Suspected Data Breach",
+        "1. Immediately rotate all API keys",
+        "2. Review audit logs",
+        "3. Identify affected users",
+        "4. Notify team lead",
+        "",
+        "### Key Exposure",
+        "1. Rotate exposed key immediately",
+        "2. Review logs for unauthorized access",
+        "3. Update all deployments",
+        "4. Document incident",
+        "",
+        "## Regular Security Tasks",
+        "- Weekly: Review API logs",
+        "- Monthly: Audit RLS policies",
+        "- Quarterly: Rotate API keys",
+        "- Annually: Full security review",
+        "",
+        "## Emergency Contacts",
+        "- Security Lead: [contact]",
+        "- Supabase Support: support@supabase.io",
+        "- On-call Engineer: [rotation]"
+      ]
+    }
+  }
+}
+
+## Success Metrics {
+  @security: [
+    "100% tables have RLS enabled",
+    "Zero unauthorized data access",
+    "All policies validated",
+    "Security runbook created"
+  ]
+  @operational: [
+    "API tests pass security checks",
+    "Documentation complete",
+    "Team trained on procedures",
+    "Monitoring in place"
+  ]
+}
+
+## Dependencies {
+  @requires: [
+    "Epic 5.3 completed (migrations applied)",
+    "API keys available",
+    "curl or similar tool for testing"
+  ]
+  @blocks: ["Phase 2: Authentication UI"]
+}
+
+## Rollback Plan {
+  @trigger: "Security vulnerability discovered"
+  @procedure: [
+    "1. If critical: Disable public API access",
+    "2. Fix vulnerable policies",
+    "3. Re-test security",
+    "4. Re-enable access",
+    "5. Audit for any unauthorized access"
+  ]
+  @time_to_rollback: "< 5 minutes for API disable"
+}
+
+## Security Checklist {
+  @must_verify: [
+    "[ ] All tables have RLS enabled",
+    "[ ] No data exposed to anonymous users",
+    "[ ] Policies check user ownership",
+    "[ ] API keys stored securely",
+    "[ ] Service role key never exposed",
+    "[ ] Monitoring configured",
+    "[ ] Security runbook created"
+  ]
+}

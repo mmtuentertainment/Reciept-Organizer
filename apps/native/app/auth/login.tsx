@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, Alert, ScrollView, Pressable } from 'react-native';
 import { Link, router } from 'expo-router';
-import { useAuth } from '../../lib/contexts/AuthContext';
-import { OfflineAuthService } from '../../lib/services/offlineAuthService';
+import { supabase } from '../../lib/supabase';
 import {
   Button,
   ButtonText,
@@ -17,31 +16,17 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isOfflineMode, setIsOfflineMode] = useState(false);
-  const { signIn, isOffline } = useAuth();
-
-  useEffect(() => {
-    checkOfflineMode();
-  }, []);
-
-  async function checkOfflineMode() {
-    const isOnline = await OfflineAuthService.isOnline();
-    if (!isOnline) {
-      const hasOfflineAuth = await OfflineAuthService.isOfflineModeAvailable();
-      setIsOfflineMode(!isOnline && hasOfflineAuth);
-    }
-  }
 
   async function signInWithEmail() {
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
 
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      if (isOffline) {
-        Alert.alert('Offline Mode', 'Signed in offline. Data will sync when online.');
-      }
       router.replace('/');
     }
     setLoading(false);
@@ -55,22 +40,9 @@ export default function LoginScreen() {
             <VStack space="sm">
               <Heading size="xl">Welcome Back</Heading>
               <Text className="text-muted-foreground">
-                {isOfflineMode
-                  ? 'Sign in offline to access cached receipts'
-                  : 'Sign in to manage your receipts'}
+                Sign in to manage your receipts
               </Text>
             </VStack>
-
-            {isOfflineMode && (
-              <View className="p-3 bg-orange-100 rounded-lg border border-orange-300">
-                <View className="flex-row items-center">
-                  <Text className="text-orange-600 font-medium">⚠️ Offline Mode</Text>
-                </View>
-                <Text className="text-orange-600 text-sm mt-1">
-                  Limited functionality available
-                </Text>
-              </View>
-            )}
 
             <VStack space="md">
               <VStack space="xs">

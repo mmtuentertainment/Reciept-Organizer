@@ -76,8 +76,8 @@ dependencies:
   flutter_background_service_ios: ^5.0.2
 
   # Network Connectivity
+  connectivity_plus: ^6.1.1
   internet_connection_checker: ^3.0.1
-  # connectivity_plus comes as dependency of internet_connection_checker (^6.1.1)
 
 dev_dependencies:
   flutter_test:

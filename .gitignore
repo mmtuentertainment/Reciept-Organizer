@@ -5,6 +5,13 @@ apps/mobile/tmp/
 .gemini/
 gha-creds-*.json
 
+# Environment files with sensitive data
+.env.mcp
+.env.local
+.env.production
+apps/native/.env.local
+apps/web/.env.local
+
 # Large files that shouldn't be committed
 **/*.tar.xz
 **/*.tar.gz
@@ -76,7 +83,12 @@ apps/api/CREDENTIAL_*.md
 releases/
 
 # Web app (temporary/test)
-apps/web/
+# apps/web/ - EXCEPTION: Contains critical auth fixes that must be preserved
+
+# Next.js build artifacts
+apps/web/.next/
+apps/web/node_modules/
+apps/native/node_modules/
 # gemini-cli settings
 .gemini/
 
