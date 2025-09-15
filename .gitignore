@@ -83,3 +83,6 @@ apps/web/
 # GitHub App credentials
 gha-creds-*.json
 infrastructure/supabase/PRODUCTION_CREDENTIALS.md
+
+# Local documentation (not for repo)
+local-docs/
