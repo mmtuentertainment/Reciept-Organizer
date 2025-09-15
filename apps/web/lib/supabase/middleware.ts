@@ -36,7 +36,13 @@ export async function updateSession(request: NextRequest) {
     // Log Supabase connection error but don't block the request
     console.warn('Supabase connection error in middleware:', error)
     // Clear any invalid auth cookies
-    supabaseResponse.cookies.delete('sb-xbadaalqaeszooyxuoac-auth-token')
+    // Delete the auth token cookie - the prefix depends on your Supabase project
+    // Format: sb-[project-ref]-auth-token
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    const projectRef = supabaseUrl.split('.')[0]?.split('//')[1] || ''
+    if (projectRef) {
+      supabaseResponse.cookies.delete(`sb-${projectRef}-auth-token`)
+    }
   }
 
   return supabaseResponse

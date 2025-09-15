@@ -3,8 +3,15 @@ import { createClient } from '@supabase/supabase-js'
 import * as SecureStore from 'expo-secure-store'
 import { Platform } from 'react-native'
 
-const supabaseUrl = 'https://xbadaalqaeszooyxuoac.supabase.co'
-const supabaseAnonKey = '[REDACTED_SUPABASE_ANON_KEY]'
+// These MUST be set in your .env.local file - NEVER hardcode them
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Missing Supabase environment variables. Please create a .env.local file with EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY'
+  )
+}
 
 // Custom storage adapter for Expo SecureStore
 const ExpoSecureStoreAdapter = {
