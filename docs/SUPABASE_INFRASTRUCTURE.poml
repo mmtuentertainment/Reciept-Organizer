@@ -1,0 +1,75 @@
+<supabase-infrastructure>
+  <section name="LocalDevelopmentSetup">
+    <description>The project includes a fully configured Supabase setup for cloud features</description>
+    <configuration>
+      <endpoint name="LocalURL">http://127.0.0.1:54321</endpoint>
+      <endpoint name="Dashboard">http://127.0.0.1:54323</endpoint>
+      <endpoint name="Database">PostgreSQL on port 54322</endpoint>
+      <path name="Migrations">infrastructure/supabase/migrations/</path>
+    </configuration>
+  </section>
+
+  <section name="KeyServicesImplemented">
+    <service name="SupabaseAuthService">
+      <location>lib/infrastructure/services/supabase_auth_service.dart</location>
+      <features>
+        <feature>Anonymous authentication for quick start</feature>
+        <feature>Email/password registration and sign-in</feature>
+        <feature>Session management and token refresh</feature>
+        <feature>Implements IAuthService interface</feature>
+      </features>
+    </service>
+
+    <service name="SupabaseSyncService">
+      <location>lib/infrastructure/services/supabase_sync_service.dart</location>
+      <features>
+        <feature>Bidirectional data sync</feature>
+        <feature>Realtime subscriptions using channels</feature>
+        <feature>Conflict resolution (Last Write Wins + field merging)</feature>
+        <feature>Offline queue management</feature>
+        <feature>Implements ISyncService interface</feature>
+      </features>
+    </service>
+  </section>
+
+  <section name="DatabaseSchema">
+    <table name="receipts">Main receipt storage with user isolation via RLS</table>
+    <table name="sync_metadata">Track sync state per device</table>
+    <table name="export_history">CSV export audit trail</table>
+    <table name="user_preferences">User-specific settings</table>
+  </section>
+
+  <section name="EnvironmentConfiguration">
+    <environment name="LocalDevelopment">
+      <description>The app uses standard Supabase local development credentials which are safe for local use</description>
+      <code language="dart">
+// Environment.isDevelopment determines which config to use
+const String _localDevUrl = 'http://127.0.0.1:54321';
+const String _localDevAnonKey = 'eyJhb...'; // Standard local dev key
+      </code>
+    </environment>
+
+    <environment name="ProductionDeployment">
+      <description>For production, use environment variables</description>
+      <code language="bash">
+flutter build apk \
+  --dart-define=SUPABASE_URL=https://your-project.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=your-anon-key
+      </code>
+    </environment>
+  </section>
+
+  <section name="SupabaseCommands">
+    <commandGroup name="BasicOperations">
+      <command name="start" location="infrastructure/supabase/">npx supabase start     # Start local Supabase</command>
+      <command name="stop" location="infrastructure/supabase/">npx supabase stop      # Stop local Supabase</command>
+      <command name="status" location="infrastructure/supabase/">npx supabase status    # Check Supabase status</command>
+      <command name="push" location="infrastructure/supabase/">npx supabase db push   # Apply migrations</command>
+      <command name="seed" location="infrastructure/supabase/">npx supabase db seed   # Seed test data</command>
+    </commandGroup>
+
+    <commandGroup name="IntegrationTests">
+      <command name="test">CI=true flutter test test/infrastructure/supabase_integration_test.dart</command>
+    </commandGroup>
+  </section>
+</supabase-infrastructure>

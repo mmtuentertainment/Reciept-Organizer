@@ -10,16 +10,19 @@ String _$dateRangeNotifierHash() => r'82c8702b50be229dd2faaee37aefedea7e1d586a';
 
 /// See also [DateRangeNotifier].
 @ProviderFor(DateRangeNotifier)
-final dateRangeNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    DateRangeNotifier, DateRangeState>.internal(
-  DateRangeNotifier.new,
-  name: r'dateRangeNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$dateRangeNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final dateRangeNotifierProvider =
+    AutoDisposeAsyncNotifierProvider<
+      DateRangeNotifier,
+      DateRangeState
+    >.internal(
+      DateRangeNotifier.new,
+      name: r'dateRangeNotifierProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$dateRangeNotifierHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$DateRangeNotifier = AutoDisposeAsyncNotifier<DateRangeState>;
 // ignore_for_file: type=lint

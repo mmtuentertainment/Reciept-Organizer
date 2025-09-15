@@ -1,0 +1,155 @@
+# Epic 5.1: Pre-Production Validation
+@type: brownfield_epic
+@phase: production_infrastructure
+@priority: P0-CRITICAL
+@duration: 30 minutes
+@risk: LOW
+
+## Epic Overview {
+  @goal: "Ensure all local development artifacts are safely backed up and migrations are reviewed before production deployment"
+  @outcome: "Verified safe state for production deployment with rollback capabilities"
+  @integration_requirements: "Must integrate with existing local Supabase development environment"
+}
+
+## Background Context {
+  @current_state: "Local development environment with Supabase, working migrations, and test data"
+  @problem: "Need to ensure no data loss and safe migration path to production"
+  @solution: "Systematic validation and backup before production deployment"
+}
+
+## Stories {
+
+  ### Story 5.1.1: Local Database Backup {
+    @type: infrastructure_story
+    @effort: 10 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a DevOps engineer,
+      I want to create a complete backup of the local Supabase database,
+      so that I can restore if anything goes wrong during production setup.
+
+    Acceptance_Criteria: [
+      "1. Database dump created with timestamp",
+      "2. Backup file verified for completeness",
+      "3. Backup location documented",
+      "4. Restore procedure tested locally"
+    ]
+
+    Integration_Verification: [
+      "IV1: Verify local Supabase is running",
+      "IV2: Confirm all tables are included in backup",
+      "IV3: Test restore to temporary database"
+    ]
+
+    Technical_Details: {
+      @command: |
+        cd /home/matt/FINAPP/Receipt\ Organizer/infrastructure/supabase
+        npx supabase db dump > backup_$(date +%Y%m%d_%H%M%S).sql
+      @verification: "ls -la backup_*.sql && wc -l backup_*.sql"
+    }
+  }
+
+  ### Story 5.1.2: Migration Safety Review {
+    @type: infrastructure_story
+    @effort: 15 minutes
+    @risk: MEDIUM
+
+    User_Story: |
+      As a Database Administrator,
+      I want to review all pending migrations for destructive operations,
+      so that I can prevent accidental data loss in production.
+
+    Acceptance_Criteria: [
+      "1. All migration files reviewed for DROP, DELETE, TRUNCATE operations",
+      "2. Each migration has rollback capability documented",
+      "3. Migration order verified for dependencies",
+      "4. Destructive operations flagged and documented"
+    ]
+
+    Integration_Verification: [
+      "IV1: Existing schema preserved",
+      "IV2: No breaking changes to current APIs",
+      "IV3: RLS policies maintain security model"
+    ]
+
+    Review_Checklist: {
+      @items: [
+        "Check for DROP TABLE/COLUMN statements",
+        "Verify ALTER TABLE operations are safe",
+        "Confirm RLS policies are additive",
+        "Validate foreign key constraints",
+        "Review index creation for performance impact"
+      ]
+    }
+  }
+
+  ### Story 5.1.3: Deployment Checklist Creation {
+    @type: documentation_story
+    @effort: 5 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a Release Manager,
+      I want a comprehensive deployment checklist,
+      so that I can track progress and ensure nothing is missed.
+
+    Acceptance_Criteria: [
+      "1. Checklist created in markdown format",
+      "2. All critical steps included",
+      "3. Rollback procedures documented",
+      "4. Team notification steps included"
+    ]
+
+    Integration_Verification: [
+      "IV1: Checklist references existing procedures",
+      "IV2: Compatible with current CI/CD workflow",
+      "IV3: Includes existing monitoring checks"
+    ]
+
+    Checklist_Template: {
+      @sections: [
+        "Pre-deployment validation",
+        "Backup verification",
+        "Migration review",
+        "Team notifications",
+        "Deployment execution",
+        "Post-deployment verification",
+        "Rollback procedures"
+      ]
+    }
+  }
+}
+
+## Success Metrics {
+  @technical: [
+    "Backup file > 100KB (non-empty)",
+    "Zero destructive migrations without approval",
+    "100% checklist items documented"
+  ]
+  @operational: [
+    "Rollback procedure tested",
+    "Team notified before deployment",
+    "No production data at risk"
+  ]
+}
+
+## Dependencies {
+  @requires: [
+    "Local Supabase running",
+    "Migration files in infrastructure/supabase/migrations",
+    "npx and supabase CLI installed"
+  ]
+  @blocks: ["Epic 5.2: Supabase Project Setup"]
+}
+
+## Rollback Plan {
+  @trigger: "Any validation failure"
+  @procedure: [
+    "1. Stop deployment process",
+    "2. Document failure reason",
+    "3. Fix identified issues",
+    "4. Re-run validation"
+  ]
+  @time_to_rollback: "< 5 minutes"
+}

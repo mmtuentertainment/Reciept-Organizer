@@ -1,0 +1,248 @@
+# Epic 5.2: Supabase Project Setup
+@type: brownfield_epic
+@phase: production_infrastructure
+@priority: P0-CRITICAL
+@duration: 45 minutes
+@risk: MEDIUM
+
+## Epic Overview {
+  @goal: "Create and configure production Supabase project with proper authentication and security settings"
+  @outcome: "Production-ready Supabase instance with auth providers configured and RLS enabled"
+  @integration_requirements: "Must match local development configuration while adding production-specific security"
+}
+
+## Background Context {
+  @current_state: "Local Supabase development environment fully configured and tested"
+  @problem: "Need production cloud instance with enhanced security and proper configuration"
+  @solution: "Create Supabase cloud project with production settings matching local development"
+}
+
+## Stories {
+
+  ### Story 5.2.1: Create Supabase Cloud Project {
+    @type: infrastructure_story
+    @effort: 15 minutes
+    @risk: LOW
+    @manual: true
+
+    User_Story: |
+      As a Platform Engineer,
+      I want to create a new Supabase cloud project,
+      so that I have a production environment for the Receipt Organizer app.
+
+    Acceptance_Criteria: [
+      "1. Project created in Supabase dashboard",
+      "2. Strong database password generated (32+ characters)",
+      "3. Appropriate region selected (closest to users)",
+      "4. Project URL and keys captured securely",
+      "5. Free tier limits understood and documented"
+    ]
+
+    Integration_Verification: [
+      "IV1: Project configuration matches local setup",
+      "IV2: Database version compatible with local",
+      "IV3: Extension requirements validated"
+    ]
+
+    Manual_Steps: {
+      @url: "https://supabase.com/dashboard"
+      @procedure: [
+        "1. Login to Supabase Dashboard",
+        "2. Click 'New Project'",
+        "3. Enter project name: 'receipt-organizer-prod'",
+        "4. Generate strong password (use password manager)",
+        "5. Select region (us-east-1 or closest)",
+        "6. Select Free tier initially",
+        "7. Click 'Create Project' and wait for provisioning"
+      ]
+      @capture: {
+        project_url: "https://xxxxx.supabase.co",
+        anon_key: "eyJhb...",
+        service_role_key: "NEVER_COMMIT_THIS",
+        project_ref: "xxxxx",
+        database_password: "STORE_IN_PASSWORD_MANAGER"
+      }
+    }
+  }
+
+  ### Story 5.2.2: Configure Authentication Providers {
+    @type: configuration_story
+    @effort: 15 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a Security Engineer,
+      I want to configure authentication providers properly,
+      so that users can securely access the application.
+
+    Acceptance_Criteria: [
+      "1. Email authentication enabled with confirmation",
+      "2. Anonymous authentication enabled for quick start",
+      "3. Secure email change enabled",
+      "4. Password policies configured",
+      "5. JWT expiry set appropriately"
+    ]
+
+    Integration_Verification: [
+      "IV1: Auth settings match local development",
+      "IV2: Existing auth flows remain functional",
+      "IV3: Mobile and web clients can authenticate"
+    ]
+
+    Configuration: {
+      @navigation: "Authentication > Providers"
+      @settings: {
+        email: {
+          enabled: true,
+          confirm_email: true,
+          secure_email_change: true,
+          double_confirm_changes: true,
+          enable_signup: true
+        },
+        anonymous: {
+          enabled: true,
+          description: "For quick start experience without account"
+        },
+        password: {
+          min_length: 8,
+          require_uppercase: false,
+          require_lowercase: false,
+          require_numbers: false,
+          require_special_chars: false
+        },
+        jwt: {
+          expiry: 3600,
+          refresh_token_expiry: 604800
+        }
+      }
+    }
+  }
+
+  ### Story 5.2.3: Enable Row Level Security {
+    @type: security_story
+    @effort: 10 minutes
+    @risk: HIGH
+
+    User_Story: |
+      As a Security Administrator,
+      I want to enable RLS on all production tables,
+      so that data access is properly secured at the database level.
+
+    Acceptance_Criteria: [
+      "1. RLS enabled on all user tables",
+      "2. Verification that RLS is active",
+      "3. No tables accessible without policies",
+      "4. Service role key access documented"
+    ]
+
+    Integration_Verification: [
+      "IV1: RLS policies match local development",
+      "IV2: No data exposed without authentication",
+      "IV3: Anonymous users properly restricted"
+    ]
+
+    SQL_Commands: {
+      @execute_in: "SQL Editor"
+      @commands: |
+        -- Enable RLS on all tables (will be created by migrations)
+        -- This is a placeholder for tables that will exist after migration
+        ALTER TABLE receipts ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE sync_metadata ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE export_history ENABLE ROW LEVEL SECURITY;
+        ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
+
+        -- Verify RLS is enabled
+        SELECT schemaname, tablename, rowsecurity
+        FROM pg_tables
+        WHERE schemaname = 'public';
+      @note: "These commands will be run AFTER migrations in Epic 5.3"
+    }
+  }
+
+  ### Story 5.2.4: Configure Project Settings {
+    @type: configuration_story
+    @effort: 5 minutes
+    @risk: LOW
+
+    User_Story: |
+      As a DevOps Engineer,
+      I want to configure project-specific settings,
+      so that the production environment is optimized for our use case.
+
+    Acceptance_Criteria: [
+      "1. API settings configured",
+      "2. Database pooling configured",
+      "3. Realtime settings enabled",
+      "4. CORS settings appropriate for web app",
+      "5. Rate limiting understood"
+    ]
+
+    Integration_Verification: [
+      "IV1: Settings compatible with app requirements",
+      "IV2: API limits sufficient for expected load",
+      "IV3: Realtime subscriptions working"
+    ]
+
+    Settings: {
+      @api: {
+        max_rows: 1000,
+        include_schemas: ["public"],
+        extra_search_path: []
+      },
+      @database: {
+        pool_mode: "transaction",
+        pool_size: 15,
+        statement_timeout: "8s"
+      },
+      @realtime: {
+        enabled: true,
+        max_channels: 100,
+        max_events_per_second: 10
+      }
+    }
+  }
+}
+
+## Success Metrics {
+  @technical: [
+    "Project successfully created",
+    "All auth providers functional",
+    "RLS enabled (pending migration)",
+    "API accessible from test client"
+  ]
+  @security: [
+    "Strong password in use",
+    "Service role key secured",
+    "Email confirmation enabled",
+    "Anonymous access controlled"
+  ]
+}
+
+## Dependencies {
+  @requires: [
+    "Epic 5.1 completed (backups ready)",
+    "Supabase account created",
+    "Password manager for credentials"
+  ]
+  @blocks: ["Epic 5.3: Database Migration"]
+}
+
+## Rollback Plan {
+  @trigger: "Configuration issues or security concerns"
+  @procedure: [
+    "1. Document issue encountered",
+    "2. Delete project if critically misconfigured",
+    "3. Create new project with corrected settings",
+    "4. Update captured credentials"
+  ]
+  @time_to_rollback: "< 15 minutes"
+}
+
+## Security Notes {
+  @critical: [
+    "NEVER commit service_role_key to git",
+    "Store database password in password manager only",
+    "Use environment variables for all keys",
+    "Rotate keys if ever exposed"
+  ]
+}
