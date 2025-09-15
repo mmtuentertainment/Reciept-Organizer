@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:receipt_organizer/infrastructure/config/supabase_config.dart';
+import 'package:receipt_organizer/core/services/background_sync_service.dart';
+import 'package:receipt_organizer/core/services/request_queue_service.dart';
+import 'package:receipt_organizer/core/services/network_connectivity_service.dart';
 import 'package:receipt_organizer/features/capture/screens/capture_screen.dart';
 import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
 import 'package:receipt_organizer/features/receipts/presentation/providers/image_viewer_provider.dart';
@@ -16,6 +19,29 @@ import 'package:receipt_organizer/features/receipts/screens/receipts_list_screen
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize core services early
+  try {
+    // Initialize network connectivity monitoring
+    final connectivity = NetworkConnectivityService();
+    await connectivity.initialize();
+    print('✅ Network connectivity service initialized');
+
+    // Initialize request queue service
+    final queueService = RequestQueueService();
+    await queueService.initialize();
+    print('✅ Request queue service initialized');
+
+    // Initialize background service
+    await BackgroundSyncService.initialize();
+    print('✅ Background service initialized');
+
+    // Start periodic sync
+    final backgroundService = BackgroundSyncService();
+    await backgroundService.registerPeriodicSync();
+    print('✅ Background periodic sync started');
+  } catch (e) {
+    print('⚠️ Service initialization failed: $e');
+  }
   // Load environment variables (optional for local dev)
   try {
     await dotenv.load(fileName: ".env");

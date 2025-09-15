@@ -60,5 +60,20 @@
 			<string>com.receiptorganizer</string>
 		</dict>
 	</array>
+
+	<!-- Background Modes for flutter_background_service -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+
+	<!-- Background Task Scheduler Identifiers -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.receiptorganizer.fetch</string>
+		<string>com.receiptorganizer.sync</string>
+		<string>dev.fluttercommunity.flutter_background_service.bg</string>
+	</array>
 </dict>
 </plist>
