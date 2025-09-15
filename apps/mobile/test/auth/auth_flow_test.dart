@@ -6,7 +6,9 @@ void main() {
   group('Production Auth Flow Test', () {
     test('should connect to production Supabase', () async {
       // Verify production configuration
-      expect(ProductionConfig.supabaseUrl, 'https://xbadaalqaeszooyxuoac.supabase.co');
+      // URL should be provided via environment variables, not hardcoded
+      expect(ProductionConfig.supabaseUrl.isNotEmpty, isTrue,
+          reason: 'Supabase URL should be set via --dart-define');
       expect(ProductionConfig.supabaseAnonKey, isNotEmpty);
 
       // In production mode, should use production config

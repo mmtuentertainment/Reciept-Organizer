@@ -98,3 +98,4 @@ infrastructure/supabase/PRODUCTION_CREDENTIALS.md
 
 # Local documentation (not for repo)
 local-docs/
+apps/native/.env.local

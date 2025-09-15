@@ -6,10 +6,14 @@ void main() {
   group('Production Supabase Configuration', () {
     test('should use production URL and key', () {
       // Verify production config is loaded
-      expect(ProductionConfig.supabaseUrl, 'https://xbadaalqaeszooyxuoac.supabase.co');
-      expect(ProductionConfig.supabaseAnonKey, startsWith('eyJhbGciOiJIUzI1NiI'));
-      // The JWT contains the project ref in its payload
-      expect(ProductionConfig.supabaseAnonKey.contains('xbadaalqaeszooyxuoac'), isTrue);
+      // Verify environment variables are provided, not hardcoded
+      expect(ProductionConfig.supabaseUrl.isNotEmpty, isTrue,
+          reason: 'Supabase URL should be set via --dart-define');
+      expect(ProductionConfig.supabaseAnonKey.isNotEmpty, isTrue,
+          reason: 'Supabase anon key should be set via --dart-define');
+      // Check it's a valid JWT format
+      expect(ProductionConfig.supabaseAnonKey, startsWith('eyJ'),
+          reason: 'Anon key should be a valid JWT');
     });
 
     test('should return production config when not in development', () {
