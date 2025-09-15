@@ -45,6 +45,9 @@ bfg.jar
 *.env.production
 *.env.development
 .env.mcp
+apps/mobile/.env
+apps/mobile/.env.*
+!apps/mobile/.env.example
 
 # PDF files and documents
 *.pdf
@@ -78,6 +81,10 @@ fix_*.sh
 SECURITY_*.md
 CREDENTIAL_*.md
 apps/api/CREDENTIAL_*.md
+
+# Secret management files
+.secrets-config.json
+*.secrets.json
 
 # Release artifacts
 releases/

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:receipt_organizer/features/receipts/providers/receipts_provider.dart';
 import 'package:receipt_organizer/core/models/receipt.dart';
+import 'package:receipt_organizer/core/models/receipt_extended.dart';
 
 class ReceiptsListScreen extends ConsumerStatefulWidget {
   const ReceiptsListScreen({super.key});
