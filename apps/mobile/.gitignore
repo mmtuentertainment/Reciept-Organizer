@@ -52,3 +52,15 @@ app.*.map.json
 # Supabase
 supabase/.env
 supabase/.env.local
+
+# Debug symbols (keep safe for crash reports)
+symbols/
+*.symbols
+# Release signing keys (NEVER commit these!)
+android/keystores/
+android/key.properties
+*.keystore
+*.jks
+
+# Local documentation (not for repo)
+local-docs/
