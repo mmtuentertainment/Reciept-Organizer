@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Alert, ScrollView, Pressable } from 'react-native';
 import { Link, router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../lib/contexts/AuthContext';
 import { validatePassword } from '../../lib/validators/password';
 import {
   Button,
@@ -36,10 +36,16 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { signUp, isOffline } = useAuth();
 
   const passwordValidation = validatePassword(password);
 
   async function signUpWithEmail() {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
       return;
@@ -51,11 +57,13 @@ export default function RegisterScreen() {
       return;
     }
 
+    if (isOffline) {
+      Alert.alert('Error', 'Network connection required for sign up');
+      return;
+    }
+
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
+    const { error } = await signUp(email, password);
 
     if (error) {
       Alert.alert('Error', error.message);
