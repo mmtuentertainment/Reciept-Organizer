@@ -3,14 +3,34 @@ import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { GluestackUIProvider } from '@gluestack-ui/themed';
 import { config } from '@gluestack-ui/config';
-import { AuthProvider, useAuth } from '../lib/contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+import { Session } from '@supabase/supabase-js';
 import { useRouter, useSegments } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
+import { useState } from 'react';
 
-function RootLayoutNav() {
-  const { session, isLoading, isOffline } = useAuth();
+export default function RootLayout() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const segments = useSegments();
+
+  useEffect(() => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setIsLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -35,28 +55,11 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="auth" options={{ headerShown: false }} />
-      {isOffline && (
-        <Stack.Screen
-          name="offline-banner"
-          options={{
-            presentation: 'transparentModal',
-            headerShown: false
-          }}
-        />
-      )}
-    </Stack>
-  );
-}
-
-export default function RootLayout() {
-  return (
     <GluestackUIProvider config={config}>
-      <AuthProvider>
-        <RootLayoutNav />
-      </AuthProvider>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+      </Stack>
     </GluestackUIProvider>
   );
 }

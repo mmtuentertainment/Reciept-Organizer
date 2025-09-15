@@ -12,7 +12,8 @@ part of 'receipt.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 Receipt _$ReceiptFromJson(Map<String, dynamic> json) {
   return _Receipt.fromJson(json);
@@ -50,19 +51,20 @@ abstract class $ReceiptCopyWith<$Res> {
   factory $ReceiptCopyWith(Receipt value, $Res Function(Receipt) then) =
       _$ReceiptCopyWithImpl<$Res, Receipt>;
   @useResult
-  $Res call(
-      {String id,
-      String? merchantName,
-      DateTime? date,
-      double? totalAmount,
-      double? taxAmount,
-      ProcessingResult? ocrResults,
-      DateTime createdAt,
-      DateTime? updatedAt,
-      String? imagePath,
-      String? thumbnailPath,
-      DateTime? lastExportedAt,
-      String? lastExportFormat});
+  $Res call({
+    String id,
+    String? merchantName,
+    DateTime? date,
+    double? totalAmount,
+    double? taxAmount,
+    ProcessingResult? ocrResults,
+    DateTime createdAt,
+    DateTime? updatedAt,
+    String? imagePath,
+    String? thumbnailPath,
+    DateTime? lastExportedAt,
+    String? lastExportFormat,
+  });
 
   $ProcessingResultCopyWith<$Res>? get ocrResults;
 }
@@ -95,56 +97,59 @@ class _$ReceiptCopyWithImpl<$Res, $Val extends Receipt>
     Object? lastExportedAt = freezed,
     Object? lastExportFormat = freezed,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      merchantName: freezed == merchantName
-          ? _value.merchantName
-          : merchantName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      date: freezed == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      totalAmount: freezed == totalAmount
-          ? _value.totalAmount
-          : totalAmount // ignore: cast_nullable_to_non_nullable
-              as double?,
-      taxAmount: freezed == taxAmount
-          ? _value.taxAmount
-          : taxAmount // ignore: cast_nullable_to_non_nullable
-              as double?,
-      ocrResults: freezed == ocrResults
-          ? _value.ocrResults
-          : ocrResults // ignore: cast_nullable_to_non_nullable
-              as ProcessingResult?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: freezed == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      imagePath: freezed == imagePath
-          ? _value.imagePath
-          : imagePath // ignore: cast_nullable_to_non_nullable
-              as String?,
-      thumbnailPath: freezed == thumbnailPath
-          ? _value.thumbnailPath
-          : thumbnailPath // ignore: cast_nullable_to_non_nullable
-              as String?,
-      lastExportedAt: freezed == lastExportedAt
-          ? _value.lastExportedAt
-          : lastExportedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      lastExportFormat: freezed == lastExportFormat
-          ? _value.lastExportFormat
-          : lastExportFormat // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            merchantName: freezed == merchantName
+                ? _value.merchantName
+                : merchantName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            date: freezed == date
+                ? _value.date
+                : date // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            totalAmount: freezed == totalAmount
+                ? _value.totalAmount
+                : totalAmount // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            taxAmount: freezed == taxAmount
+                ? _value.taxAmount
+                : taxAmount // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            ocrResults: freezed == ocrResults
+                ? _value.ocrResults
+                : ocrResults // ignore: cast_nullable_to_non_nullable
+                      as ProcessingResult?,
+            createdAt: null == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            updatedAt: freezed == updatedAt
+                ? _value.updatedAt
+                : updatedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            imagePath: freezed == imagePath
+                ? _value.imagePath
+                : imagePath // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            thumbnailPath: freezed == thumbnailPath
+                ? _value.thumbnailPath
+                : thumbnailPath // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            lastExportedAt: freezed == lastExportedAt
+                ? _value.lastExportedAt
+                : lastExportedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            lastExportFormat: freezed == lastExportFormat
+                ? _value.lastExportFormat
+                : lastExportFormat // ignore: cast_nullable_to_non_nullable
+                      as String?,
+          )
+          as $Val,
+    );
   }
 
   /// Create a copy of Receipt
@@ -165,23 +170,25 @@ class _$ReceiptCopyWithImpl<$Res, $Val extends Receipt>
 /// @nodoc
 abstract class _$$ReceiptImplCopyWith<$Res> implements $ReceiptCopyWith<$Res> {
   factory _$$ReceiptImplCopyWith(
-          _$ReceiptImpl value, $Res Function(_$ReceiptImpl) then) =
-      __$$ReceiptImplCopyWithImpl<$Res>;
+    _$ReceiptImpl value,
+    $Res Function(_$ReceiptImpl) then,
+  ) = __$$ReceiptImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id,
-      String? merchantName,
-      DateTime? date,
-      double? totalAmount,
-      double? taxAmount,
-      ProcessingResult? ocrResults,
-      DateTime createdAt,
-      DateTime? updatedAt,
-      String? imagePath,
-      String? thumbnailPath,
-      DateTime? lastExportedAt,
-      String? lastExportFormat});
+  $Res call({
+    String id,
+    String? merchantName,
+    DateTime? date,
+    double? totalAmount,
+    double? taxAmount,
+    ProcessingResult? ocrResults,
+    DateTime createdAt,
+    DateTime? updatedAt,
+    String? imagePath,
+    String? thumbnailPath,
+    DateTime? lastExportedAt,
+    String? lastExportFormat,
+  });
 
   @override
   $ProcessingResultCopyWith<$Res>? get ocrResults;
@@ -192,8 +199,9 @@ class __$$ReceiptImplCopyWithImpl<$Res>
     extends _$ReceiptCopyWithImpl<$Res, _$ReceiptImpl>
     implements _$$ReceiptImplCopyWith<$Res> {
   __$$ReceiptImplCopyWithImpl(
-      _$ReceiptImpl _value, $Res Function(_$ReceiptImpl) _then)
-      : super(_value, _then);
+    _$ReceiptImpl _value,
+    $Res Function(_$ReceiptImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of Receipt
   /// with the given fields replaced by the non-null parameter values.
@@ -213,75 +221,78 @@ class __$$ReceiptImplCopyWithImpl<$Res>
     Object? lastExportedAt = freezed,
     Object? lastExportFormat = freezed,
   }) {
-    return _then(_$ReceiptImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      merchantName: freezed == merchantName
-          ? _value.merchantName
-          : merchantName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      date: freezed == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      totalAmount: freezed == totalAmount
-          ? _value.totalAmount
-          : totalAmount // ignore: cast_nullable_to_non_nullable
-              as double?,
-      taxAmount: freezed == taxAmount
-          ? _value.taxAmount
-          : taxAmount // ignore: cast_nullable_to_non_nullable
-              as double?,
-      ocrResults: freezed == ocrResults
-          ? _value.ocrResults
-          : ocrResults // ignore: cast_nullable_to_non_nullable
-              as ProcessingResult?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: freezed == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      imagePath: freezed == imagePath
-          ? _value.imagePath
-          : imagePath // ignore: cast_nullable_to_non_nullable
-              as String?,
-      thumbnailPath: freezed == thumbnailPath
-          ? _value.thumbnailPath
-          : thumbnailPath // ignore: cast_nullable_to_non_nullable
-              as String?,
-      lastExportedAt: freezed == lastExportedAt
-          ? _value.lastExportedAt
-          : lastExportedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      lastExportFormat: freezed == lastExportFormat
-          ? _value.lastExportFormat
-          : lastExportFormat // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    return _then(
+      _$ReceiptImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        merchantName: freezed == merchantName
+            ? _value.merchantName
+            : merchantName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        date: freezed == date
+            ? _value.date
+            : date // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        totalAmount: freezed == totalAmount
+            ? _value.totalAmount
+            : totalAmount // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        taxAmount: freezed == taxAmount
+            ? _value.taxAmount
+            : taxAmount // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        ocrResults: freezed == ocrResults
+            ? _value.ocrResults
+            : ocrResults // ignore: cast_nullable_to_non_nullable
+                  as ProcessingResult?,
+        createdAt: null == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        updatedAt: freezed == updatedAt
+            ? _value.updatedAt
+            : updatedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        imagePath: freezed == imagePath
+            ? _value.imagePath
+            : imagePath // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        thumbnailPath: freezed == thumbnailPath
+            ? _value.thumbnailPath
+            : thumbnailPath // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        lastExportedAt: freezed == lastExportedAt
+            ? _value.lastExportedAt
+            : lastExportedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        lastExportFormat: freezed == lastExportFormat
+            ? _value.lastExportFormat
+            : lastExportFormat // ignore: cast_nullable_to_non_nullable
+                  as String?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ReceiptImpl implements _Receipt {
-  const _$ReceiptImpl(
-      {required this.id,
-      this.merchantName,
-      this.date,
-      this.totalAmount,
-      this.taxAmount,
-      this.ocrResults,
-      required this.createdAt,
-      this.updatedAt,
-      this.imagePath,
-      this.thumbnailPath,
-      this.lastExportedAt,
-      this.lastExportFormat});
+  const _$ReceiptImpl({
+    required this.id,
+    this.merchantName,
+    this.date,
+    this.totalAmount,
+    this.taxAmount,
+    this.ocrResults,
+    required this.createdAt,
+    this.updatedAt,
+    this.imagePath,
+    this.thumbnailPath,
+    this.lastExportedAt,
+    this.lastExportFormat,
+  });
 
   factory _$ReceiptImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReceiptImplFromJson(json);
@@ -296,10 +307,10 @@ class _$ReceiptImpl implements _Receipt {
   final double? totalAmount;
   @override
   final double? taxAmount;
-// OCR processing results
+  // OCR processing results
   @override
   final ProcessingResult? ocrResults;
-// Metadata
+  // Metadata
   @override
   final DateTime createdAt;
   @override
@@ -308,7 +319,7 @@ class _$ReceiptImpl implements _Receipt {
   final String? imagePath;
   @override
   final String? thumbnailPath;
-// Export tracking
+  // Export tracking
   @override
   final DateTime? lastExportedAt;
   @override
@@ -351,19 +362,20 @@ class _$ReceiptImpl implements _Receipt {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      merchantName,
-      date,
-      totalAmount,
-      taxAmount,
-      ocrResults,
-      createdAt,
-      updatedAt,
-      imagePath,
-      thumbnailPath,
-      lastExportedAt,
-      lastExportFormat);
+    runtimeType,
+    id,
+    merchantName,
+    date,
+    totalAmount,
+    taxAmount,
+    ocrResults,
+    createdAt,
+    updatedAt,
+    imagePath,
+    thumbnailPath,
+    lastExportedAt,
+    lastExportFormat,
+  );
 
   /// Create a copy of Receipt
   /// with the given fields replaced by the non-null parameter values.
@@ -375,26 +387,25 @@ class _$ReceiptImpl implements _Receipt {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ReceiptImplToJson(
-      this,
-    );
+    return _$$ReceiptImplToJson(this);
   }
 }
 
 abstract class _Receipt implements Receipt {
-  const factory _Receipt(
-      {required final String id,
-      final String? merchantName,
-      final DateTime? date,
-      final double? totalAmount,
-      final double? taxAmount,
-      final ProcessingResult? ocrResults,
-      required final DateTime createdAt,
-      final DateTime? updatedAt,
-      final String? imagePath,
-      final String? thumbnailPath,
-      final DateTime? lastExportedAt,
-      final String? lastExportFormat}) = _$ReceiptImpl;
+  const factory _Receipt({
+    required final String id,
+    final String? merchantName,
+    final DateTime? date,
+    final double? totalAmount,
+    final double? taxAmount,
+    final ProcessingResult? ocrResults,
+    required final DateTime createdAt,
+    final DateTime? updatedAt,
+    final String? imagePath,
+    final String? thumbnailPath,
+    final DateTime? lastExportedAt,
+    final String? lastExportFormat,
+  }) = _$ReceiptImpl;
 
   factory _Receipt.fromJson(Map<String, dynamic> json) = _$ReceiptImpl.fromJson;
 
@@ -458,17 +469,19 @@ mixin _$ProcessingResult {
 /// @nodoc
 abstract class $ProcessingResultCopyWith<$Res> {
   factory $ProcessingResultCopyWith(
-          ProcessingResult value, $Res Function(ProcessingResult) then) =
-      _$ProcessingResultCopyWithImpl<$Res, ProcessingResult>;
+    ProcessingResult value,
+    $Res Function(ProcessingResult) then,
+  ) = _$ProcessingResultCopyWithImpl<$Res, ProcessingResult>;
   @useResult
-  $Res call(
-      {StringFieldData merchantName,
-      DoubleFieldData totalAmount,
-      DateFieldData date,
-      DoubleFieldData taxAmount,
-      String processingEngine,
-      DateTime processedAt,
-      double? overallConfidence});
+  $Res call({
+    StringFieldData merchantName,
+    DoubleFieldData totalAmount,
+    DateFieldData date,
+    DoubleFieldData taxAmount,
+    String processingEngine,
+    DateTime processedAt,
+    double? overallConfidence,
+  });
 
   $StringFieldDataCopyWith<$Res> get merchantName;
   $DoubleFieldDataCopyWith<$Res> get totalAmount;
@@ -499,36 +512,39 @@ class _$ProcessingResultCopyWithImpl<$Res, $Val extends ProcessingResult>
     Object? processedAt = null,
     Object? overallConfidence = freezed,
   }) {
-    return _then(_value.copyWith(
-      merchantName: null == merchantName
-          ? _value.merchantName
-          : merchantName // ignore: cast_nullable_to_non_nullable
-              as StringFieldData,
-      totalAmount: null == totalAmount
-          ? _value.totalAmount
-          : totalAmount // ignore: cast_nullable_to_non_nullable
-              as DoubleFieldData,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateFieldData,
-      taxAmount: null == taxAmount
-          ? _value.taxAmount
-          : taxAmount // ignore: cast_nullable_to_non_nullable
-              as DoubleFieldData,
-      processingEngine: null == processingEngine
-          ? _value.processingEngine
-          : processingEngine // ignore: cast_nullable_to_non_nullable
-              as String,
-      processedAt: null == processedAt
-          ? _value.processedAt
-          : processedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      overallConfidence: freezed == overallConfidence
-          ? _value.overallConfidence
-          : overallConfidence // ignore: cast_nullable_to_non_nullable
-              as double?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            merchantName: null == merchantName
+                ? _value.merchantName
+                : merchantName // ignore: cast_nullable_to_non_nullable
+                      as StringFieldData,
+            totalAmount: null == totalAmount
+                ? _value.totalAmount
+                : totalAmount // ignore: cast_nullable_to_non_nullable
+                      as DoubleFieldData,
+            date: null == date
+                ? _value.date
+                : date // ignore: cast_nullable_to_non_nullable
+                      as DateFieldData,
+            taxAmount: null == taxAmount
+                ? _value.taxAmount
+                : taxAmount // ignore: cast_nullable_to_non_nullable
+                      as DoubleFieldData,
+            processingEngine: null == processingEngine
+                ? _value.processingEngine
+                : processingEngine // ignore: cast_nullable_to_non_nullable
+                      as String,
+            processedAt: null == processedAt
+                ? _value.processedAt
+                : processedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            overallConfidence: freezed == overallConfidence
+                ? _value.overallConfidence
+                : overallConfidence // ignore: cast_nullable_to_non_nullable
+                      as double?,
+          )
+          as $Val,
+    );
   }
 
   /// Create a copy of ProcessingResult
@@ -575,19 +591,21 @@ class _$ProcessingResultCopyWithImpl<$Res, $Val extends ProcessingResult>
 /// @nodoc
 abstract class _$$ProcessingResultImplCopyWith<$Res>
     implements $ProcessingResultCopyWith<$Res> {
-  factory _$$ProcessingResultImplCopyWith(_$ProcessingResultImpl value,
-          $Res Function(_$ProcessingResultImpl) then) =
-      __$$ProcessingResultImplCopyWithImpl<$Res>;
+  factory _$$ProcessingResultImplCopyWith(
+    _$ProcessingResultImpl value,
+    $Res Function(_$ProcessingResultImpl) then,
+  ) = __$$ProcessingResultImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {StringFieldData merchantName,
-      DoubleFieldData totalAmount,
-      DateFieldData date,
-      DoubleFieldData taxAmount,
-      String processingEngine,
-      DateTime processedAt,
-      double? overallConfidence});
+  $Res call({
+    StringFieldData merchantName,
+    DoubleFieldData totalAmount,
+    DateFieldData date,
+    DoubleFieldData taxAmount,
+    String processingEngine,
+    DateTime processedAt,
+    double? overallConfidence,
+  });
 
   @override
   $StringFieldDataCopyWith<$Res> get merchantName;
@@ -603,9 +621,10 @@ abstract class _$$ProcessingResultImplCopyWith<$Res>
 class __$$ProcessingResultImplCopyWithImpl<$Res>
     extends _$ProcessingResultCopyWithImpl<$Res, _$ProcessingResultImpl>
     implements _$$ProcessingResultImplCopyWith<$Res> {
-  __$$ProcessingResultImplCopyWithImpl(_$ProcessingResultImpl _value,
-      $Res Function(_$ProcessingResultImpl) _then)
-      : super(_value, _then);
+  __$$ProcessingResultImplCopyWithImpl(
+    _$ProcessingResultImpl _value,
+    $Res Function(_$ProcessingResultImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ProcessingResult
   /// with the given fields replaced by the non-null parameter values.
@@ -620,50 +639,53 @@ class __$$ProcessingResultImplCopyWithImpl<$Res>
     Object? processedAt = null,
     Object? overallConfidence = freezed,
   }) {
-    return _then(_$ProcessingResultImpl(
-      merchantName: null == merchantName
-          ? _value.merchantName
-          : merchantName // ignore: cast_nullable_to_non_nullable
-              as StringFieldData,
-      totalAmount: null == totalAmount
-          ? _value.totalAmount
-          : totalAmount // ignore: cast_nullable_to_non_nullable
-              as DoubleFieldData,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateFieldData,
-      taxAmount: null == taxAmount
-          ? _value.taxAmount
-          : taxAmount // ignore: cast_nullable_to_non_nullable
-              as DoubleFieldData,
-      processingEngine: null == processingEngine
-          ? _value.processingEngine
-          : processingEngine // ignore: cast_nullable_to_non_nullable
-              as String,
-      processedAt: null == processedAt
-          ? _value.processedAt
-          : processedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      overallConfidence: freezed == overallConfidence
-          ? _value.overallConfidence
-          : overallConfidence // ignore: cast_nullable_to_non_nullable
-              as double?,
-    ));
+    return _then(
+      _$ProcessingResultImpl(
+        merchantName: null == merchantName
+            ? _value.merchantName
+            : merchantName // ignore: cast_nullable_to_non_nullable
+                  as StringFieldData,
+        totalAmount: null == totalAmount
+            ? _value.totalAmount
+            : totalAmount // ignore: cast_nullable_to_non_nullable
+                  as DoubleFieldData,
+        date: null == date
+            ? _value.date
+            : date // ignore: cast_nullable_to_non_nullable
+                  as DateFieldData,
+        taxAmount: null == taxAmount
+            ? _value.taxAmount
+            : taxAmount // ignore: cast_nullable_to_non_nullable
+                  as DoubleFieldData,
+        processingEngine: null == processingEngine
+            ? _value.processingEngine
+            : processingEngine // ignore: cast_nullable_to_non_nullable
+                  as String,
+        processedAt: null == processedAt
+            ? _value.processedAt
+            : processedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        overallConfidence: freezed == overallConfidence
+            ? _value.overallConfidence
+            : overallConfidence // ignore: cast_nullable_to_non_nullable
+                  as double?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ProcessingResultImpl implements _ProcessingResult {
-  const _$ProcessingResultImpl(
-      {required this.merchantName,
-      required this.totalAmount,
-      required this.date,
-      required this.taxAmount,
-      required this.processingEngine,
-      required this.processedAt,
-      this.overallConfidence});
+  const _$ProcessingResultImpl({
+    required this.merchantName,
+    required this.totalAmount,
+    required this.date,
+    required this.taxAmount,
+    required this.processingEngine,
+    required this.processedAt,
+    this.overallConfidence,
+  });
 
   factory _$ProcessingResultImpl.fromJson(Map<String, dynamic> json) =>
       _$$ProcessingResultImplFromJson(json);
@@ -710,8 +732,16 @@ class _$ProcessingResultImpl implements _ProcessingResult {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, merchantName, totalAmount, date,
-      taxAmount, processingEngine, processedAt, overallConfidence);
+  int get hashCode => Object.hash(
+    runtimeType,
+    merchantName,
+    totalAmount,
+    date,
+    taxAmount,
+    processingEngine,
+    processedAt,
+    overallConfidence,
+  );
 
   /// Create a copy of ProcessingResult
   /// with the given fields replaced by the non-null parameter values.
@@ -720,25 +750,26 @@ class _$ProcessingResultImpl implements _ProcessingResult {
   @pragma('vm:prefer-inline')
   _$$ProcessingResultImplCopyWith<_$ProcessingResultImpl> get copyWith =>
       __$$ProcessingResultImplCopyWithImpl<_$ProcessingResultImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ProcessingResultImplToJson(
-      this,
-    );
+    return _$$ProcessingResultImplToJson(this);
   }
 }
 
 abstract class _ProcessingResult implements ProcessingResult {
-  const factory _ProcessingResult(
-      {required final StringFieldData merchantName,
-      required final DoubleFieldData totalAmount,
-      required final DateFieldData date,
-      required final DoubleFieldData taxAmount,
-      required final String processingEngine,
-      required final DateTime processedAt,
-      final double? overallConfidence}) = _$ProcessingResultImpl;
+  const factory _ProcessingResult({
+    required final StringFieldData merchantName,
+    required final DoubleFieldData totalAmount,
+    required final DateFieldData date,
+    required final DoubleFieldData taxAmount,
+    required final String processingEngine,
+    required final DateTime processedAt,
+    final double? overallConfidence,
+  }) = _$ProcessingResultImpl;
 
   factory _ProcessingResult.fromJson(Map<String, dynamic> json) =
       _$ProcessingResultImpl.fromJson;
@@ -790,14 +821,16 @@ mixin _$StringFieldData {
 /// @nodoc
 abstract class $StringFieldDataCopyWith<$Res> {
   factory $StringFieldDataCopyWith(
-          StringFieldData value, $Res Function(StringFieldData) then) =
-      _$StringFieldDataCopyWithImpl<$Res, StringFieldData>;
+    StringFieldData value,
+    $Res Function(StringFieldData) then,
+  ) = _$StringFieldDataCopyWithImpl<$Res, StringFieldData>;
   @useResult
-  $Res call(
-      {String value,
-      double confidence,
-      String? rawText,
-      Map<String, dynamic>? metadata});
+  $Res call({
+    String value,
+    double confidence,
+    String? rawText,
+    Map<String, dynamic>? metadata,
+  });
 }
 
 /// @nodoc
@@ -820,40 +853,45 @@ class _$StringFieldDataCopyWithImpl<$Res, $Val extends StringFieldData>
     Object? rawText = freezed,
     Object? metadata = freezed,
   }) {
-    return _then(_value.copyWith(
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as String,
-      confidence: null == confidence
-          ? _value.confidence
-          : confidence // ignore: cast_nullable_to_non_nullable
-              as double,
-      rawText: freezed == rawText
-          ? _value.rawText
-          : rawText // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value.metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            value: null == value
+                ? _value.value
+                : value // ignore: cast_nullable_to_non_nullable
+                      as String,
+            confidence: null == confidence
+                ? _value.confidence
+                : confidence // ignore: cast_nullable_to_non_nullable
+                      as double,
+            rawText: freezed == rawText
+                ? _value.rawText
+                : rawText // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            metadata: freezed == metadata
+                ? _value.metadata
+                : metadata // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>?,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$StringFieldDataImplCopyWith<$Res>
     implements $StringFieldDataCopyWith<$Res> {
-  factory _$$StringFieldDataImplCopyWith(_$StringFieldDataImpl value,
-          $Res Function(_$StringFieldDataImpl) then) =
-      __$$StringFieldDataImplCopyWithImpl<$Res>;
+  factory _$$StringFieldDataImplCopyWith(
+    _$StringFieldDataImpl value,
+    $Res Function(_$StringFieldDataImpl) then,
+  ) = __$$StringFieldDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String value,
-      double confidence,
-      String? rawText,
-      Map<String, dynamic>? metadata});
+  $Res call({
+    String value,
+    double confidence,
+    String? rawText,
+    Map<String, dynamic>? metadata,
+  });
 }
 
 /// @nodoc
@@ -861,8 +899,9 @@ class __$$StringFieldDataImplCopyWithImpl<$Res>
     extends _$StringFieldDataCopyWithImpl<$Res, _$StringFieldDataImpl>
     implements _$$StringFieldDataImplCopyWith<$Res> {
   __$$StringFieldDataImplCopyWithImpl(
-      _$StringFieldDataImpl _value, $Res Function(_$StringFieldDataImpl) _then)
-      : super(_value, _then);
+    _$StringFieldDataImpl _value,
+    $Res Function(_$StringFieldDataImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of StringFieldData
   /// with the given fields replaced by the non-null parameter values.
@@ -874,36 +913,38 @@ class __$$StringFieldDataImplCopyWithImpl<$Res>
     Object? rawText = freezed,
     Object? metadata = freezed,
   }) {
-    return _then(_$StringFieldDataImpl(
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as String,
-      confidence: null == confidence
-          ? _value.confidence
-          : confidence // ignore: cast_nullable_to_non_nullable
-              as double,
-      rawText: freezed == rawText
-          ? _value.rawText
-          : rawText // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value._metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-    ));
+    return _then(
+      _$StringFieldDataImpl(
+        value: null == value
+            ? _value.value
+            : value // ignore: cast_nullable_to_non_nullable
+                  as String,
+        confidence: null == confidence
+            ? _value.confidence
+            : confidence // ignore: cast_nullable_to_non_nullable
+                  as double,
+        rawText: freezed == rawText
+            ? _value.rawText
+            : rawText // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        metadata: freezed == metadata
+            ? _value._metadata
+            : metadata // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$StringFieldDataImpl implements _StringFieldData {
-  const _$StringFieldDataImpl(
-      {required this.value,
-      required this.confidence,
-      this.rawText,
-      final Map<String, dynamic>? metadata})
-      : _metadata = metadata;
+  const _$StringFieldDataImpl({
+    required this.value,
+    required this.confidence,
+    this.rawText,
+    final Map<String, dynamic>? metadata,
+  }) : _metadata = metadata;
 
   factory _$StringFieldDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$StringFieldDataImplFromJson(json);
@@ -943,8 +984,13 @@ class _$StringFieldDataImpl implements _StringFieldData {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, value, confidence, rawText,
-      const DeepCollectionEquality().hash(_metadata));
+  int get hashCode => Object.hash(
+    runtimeType,
+    value,
+    confidence,
+    rawText,
+    const DeepCollectionEquality().hash(_metadata),
+  );
 
   /// Create a copy of StringFieldData
   /// with the given fields replaced by the non-null parameter values.
@@ -953,22 +999,23 @@ class _$StringFieldDataImpl implements _StringFieldData {
   @pragma('vm:prefer-inline')
   _$$StringFieldDataImplCopyWith<_$StringFieldDataImpl> get copyWith =>
       __$$StringFieldDataImplCopyWithImpl<_$StringFieldDataImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$StringFieldDataImplToJson(
-      this,
-    );
+    return _$$StringFieldDataImplToJson(this);
   }
 }
 
 abstract class _StringFieldData implements StringFieldData {
-  const factory _StringFieldData(
-      {required final String value,
-      required final double confidence,
-      final String? rawText,
-      final Map<String, dynamic>? metadata}) = _$StringFieldDataImpl;
+  const factory _StringFieldData({
+    required final String value,
+    required final double confidence,
+    final String? rawText,
+    final Map<String, dynamic>? metadata,
+  }) = _$StringFieldDataImpl;
 
   factory _StringFieldData.fromJson(Map<String, dynamic> json) =
       _$StringFieldDataImpl.fromJson;
@@ -1014,14 +1061,16 @@ mixin _$DoubleFieldData {
 /// @nodoc
 abstract class $DoubleFieldDataCopyWith<$Res> {
   factory $DoubleFieldDataCopyWith(
-          DoubleFieldData value, $Res Function(DoubleFieldData) then) =
-      _$DoubleFieldDataCopyWithImpl<$Res, DoubleFieldData>;
+    DoubleFieldData value,
+    $Res Function(DoubleFieldData) then,
+  ) = _$DoubleFieldDataCopyWithImpl<$Res, DoubleFieldData>;
   @useResult
-  $Res call(
-      {double value,
-      double confidence,
-      String? rawText,
-      Map<String, dynamic>? metadata});
+  $Res call({
+    double value,
+    double confidence,
+    String? rawText,
+    Map<String, dynamic>? metadata,
+  });
 }
 
 /// @nodoc
@@ -1044,40 +1093,45 @@ class _$DoubleFieldDataCopyWithImpl<$Res, $Val extends DoubleFieldData>
     Object? rawText = freezed,
     Object? metadata = freezed,
   }) {
-    return _then(_value.copyWith(
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as double,
-      confidence: null == confidence
-          ? _value.confidence
-          : confidence // ignore: cast_nullable_to_non_nullable
-              as double,
-      rawText: freezed == rawText
-          ? _value.rawText
-          : rawText // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value.metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            value: null == value
+                ? _value.value
+                : value // ignore: cast_nullable_to_non_nullable
+                      as double,
+            confidence: null == confidence
+                ? _value.confidence
+                : confidence // ignore: cast_nullable_to_non_nullable
+                      as double,
+            rawText: freezed == rawText
+                ? _value.rawText
+                : rawText // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            metadata: freezed == metadata
+                ? _value.metadata
+                : metadata // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>?,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$DoubleFieldDataImplCopyWith<$Res>
     implements $DoubleFieldDataCopyWith<$Res> {
-  factory _$$DoubleFieldDataImplCopyWith(_$DoubleFieldDataImpl value,
-          $Res Function(_$DoubleFieldDataImpl) then) =
-      __$$DoubleFieldDataImplCopyWithImpl<$Res>;
+  factory _$$DoubleFieldDataImplCopyWith(
+    _$DoubleFieldDataImpl value,
+    $Res Function(_$DoubleFieldDataImpl) then,
+  ) = __$$DoubleFieldDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {double value,
-      double confidence,
-      String? rawText,
-      Map<String, dynamic>? metadata});
+  $Res call({
+    double value,
+    double confidence,
+    String? rawText,
+    Map<String, dynamic>? metadata,
+  });
 }
 
 /// @nodoc
@@ -1085,8 +1139,9 @@ class __$$DoubleFieldDataImplCopyWithImpl<$Res>
     extends _$DoubleFieldDataCopyWithImpl<$Res, _$DoubleFieldDataImpl>
     implements _$$DoubleFieldDataImplCopyWith<$Res> {
   __$$DoubleFieldDataImplCopyWithImpl(
-      _$DoubleFieldDataImpl _value, $Res Function(_$DoubleFieldDataImpl) _then)
-      : super(_value, _then);
+    _$DoubleFieldDataImpl _value,
+    $Res Function(_$DoubleFieldDataImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DoubleFieldData
   /// with the given fields replaced by the non-null parameter values.
@@ -1098,36 +1153,38 @@ class __$$DoubleFieldDataImplCopyWithImpl<$Res>
     Object? rawText = freezed,
     Object? metadata = freezed,
   }) {
-    return _then(_$DoubleFieldDataImpl(
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as double,
-      confidence: null == confidence
-          ? _value.confidence
-          : confidence // ignore: cast_nullable_to_non_nullable
-              as double,
-      rawText: freezed == rawText
-          ? _value.rawText
-          : rawText // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value._metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-    ));
+    return _then(
+      _$DoubleFieldDataImpl(
+        value: null == value
+            ? _value.value
+            : value // ignore: cast_nullable_to_non_nullable
+                  as double,
+        confidence: null == confidence
+            ? _value.confidence
+            : confidence // ignore: cast_nullable_to_non_nullable
+                  as double,
+        rawText: freezed == rawText
+            ? _value.rawText
+            : rawText // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        metadata: freezed == metadata
+            ? _value._metadata
+            : metadata // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DoubleFieldDataImpl implements _DoubleFieldData {
-  const _$DoubleFieldDataImpl(
-      {required this.value,
-      required this.confidence,
-      this.rawText,
-      final Map<String, dynamic>? metadata})
-      : _metadata = metadata;
+  const _$DoubleFieldDataImpl({
+    required this.value,
+    required this.confidence,
+    this.rawText,
+    final Map<String, dynamic>? metadata,
+  }) : _metadata = metadata;
 
   factory _$DoubleFieldDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$DoubleFieldDataImplFromJson(json);
@@ -1167,8 +1224,13 @@ class _$DoubleFieldDataImpl implements _DoubleFieldData {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, value, confidence, rawText,
-      const DeepCollectionEquality().hash(_metadata));
+  int get hashCode => Object.hash(
+    runtimeType,
+    value,
+    confidence,
+    rawText,
+    const DeepCollectionEquality().hash(_metadata),
+  );
 
   /// Create a copy of DoubleFieldData
   /// with the given fields replaced by the non-null parameter values.
@@ -1177,22 +1239,23 @@ class _$DoubleFieldDataImpl implements _DoubleFieldData {
   @pragma('vm:prefer-inline')
   _$$DoubleFieldDataImplCopyWith<_$DoubleFieldDataImpl> get copyWith =>
       __$$DoubleFieldDataImplCopyWithImpl<_$DoubleFieldDataImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DoubleFieldDataImplToJson(
-      this,
-    );
+    return _$$DoubleFieldDataImplToJson(this);
   }
 }
 
 abstract class _DoubleFieldData implements DoubleFieldData {
-  const factory _DoubleFieldData(
-      {required final double value,
-      required final double confidence,
-      final String? rawText,
-      final Map<String, dynamic>? metadata}) = _$DoubleFieldDataImpl;
+  const factory _DoubleFieldData({
+    required final double value,
+    required final double confidence,
+    final String? rawText,
+    final Map<String, dynamic>? metadata,
+  }) = _$DoubleFieldDataImpl;
 
   factory _DoubleFieldData.fromJson(Map<String, dynamic> json) =
       _$DoubleFieldDataImpl.fromJson;
@@ -1238,14 +1301,16 @@ mixin _$DateFieldData {
 /// @nodoc
 abstract class $DateFieldDataCopyWith<$Res> {
   factory $DateFieldDataCopyWith(
-          DateFieldData value, $Res Function(DateFieldData) then) =
-      _$DateFieldDataCopyWithImpl<$Res, DateFieldData>;
+    DateFieldData value,
+    $Res Function(DateFieldData) then,
+  ) = _$DateFieldDataCopyWithImpl<$Res, DateFieldData>;
   @useResult
-  $Res call(
-      {DateTime value,
-      double confidence,
-      String? rawText,
-      Map<String, dynamic>? metadata});
+  $Res call({
+    DateTime value,
+    double confidence,
+    String? rawText,
+    Map<String, dynamic>? metadata,
+  });
 }
 
 /// @nodoc
@@ -1268,24 +1333,27 @@ class _$DateFieldDataCopyWithImpl<$Res, $Val extends DateFieldData>
     Object? rawText = freezed,
     Object? metadata = freezed,
   }) {
-    return _then(_value.copyWith(
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      confidence: null == confidence
-          ? _value.confidence
-          : confidence // ignore: cast_nullable_to_non_nullable
-              as double,
-      rawText: freezed == rawText
-          ? _value.rawText
-          : rawText // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value.metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            value: null == value
+                ? _value.value
+                : value // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            confidence: null == confidence
+                ? _value.confidence
+                : confidence // ignore: cast_nullable_to_non_nullable
+                      as double,
+            rawText: freezed == rawText
+                ? _value.rawText
+                : rawText // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            metadata: freezed == metadata
+                ? _value.metadata
+                : metadata // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -1293,15 +1361,17 @@ class _$DateFieldDataCopyWithImpl<$Res, $Val extends DateFieldData>
 abstract class _$$DateFieldDataImplCopyWith<$Res>
     implements $DateFieldDataCopyWith<$Res> {
   factory _$$DateFieldDataImplCopyWith(
-          _$DateFieldDataImpl value, $Res Function(_$DateFieldDataImpl) then) =
-      __$$DateFieldDataImplCopyWithImpl<$Res>;
+    _$DateFieldDataImpl value,
+    $Res Function(_$DateFieldDataImpl) then,
+  ) = __$$DateFieldDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {DateTime value,
-      double confidence,
-      String? rawText,
-      Map<String, dynamic>? metadata});
+  $Res call({
+    DateTime value,
+    double confidence,
+    String? rawText,
+    Map<String, dynamic>? metadata,
+  });
 }
 
 /// @nodoc
@@ -1309,8 +1379,9 @@ class __$$DateFieldDataImplCopyWithImpl<$Res>
     extends _$DateFieldDataCopyWithImpl<$Res, _$DateFieldDataImpl>
     implements _$$DateFieldDataImplCopyWith<$Res> {
   __$$DateFieldDataImplCopyWithImpl(
-      _$DateFieldDataImpl _value, $Res Function(_$DateFieldDataImpl) _then)
-      : super(_value, _then);
+    _$DateFieldDataImpl _value,
+    $Res Function(_$DateFieldDataImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of DateFieldData
   /// with the given fields replaced by the non-null parameter values.
@@ -1322,36 +1393,38 @@ class __$$DateFieldDataImplCopyWithImpl<$Res>
     Object? rawText = freezed,
     Object? metadata = freezed,
   }) {
-    return _then(_$DateFieldDataImpl(
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      confidence: null == confidence
-          ? _value.confidence
-          : confidence // ignore: cast_nullable_to_non_nullable
-              as double,
-      rawText: freezed == rawText
-          ? _value.rawText
-          : rawText // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value._metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-    ));
+    return _then(
+      _$DateFieldDataImpl(
+        value: null == value
+            ? _value.value
+            : value // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        confidence: null == confidence
+            ? _value.confidence
+            : confidence // ignore: cast_nullable_to_non_nullable
+                  as double,
+        rawText: freezed == rawText
+            ? _value.rawText
+            : rawText // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        metadata: freezed == metadata
+            ? _value._metadata
+            : metadata // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DateFieldDataImpl implements _DateFieldData {
-  const _$DateFieldDataImpl(
-      {required this.value,
-      required this.confidence,
-      this.rawText,
-      final Map<String, dynamic>? metadata})
-      : _metadata = metadata;
+  const _$DateFieldDataImpl({
+    required this.value,
+    required this.confidence,
+    this.rawText,
+    final Map<String, dynamic>? metadata,
+  }) : _metadata = metadata;
 
   factory _$DateFieldDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$DateFieldDataImplFromJson(json);
@@ -1391,8 +1464,13 @@ class _$DateFieldDataImpl implements _DateFieldData {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, value, confidence, rawText,
-      const DeepCollectionEquality().hash(_metadata));
+  int get hashCode => Object.hash(
+    runtimeType,
+    value,
+    confidence,
+    rawText,
+    const DeepCollectionEquality().hash(_metadata),
+  );
 
   /// Create a copy of DateFieldData
   /// with the given fields replaced by the non-null parameter values.
@@ -1404,18 +1482,17 @@ class _$DateFieldDataImpl implements _DateFieldData {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DateFieldDataImplToJson(
-      this,
-    );
+    return _$$DateFieldDataImplToJson(this);
   }
 }
 
 abstract class _DateFieldData implements DateFieldData {
-  const factory _DateFieldData(
-      {required final DateTime value,
-      required final double confidence,
-      final String? rawText,
-      final Map<String, dynamic>? metadata}) = _$DateFieldDataImpl;
+  const factory _DateFieldData({
+    required final DateTime value,
+    required final double confidence,
+    final String? rawText,
+    final Map<String, dynamic>? metadata,
+  }) = _$DateFieldDataImpl;
 
   factory _DateFieldData.fromJson(Map<String, dynamic> json) =
       _$DateFieldDataImpl.fromJson;

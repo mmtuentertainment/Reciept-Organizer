@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/config/environment.dart';
+import 'production_config.dart';
 
 /// Supabase configuration and initialization
 class SupabaseConfig {
@@ -11,34 +12,34 @@ class SupabaseConfig {
   
   // Get Supabase URL based on environment
   static String get supabaseUrl {
+    // Check if we should use production config
+    if (ProductionConfig.useProduction) {
+      return ProductionConfig.supabaseUrl;
+    }
+
     // Check if running in development mode
     if (Environment.isDevelopment) {
       // Use environment variable if available, otherwise use local dev URL
       return const String.fromEnvironment('SUPABASE_URL', defaultValue: _localDevUrl);
     } else {
-      // Production/staging - require environment variable
-      final url = const String.fromEnvironment('SUPABASE_URL');
-      if (url.isEmpty) {
-        // Fallback to local for now since we're in development
-        return _localDevUrl;
-      }
-      return url;
+      // Production/staging - use production config
+      return ProductionConfig.supabaseUrl;
     }
   }
-  
+
   static String get supabaseAnonKey {
+    // Check if we should use production config
+    if (ProductionConfig.useProduction) {
+      return ProductionConfig.supabaseAnonKey;
+    }
+
     // Check if running in development mode
     if (Environment.isDevelopment) {
       // Use environment variable if available, otherwise use local dev key
       return const String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: _localDevAnonKey);
     } else {
-      // Production/staging - require environment variable
-      final key = const String.fromEnvironment('SUPABASE_ANON_KEY');
-      if (key.isEmpty) {
-        // Fallback to local for now since we're in development
-        return _localDevAnonKey;
-      }
-      return key;
+      // Production/staging - use production config
+      return ProductionConfig.supabaseAnonKey;
     }
   }
   

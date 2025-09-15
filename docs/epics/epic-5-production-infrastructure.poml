@@ -1,0 +1,220 @@
+# Epic 5: Production Infrastructure
+@type: infrastructure_epic
+@phase: production_deployment
+@priority: P0-CRITICAL
+@status: IN_PLANNING
+@created: 2025-01-13
+
+## Epic Header {
+  @title: "Production Infrastructure Setup"
+  @epic_number: 5
+  @parent_workflow: "PRODUCTION_DEPLOYMENT_WORKFLOW.poml"
+}
+
+## Epic Goal {
+  @objective: "Establish secure, scalable production infrastructure on Supabase cloud with proper authentication, migration, and security configuration"
+  @outcome: "Production-ready Supabase instance supporting both web and mobile applications with verified security"
+}
+
+## Epic Description {
+  Vision: |
+    Create a robust production infrastructure that securely hosts the Receipt Organizer application,
+    ensuring data integrity, proper authentication, and scalability for growing user base.
+
+  Scope: [
+    "Pre-production validation and backup procedures",
+    "Supabase cloud project creation and configuration",
+    "Database migration from local to production",
+    "Security hardening and verification",
+    "Documentation and runbooks"
+  ]
+
+  Success_Metrics: {
+    technical: [
+      "100% migrations applied successfully",
+      "All tables have RLS enabled",
+      "Zero unauthorized data access",
+      "Backup and rollback procedures tested"
+    ],
+    operational: [
+      "< 60 minute total deployment time",
+      "Complete documentation created",
+      "Security runbook available",
+      "Team can access production"
+    ]
+  }
+}
+
+## Sub-Epics {
+
+  ### Epic_5_1: "Pre-Production Validation" {
+    @file: "epic-5.1-pre-production-validation.poml"
+    @duration: "30 minutes"
+    @stories: 3
+    @status: "PLANNED"
+    @summary: "Backup local data, review migrations, create deployment checklist"
+  }
+
+  ### Epic_5_2: "Supabase Project Setup" {
+    @file: "epic-5.2-supabase-project-setup.poml"
+    @duration: "45 minutes"
+    @stories: 4
+    @status: "PLANNED"
+    @summary: "Create cloud project, configure auth, enable RLS, set project settings"
+  }
+
+  ### Epic_5_3: "Database Migration" {
+    @file: "epic-5.3-database-migration.poml"
+    @duration: "45 minutes"
+    @stories: 5
+    @status: "PLANNED"
+    @summary: "Link project, dry run, apply migrations, verify schema, document"
+  }
+
+  ### Epic_5_4: "Security Configuration" {
+    @file: "epic-5.4-security-configuration.poml"
+    @duration: "30 minutes"
+    @stories: 5
+    @status: "PLANNED"
+    @summary: "Verify RLS, test access, validate policies, configure API, create runbook"
+  }
+}
+
+## Dependencies {
+  Prerequisites: [
+    "Flutter 3.35.3 installed",
+    "Node.js v24.6.0 installed",
+    "Supabase CLI 2.40.7 installed",
+    "Local development environment working",
+    "All tests passing"
+  ]
+
+  Blocks: [
+    "Phase 2: Authentication UI",
+    "Phase 3: Sync Status Indicators",
+    "Phase 4: Landing Page",
+    "Phase 5: Dashboard"
+  ]
+}
+
+## Risk Assessment {
+  High_Risk: [
+    "Database migration failures",
+    "RLS policy misconfiguration",
+    "Credential exposure"
+  ]
+
+  Medium_Risk: [
+    "API rate limiting issues",
+    "CORS configuration problems",
+    "Missing dependencies"
+  ]
+
+  Low_Risk: [
+    "Documentation gaps",
+    "Team access delays"
+  ]
+
+  Mitigation: {
+    strategy: "Incremental validation with rollback capability at each step",
+    backup_plan: "Complete backup before each major operation",
+    testing: "Dry run all operations before execution"
+  }
+}
+
+## Execution Plan {
+
+  ### Phase_Approach: "Sequential execution with validation gates" {
+
+    Day_1_Morning: [
+      "Epic 5.1: Pre-Production Validation (30 min)",
+      "Epic 5.2: Supabase Project Setup (45 min)",
+      "Validation checkpoint"
+    ]
+
+    Day_1_Afternoon: [
+      "Epic 5.3: Database Migration (45 min)",
+      "Epic 5.4: Security Configuration (30 min)",
+      "Final verification"
+    ]
+
+    Total_Duration: "2.5 hours active work + buffer time"
+  }
+
+  ### Rollback_Points: [
+    "After backup creation",
+    "Before migration apply",
+    "After each security change"
+  ]
+}
+
+## Team Allocation {
+  Required_Roles: {
+    lead: "DevOps Engineer or Full Stack Developer",
+    support: "Database Administrator (optional)",
+    reviewer: "Security Engineer (for Epic 5.4)"
+  }
+
+  Knowledge_Required: [
+    "Supabase platform familiarity",
+    "PostgreSQL and RLS understanding",
+    "Basic security testing",
+    "CLI tool usage"
+  ]
+}
+
+## Documentation Outputs {
+  Required_Artifacts: [
+    "deployment_checklist.md",
+    "migration-log-{{date}}.md",
+    "production-security-runbook.md",
+    "credentials in password manager"
+  ]
+
+  Team_Communication: [
+    "Slack notification before start",
+    "Update after each epic completion",
+    "Final summary with access details"
+  ]
+}
+
+## Success Criteria {
+  @must_have: [
+    "Production Supabase project live",
+    "All migrations applied successfully",
+    "RLS enabled and verified on all tables",
+    "Authentication providers configured",
+    "Security tests passing"
+  ]
+
+  @nice_to_have: [
+    "Automated backup schedule configured",
+    "Monitoring alerts set up",
+    "Performance baseline established"
+  ]
+}
+
+## Next Steps {
+  After_Completion: [
+    "Phase 2: Implement Authentication UI",
+    "Configure environment variables in apps",
+    "Test end-to-end connectivity",
+    "Begin user acceptance testing"
+  ]
+
+  Immediate_Actions: [
+    "Review all sub-epics",
+    "Verify prerequisites",
+    "Schedule deployment window",
+    "Notify team"
+  ]
+}
+
+---
+## Metadata Footer {
+  @epic_count: 4
+  @total_stories: 17
+  @estimated_effort: "2.5 hours"
+  @last_updated: "2025-01-13"
+  @format: "POML"
+}

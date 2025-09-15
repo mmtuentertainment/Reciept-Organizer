@@ -1,0 +1,91 @@
+<testing-strategy>
+  <section name="CriticalDirective" priority="CRITICAL">
+    <warning>DO NOT ADD MORE TESTS WITHOUT EXPLICIT DISCUSSION</warning>
+    <description>This project uses a minimal test strategy following the CleanArchitectureTodoApp pattern</description>
+  </section>
+
+  <section name="TestHistory">
+    <milestone name="Original">571 tests (way too many, 131 failing)</milestone>
+    <milestone name="Current">15 critical tests only</milestone>
+    <location>apps/mobile/test/</location>
+    <strategy-doc>apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md</strategy-doc>
+  </section>
+
+  <section name="TestCategories">
+    <category name="CoreTests">
+      <location>test/core_tests/</location>
+      <description>Unit tests for business logic</description>
+      <tests>
+        <test>Receipt repository operations</test>
+        <test>CSV export functionality</test>
+        <test>App launch verification</test>
+      </tests>
+    </category>
+
+    <category name="IntegrationTests">
+      <location>test/integration_tests/</location>
+      <description>User flow tests</description>
+      <tests>
+        <test>Critical user flows</test>
+        <test>Navigation between screens</test>
+        <test>Settings access</test>
+      </tests>
+    </category>
+
+    <category name="ExportValidation">
+      <location>test/integration/export_validation_flow_test.dart</location>
+      <description>13 comprehensive tests</description>
+      <tests>
+        <test>QuickBooks/Xero format validation</test>
+        <test>CSV injection prevention</test>
+        <test>Performance benchmarks</test>
+      </tests>
+    </category>
+
+    <category name="InfrastructureTests">
+      <location>test/infrastructure/</location>
+      <description>Cloud integration</description>
+      <tests>
+        <test>Supabase auth service tests</test>
+        <test>Sync service tests</test>
+        <test>Integration tests (skipped when not configured)</test>
+      </tests>
+    </category>
+  </section>
+
+  <section name="Rationale">
+    <reason>Industry best practice: Most successful Flutter apps have 50-200 tests, not 500+</reason>
+    <reason>CleanArchitectureTodoApp (a reference implementation) uses only 12 tests</reason>
+    <reason>Maintenance burden of 571 tests was unsustainable</reason>
+    <reason>Focus on critical business logic, not edge cases</reason>
+  </section>
+
+  <section name="BeforeAddingTests">
+    <step number="1">Read apps/mobile/test/SIMPLIFIED_TEST_STRATEGY.md</step>
+    <step number="2">Justify why it's critical for MVP</step>
+    <step number="3">Consider if existing tests already cover it</step>
+    <step number="4">Get explicit approval in the conversation</step>
+  </section>
+
+  <section name="TestCommands">
+    <command name="RunCriticalTests">
+      <description>Run ONLY the 15 critical tests</description>
+      <code>flutter test test/core_tests/ test/integration_tests/</code>
+    </command>
+    <command name="VerifyTestCount">
+      <description>Verify test count stays at ~15</description>
+      <code>bash apps/mobile/test/PROTECT_TESTS.sh</code>
+    </command>
+    <command name="RunInfrastructureTests">
+      <description>Run infrastructure tests (when configured)</description>
+      <code>CI=true flutter test test/infrastructure/supabase_integration_test.dart</code>
+    </command>
+  </section>
+
+  <section name="TestDiscipline">
+    <rule priority="HIGH">NEVER add tests without explicit discussion</rule>
+    <rule>Use real data fixtures from lib/test/fixtures/real_data_loader.dart</rule>
+    <rule>All tests must pass before any PR/merge</rule>
+    <rule>Follow patterns in existing test codebase</rule>
+  </section>
+</testing-strategy>
