@@ -25,7 +25,7 @@ void main() {
       // Given
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
-      
+
       // When
       await tester.pumpWidget(
         ProviderScope(
@@ -36,17 +36,17 @@ void main() {
         ),
       );
       await tester.pump();
-      
-      // Then - App loaded with title
-      expect(find.text('Receipt Organizer'), findsOneWidget);
-      expect(find.text('Receipt Organizer MVP'), findsOneWidget);
+
+      // Then - App loaded with login screen (no auth session)
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(find.text('Sign in to your account'), findsOneWidget);
     });
 
-    testWidgets('main buttons should be visible', (WidgetTester tester) async {
+    testWidgets('login screen elements should be visible', (WidgetTester tester) async {
       // Given
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
-      
+
       // When
       await tester.pumpWidget(
         ProviderScope(
@@ -57,10 +57,10 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      
-      // Then - Main action buttons exist
-      expect(find.text('Capture Receipt'), findsOneWidget);
-      expect(find.byIcon(Icons.receipt_long), findsOneWidget);
+
+      // Then - Login screen elements exist
+      expect(find.text('Sign In'), findsOneWidget); // The Sign In button
+      expect(find.byIcon(Icons.receipt_long), findsOneWidget); // App icon
     });
   });
 }
