@@ -22,6 +22,10 @@ void main() {
           id: 'test-1',
           imageUri: '/image1.jpg',
           capturedAt: DateTime(2024, 12, 6),
+          vendorName: 'Test Store',
+          receiptDate: DateTime(2024, 12, 6),
+          totalAmount: 25.99,
+          ocrConfidence: 95.0,
           ocrResults: ProcessingResult(
             merchant: FieldData(value: 'Test Store', confidence: 0.95, originalText: 'Test Store'),
             total: FieldData(value: '25.99', confidence: 0.98, originalText: '25.99'),
@@ -50,6 +54,10 @@ void main() {
           id: 'test-1',
           imageUri: '/image1.jpg',
           capturedAt: DateTime(2024, 12, 6),
+          vendorName: 'Coffee Shop',
+          receiptDate: DateTime(2024, 12, 6),
+          totalAmount: 4.50,
+          ocrConfidence: 95.0,
           ocrResults: ProcessingResult(
             merchant: FieldData(value: 'Coffee Shop', confidence: 0.95, originalText: 'Coffee Shop'),
             total: FieldData(value: '4.50', confidence: 0.98, originalText: '4.50'),
