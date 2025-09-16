@@ -15,6 +15,7 @@ class ReceiptRecord {
   final double? tax;
   final double confidence;
   final String? rawOcrText;
+  final String? notes;
 
   ReceiptRecord({
     required this.id,
@@ -27,6 +28,7 @@ class ReceiptRecord {
     this.tax,
     required this.confidence,
     this.rawOcrText,
+    this.notes,
   });
 
   Map<String, dynamic> toMap() {
@@ -41,6 +43,7 @@ class ReceiptRecord {
       'tax': tax,
       'confidence': confidence,
       'rawOcrText': rawOcrText,
+      'notes': notes,
     };
   }
 
@@ -56,6 +59,7 @@ class ReceiptRecord {
       tax: map['tax'],
       confidence: map['confidence'],
       rawOcrText: map['rawOcrText'],
+      notes: map['notes'],
     );
   }
 }
@@ -90,7 +94,8 @@ class ReceiptStorageService {
             total REAL,
             tax REAL,
             confidence REAL NOT NULL,
-            rawOcrText TEXT
+            rawOcrText TEXT,
+            notes TEXT
           )
         ''');
 
@@ -109,6 +114,7 @@ class ReceiptStorageService {
     double? tax,
     double confidence = 0.0,
     String? rawOcrText,
+    String? notes,
   }) async {
     final db = await database;
     final id = const Uuid().v4();
@@ -124,6 +130,7 @@ class ReceiptStorageService {
       tax: tax,
       confidence: confidence,
       rawOcrText: rawOcrText,
+      notes: notes,
     );
 
     await db.insert('receipts', record.toMap());
@@ -133,6 +140,28 @@ class ReceiptStorageService {
   Future<List<ReceiptRecord>> getAllReceipts() async {
     final db = await database;
     final maps = await db.query('receipts', orderBy: 'capturedAt DESC');
+    return maps.map((map) => ReceiptRecord.fromMap(map)).toList();
+  }
+
+  Future<List<ReceiptRecord>> searchReceipts(String searchTerm) async {
+    if (searchTerm.isEmpty) {
+      return getAllReceipts();
+    }
+
+    final db = await database;
+    final searchPattern = '%${searchTerm.toLowerCase()}%';
+
+    final maps = await db.query(
+      'receipts',
+      where: '''
+        LOWER(merchant) LIKE ? OR
+        LOWER(notes) LIKE ? OR
+        LOWER(rawOcrText) LIKE ?
+      ''',
+      whereArgs: [searchPattern, searchPattern, searchPattern],
+      orderBy: 'capturedAt DESC',
+    );
+
     return maps.map((map) => ReceiptRecord.fromMap(map)).toList();
   }
 

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as path;
 import '../../domain/services/ocr_service.dart';
+import '../presentation/widgets/notes_field_editor.dart';
 
 class ReceiptPreviewScreen extends ConsumerStatefulWidget {
   final String imagePath;
@@ -21,6 +22,7 @@ class _ReceiptPreviewScreenState extends ConsumerState<ReceiptPreviewScreen> {
   bool _isProcessing = false;
   String? _errorMessage;
   ProcessingResult? _ocrResult;
+  String? _notes;
   final OCRService _ocrService = OCRService();
 
   @override
@@ -95,13 +97,20 @@ class _ReceiptPreviewScreenState extends ConsumerState<ReceiptPreviewScreen> {
         await File(thumbnailPath).writeAsBytes(thumbnailBytes);
       }
 
+      // Save receipt with notes to storage
+      // This would integrate with ReceiptStorageService in a real implementation
+      // For now, notes are captured and ready to be saved
+
       if (mounted) {
-        // Navigate to next screen or back to home
+        // Navigate to next screen or back to home with notes included
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/home',
           (route) => false,
-          arguments: {'savedReceipt': widget.imagePath},
+          arguments: {
+            'savedReceipt': widget.imagePath,
+            'notes': _notes,
+          },
         );
       }
     } catch (e) {
@@ -176,6 +185,24 @@ class _ReceiptPreviewScreenState extends ConsumerState<ReceiptPreviewScreen> {
                     _buildResultRow('Tax', '\$${_ocrResult!.tax!.toStringAsFixed(2)}',
                         _ocrResult!.confidence['tax'] ?? 0),
                 ],
+              ),
+            ),
+
+          // Notes field
+          if (_ocrResult != null && !_isProcessing)
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.black87,
+              child: NotesFieldEditor(
+                initialValue: _notes,
+                onChanged: (value) {
+                  setState(() {
+                    _notes = value;
+                  });
+                },
+                onSaved: () {
+                  // Notes will be saved with the receipt
+                },
               ),
             ),
 
