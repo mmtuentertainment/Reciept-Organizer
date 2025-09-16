@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:receipt_organizer/features/export/presentation/pages/export_screen.dart';
@@ -23,7 +24,7 @@ void main() {
   late TestDataGenerator testDataGenerator;
   
   setUpAll(() {
-    registerFallbackValue(ExportFormat.quickbooks);
+    registerFallbackValue(ExportFormat.quickBooks3Column);
     registerFallbackValue(DateTime.now());
     registerFallbackValue(<Receipt>[]);
   });
@@ -228,7 +229,7 @@ void main() {
                 ExportRecord(
                   id: '1',
                   exportDate: DateTime.now(),
-                  format: ExportFormat.quickbooks,
+                  format: ExportFormat.quickBooks3Column,
                   receiptCount: 25,
                   filePath: '/storage/receipts.csv',
                   fileName: 'receipts.csv',
@@ -305,7 +306,7 @@ void main() {
               BatchInfo(
                 totalBatches: 3,
                 batchSizes: [1000, 1000, 500],
-                format: ExportFormat.quickbooks,
+                format: ExportFormat.quickBooks3Column,
               ),
             ),
           ],

@@ -28,7 +28,7 @@ void main() {
       // Step 1: Validate receipts
       final validation = await exportService.validateForExport(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
       );
 
       expect(validation.isValid, true);
@@ -38,7 +38,7 @@ void main() {
       // Step 2: Generate CSV content
       final csvContent = exportService.generateCSVContent(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
       );
 
       expect(csvContent, isNotEmpty);
@@ -48,7 +48,7 @@ void main() {
       // Step 3: Validate format compliance
       final formatValidation = ExportFormatValidator.validateFormat(
         csvContent,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
       );
 
       expect(formatValidation.isValid, true);
@@ -57,7 +57,7 @@ void main() {
       // Step 4: Check batch processing
       final batches = exportService.createBatches(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
       );
 
       expect(batches.length, equals(1)); // 50 receipts should fit in one batch
@@ -67,7 +67,7 @@ void main() {
       final progressValues = <double>[];
       await for (final progress in exportService.exportWithProgress(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
         customFileName: 'test_export_quickbooks.csv',
       )) {
         progressValues.add(progress);
@@ -92,7 +92,7 @@ void main() {
         taxAmount: (data['tax'] as num?)?.toDouble(),
         notes: data['notes'],
         capturedAt: DateTime.now(),
-        imagePath: 'test/image.jpg',
+        imageUri: 'test/image.jpg',
         status: ReceiptStatus.ready,
         overallConfidence: 85.0,
       )).toList();
@@ -167,7 +167,7 @@ void main() {
       // Validate edge cases
       final validation = await exportService.validateForExport(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
       );
 
       // Even with edge cases, valid receipts should export
@@ -178,7 +178,7 @@ void main() {
       // Generate CSV with sanitization
       final csvContent = exportService.generateCSVContent(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
       );
 
       // Verify CSV injection prevention
@@ -218,7 +218,7 @@ void main() {
       // Test QuickBooks batching (1000 per batch)
       final qbBatches = exportService.createBatches(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
       );
 
       expect(qbBatches.length, equals(3)); // 2500 / 1000 = 3 batches
@@ -261,7 +261,7 @@ void main() {
       // Test QuickBooks format (MM/DD/YYYY expected)
       final qbContent = exportService.generateCSVContent(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
       );
 
       expect(qbContent, contains('01/15/2024'));
@@ -302,12 +302,12 @@ void main() {
 
         // Measure validation time
         final validationStart = DateTime.now();
-        await exportService.validateForExport(receipts, ExportFormat.quickbooks);
+        await exportService.validateForExport(receipts, ExportFormat.quickBooks3Column);
         final validationTime = DateTime.now().difference(validationStart);
 
         // Measure CSV generation time
         final generationStart = DateTime.now();
-        exportService.generateCSVContent(receipts, ExportFormat.quickbooks);
+        exportService.generateCSVContent(receipts, ExportFormat.quickBooks3Column);
         final generationTime = DateTime.now().difference(generationStart);
 
         // Performance assertions
@@ -343,7 +343,7 @@ void main() {
       // Export to file
       final result = await exportService.exportToCSV(
         receipts,
-        ExportFormat.quickbooks,
+        ExportFormat.quickBooks3Column,
         customFileName: 'test_file_creation.csv',
       );
 

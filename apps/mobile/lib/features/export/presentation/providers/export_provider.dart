@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_repository.dart';
 import 'package:receipt_organizer/core/providers/repository_providers.dart' as core_providers;
@@ -22,7 +23,7 @@ class ExportState {
   ExportState({
     this.isExporting = false,
     this.progress = 0.0,
-    this.selectedFormat = ExportFormat.quickbooks,
+    this.selectedFormat = ExportFormat.quickBooks3Column,
     this.startDate,
     this.endDate,
     this.selectedReceipts = const [],

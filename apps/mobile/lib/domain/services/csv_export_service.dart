@@ -4,14 +4,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 
-class ValidationResult {
+class CSVValidationResult {
   final bool isValid;
   final List<String> errors;
   final List<String> warnings;
   final int validCount;
   final int totalCount;
 
-  ValidationResult({
+  CSVValidationResult({
     required this.isValid,
     this.errors = const [],
     this.warnings = const [],
@@ -53,7 +53,7 @@ class ExportResult {
 }
 
 abstract class ICSVExportService {
-  Future<ValidationResult> validateForExport(List<Receipt> receipts, ExportFormat format);
+  Future<CSVValidationResult> validateForExport(List<Receipt> receipts, ExportFormat format);
   Future<ExportResult> exportToCSV(List<Receipt> receipts, ExportFormat format, {String? customFileName});
   String generateCSVContent(List<Receipt> receipts, ExportFormat format);
   List<String> getRequiredFields(ExportFormat format);
@@ -68,13 +68,13 @@ class CSVExportService implements ICSVExportService {
 
   final ExportFormatValidator _validator = ExportFormatValidator();
   @override
-  Future<ValidationResult> validateForExport(List<Receipt> receipts, ExportFormat format) async {
+  Future<CSVValidationResult> validateForExport(List<Receipt> receipts, ExportFormat format) async {
     // First use our comprehensive validator
     final csvContent = generateCSVContent(receipts, format);
     final validatorResult = ExportFormatValidator.validateFormat(csvContent, format);
 
     if (!validatorResult.isValid) {
-      return ValidationResult(
+      return CSVValidationResult(
         isValid: false,
         errors: validatorResult.errors,
         warnings: validatorResult.warnings,
@@ -138,7 +138,7 @@ class CSVExportService implements ICSVExportService {
       warnings.addAll(receiptWarnings);
     }
     
-    return ValidationResult(
+    return CSVValidationResult(
       isValid: errors.isEmpty,
       errors: errors,
       warnings: warnings,
