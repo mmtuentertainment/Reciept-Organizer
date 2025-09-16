@@ -6,7 +6,7 @@ import 'package:receipt_organizer/features/capture/widgets/receipt_thumbnail_wid
 import 'package:receipt_organizer/features/capture/widgets/ocr_results_widget.dart';
 import 'package:receipt_organizer/features/receipts/presentation/widgets/confidence_badge.dart';
 import 'package:receipt_organizer/shared/widgets/confidence_score_widget.dart';
-import 'package:receipt_organizer/domain/services/csv_export_service.dart';
+import 'package:receipt_organizer/domain/services/csv_export_service.dart' hide ValidationResult;
 import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 
 class BatchReviewScreen extends ConsumerStatefulWidget {
