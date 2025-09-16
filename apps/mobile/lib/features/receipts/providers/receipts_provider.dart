@@ -78,7 +78,7 @@ final createReceiptProvider = Provider((ref) {
         'notes': receipt.notes,
         'image_url': receipt.imageUrl,
         'ocr_confidence': receipt.ocrConfidence,
-        'status': receipt.status,
+        'status': receipt.status.name,
       };
 
       final response = await SupabaseConfig.client
@@ -115,7 +115,7 @@ final updateReceiptProvider = Provider((ref) {
         'notes': receipt.notes,
         'image_url': receipt.imageUrl,
         'ocr_confidence': receipt.ocrConfidence,
-        'status': receipt.status,
+        'status': receipt.status.name,
         'updated_at': DateTime.now().toIso8601String(),
       };
 
