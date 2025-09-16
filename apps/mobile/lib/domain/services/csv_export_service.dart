@@ -97,27 +97,27 @@ class CSVExportService implements ICSVExportService {
       
       // Check required fields based on format
       if (format == ExportFormat.quickBooks3Column || format == ExportFormat.quickBooks4Column || format == ExportFormat.xero) {
-        if (receipt.merchantName == null || receipt.merchantName!.isEmpty) {
+        if (receipt.vendorName == null || receipt.vendorName!.isEmpty) {
           receiptErrors.add('Receipt ${i + 1}: Missing merchant name');
         }
-        
+
         if (receipt.receiptDate == null) {
           receiptErrors.add('Receipt ${i + 1}: Missing date');
         }
-        
+
         if (receipt.totalAmount == null || receipt.totalAmount! <= 0) {
           receiptErrors.add('Receipt ${i + 1}: Missing or invalid total amount');
         }
-        
+
         // Warnings for low confidence
-        if (receipt.hasOCRResults && receipt.overallConfidence < 70) {
-          receiptWarnings.add('Receipt ${i + 1}: Low OCR confidence (${receipt.overallConfidence.toStringAsFixed(1)}%)');
+        if (receipt.hasOCRResults && receipt.ocrConfidence != null && receipt.ocrConfidence! < 70) {
+          receiptWarnings.add('Receipt ${i + 1}: Low OCR confidence (${receipt.ocrConfidence!.toStringAsFixed(1)}%)');
         }
-        
+
         // Format-specific validations
         if (format == ExportFormat.quickBooks3Column || format == ExportFormat.quickBooks4Column) {
           // QuickBooks-specific validations
-          if (receipt.merchantName != null && receipt.merchantName!.length > 100) {
+          if (receipt.vendorName != null && receipt.vendorName!.length > 100) {
             receiptWarnings.add('Receipt ${i + 1}: Merchant name may be too long for QuickBooks');
           }
         }
@@ -217,7 +217,7 @@ class CSVExportService implements ICSVExportService {
     final rows = <List<String>>[headers];
     
     for (final receipt in receipts) {
-      final description = '${_sanitizeForCSV(receipt.merchantName ?? 'Unknown Merchant')} - ${_sanitizeForCSV(receipt.notes)}';
+      final description = '${_sanitizeForCSV(receipt.vendorName ?? 'Unknown Merchant')} - ${_sanitizeForCSV(receipt.notes)}';
       rows.add([
         _formatDateQuickBooks(receipt.receiptDate) ?? '',
         description,
@@ -241,7 +241,7 @@ class CSVExportService implements ICSVExportService {
           : (receipt.totalAmount ?? 0);
 
       rows.add([
-        _sanitizeForCSV(receipt.merchantName ?? 'Unknown Vendor'),
+        _sanitizeForCSV(receipt.vendorName ?? 'Unknown Vendor'),
         'REC-${invoiceNum.toString().padLeft(6, '0')}',
         date,
         date, // Due date same as invoice date
@@ -277,12 +277,12 @@ class CSVExportService implements ICSVExportService {
       rows.add([
         receipt.id,
         _formatDate(receipt.receiptDate) ?? '',
-        _sanitizeForCSV(receipt.merchantName),
+        _sanitizeForCSV(receipt.vendorName),
         _formatAmount(receipt.totalAmount) ?? '',
         _formatAmount(receipt.taxAmount) ?? '',
         _formatDateTime(receipt.capturedAt),
         receipt.batchId ?? '',
-        receipt.overallConfidence.toStringAsFixed(1),
+        receipt.ocrConfidence?.toStringAsFixed(1) ?? '0.0',
         receipt.status.name,
         _sanitizeForCSV(receipt.notes),
       ]);
