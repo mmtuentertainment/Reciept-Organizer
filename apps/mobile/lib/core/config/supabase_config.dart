@@ -14,7 +14,7 @@ class SupabaseConfig {
         'SUPABASE_ANON_KEY',
         defaultValue: '[REDACTED_SUPABASE_ANON_KEY]',
       ),
-      authOptions: const FlutterAuthClientOptions(
+      authOptions: FlutterAuthClientOptions(
         authFlowType: AuthFlowType.pkce,
         localStorage: SecureLocalStorage(),
       ),
@@ -27,6 +27,7 @@ class SupabaseConfig {
 /// Secure storage implementation for Supabase auth
 class SecureLocalStorage extends LocalStorage {
   static const _storage = FlutterSecureStorage();
+  static const _sessionKey = 'supabase_session';
 
   @override
   Future<void> initialize() async {
@@ -35,7 +36,7 @@ class SecureLocalStorage extends LocalStorage {
 
   @override
   Future<String?> accessToken() async {
-    final session = await getItem('supabase_session');
+    final session = await getItem(_sessionKey);
     if (session != null) {
       final data = json.decode(session);
       return data['access_token'];
@@ -75,6 +76,18 @@ class SecureLocalStorage extends LocalStorage {
     } catch (e) {
       print('Error removing from secure storage: $e');
     }
+  }
+
+  @override
+  Future<void> persistSession(String session) async {
+    // Store the session string in secure storage
+    await setItem(_sessionKey, session);
+  }
+
+  @override
+  Future<void> removePersistedSession() async {
+    // Remove the session from secure storage
+    await removeItem(_sessionKey);
   }
 }
 

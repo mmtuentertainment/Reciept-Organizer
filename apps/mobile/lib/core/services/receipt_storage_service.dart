@@ -183,8 +183,8 @@ class ReceiptStorageService {
         if (await File(receipt.imagePath).exists()) {
           await File(receipt.imagePath).delete();
         }
-        if (receipt.thumbnailPath != null && await File(receipt.thumbnailPath).exists()) {
-          await File(receipt.thumbnailPath).delete();
+        if (receipt.thumbnailPath != null && await File(receipt.thumbnailPath!).exists()) {
+          await File(receipt.thumbnailPath!).delete();
         }
       } catch (_) {
         // Ignore file deletion errors
@@ -196,14 +196,13 @@ class ReceiptStorageService {
   }
 
   Future<void> cleanupOrphanedImages() async {
-    final db = await database;
     final receipts = await getAllReceipts();
     final validPaths = <String>{};
 
     for (final receipt in receipts) {
       validPaths.add(receipt.imagePath);
       if (receipt.thumbnailPath != null) {
-        validPaths.add(receipt.thumbnailPath);
+        validPaths.add(receipt.thumbnailPath!);
       }
     }
 
