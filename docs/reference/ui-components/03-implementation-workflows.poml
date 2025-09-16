@@ -1,0 +1,515 @@
+# Implementation Workflows - Receipt Organizer Web UI
+@type: step_by_step_guides
+@purpose: "Complete implementation workflows for features"
+@optimized_for: claude_code
+
+## Landing_Page_Workflow {
+  @priority: 1
+  @estimated_time: "2-3 hours"
+  @location: apps/web
+  
+  Step_1_Setup: {
+    @description: "Initialize shadcn and add components"
+    @commands: [
+      "cd apps/web",
+      "npx shadcn@latest init",
+      "npx shadcn@latest add card button badge avatar",
+      "npx shadcn@latest add navigation-menu",
+      "npx shadcn@latest add accordion"
+    ]
+    @creates: [
+      "components.json",
+      "components/ui/card.tsx",
+      "components/ui/button.tsx",
+      "components/ui/badge.tsx"
+    ]
+  }
+  
+  Step_2_Layout: {
+    @description: "Create landing page layout"
+    @file: "app/page.tsx"
+    @structure: ```tsx
+      import { Hero } from '@/components/landing/hero'
+      import { Features } from '@/components/landing/features'
+      import { Pricing } from '@/components/landing/pricing'
+      import { Testimonials } from '@/components/landing/testimonials'
+      import { CTA } from '@/components/landing/cta'
+      
+      export default function LandingPage() {
+        return (
+          <main>
+            <Hero />
+            <Features />
+            <Pricing />
+            <Testimonials />
+            <CTA />
+          </main>
+        )
+      }
+    ```
+  }
+  
+  Step_3_Hero: {
+    @description: "Implement hero section"
+    @file: "components/landing/hero.tsx"
+    @components: ["Card", "Button", "Badge"]
+    @image: "public/images/hero-product-mockup.png"
+    @content: ```tsx
+      export function Hero() {
+        return (
+          <section className="container mx-auto px-4 py-20">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <Badge className="mb-4">No Credit Card Required</Badge>
+                <h1 className="text-5xl font-bold mb-6">
+                  Organize Receipts Effortlessly
+                </h1>
+                <p className="text-xl text-muted-foreground mb-8">
+                  AI-powered OCR with 95% accuracy. Export to QuickBooks & Xero.
+                </p>
+                <div className="flex gap-4">
+                  <Button size="lg">Start Free Trial</Button>
+                  <Button size="lg" variant="outline">Watch Demo</Button>
+                </div>
+              </div>
+              <div>
+                <img src="/images/hero-product-mockup.png" alt="ReceiptVault Dashboard" />
+              </div>
+            </div>
+          </section>
+        )
+      }
+    ```
+  }
+  
+  Step_4_Features: {
+    @description: "Create features grid"
+    @file: "components/landing/features.tsx"
+    @components: ["Card", "CardHeader", "CardTitle", "CardDescription"]
+    @features: [
+      {
+        title: "Smart OCR Processing",
+        description: "95% accuracy with AI-powered text extraction",
+        icon: "ScanLine"
+      },
+      {
+        title: "Batch Upload",
+        description: "Process multiple receipts simultaneously",
+        icon: "Upload"
+      },
+      {
+        title: "QuickBooks Integration",
+        description: "Seamless sync with your accounting software",
+        icon: "Link"
+      },
+      {
+        title: "Advanced Analytics",
+        description: "Insights into spending patterns and trends",
+        icon: "ChartBar"
+      }
+    ]
+  }
+  
+  Step_5_Pricing: {
+    @description: "Implement pricing table"
+    @file: "components/landing/pricing.tsx"
+    @components: ["Card", "Button", "Badge", "Check"]
+    @tiers: [
+      {
+        name: "Starter",
+        price: "$9/mo",
+        features: ["100 receipts/month", "Basic OCR", "CSV export"]
+      },
+      {
+        name: "Professional",
+        price: "$29/mo",
+        features: ["1000 receipts/month", "Advanced OCR", "QuickBooks/Xero"],
+        popular: true
+      },
+      {
+        name: "Enterprise",
+        price: "Custom",
+        features: ["Unlimited receipts", "API access", "Priority support"]
+      }
+    ]
+  }
+}
+
+## Dashboard_Workflow {
+  @priority: 2
+  @estimated_time: "3-4 hours"
+  @location: apps/web/app/dashboard
+  
+  Step_1_Components: {
+    @description: "Add dashboard components"
+    @commands: [
+      "npx shadcn@latest add card table badge dropdown-menu",
+      "npx shadcn@latest add chart",
+      "npx shadcn@latest add sidebar",
+      "npx shadcn@latest add avatar"
+    ]
+  }
+  
+  Step_2_Layout: {
+    @description: "Create dashboard layout"
+    @file: "app/dashboard/layout.tsx"
+    @structure: ```tsx
+      import { Sidebar } from '@/components/dashboard/sidebar'
+      import { Header } from '@/components/dashboard/header'
+      
+      export default function DashboardLayout({
+        children
+      }: {
+        children: React.ReactNode
+      }) {
+        return (
+          <div className="flex h-screen">
+            <Sidebar />
+            <div className="flex-1 flex flex-col">
+              <Header />
+              <main className="flex-1 overflow-y-auto p-6">
+                {children}
+              </main>
+            </div>
+          </div>
+        )
+      }
+    ```
+  }
+  
+  Step_3_Stats: {
+    @description: "Create stats cards"
+    @file: "components/dashboard/stats.tsx"
+    @data: [
+      { label: "Total Receipts", value: "2,847", change: "+20.1%" },
+      { label: "This Month", value: "$4,326.89", change: "+8.2%" },
+      { label: "Pending Review", value: "12", change: "-3" },
+      { label: "Export Ready", value: "94", change: "+15" }
+    ]
+    @pattern: ```tsx
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <Card key={stat.label}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {stat.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <p className="text-xs text-muted-foreground">
+                {stat.change} from last month
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    ```
+  }
+  
+  Step_4_Table: {
+    @description: "Implement receipt table"
+    @file: "components/dashboard/receipt-table.tsx"
+    @features: ["Sorting", "Filtering", "Pagination", "Actions"]
+    @columns: [
+      "Date",
+      "Merchant", 
+      "Category",
+      "Amount",
+      "Status",
+      "Actions"
+    ]
+    @with_tanstack: true
+  }
+  
+  Step_5_Charts: {
+    @description: "Add analytics charts"
+    @file: "components/dashboard/charts.tsx"
+    @library: "recharts"
+    @types: [
+      "Monthly spending trend",
+      "Category breakdown",
+      "Top merchants"
+    ]
+  }
+}
+
+## Form_Workflow {
+  @priority: 3
+  @estimated_time: "2 hours"
+  @stack: ["React Hook Form", "Zod", "shadcn Form"]
+  
+  Step_1_Setup: {
+    @description: "Install form dependencies"
+    @commands: [
+      "npm install react-hook-form zod @hookform/resolvers",
+      "npx shadcn@latest add form",
+      "npx shadcn@latest add input select checkbox button",
+      "npx shadcn@latest add toast"
+    ]
+  }
+  
+  Step_2_Schema: {
+    @description: "Define validation schema"
+    @file: "lib/validations/receipt.ts"
+    @example: ```typescript
+      import * as z from 'zod'
+      
+      export const receiptSchema = z.object({
+        merchant: z.string().min(1, "Merchant is required"),
+        date: z.date(),
+        amount: z.number().positive("Amount must be positive"),
+        category: z.string(),
+        description: z.string().optional(),
+        image: z.instanceof(File).optional()
+      })
+      
+      export type ReceiptFormData = z.infer<typeof receiptSchema>
+    ```
+  }
+  
+  Step_3_Form_Component: {
+    @description: "Create form component"
+    @file: "components/forms/receipt-form.tsx"
+    @pattern: ```tsx
+      'use client'
+      
+      import { useForm } from 'react-hook-form'
+      import { zodResolver } from '@hookform/resolvers/zod'
+      import { receiptSchema, ReceiptFormData } from '@/lib/validations/receipt'
+      
+      export function ReceiptForm() {
+        const form = useForm<ReceiptFormData>({
+          resolver: zodResolver(receiptSchema),
+          defaultValues: {
+            merchant: "",
+            amount: 0,
+            category: "",
+          }
+        })
+        
+        async function onSubmit(data: ReceiptFormData) {
+          // Handle form submission
+          console.log(data)
+        }
+        
+        return (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="merchant"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Merchant</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter merchant name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Add more fields */}
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
+        )
+      }
+    ```
+  }
+  
+  Step_4_Feedback: {
+    @description: "Add success/error feedback"
+    @components: ["Toast", "useToast"]
+    @pattern: ```tsx
+      import { useToast } from '@/components/ui/use-toast'
+      
+      const { toast } = useToast()
+      
+      async function onSubmit(data: ReceiptFormData) {
+        try {
+          await submitReceipt(data)
+          toast({
+            title: "Success",
+            description: "Receipt saved successfully",
+          })
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "Failed to save receipt",
+            variant: "destructive",
+          })
+        }
+      }
+    ```
+  }
+}
+
+## Authentication_Workflow {
+  @priority: 4
+  @estimated_time: "2 hours"
+  
+  Step_1_Components: {
+    @commands: [
+      "npx shadcn@latest add card form input button",
+      "npx shadcn@latest add tabs",
+      "npx shadcn@latest add alert"
+    ]
+  }
+  
+  Step_2_Login_Form: {
+    @file: "components/auth/login-form.tsx"
+    @fields: ["email", "password", "remember"]
+    @validation: "Zod schema"
+    @oauth: ["Google", "Microsoft"]
+  }
+  
+  Step_3_Signup_Form: {
+    @file: "components/auth/signup-form.tsx"
+    @fields: ["name", "email", "password", "confirmPassword"]
+    @validation: "Password strength check"
+  }
+  
+  Step_4_Auth_Page: {
+    @file: "app/auth/page.tsx"
+    @layout: "Tabs for Login/Signup"
+    @features: ["Social login", "Password reset link"]
+  }
+}
+
+## Export_Workflow {
+  @priority: 5
+  @estimated_time: "1.5 hours"
+  
+  Step_1_Components: {
+    @commands: [
+      "npx shadcn@latest add form select checkbox",
+      "npx shadcn@latest add date-picker",
+      "npx shadcn@latest add dialog"
+    ]
+  }
+  
+  Step_2_Export_Form: {
+    @fields: {
+      format: ["CSV", "QuickBooks", "Xero"],
+      dateRange: "DateRange",
+      categories: "string[]",
+      includeImages: "boolean"
+    }
+  }
+  
+  Step_3_Preview: {
+    @component: "ExportPreview"
+    @features: ["Sample data", "Column selection", "Format preview"]
+  }
+  
+  Step_4_Integration: {
+    @api: "/api/export"
+    @response: "Download link or redirect"
+  }
+}
+
+## Settings_Workflow {
+  @priority: 6
+  @estimated_time: "1.5 hours"
+  
+  Step_1_Layout: {
+    @pattern: "Sidebar navigation + content area"
+    @sections: ["Profile", "Preferences", "Integrations", "Security"]
+  }
+  
+  Step_2_Components: {
+    @commands: [
+      "npx shadcn@latest add form input switch select",
+      "npx shadcn@latest add separator",
+      "npx shadcn@latest add label"
+    ]
+  }
+  
+  Step_3_Sections: {
+    Profile: {
+      @fields: ["name", "email", "company", "avatar"]
+    }
+    Preferences: {
+      @fields: ["theme", "language", "dateFormat", "currency"]
+    }
+    Integrations: {
+      @fields: ["quickbooks", "xero", "googleDrive"]
+    }
+    Security: {
+      @fields: ["password", "twoFactor", "sessions"]
+    }
+  }
+}
+
+## Performance_Optimization {
+  @when: "After initial implementation"
+  
+  Code_Splitting: {
+    @pattern: "Dynamic imports for large components"
+    @example: ```tsx
+      const Dashboard = dynamic(() => import('./dashboard'), {
+        loading: () => <DashboardSkeleton />
+      })
+    ```
+  }
+  
+  Image_Optimization: {
+    @use: "next/image"
+    @formats: ["WebP", "AVIF"]
+    @lazy: true
+  }
+  
+  Bundle_Analysis: {
+    @command: "npm run analyze"
+    @optimize: ["Remove unused imports", "Tree shake libraries"]
+  }
+}
+
+## Testing_Workflow {
+  @after: "Feature implementation"
+  
+  Component_Tests: {
+    @pattern: "[component].test.tsx"
+    @library: "React Testing Library"
+    @example: ```tsx
+      import { render, screen } from '@testing-library/react'
+      import { Button } from './button'
+      
+      describe('Button', () => {
+        it('renders with text', () => {
+          render(<Button>Click me</Button>)
+          expect(screen.getByText('Click me')).toBeInTheDocument()
+        })
+      })
+    ```
+  }
+  
+  Integration_Tests: {
+    @pattern: "Full user flows"
+    @tools: ["Playwright", "Cypress"]
+  }
+}
+
+## Deployment_Workflow {
+  @platform: "Vercel"
+  
+  Build: {
+    @command: "npm run build"
+    @checks: ["Type checking", "Linting", "Tests"]
+  }
+  
+  Deploy: {
+    @command: "vercel"
+    @env: [
+      "NEXT_PUBLIC_API_URL",
+      "OAUTH_CLIENT_ID",
+      "OAUTH_CLIENT_SECRET"
+    ]
+  }
+  
+  Preview: {
+    @automatic: "On pull requests"
+    @url: "Generated by Vercel"
+  }
+}

@@ -1,0 +1,237 @@
+# Requirements
+
+<requirements>
+
+    <!-- FUNCTIONAL REQUIREMENTS -->
+    <functional-requirements>
+      <!-- Authentication Requirements (FR1-FR15) -->
+      <category name="Authentication">
+        <requirement id="FR-AUTH-1">
+          The system SHALL implement Supabase Auth integration across all three platforms
+          (Flutter web, Next.js, React Native) with consistent user experience
+        </requirement>
+        <requirement id="FR-AUTH-2">
+          Users SHALL be able to sign up and log in using email/password authentication
+          with secure password requirements (min 8 chars, 1 number, 1 special)
+        </requirement>
+        <requirement id="FR-AUTH-3">
+          Users SHALL be able to authenticate using OAuth providers (Google Sign-In)
+        </requirement>
+        <requirement id="FR-AUTH-4">
+          The system SHALL maintain user sessions with automatic token refresh before expiration
+        </requirement>
+        <requirement id="FR-AUTH-5">
+          Users SHALL be able to manage profile information (username, full name, avatar)
+        </requirement>
+        <requirement id="FR-AUTH-6">
+          The system SHALL support profile photo upload to Supabase Storage with thumbnails
+        </requirement>
+        <requirement id="FR-AUTH-7">
+          Each authenticated user SHALL only access their own receipts via RLS policies
+        </requirement>
+        <requirement id="FR-AUTH-8">
+          Mobile app SHALL support offline authentication with cached credentials
+        </requirement>
+        <requirement id="FR-AUTH-9">
+          Users SHALL be able to sign out, invalidating session across all devices
+        </requirement>
+        <requirement id="FR-AUTH-10">
+          The system SHALL provide password reset via email magic links
+        </requirement>
+        <requirement id="FR-AUTH-11">
+          Session state SHALL be synchronized across browser tabs
+        </requirement>
+        <requirement id="FR-AUTH-12">
+          The system SHALL track and display authentication status in UI
+        </requirement>
+        <requirement id="FR-AUTH-13">
+          The system SHALL remember login state using secure storage per platform
+        </requirement>
+        <requirement id="FR-AUTH-14">
+          The system SHALL support biometric authentication on mobile devices
+        </requirement>
+        <requirement id="FR-AUTH-15">
+          The system SHALL auto-logout after inactivity (30min web, 2hr mobile)
+        </requirement>
+      </category>
+
+      <!-- Core Receipt Requirements -->
+      <category name="Receipt Capture">
+        <requirement id="FR-CAPTURE-1">
+          Users SHALL capture receipts using device camera with real-time preview
+        </requirement>
+        <requirement id="FR-CAPTURE-2">
+          The system SHALL support batch capture mode for multiple receipts
+        </requirement>
+        <requirement id="FR-CAPTURE-3">
+          The system SHALL automatically detect receipt edges during capture
+        </requirement>
+        <requirement id="FR-CAPTURE-4">
+          Users SHALL be able to manually adjust detected boundaries
+        </requirement>
+        <requirement id="FR-CAPTURE-5">
+          The system SHALL support up to 3 retry attempts for failed captures
+        </requirement>
+      </category>
+
+      <category name="OCR Processing">
+        <requirement id="FR-OCR-1">
+          The system SHALL extract merchant, date, total, and tax from receipts
+        </requirement>
+        <requirement id="FR-OCR-2">
+          The system SHALL display confidence scores for each extracted field
+        </requirement>
+        <requirement id="FR-OCR-3">
+          The system SHALL process receipts in <5 seconds
+        </requirement>
+        <requirement id="FR-OCR-4">
+          Users SHALL be able to edit extracted data inline
+        </requirement>
+        <requirement id="FR-OCR-5">
+          The system SHALL support offline OCR processing using ML Kit
+        </requirement>
+      </category>
+
+      <category name="Data Management">
+        <requirement id="FR-DATA-1">
+          Users SHALL add notes to any receipt
+        </requirement>
+        <requirement id="FR-DATA-2">
+          Users SHALL categorize receipts from 52 predefined categories
+        </requirement>
+        <requirement id="FR-DATA-3">
+          The system SHALL auto-save all changes
+        </requirement>
+        <requirement id="FR-DATA-4">
+          Users SHALL search receipts by merchant, date, amount
+        </requirement>
+        <requirement id="FR-DATA-5">
+          Users SHALL filter receipts by date range and category
+        </requirement>
+      </category>
+
+      <category name="Export">
+        <requirement id="FR-EXPORT-1">
+          Users SHALL export receipts to CSV format
+        </requirement>
+        <requirement id="FR-EXPORT-2">
+          The system SHALL support QuickBooks, Xero, and Generic formats
+        </requirement>
+        <requirement id="FR-EXPORT-3">
+          The system SHALL validate export data before generation
+        </requirement>
+        <requirement id="FR-EXPORT-4">
+          The system SHALL sanitize CSV data to prevent injection attacks
+        </requirement>
+        <requirement id="FR-EXPORT-5">
+          Users SHALL select custom date ranges for export
+        </requirement>
+      </category>
+    </functional-requirements>
+
+    <!-- NON-FUNCTIONAL REQUIREMENTS -->
+    <non-functional-requirements>
+      <category name="Performance">
+        <requirement id="NFR-PERF-1">
+          Authentication responses SHALL complete within 2 seconds
+        </requirement>
+        <requirement id="NFR-PERF-2">
+          Camera SHALL be ready within 2 seconds of app launch
+        </requirement>
+        <requirement id="NFR-PERF-3">
+          OCR processing SHALL complete within 5 seconds per receipt
+        </requirement>
+        <requirement id="NFR-PERF-4">
+          Batch capture SHALL process 10 receipts in <3 minutes
+        </requirement>
+        <requirement id="NFR-PERF-5">
+          Export generation SHALL complete within 3 seconds for 100 receipts
+        </requirement>
+        <requirement id="NFR-PERF-6">
+          The app SHALL use <50MB memory on average
+        </requirement>
+        <requirement id="NFR-PERF-7">
+          Battery usage SHALL be <5% for 30 minutes of use
+        </requirement>
+      </category>
+
+      <category name="Reliability">
+        <requirement id="NFR-REL-1">
+          The system SHALL maintain 99.9% availability for auth services
+        </requirement>
+        <requirement id="NFR-REL-2">
+          The app SHALL achieve >99.5% crash-free sessions
+        </requirement>
+        <requirement id="NFR-REL-3">
+          Edge detection SHALL achieve 80%+ success rate
+        </requirement>
+        <requirement id="NFR-REL-4">
+          OCR SHALL achieve 90%+ accuracy for clear receipts
+        </requirement>
+        <requirement id="NFR-REL-5">
+          The system SHALL handle 1000 concurrent users
+        </requirement>
+      </category>
+
+      <category name="Security">
+        <requirement id="NFR-SEC-1">
+          Passwords SHALL be hashed using bcrypt (cost factor 10+)
+        </requirement>
+        <requirement id="NFR-SEC-2">
+          JWT tokens SHALL expire after 1 hour with 7-day refresh tokens
+        </requirement>
+        <requirement id="NFR-SEC-3">
+          OAuth SHALL use PKCE flow for enhanced security
+        </requirement>
+        <requirement id="NFR-SEC-4">
+          All API calls SHALL use HTTPS encryption
+        </requirement>
+        <requirement id="NFR-SEC-5">
+          Biometric data SHALL never leave the device
+        </requirement>
+        <requirement id="NFR-SEC-6">
+          The system SHALL log all authentication attempts
+        </requirement>
+      </category>
+
+      <category name="Usability">
+        <requirement id="NFR-USE-1">
+          UI feedback SHALL appear within 100ms of user action
+        </requirement>
+        <requirement id="NFR-USE-2">
+          Error messages SHALL be user-friendly without system details
+        </requirement>
+        <requirement id="NFR-USE-3">
+          The app SHALL support accessibility features (screen readers)
+        </requirement>
+        <requirement id="NFR-USE-4">
+          Profile images SHALL be limited to 5MB (JPG, PNG, WebP)
+        </requirement>
+        <requirement id="NFR-USE-5">
+          The system SHALL comply with GDPR for data handling
+        </requirement>
+      </category>
+    </non-functional-requirements>
+
+    <!-- COMPATIBILITY REQUIREMENTS -->
+    <compatibility-requirements>
+      <requirement id="CR-1">
+        All receipt endpoints SHALL continue functioning with added auth headers
+      </requirement>
+      <requirement id="CR-2">
+        New auth tables SHALL not modify existing receipt schema
+      </requirement>
+      <requirement id="CR-3">
+        Auth UI SHALL use existing design systems (shadcn, Material)
+      </requirement>
+      <requirement id="CR-4">
+        Google Vision API calls SHALL include user context for quota tracking
+      </requirement>
+      <requirement id="CR-5">
+        Existing receipt images SHALL migrate to user-specific buckets
+      </requirement>
+      <requirement id="CR-6">
+        Authentication SHALL not break existing 15 critical tests
+      </requirement>
+    </compatibility-requirements>
+  </requirements>

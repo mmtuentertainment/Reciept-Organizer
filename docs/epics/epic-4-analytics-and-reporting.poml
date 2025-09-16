@@ -1,0 +1,23 @@
+# Epic 4: Analytics & Reporting
+
+## Description
+Dashboard, insights, spending analysis, and business intelligence features
+
+## Stories
+- 4.1: Dashboard Overview
+- 4.2: Spending Trends
+- 4.3: Category Analysis
+- 4.4: Vendor Analytics
+- 4.5: Monthly Reports
+- 4.6: Tax Summaries
+- 4.7: Custom Reports
+- 4.8: Report Scheduling
+
+## Success Criteria
+- All stories completed and tested
+- Integration tests passing
+- Performance benchmarks met
+- User acceptance testing complete
+
+## Phase
+Core MVP

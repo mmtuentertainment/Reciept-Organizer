@@ -1,0 +1,367 @@
+# Quick Reference - Receipt Organizer Web UI
+@type: quick_reference
+@purpose: "Fast lookup for common tasks"
+@location: apps/web
+
+## Essential_Commands {
+  @category: most_used
+  
+  Setup: {
+    Initialize_shadcn: "npx shadcn@latest init"
+    Dev_Server: "npm run dev"
+    Build: "npm run build"
+    Type_Check: "npm run type-check"
+  }
+  
+  Component_Management: {
+    Add_Single: "npx shadcn@latest add button"
+    Add_Multiple: "npx shadcn@latest add button card form dialog"
+    Add_Dashboard: "npx shadcn@latest add dashboard-01"
+    Check_Updates: "npx shadcn@latest diff button"
+    Update_Component: "npx shadcn@latest update button"
+  }
+  
+  Common_Combinations: {
+    Landing_Page: "npx shadcn@latest add card button badge avatar"
+    Dashboard: "npx shadcn@latest add card table chart badge dropdown-menu"
+    Forms: "npx shadcn@latest add form input select button toast"
+    Modals: "npx shadcn@latest add dialog sheet alert-dialog"
+  }
+}
+
+## Component_Cheatsheet {
+  @category: quick_implementation
+  
+  Button: {
+    @import: "import { Button } from '@/components/ui/button'"
+    @variants: ["default", "destructive", "outline", "secondary", "ghost", "link"]
+    @sizes: ["default", "sm", "lg", "icon"]
+    @usage: '<Button variant="outline" size="sm">Click me</Button>'
+  }
+  
+  Card: {
+    @import: "import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'"
+    @structure: ```tsx
+      <Card>
+        <CardHeader>
+          <CardTitle>Title</CardTitle>
+          <CardDescription>Description</CardDescription>
+        </CardHeader>
+        <CardContent>Content</CardContent>
+        <CardFooter>Footer</CardFooter>
+      </Card>
+    ```
+  }
+  
+  Form: {
+    @imports: [
+      "import { useForm } from 'react-hook-form'",
+      "import { zodResolver } from '@hookform/resolvers/zod'",
+      "import * as z from 'zod'",
+      "import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'"
+    ]
+    @pattern: ```tsx
+      const formSchema = z.object({
+        email: z.string().email(),
+      })
+      
+      const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+      })
+      
+      function onSubmit(values: z.infer<typeof formSchema>) {
+        console.log(values)
+      }
+    ```
+  }
+  
+  Dialog: {
+    @import: "import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'"
+    @usage: ```tsx
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>Open</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Title</DialogTitle>
+            <DialogDescription>Description</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    ```
+  }
+  
+  Table: {
+    @import: "import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'"
+    @with_tanstack: "npm install @tanstack/react-table"
+  }
+}
+
+## Receipt_Organizer_Patterns {
+  @category: app_specific
+  
+  Landing_Hero: {
+    @components: ["Card", "Button", "Badge"]
+    @layout: "Grid with image right"
+    @content: {
+      Title: "Organize Receipts Effortlessly"
+      Subtitle: "AI-powered OCR with 95% accuracy"
+      CTA: "Start Free Trial"
+      Badge: "No Credit Card Required"
+    }
+  }
+  
+  Receipt_Card: {
+    @components: ["Card", "Badge", "Button", "DropdownMenu"]
+    @data: {
+      Merchant: "string"
+      Date: "Date"
+      Amount: "number"
+      Category: "string"
+      Status: "pending | processed | exported"
+    }
+    @actions: ["View", "Edit", "Delete", "Export"]
+  }
+  
+  Stats_Card: {
+    @components: ["Card", "Badge"]
+    @structure: ```tsx
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Receipts</CardTitle>
+          <ReceiptIcon className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">2,847</div>
+          <p className="text-xs text-muted-foreground">
+            +20.1% from last month
+          </p>
+        </CardContent>
+      </Card>
+    ```
+  }
+  
+  Export_Form: {
+    @components: ["Form", "Select", "DatePicker", "Checkbox", "Button"]
+    @fields: {
+      Format: ["CSV", "QuickBooks", "Xero"]
+      DateRange: "DateRange"
+      Categories: "string[]"
+      IncludeImages: "boolean"
+    }
+  }
+}
+
+## File_Structure {
+  @base: apps/web
+  
+  Components: {
+    UI_Components: "components/ui/"
+    App_Components: "components/"
+    Layouts: "components/layouts/"
+    Features: "components/features/"
+  }
+  
+  Pages: {
+    App_Router: "app/"
+    Landing: "app/page.tsx"
+    Dashboard: "app/dashboard/page.tsx"
+    Settings: "app/settings/page.tsx"
+  }
+  
+  Styles: {
+    Global: "app/globals.css"
+    Component_Styles: "Inline with Tailwind"
+  }
+  
+  Configuration: {
+    Tailwind: "tailwind.config.js"
+    TypeScript: "tsconfig.json"
+    Components: "components.json"
+  }
+}
+
+## Styling_Patterns {
+  @utility: cn_function
+  
+  CN_Function: {
+    @import: "import { cn } from '@/lib/utils'"
+    @usage: "cn('base-classes', condition && 'conditional-classes', className)"
+    @purpose: "Merge Tailwind classes with conflict resolution"
+  }
+  
+  Common_Classes: {
+    Container: "container mx-auto px-4"
+    Grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    Flex_Center: "flex items-center justify-center"
+    Card_Hover: "transition-shadow hover:shadow-lg"
+    Text_Muted: "text-muted-foreground"
+  }
+  
+  Dark_Mode: {
+    Toggle: "dark:bg-gray-900 dark:text-white"
+    Card: "bg-white dark:bg-gray-800"
+    Border: "border-gray-200 dark:border-gray-700"
+  }
+}
+
+## API_Integration {
+  @base_url: "http://localhost:3001"
+  
+  Endpoints: {
+    OAuth: "/api/oauth/[provider]"
+    Validate: "/api/validate"
+    Export: "/api/export"
+  }
+  
+  Patterns: {
+    Server_Component: ```tsx
+      async function getData() {
+        const res = await fetch('http://localhost:3001/api/data')
+        return res.json()
+      }
+      
+      export default async function Page() {
+        const data = await getData()
+        return <div>{data}</div>
+      }
+    ```
+    
+    Client_Component: ```tsx
+      'use client'
+      
+      export function ClientComponent() {
+        const [data, setData] = useState(null)
+        
+        useEffect(() => {
+          fetch('/api/data')
+            .then(res => res.json())
+            .then(setData)
+        }, [])
+        
+        return <div>{data}</div>
+      }
+    ```
+  }
+}
+
+## Testing_Commands {
+  @location: apps/web
+  
+  Commands: {
+    Run_Tests: "npm test"
+    Watch_Tests: "npm run test:watch"
+    Coverage: "npm run test:coverage"
+    E2E: "npm run test:e2e"
+  }
+  
+  Component_Testing: {
+    @pattern: "component.test.tsx"
+    @library: "React Testing Library"
+    @setup: "jest.config.js"
+  }
+}
+
+## Deployment {
+  @platform: "Vercel"
+  
+  Commands: {
+    Build: "npm run build"
+    Start: "npm start"
+    Deploy: "vercel"
+  }
+  
+  Environment_Variables: {
+    API_URL: "process.env.NEXT_PUBLIC_API_URL"
+    OAuth_Keys: "process.env.OAUTH_CLIENT_ID"
+  }
+}
+
+## MCP_Tools_Reference {
+  @usage: "For component discovery"
+  
+  List_Components: {
+    @tool: "mcp__shadcn__list_items_in_registries"
+    @params: {
+      registries: ["@shadcn"]
+      limit: 50
+    }
+  }
+  
+  Search_Components: {
+    @tool: "mcp__shadcn__search_items_in_registries"
+    @params: {
+      query: "dashboard"
+      registries: ["@shadcn"]
+    }
+  }
+  
+  Get_Examples: {
+    @tool: "mcp__shadcn__get_item_examples_from_registries"
+    @params: {
+      query: "button-demo"
+      registries: ["@shadcn"]
+    }
+  }
+  
+  Get_Add_Command: {
+    @tool: "mcp__shadcn__get_add_command_for_items"
+    @params: {
+      items: ["@shadcn/button", "@shadcn/card"]
+    }
+  }
+}
+
+## Troubleshooting {
+  @common_issues: true
+  
+  Module_Not_Found: {
+    @error: "Cannot find module '@/components/ui/button'"
+    @fix: [
+      "Check tsconfig.json paths",
+      "Ensure component is added: npx shadcn@latest add button",
+      "Verify import path"
+    ]
+  }
+  
+  Styles_Not_Applied: {
+    @error: "Components appear unstyled"
+    @fix: [
+      "Check globals.css import in layout.tsx",
+      "Verify tailwind.config.js",
+      "Ensure PostCSS is configured"
+    ]
+  }
+  
+  Type_Errors: {
+    @error: "TypeScript errors in components"
+    @fix: [
+      "npm install -D @types/react @types/node",
+      "Check tsconfig.json",
+      "Run npm run type-check"
+    ]
+  }
+}
+
+## Performance_Tips {
+  @category: optimization
+  
+  Bundle_Size: {
+    Analyze: "npm run analyze"
+    Tree_Shaking: "Import specific components"
+    Dynamic_Import: "const Component = dynamic(() => import('./component'))"
+  }
+  
+  Images: {
+    Optimization: "Use next/image"
+    Lazy_Loading: "loading='lazy'"
+    Formats: "Use WebP/AVIF"
+  }
+  
+  Caching: {
+    Static: "export const revalidate = 3600"
+    Dynamic: "cache: 'force-cache'"
+    CDN: "Deploy to Vercel"
+  }
+}

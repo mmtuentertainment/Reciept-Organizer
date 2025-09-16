@@ -1,0 +1,48 @@
+# Technology Stack
+
+
+
+#### Frontend Platforms
+flutter:
+  version: "3.35.3+"
+  targets: ["iOS", "Android", "Web"]
+  state_management: "Riverpod 2.5.1"
+  routing: "go_router 14.6.0"
+  ui: "Material 3 Design System"
+  local_db: "drift 2.16.0"
+
+nextjs:
+  version: "15.1.3"
+  ui: "shadcn/ui + Tailwind CSS"
+  auth: "Supabase Auth Helpers"
+  state: "React Context + Zustand"
+
+react_native:
+  sdk: "Expo SDK 52"
+  ui: "Native Base / React Native Elements"
+  navigation: "React Navigation 6"
+  state: "React Context + Redux Toolkit"
+
+#### Backend Services
+supabase:
+  services: ["Authentication", "Database", "Storage", "Realtime", "Edge Functions"]
+  database: "PostgreSQL 15"
+  auth_providers: ["Email", "Google", "Apple", "GitHub"]
+
+#### External Integrations
+ocr_services:
+  google_vision_api:
+    status: "Production"
+    note: "Needs key rotation"
+  google_ml_kit:
+    status: "Mobile only"
+    type: "On-device processing"
+
+payment_apis:
+  quickbooks:
+    status: "Planned"
+    format: "3-column CSV export"
+  xero:
+    status: "Planned"
+    format: "Invoice CSV export"
+

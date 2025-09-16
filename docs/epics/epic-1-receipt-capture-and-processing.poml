@@ -1,0 +1,27 @@
+# Epic 1: Receipt Capture & Processing
+
+## Description
+Core receipt capture with OCR, batch processing, edge detection, and retry mechanisms
+
+## Stories
+- 1.1: Batch Receipt Capture
+- 1.2: Auto Edge Detection
+- 1.3: OCR Confidence Scores
+- 1.4: Retry Failed Captures
+- 1.5: Image Enhancement
+- 1.6: Multi-Page Support
+- 1.7: Camera Settings
+- 1.8: Capture History
+- 1.9: Quick Capture Mode
+- 1.10: Capture Templates
+- 1.11: Bulk Import
+- 1.12: Capture Shortcuts
+
+## Success Criteria
+- All stories completed and tested
+- Integration tests passing
+- Performance benchmarks met
+- User acceptance testing complete
+
+## Phase
+Core MVP

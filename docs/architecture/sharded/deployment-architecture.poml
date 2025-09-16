@@ -1,0 +1,666 @@
+<poml>
+  <role>Deployment Architecture - Receipt Organizer Architecture Component</role>
+  <task>Environment setup, CI/CD pipelines, and deployment strategies</task>
+
+  <metadata>
+    <component>Deployment Architecture</component>
+    <parent-document>docs/architecture/main/architecture.poml</parent-document>
+    <version>3.0</version>
+    <date>2025-01-16</date>
+  </metadata>
+
+  <deployment-architecture>
+    <environment-strategy>
+      <development-environment>
+        <purpose>Local development and testing</purpose>
+        <infrastructure>
+          - Local Supabase instance (Docker)
+          - Local database with seed data
+          - Mock external services
+          - Hot reload for rapid iteration
+          - Debug logging enabled
+        </infrastructure>
+
+        <configuration>
+          ```yaml
+          environment: development
+          supabase:
+            url: http://localhost:54321
+            anon_key: development-anon-key
+            service_role_key: development-service-key
+          google_vision:
+            api_key: mock-api-key
+          debug:
+            verbose_logging: true
+            mock_ocr: true
+            skip_auth: false
+          ```
+        </configuration>
+
+        <features>
+          - Rapid development cycles
+          - Complete offline capability
+          - Mock data for testing
+          - Debug tools integration
+          - Performance profiling
+        </features>
+      </development-environment>
+
+      <staging-environment>
+        <purpose>Pre-production testing and validation</purpose>
+        <infrastructure>
+          - Supabase staging project
+          - Real external service integration
+          - Production-like data volume
+          - Performance testing setup
+          - Monitoring and alerting
+        </infrastructure>
+
+        <configuration>
+          ```yaml
+          environment: staging
+          supabase:
+            url: https://staging-project.supabase.co
+            anon_key: staging-anon-key
+            service_role_key: staging-service-key
+          google_vision:
+            api_key: staging-api-key
+          debug:
+            verbose_logging: false
+            mock_ocr: false
+            performance_monitoring: true
+          ```
+        </configuration>
+
+        <validation-criteria>
+          - All critical tests passing
+          - Performance targets met
+          - Security scans completed
+          - User acceptance testing
+          - Load testing validation
+        </validation-criteria>
+      </staging-environment>
+
+      <production-environment>
+        <purpose>Live user-facing application</purpose>
+        <infrastructure>
+          - Supabase production project (xbadaalqaeszooyxuoac)
+          - Full monitoring and alerting
+          - Automated backups
+          - High availability configuration
+          - Security hardening
+        </infrastructure>
+
+        <configuration>
+          ```yaml
+          environment: production
+          supabase:
+            url: https://xbadaalqaeszooyxuoac.supabase.co
+            anon_key: ${SUPABASE_ANON_KEY}
+            service_role_key: ${SUPABASE_SERVICE_ROLE_KEY}
+          google_vision:
+            api_key: ${GOOGLE_VISION_API_KEY}
+          debug:
+            verbose_logging: false
+            error_reporting: true
+            performance_monitoring: true
+          ```
+        </configuration>
+
+        <production-requirements>
+          - 99.9% uptime target
+          - Full backup strategy
+          - Incident response plan
+          - Security monitoring
+          - Performance optimization
+        </production-requirements>
+      </production-environment>
+    </environment-strategy>
+
+    <ci-cd-pipeline>
+      <source-control>
+        <repository>GitHub: Receipt-Organizer</repository>
+        <branching-strategy>
+          - main: Production-ready code
+          - develop: Integration branch
+          - feature/*: Feature development
+          - hotfix/*: Production bug fixes
+          - release/*: Release preparation
+        </branching-strategy>
+
+        <commit-conventions>
+          - feat: New features
+          - fix: Bug fixes
+          - docs: Documentation changes
+          - style: Code formatting
+          - refactor: Code restructuring
+          - test: Test additions/modifications
+          - chore: Maintenance tasks
+        </commit-conventions>
+      </source-control>
+
+      <automated-testing>
+        <test-stages>
+          <unit-tests>
+            - Flutter: flutter test
+            - Next.js: npm run test
+            - Coverage threshold: 70%
+            - Fast execution: < 2 minutes
+          </unit-tests>
+
+          <integration-tests>
+            - Critical user flows
+            - API endpoint testing
+            - Database integration
+            - Cross-platform consistency
+          </integration-tests>
+
+          <e2e-tests>
+            - Full user journeys
+            - Cross-browser testing
+            - Mobile device testing
+            - Performance validation
+          </e2e-tests>
+
+          <security-tests>
+            - Dependency vulnerability scanning
+            - Static code analysis
+            - Security policy validation
+            - Authentication flow testing
+          </security-tests>
+        </test-stages>
+
+        <test-automation>
+          ```yaml
+          # GitHub Actions workflow
+          name: CI/CD Pipeline
+          on:
+            push:
+              branches: [main, develop]
+            pull_request:
+              branches: [main]
+
+          jobs:
+            test:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v3
+                - name: Setup Flutter
+                  uses: subosito/flutter-action@v2
+                - name: Run tests
+                  run: flutter test test/core_tests/ test/integration_tests/
+                - name: Security scan
+                  run: dart analyze --fatal-infos
+
+            build:
+              needs: test
+              runs-on: ubuntu-latest
+              steps:
+                - name: Build Flutter Web
+                  run: flutter build web
+                - name: Build Android APK
+                  run: flutter build apk --release
+          ```
+        </test-automation>
+      </automated-testing>
+
+      <build-process>
+        <flutter-builds>
+          <mobile-builds>
+            - Android APK for testing
+            - iOS IPA for App Store
+            - Release signing configuration
+            - Obfuscation and optimization
+            - Platform-specific optimizations
+          </mobile-builds>
+
+          <web-builds>
+            - Progressive Web App build
+            - Service worker generation
+            - Asset optimization
+            - CDN deployment preparation
+            - Performance optimization
+          </web-builds>
+
+          <build-optimization>
+            - Code splitting by routes
+            - Asset compression
+            - Tree shaking
+            - Dead code elimination
+            - Bundle size analysis
+          </build-optimization>
+        </flutter-builds>
+
+        <nextjs-builds>
+          <static-generation>
+            - Static page generation
+            - Incremental static regeneration
+            - Image optimization
+            - Font optimization
+            - CSS optimization
+          </static-generation>
+
+          <deployment-preparation>
+            - Environment variable injection
+            - API route optimization
+            - Edge function deployment
+            - CDN configuration
+            - Cache policy setup
+          </deployment-preparation>
+        </nextjs-builds>
+      </build-process>
+
+      <deployment-stages>
+        <staging-deployment>
+          <triggers>
+            - Merge to develop branch
+            - Manual deployment trigger
+            - Scheduled deployments
+          </triggers>
+
+          <process>
+            1. Build validation
+            2. Test execution
+            3. Security scanning
+            4. Staging deployment
+            5. Smoke testing
+            6. Performance validation
+            7. Notification to team
+          </process>
+
+          <rollback-strategy>
+            - Automatic rollback on failed tests
+            - Manual rollback capability
+            - Database migration rollback
+            - Asset rollback procedures
+          </rollback-strategy>
+        </staging-deployment>
+
+        <production-deployment>
+          <triggers>
+            - Merge to main branch
+            - Tagged releases
+            - Manual production trigger
+          </triggers>
+
+          <deployment-strategy>
+            <blue-green-deployment>
+              - Deploy to inactive environment
+              - Run validation tests
+              - Switch traffic gradually
+              - Monitor for issues
+              - Complete switch or rollback
+            </blue-green-deployment>
+
+            <canary-deployment>
+              - Deploy to subset of users
+              - Monitor metrics and errors
+              - Gradually increase traffic
+              - Full deployment or rollback
+            </canary-deployment>
+          </deployment-strategy>
+
+          <safety-measures>
+            - Pre-deployment checklist
+            - Automated health checks
+            - Performance monitoring
+            - Error rate monitoring
+            - Automatic rollback triggers
+          </safety-measures>
+        </production-deployment>
+      </deployment-stages>
+    </ci-cd-pipeline>
+
+    <platform-deployments>
+      <flutter-deployment>
+        <mobile-app-stores>
+          <ios-app-store>
+            <deployment-process>
+              1. Build signed IPA
+              2. Upload to App Store Connect
+              3. TestFlight distribution
+              4. App Store review submission
+              5. Production release
+            </deployment-process>
+
+            <requirements>
+              - Apple Developer Account ($99/year)
+              - App Store guidelines compliance
+              - Privacy policy requirements
+              - App review process (1-7 days)
+              - Version management
+            </requirements>
+
+            <automation>
+              - Fastlane for build automation
+              - Automated TestFlight uploads
+              - Review submission automation
+              - Release notes generation
+            </automation>
+          </ios-app-store>
+
+          <google-play-store>
+            <deployment-process>
+              1. Build signed APK/AAB
+              2. Upload to Google Play Console
+              3. Internal testing distribution
+              4. Production release rollout
+              5. Monitoring and updates
+            </deployment-process>
+
+            <requirements>
+              - Google Play Developer Account ($25 one-time)
+              - Play Store policy compliance
+              - App signing key management
+              - Release track management
+              - Staged rollout capability
+            </requirements>
+
+            <automation>
+              - Gradle build automation
+              - Play Console API integration
+              - Automated publishing
+              - Release notes automation
+            </automation>
+          </google-play-store>
+        </mobile-app-stores>
+
+        <web-deployment>
+          <vercel-deployment>
+            <configuration>
+              ```json
+              {
+                "name": "receipt-organizer-flutter",
+                "version": 2,
+                "builds": [
+                  {
+                    "src": "web/**",
+                    "use": "@vercel/static"
+                  }
+                ],
+                "routes": [
+                  {
+                    "src": "/(.*)",
+                    "dest": "/web/$1"
+                  }
+                ]
+              }
+              ```
+            </configuration>
+
+            <features>
+              - Automatic deployments from Git
+              - Preview deployments for PRs
+              - Edge network distribution
+              - Custom domain support
+              - SSL certificate management
+            </features>
+
+            <optimization>
+              - Gzip compression
+              - Brotli compression
+              - HTTP/2 support
+              - Cache headers optimization
+              - CDN integration
+            </optimization>
+          </vercel-deployment>
+        </web-deployment>
+      </flutter-deployment>
+
+      <nextjs-deployment>
+        <vercel-platform>
+          <configuration>
+            ```json
+            {
+              "name": "receipt-organizer-web",
+              "version": 2,
+              "env": {
+                "SUPABASE_URL": "@supabase-url",
+                "SUPABASE_ANON_KEY": "@supabase-anon-key"
+              },
+              "build": {
+                "env": {
+                  "NODE_ENV": "production"
+                }
+              }
+            }
+            ```
+          </configuration>
+
+          <deployment-features>
+            - Serverless function deployment
+            - Edge function optimization
+            - Static asset optimization
+            - Incremental static regeneration
+            - Preview deployments
+          </deployment-features>
+
+          <monitoring-integration>
+            - Real-time analytics
+            - Performance monitoring
+            - Error tracking
+            - User behavior analytics
+            - Core Web Vitals tracking
+          </monitoring-integration>
+        </vercel-platform>
+
+        <alternative-platforms>
+          <netlify>
+            - Static site hosting
+            - Serverless functions
+            - Form handling
+            - Identity management
+            - Edge computing
+          </netlify>
+
+          <aws-amplify>
+            - Full-stack deployment
+            - CI/CD integration
+            - Custom domain management
+            - Environment management
+            - Performance monitoring
+          </aws-amplify>
+        </alternative-platforms>
+      </nextjs-deployment>
+
+      <database-deployment>
+        <supabase-cloud>
+          <project-configuration>
+            - Production project: xbadaalqaeszooyxuoac
+            - Region: us-east-1
+            - Tier: Pro plan
+            - Backup retention: 30 days
+            - Point-in-time recovery: 7 days
+          </project-configuration>
+
+          <migration-strategy>
+            ```sql
+            -- Migration versioning
+            CREATE TABLE IF NOT EXISTS schema_migrations (
+              version VARCHAR(255) PRIMARY KEY,
+              applied_at TIMESTAMP DEFAULT NOW()
+            );
+
+            -- Migration application
+            \i migrations/001_initial_schema.sql
+            \i migrations/002_add_categories.sql
+            \i migrations/003_add_rls_policies.sql
+            ```
+          </migration-strategy>
+
+          <backup-procedures>
+            - Automated daily backups
+            - Manual backup before major changes
+            - Cross-region backup replication
+            - Backup validation testing
+            - Restore procedure documentation
+          </backup-procedures>
+        </supabase-cloud>
+
+        <migration-management>
+          <version-control>
+            - SQL migration files in Git
+            - Migration numbering system
+            - Rollback migration scripts
+            - Schema documentation
+            - Change approval process
+          </version-control>
+
+          <deployment-pipeline>
+            1. Development migration testing
+            2. Staging migration validation
+            3. Production migration scheduling
+            4. Backup creation
+            5. Migration execution
+            6. Validation testing
+            7. Rollback procedures (if needed)
+          </deployment-pipeline>
+        </migration-management>
+      </database-deployment>
+    </platform-deployments>
+
+    <monitoring-deployment>
+      <application-monitoring>
+        <error-tracking>
+          <sentry-integration>
+            - Real-time error reporting
+            - Performance monitoring
+            - Release tracking
+            - User feedback integration
+            - Alert management
+          </sentry-integration>
+
+          <configuration>
+            ```dart
+            // Flutter Sentry configuration
+            await SentryFlutter.init(
+              (options) {
+                options.dsn = 'YOUR_DSN_HERE';
+                options.environment = environment;
+                options.tracesSampleRate = 1.0;
+                options.attachStacktrace = true;
+              },
+              appRunner: () => runApp(MyApp()),
+            );
+            ```
+          </configuration>
+        </error-tracking>
+
+        <performance-monitoring>
+          <metrics-collection>
+            - Application performance metrics
+            - User experience metrics
+            - Business metrics
+            - Infrastructure metrics
+            - Custom event tracking
+          </metrics-collection>
+
+          <alerting-setup>
+            - Performance threshold alerts
+            - Error rate alerts
+            - Availability alerts
+            - Capacity alerts
+            - Security incident alerts
+          </alerting-setup>
+        </performance-monitoring>
+      </application-monitoring>
+
+      <infrastructure-monitoring>
+        <supabase-monitoring>
+          - Database performance metrics
+          - Connection pool monitoring
+          - Query performance tracking
+          - Storage usage monitoring
+          - API response time tracking
+        </supabase-monitoring>
+
+        <third-party-monitoring>
+          - Google Vision API health
+          - CDN performance
+          - App store connectivity
+          - External service dependencies
+          - Network performance
+        </third-party-monitoring>
+      </infrastructure-monitoring>
+    </monitoring-deployment>
+
+    <security-deployment>
+      <secrets-management>
+        <environment-variables>
+          ```yaml
+          # Production secrets (stored in CI/CD platform)
+          SUPABASE_URL: "https://xbadaalqaeszooyxuoac.supabase.co"
+          SUPABASE_ANON_KEY: "${SUPABASE_ANON_KEY}"
+          SUPABASE_SERVICE_ROLE_KEY: "${SUPABASE_SERVICE_ROLE_KEY}"
+          GOOGLE_VISION_API_KEY: "${GOOGLE_VISION_API_KEY}"
+          SENTRY_DSN: "${SENTRY_DSN}"
+          ```
+        </environment-variables>
+
+        <secret-rotation>
+          - Regular API key rotation (quarterly)
+          - Database password rotation (monthly)
+          - Certificate renewal automation
+          - Access token refresh
+          - Security audit scheduling
+        </secret-rotation>
+      </secrets-management>
+
+      <security-hardening>
+        <deployment-security>
+          - Secure container images
+          - Minimal attack surface
+          - Runtime security monitoring
+          - Network security policies
+          - Access control enforcement
+        </deployment-security>
+
+        <compliance-deployment>
+          - GDPR compliance validation
+          - Security policy enforcement
+          - Audit trail configuration
+          - Data retention policies
+          - Privacy controls deployment
+        </compliance-deployment>
+      </security-hardening>
+    </security-deployment>
+
+    <disaster-recovery>
+      <backup-strategy>
+        <data-backups>
+          - Automated daily database backups
+          - Weekly full system backups
+          - Image storage backups
+          - Configuration backups
+          - Code repository backups
+        </data-backups>
+
+        <recovery-procedures>
+          - Recovery time objective (RTO): 4 hours
+          - Recovery point objective (RPO): 1 hour
+          - Backup validation testing
+          - Recovery procedure documentation
+          - Regular recovery drills
+        </recovery-procedures>
+      </backup-strategy>
+
+      <incident-response>
+        <escalation-procedures>
+          1. Automated monitoring alerts
+          2. On-call engineer notification
+          3. Incident commander assignment
+          4. Team assembly and communication
+          5. Resolution and post-mortem
+        </escalation-procedures>
+
+        <communication-plan>
+          - Status page updates
+          - Customer notifications
+          - Team communication channels
+          - Management reporting
+          - Post-incident communication
+        </communication-plan>
+      </incident-response>
+    </disaster-recovery>
+  </deployment-architecture>
+</poml>

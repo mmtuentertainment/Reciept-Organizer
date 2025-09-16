@@ -1,0 +1,283 @@
+<poml>
+  <role>Technical Constraints - Receipt Organizer PRD Component</role>
+  <task>Platform limitations, technical debt, and implementation constraints</task>
+
+  <metadata>
+    <component>Technical Constraints</component>
+    <parent-document>docs/prd/main/prd.poml</parent-document>
+    <version>3.0</version>
+    <date>2025-01-16</date>
+  </metadata>
+
+  <technical-constraints>
+    <platform-constraints>
+      <flutter-mobile>
+        <limitations>
+          - iOS camera permissions required for functionality
+          - Android 6.0+ required for ML Kit
+          - Device storage minimum 1GB free space
+          - RAM minimum 2GB for image processing
+          - Camera resolution minimum 8MP for good OCR
+        </limitations>
+
+        <performance-constraints>
+          - OCR processing limited by device CPU
+          - Image storage limited by device capacity
+          - Background processing limited by OS policies
+          - Battery usage must stay under 5% per 30min session
+          - Memory usage capped at 50MB to prevent kills
+        </performance-constraints>
+
+        <api-limitations>
+          - Google Vision API: 1000 free requests/month
+          - Supabase storage: 1GB free tier
+          - Supabase auth: 50,000 MAU free tier
+          - ML Kit: Offline processing only, no custom models
+        </api-limitations>
+      </flutter-mobile>
+
+      <nextjs-web>
+        <limitations>
+          - Browser camera API limitations
+          - File upload size limits (5MB default)
+          - Local storage 5-10MB limit
+          - No background processing
+          - Limited offline capabilities
+        </limitations>
+
+        <browser-support>
+          - Chrome 88+ (required for camera API)
+          - Safari 14+ (iOS camera limitations)
+          - Firefox 85+ (limited file API support)
+          - Edge 88+ (full feature support)
+          - No Internet Explorer support
+        </browser-support>
+
+        <performance-constraints>
+          - Client-side OCR processing slower than native
+          - Image processing limited by JavaScript performance
+          - Large batch operations may cause browser freezing
+          - Memory leaks possible with large image sets
+        </performance-constraints>
+      </nextjs-web>
+
+      <react-native>
+        <limitations>
+          - Platform-specific code required for camera
+          - Different permission models iOS vs Android
+          - Expo limitations for advanced camera features
+          - Bridge overhead for intensive operations
+          - Limited background processing capabilities
+        </limitations>
+
+        <development-constraints>
+          - Requires separate iOS and Android builds
+          - Platform-specific testing required
+          - Different debugging tools per platform
+          - Native module dependencies
+        </development-constraints>
+      </react-native>
+    </platform-constraints>
+
+    <architectural-constraints>
+      <database>
+        <supabase-limits>
+          - PostgreSQL row limit: 500MB per table
+          - Concurrent connections: 60 (free) / 200 (pro)
+          - Request rate limit: 10 requests/second
+          - Storage bandwidth: 2GB/month free
+          - Database size: 500MB free tier
+        </supabase-limits>
+
+        <rls-constraints>
+          - Performance impact: ~0.1ms per query overhead
+          - Complex policies may slow queries significantly
+          - Policy testing required for every schema change
+          - Row-level filtering adds JOIN complexity
+        </rls-constraints>
+
+        <migration-limitations>
+          - No rollback capability for data migrations
+          - Schema changes require downtime
+          - Large data migrations may timeout
+          - Cross-platform schema consistency required
+        </migration-limitations>
+      </database>
+
+      <authentication>
+        <session-management>
+          - JWT token size limit: 8KB
+          - Session timeout: 1 hour (configurable)
+          - Refresh token rotation required for security
+          - Cross-platform session sync complexity
+          - Offline auth limited to cached credentials
+        </session-management>
+
+        <oauth-constraints>
+          - Google OAuth requires app store approval
+          - Apple Sign-In mandatory for iOS App Store
+          - Redirect URI limitations in mobile apps
+          - PKCE flow required for security
+          - Different implementations per platform
+        </oauth-constraints>
+      </authentication>
+
+      <file-storage>
+        <image-constraints>
+          - Maximum file size: 5MB per image
+          - Supported formats: JPG, PNG, WebP only
+          - CDN bandwidth limits
+          - Compression quality vs OCR accuracy trade-off
+          - Storage costs scale with user adoption
+        </image-constraints>
+
+        <backup-limitations>
+          - No automated local backups on mobile
+          - Cloud backup depends on user authentication
+          - Large backup files may fail on slow connections
+          - Export size limited by device capabilities
+        </backup-limitations>
+      </file-storage>
+    </architectural-constraints>
+
+    <development-constraints>
+      <testing-strategy>
+        <test-limitations>
+          - Limited to 15 critical tests for performance
+          - No comprehensive UI testing (maintenance burden)
+          - Manual testing required for camera functionality
+          - Cross-platform testing requires multiple devices
+          - OCR accuracy testing requires large dataset
+        </test-limitations>
+
+        <ci-cd-constraints>
+          - Flutter build times 5-15 minutes
+          - iOS builds require macOS runner
+          - Android emulator testing unreliable
+          - No automated app store deployment
+          - Cross-platform test orchestration complex
+        </ci-cd-constraints>
+      </testing-strategy>
+
+      <team-constraints>
+        <development-resources>
+          - Single developer team (limited parallel work)
+          - No dedicated QA resources
+          - No dedicated DevOps engineer
+          - Limited design resources
+          - No dedicated mobile testing devices
+        </development-resources>
+
+        <knowledge-limitations>
+          - Flutter expertise primary, React Native secondary
+          - Limited backend scaling experience
+          - No machine learning expertise for OCR improvements
+          - Basic security knowledge (not expert level)
+          - Limited analytics implementation experience
+        </knowledge-limitations>
+      </team-constraints>
+
+      <timeline-constraints>
+        <feature-development>
+          - Platform parity maintenance slows development
+          - Authentication implementation blocking other features
+          - Category UI implementation overdue
+          - Field mapping inconsistencies need resolution
+          - Technical debt accumulation slowing velocity
+        </feature-development>
+
+        <maintenance-overhead>
+          - Three platform maintenance burden
+          - Supabase updates may break functionality
+          - Flutter framework updates require testing
+          - Dependency updates frequent and risky
+          - Documentation maintenance significant overhead
+        </maintenance-overhead>
+      </timeline-constraints>
+    </development-constraints>
+
+    <business-constraints>
+      <cost-limitations>
+        <infrastructure-costs>
+          - Supabase free tier limits scaling
+          - Google Vision API costs beyond free tier
+          - App store fees ($99/year iOS, $25 Android)
+          - Domain and SSL certificate costs
+          - CDN costs scale with usage
+        </infrastructure-costs>
+
+        <development-costs>
+          - No budget for premium development tools
+          - Limited budget for third-party services
+          - No budget for dedicated testing infrastructure
+          - No budget for professional design services
+          - No budget for security audits
+        </development-costs>
+      </cost-limitations>
+
+      <compliance-requirements>
+        <data-protection>
+          - GDPR compliance required for EU users
+          - CCPA compliance required for California users
+          - Data retention policies must be implemented
+          - User consent mechanisms required
+          - Data export capabilities mandatory
+        </data-protection>
+
+        <app-store-requirements>
+          - Privacy policy required for app stores
+          - Terms of service required
+          - Age rating compliance
+          - Accessibility requirements (ADA compliance)
+          - Platform-specific review guidelines
+        </app-store-requirements>
+      </compliance-requirements>
+    </business-constraints>
+
+    <risk-mitigation>
+      <technical-risks>
+        <risk name="Platform Divergence">
+          <mitigation>Flutter as reference implementation, regular parity reviews</mitigation>
+          <impact>High - inconsistent user experience</impact>
+        </risk>
+
+        <risk name="API Rate Limits">
+          <mitigation>Implement caching, queue requests, upgrade to paid tiers</mitigation>
+          <impact>Medium - service degradation</impact>
+        </risk>
+
+        <risk name="Storage Costs">
+          <mitigation>Image compression, cleanup policies, user storage quotas</mitigation>
+          <impact>Medium - increased operational costs</impact>
+        </risk>
+
+        <risk name="OCR Accuracy">
+          <mitigation>Confidence scoring, manual correction flows, multiple OCR providers</mitigation>
+          <impact>High - core functionality reliability</impact>
+        </risk>
+
+        <risk name="Database Performance">
+          <mitigation>Query optimization, indexing strategy, connection pooling</mitigation>
+          <impact>High - user experience degradation</impact>
+        </risk>
+      </technical-risks>
+
+      <business-risks>
+        <risk name="Free Tier Limitations">
+          <mitigation>Monitor usage, plan paid tier migration, implement usage controls</mitigation>
+          <impact>High - service availability</impact>
+        </risk>
+
+        <risk name="Compliance Violations">
+          <mitigation>Legal review, privacy-first design, user consent flows</mitigation>
+          <impact>Critical - legal liability</impact>
+        </risk>
+
+        <risk name="App Store Rejection">
+          <mitigation>Follow guidelines strictly, test review process early</mitigation>
+          <impact>High - distribution blocked</impact>
+        </risk>
+      </business-risks>
+    </risk-mitigation>
+  </technical-constraints>
+</poml>

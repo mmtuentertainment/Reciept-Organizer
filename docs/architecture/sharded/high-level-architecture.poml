@@ -1,0 +1,35 @@
+# High-Level Architecture
+
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Client Applications                        │
+├─────────────────┬─────────────────┬─────────────────────────┤
+│   Flutter       │    Next.js      │   React Native          │
+│   Mobile/Web    │    Web SSR      │   iOS/Android           │
+│   (Riverpod)    │  (React Context)│  (React Context)        │
+└────────┬────────┴────────┬────────┴────────┬───────────────┘
+         │                 │                  │
+         ├─────────────────┼──────────────────┤
+         │     Unified Auth SDK Layer         │
+         │  ┌──────────────────────────────┐  │
+         │  │ Platform-Specific Adapters   │  │
+         │  ├──────────────────────────────┤  │
+         │  │ Token Storage Abstraction    │  │
+         │  ├──────────────────────────────┤  │
+         │  │ Session Management Core      │  │
+         │  └──────────────────────────────┘  │
+         │                 │                  │
+         └─────────────────┼──────────────────┘
+                          │
+                    ┌─────▼─────┐
+                    │ Supabase  │
+                    │   Cloud    │
+                    ├───────────┤
+                    │ • Auth     │
+                    │ • Database │
+                    │ • Storage  │
+                    │ • Realtime │
+                    └───────────┘
+```
+

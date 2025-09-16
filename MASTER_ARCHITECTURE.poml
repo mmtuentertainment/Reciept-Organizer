@@ -1,0 +1,713 @@
+# MASTER ARCHITECTURE DOCUMENT - Receipt Organizer
+# Consolidated from all architecture documents - Single Source of Truth
+# Created: 2025-01-16
+# Framework: BMad (Brownfield Modernization and Development)
+
+## Overview
+system: "Receipt Organizer - Multi-Platform Receipt Management System"
+description: "Cloud-based receipt capture, OCR, and financial management system"
+created: "2025-01-16"
+consolidated_from: [
+  "docs/architecture.md",
+  "docs/brownfield-architecture.md",
+  "docs/architecture/high-level-architecture.md",
+  "docs/architecture/security-architecture.md",
+  "docs/sharded-architecture/high-level-architecture.md",
+  "docs/sharded-architecture/frontend-architecture.md"
+]
+
+## Architecture Philosophy
+principles:
+  - Mobile-first, offline-first design
+  - Progressive enhancement from MVP to full features
+  - Platform-specific optimizations with shared core logic
+  - Security by default with defense in depth
+  - Performance targets: <5s capture-to-extract, <100ms auth checks
+  - User data isolation through RLS policies
+  - Event-driven architecture with reactive state management
+
+## Current State Analysis (Brownfield Reality)
+
+### Deployed Infrastructure
+production:
+  supabase_project_id: "xbadaalqaeszooyxuoac"
+  supabase_url: "https://xbadaalqaeszooyxuoac.supabase.co"
+  status: "Production - Phase 1 Complete"
+
+### Platform Status
+platforms:
+  flutter_mobile:
+    version: "3.35.3"
+    status: "Partial - Core features working"
+    gaps: ["52 categories unsupported", "14 DB fields unmapped", "No auth"]
+  flutter_web:
+    status: "Working - Full functionality"
+    auth: "Partial implementation"
+  nextjs:
+    version: "15.1.3"
+    status: "Working - Authentication functional"
+    ui: "shadcn/ui components"
+  react_native:
+    version: "Expo SDK 52"
+    status: "Minimal - No auth implementation"
+
+### Database Schema (Current)
+database:
+  tables: 6
+  columns: 100+
+  indexes: 25
+  categories: 52  # Defined but not implemented in mobile
+
+### Technical Debt
+critical_issues:
+  - "Field mapping inconsistencies (merchantName vs vendor_name)"
+  - "52 categories in DB, 0 support in mobile UI"
+  - "Authentication fragmented across platforms"
+  - "Limited to 15 critical tests for performance"
+  - "Google Vision API key needs rotation"
+  - "No cross-platform session management"
+
+## Target Architecture (Unified Vision)
+
+### System Components Diagram
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Client Applications                        │
+├─────────────────┬─────────────────┬─────────────────────────┤
+│   Flutter       │    Next.js      │   React Native          │
+│   Mobile/Web    │    Web SSR      │   iOS/Android           │
+│   (Riverpod)    │  (React Context)│  (React Context)        │
+└────────┬────────┴────────┬────────┴────────┬───────────────┘
+         │                 │                  │
+         ├─────────────────┼──────────────────┤
+         │     Unified Auth SDK Layer         │
+         │  ┌──────────────────────────────┐  │
+         │  │ Platform-Specific Adapters   │  │
+         │  ├──────────────────────────────┤  │
+         │  │ Token Storage Abstraction    │  │
+         │  ├──────────────────────────────┤  │
+         │  │ Session Management Core      │  │
+         │  └──────────────────────────────┘  │
+         │                 │                  │
+         └─────────────────┼──────────────────┘
+                          │
+                    ┌─────▼─────┐
+                    │ Supabase  │
+                    │   Cloud    │
+                    ├───────────┤
+                    │ • Auth     │
+                    │ • Database │
+                    │ • Storage  │
+                    │ • Realtime │
+                    └───────────┘
+```
+
+### Technology Stack
+
+#### Frontend Platforms
+flutter:
+  version: "3.35.3+"
+  targets: ["iOS", "Android", "Web"]
+  state_management: "Riverpod 2.5.1"
+  routing: "go_router 14.6.0"
+  ui: "Material 3 Design System"
+  local_db: "drift 2.16.0"
+
+nextjs:
+  version: "15.1.3"
+  ui: "shadcn/ui + Tailwind CSS"
+  auth: "Supabase Auth Helpers"
+  state: "React Context + Zustand"
+
+react_native:
+  sdk: "Expo SDK 52"
+  ui: "Native Base / React Native Elements"
+  navigation: "React Navigation 6"
+  state: "React Context + Redux Toolkit"
+
+#### Backend Services
+supabase:
+  services: ["Authentication", "Database", "Storage", "Realtime", "Edge Functions"]
+  database: "PostgreSQL 15"
+  auth_providers: ["Email", "Google", "Apple", "GitHub"]
+
+#### External Integrations
+ocr_services:
+  google_vision_api:
+    status: "Production"
+    note: "Needs key rotation"
+  google_ml_kit:
+    status: "Mobile only"
+    type: "On-device processing"
+
+payment_apis:
+  quickbooks:
+    status: "Planned"
+    format: "3-column CSV export"
+  xero:
+    status: "Planned"
+    format: "Invoice CSV export"
+
+## Authentication Architecture (Phase 2)
+
+### Multi-Platform Auth Strategy
+auth_flow:
+  type: "OAuth 2.0 + PKCE"
+  providers: ["Email/Password", "Google", "Apple", "GitHub"]
+  biometric: ["FaceID", "TouchID", "Fingerprint"]
+
+### Unified Auth State Machine
+states:
+  INIT: "Initial state, checking stored session"
+  LOADING: "Authentication in progress"
+  READY: "Ready for authentication (no session)"
+  AUTHED: "User authenticated with valid session"
+  EXPIRED: "Session expired, needs refresh"
+  ERROR: "Authentication error occurred"
+
+transitions:
+  - from: "INIT"
+    to: ["LOADING", "READY", "AUTHED"]
+    trigger: "Check stored session"
+  - from: "LOADING"
+    to: ["AUTHED", "ERROR", "READY"]
+    trigger: "Auth attempt complete"
+  - from: "READY"
+    to: ["LOADING", "ERROR"]
+    trigger: "User initiates auth"
+  - from: "AUTHED"
+    to: ["EXPIRED", "READY", "ERROR"]
+    trigger: "Session expires or logout"
+  - from: "EXPIRED"
+    to: ["LOADING", "READY", "ERROR"]
+    trigger: "Refresh attempt"
+  - from: "ERROR"
+    to: ["READY", "LOADING"]
+    trigger: "Retry or reset"
+
+### Platform-Specific Token Storage
+token_storage:
+  flutter_web:
+    method: "flutter_secure_storage"
+    encryption: "AES-256"
+    location: "localStorage (encrypted)"
+    security_level: "High"
+
+  flutter_mobile:
+    ios:
+      method: "Keychain Services"
+      security_level: "Very High"
+      hardware_backed: true
+    android:
+      method: "Android Keystore"
+      security_level: "Very High"
+      hardware_backed: true
+
+  nextjs:
+    method: "HttpOnly Cookies"
+    security_level: "Very High"
+    csrf_protection: true
+    same_site: "strict"
+
+  react_native:
+    method: "Expo SecureStore"
+    ios_backend: "Keychain"
+    android_backend: "SharedPreferences (encrypted)"
+    security_level: "High"
+
+### Session Management
+session_config:
+  access_token_ttl: "1 hour"
+  refresh_token_ttl: "30 days"
+  refresh_window: "5 minutes before expiry"
+  offline_validity: "72 hours"
+
+inactivity_monitoring:
+  web:
+    warning_after: "25 minutes"
+    logout_after: "30 minutes"
+  mobile:
+    warning_after: "115 minutes"
+    logout_after: "120 minutes"
+
+## Security Architecture
+
+### Defense in Depth
+layers:
+  client:
+    - "Input validation and sanitization"
+    - "Secure token storage"
+    - "Certificate pinning (mobile)"
+    - "Biometric authentication"
+
+  network:
+    - "TLS 1.3 minimum"
+    - "Certificate validation"
+    - "Request signing"
+
+  api:
+    - "Rate limiting"
+    - "Request validation"
+    - "CORS configuration"
+    - "JWT verification"
+
+  database:
+    - "Row Level Security (RLS)"
+    - "User isolation policies"
+    - "Encrypted at rest"
+    - "Audit logging"
+
+### RLS Policy Patterns
+policies:
+  user_isolation:
+    ```sql
+    CREATE POLICY "Users can only see own receipts"
+    ON receipts FOR ALL
+    USING (auth.uid() = user_id);
+    ```
+
+  public_read:
+    ```sql
+    CREATE POLICY "Public can read categories"
+    ON categories FOR SELECT
+    USING (true);
+    ```
+
+  admin_full_access:
+    ```sql
+    CREATE POLICY "Admins have full access"
+    ON receipts FOR ALL
+    USING (
+      EXISTS (
+        SELECT 1 FROM user_roles
+        WHERE user_id = auth.uid()
+        AND role = 'admin'
+      )
+    );
+    ```
+
+### Threat Model
+threats:
+  authentication:
+    - "Credential stuffing" -> "Rate limiting + 2FA"
+    - "Token theft" -> "Secure storage + short TTL"
+    - "Session hijacking" -> "Device binding + activity monitoring"
+
+  data_access:
+    - "SQL injection" -> "Parameterized queries + RLS"
+    - "Unauthorized access" -> "User isolation policies"
+    - "Data leakage" -> "Field-level encryption"
+
+  client:
+    - "XSS attacks" -> "CSP headers + input sanitization"
+    - "CSRF attacks" -> "CSRF tokens + SameSite cookies"
+    - "Man-in-the-middle" -> "Certificate pinning + TLS"
+
+## Data Architecture
+
+### Database Schema (Target)
+```sql
+-- Core Tables
+users (
+  id uuid PRIMARY KEY,
+  email text UNIQUE,
+  created_at timestamp,
+  updated_at timestamp
+)
+
+receipts (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES users(id),
+  image_uri text,
+  vendor_name text,
+  total_amount decimal,
+  receipt_date date,
+  category_id integer,
+  ocr_confidence float,
+  ocr_results jsonb,
+  created_at timestamp,
+  updated_at timestamp
+)
+
+categories (
+  id integer PRIMARY KEY,
+  name text,
+  icon text,
+  color text,
+  parent_id integer
+)
+
+-- Auth Tables (Managed by Supabase)
+auth.users
+auth.sessions
+auth.refresh_tokens
+```
+
+### Data Flow Patterns
+capture_flow:
+  1. "User captures image"
+  2. "Local edge detection and enhancement"
+  3. "Upload to Supabase Storage"
+  4. "OCR processing (ML Kit or Vision API)"
+  5. "Store results in PostgreSQL"
+  6. "Sync to local cache"
+  7. "Update UI reactively"
+
+sync_patterns:
+  offline_first:
+    - "Write to local DB first"
+    - "Queue for sync when online"
+    - "Conflict resolution: last-write-wins"
+    - "Eventual consistency model"
+
+  real_time:
+    - "Supabase Realtime subscriptions"
+    - "Instant updates across devices"
+    - "Optimistic UI updates"
+
+### Storage Strategy
+storage:
+  images:
+    location: "Supabase Storage"
+    buckets: ["receipts", "avatars", "exports"]
+    access: "Authenticated users only"
+    cdn: "Supabase CDN"
+
+  local_cache:
+    mobile: "Device filesystem + SQLite"
+    web: "IndexedDB + localStorage"
+    size_limit: "500MB"
+    eviction: "LRU when limit reached"
+
+## Performance Architecture
+
+### Performance Targets
+critical_metrics:
+  - metric: "Initial app load"
+    target: "< 100ms"
+    critical: "< 200ms"
+    measure: "Time to first meaningful paint"
+
+  - metric: "Authentication"
+    target: "< 1s"
+    critical: "< 2s"
+    measure: "Login button click to home screen"
+
+  - metric: "Receipt capture to OCR"
+    target: "< 5s"
+    critical: "< 8s"
+    measure: "Shutter click to extracted data display"
+
+  - metric: "Token refresh"
+    target: "< 500ms"
+    critical: "< 1s"
+    measure: "Background operation time"
+
+  - metric: "Database query"
+    target: "< 50ms"
+    critical: "< 100ms"
+    measure: "Query execution time"
+
+### Optimization Strategies
+frontend:
+  flutter:
+    - "Const widgets where possible"
+    - "Widget key optimization"
+    - "Image caching with CachedNetworkImage"
+    - "Lazy loading lists with ListView.builder"
+    - "Code splitting by feature"
+
+  nextjs:
+    - "Static generation where possible"
+    - "Dynamic imports for code splitting"
+    - "Image optimization with next/image"
+    - "API routes for backend operations"
+    - "Edge functions for auth checks"
+
+  react_native:
+    - "Hermes JS engine"
+    - "RAM bundles for faster startup"
+    - "Image optimization with FastImage"
+    - "Navigation lazy loading"
+
+backend:
+  database:
+    - "Proper indexing on all foreign keys"
+    - "Composite indexes for common queries"
+    - "Query optimization with EXPLAIN ANALYZE"
+    - "Connection pooling"
+    - "Read replicas for scaling"
+
+  caching:
+    - "Redis for session storage"
+    - "CDN for static assets"
+    - "Database query caching"
+    - "API response caching"
+
+## Flutter Mobile Architecture
+
+### Clean Architecture Layers
+presentation:
+  description: "UI components and state management"
+  components:
+    - "Screens/Pages"
+    - "Widgets"
+    - "Providers (Riverpod)"
+    - "View Models"
+
+application:
+  description: "Business logic and use cases"
+  components:
+    - "Use Cases"
+    - "Services"
+    - "DTOs"
+    - "Mappers"
+
+domain:
+  description: "Core business entities and rules"
+  components:
+    - "Entities"
+    - "Value Objects"
+    - "Repository Interfaces"
+    - "Domain Services"
+
+infrastructure:
+  description: "External services and data access"
+  components:
+    - "Repository Implementations"
+    - "Data Sources (Remote/Local)"
+    - "API Clients"
+    - "Database Access"
+
+### State Management (Riverpod)
+providers:
+  ```dart
+  // Auth State
+  final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>(...);
+
+  // Receipt List
+  final receiptsProvider = FutureProvider.family<List<Receipt>, Filter>(...);
+
+  // OCR Processing
+  final ocrProvider = AsyncNotifierProvider<OcrNotifier, OcrResult>(...);
+  ```
+
+patterns:
+  - "Feature-based provider organization"
+  - "AsyncNotifier for async operations"
+  - "Family modifiers for parameterized state"
+  - "AutoDispose for memory management"
+  - "Ref.watch for reactive updates"
+
+### Navigation (go_router)
+structure:
+  ```dart
+  final router = GoRouter(
+    routes: [
+      GoRoute(path: '/', builder: (_, __) => SplashScreen()),
+      GoRoute(path: '/auth', builder: (_, __) => AuthScreen()),
+      GoRoute(path: '/home', builder: (_, __) => HomeScreen()),
+      GoRoute(path: '/receipt/:id', builder: (_, state) => ReceiptDetail(state.params['id'])),
+    ],
+    redirect: (context, state) => authGuard(context, state),
+  );
+  ```
+
+## Development & Deployment
+
+### Environment Configuration
+environments:
+  development:
+    api_url: "http://localhost:54321"
+    anon_key: "development-anon-key"
+    features: ["debug_mode", "mock_data", "verbose_logging"]
+
+  staging:
+    api_url: "https://staging.supabase.co"
+    anon_key: "staging-anon-key"
+    features: ["beta_features", "analytics"]
+
+  production:
+    api_url: "https://xbadaalqaeszooyxuoac.supabase.co"
+    anon_key: "production-anon-key"
+    features: ["analytics", "crash_reporting", "performance_monitoring"]
+
+### CI/CD Pipeline
+github_actions:
+  - "Lint and format check"
+  - "Unit tests (15 critical)"
+  - "Integration tests"
+  - "Build artifacts"
+  - "Deploy to environments"
+
+deployment:
+  flutter:
+    - "Build APK/IPA"
+    - "Upload to app stores"
+    - "Web deployment to Vercel"
+
+  nextjs:
+    - "Vercel deployment"
+    - "Environment variables"
+    - "Edge functions"
+
+  supabase:
+    - "Database migrations"
+    - "RLS policies"
+    - "Edge functions"
+
+### MCP Integration
+mcp_servers:
+  supabase_mcp:
+    purpose: "Database and auth management"
+    commands: ["migrations", "RLS policies", "auth config"]
+
+  shadcn_mcp:
+    purpose: "Component management"
+    commands: ["add components", "update styles"]
+
+## Migration Strategy (Brownfield to Target)
+
+### Phase 1: Foundation (COMPLETE)
+completed:
+  - "Database schema with 6 tables"
+  - "Basic CRUD operations"
+  - "52 categories defined"
+  - "Supabase deployment"
+  - "Flutter mobile core features"
+
+### Phase 2: Authentication (IN PROGRESS)
+tasks:
+  - "Implement unified auth SDK"
+  - "Platform-specific adapters"
+  - "Session synchronization"
+  - "Biometric authentication"
+  - "OAuth providers"
+
+### Phase 3: Feature Parity
+planned:
+  - "Map all 52 categories to UI"
+  - "Fix field mapping issues"
+  - "Implement missing 14 DB fields"
+  - "Cross-platform data sync"
+  - "Offline support enhancement"
+
+### Phase 4: Advanced Features
+future:
+  - "Real-time collaboration"
+  - "Advanced analytics"
+  - "Export integrations (QuickBooks, Xero)"
+  - "Machine learning enhancements"
+  - "Multi-language support"
+
+## Architectural Decisions Record (ADR)
+
+### ADR-001: Multi-Platform Strategy
+decision: "Flutter primary, Next.js secondary, React Native minimal"
+rationale: "Flutter provides best code reuse across mobile/web"
+consequences: "Need platform-specific auth adapters"
+
+### ADR-002: State Management
+decision: "Riverpod for Flutter, React Context for web"
+rationale: "Best practices for each platform"
+consequences: "Different patterns per platform"
+
+### ADR-003: Database Strategy
+decision: "PostgreSQL with RLS on Supabase"
+rationale: "Proven scalability and security"
+consequences: "Need proper RLS policies"
+
+### ADR-004: OCR Processing
+decision: "Hybrid - ML Kit locally, Vision API cloud"
+rationale: "Balance between privacy and accuracy"
+consequences: "Two code paths to maintain"
+
+### ADR-005: Authentication
+decision: "Supabase Auth with custom adapters"
+rationale: "Reduces development time"
+consequences: "Vendor lock-in for auth"
+
+## Technical Debt Register
+
+### Critical (P0)
+- id: "TD-001"
+  description: "52 categories not implemented in mobile"
+  impact: "Users cannot categorize receipts"
+  effort: "2 days"
+
+- id: "TD-002"
+  description: "Field mapping inconsistencies"
+  impact: "Data corruption risk"
+  effort: "1 day"
+
+### High (P1)
+- id: "TD-003"
+  description: "Limited test coverage (15 tests)"
+  impact: "Quality risks"
+  effort: "1 week"
+
+- id: "TD-004"
+  description: "No React Native auth"
+  impact: "Platform incomplete"
+  effort: "3 days"
+
+### Medium (P2)
+- id: "TD-005"
+  description: "Google Vision API key rotation"
+  impact: "Security risk"
+  effort: "2 hours"
+
+- id: "TD-006"
+  description: "Cross-platform session sync"
+  impact: "Poor UX"
+  effort: "1 week"
+
+## Monitoring & Observability
+
+### Metrics
+application:
+  - "Request latency (p50, p95, p99)"
+  - "Error rates by endpoint"
+  - "Active users (DAU, MAU)"
+  - "Feature usage statistics"
+
+infrastructure:
+  - "Database connection pool"
+  - "Query performance"
+  - "Storage usage"
+  - "API rate limits"
+
+### Logging
+strategy:
+  - "Structured logging (JSON)"
+  - "Correlation IDs for tracing"
+  - "Error aggregation (Sentry)"
+  - "Performance monitoring (DataDog)"
+
+### Alerting
+rules:
+  - "Error rate > 1% - Page team"
+  - "Latency p95 > 2s - Warning"
+  - "Database connections > 80% - Scale"
+  - "Storage > 90% - Critical"
+
+## Conclusion
+summary: |
+  This master architecture document consolidates all architectural decisions,
+  patterns, and strategies from 6+ separate documents into a single source
+  of truth. It provides a comprehensive view of the current brownfield state,
+  target architecture, and migration path for the Receipt Organizer system.
+
+  Key architectural principles:
+  - Multi-platform support with unified auth
+  - Offline-first with cloud sync
+  - Security by default with RLS
+  - Performance-oriented design
+  - Progressive enhancement strategy
+
+next_steps:
+  - Complete Phase 2 authentication implementation
+  - Address critical technical debt (categories, field mapping)
+  - Expand test coverage beyond 15 tests
+  - Implement cross-platform session management
+  - Deploy monitoring and observability stack

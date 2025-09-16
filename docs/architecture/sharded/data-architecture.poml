@@ -1,0 +1,78 @@
+# Data Architecture
+
+
+
+### Database Schema (Target)
+```sql
+-- Core Tables
+users (
+  id uuid PRIMARY KEY,
+  email text UNIQUE,
+  created_at timestamp,
+  updated_at timestamp
+)
+
+receipts (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES users(id),
+  image_uri text,
+  vendor_name text,
+  total_amount decimal,
+  receipt_date date,
+  category_id integer,
+  ocr_confidence float,
+  ocr_results jsonb,
+  created_at timestamp,
+  updated_at timestamp
+)
+
+categories (
+  id integer PRIMARY KEY,
+  name text,
+  icon text,
+  color text,
+  parent_id integer
+)
+
+-- Auth Tables (Managed by Supabase)
+auth.users
+auth.sessions
+auth.refresh_tokens
+```
+
+### Data Flow Patterns
+capture_flow:
+  1. "User captures image"
+  2. "Local edge detection and enhancement"
+  3. "Upload to Supabase Storage"
+  4. "OCR processing (ML Kit or Vision API)"
+  5. "Store results in PostgreSQL"
+  6. "Sync to local cache"
+  7. "Update UI reactively"
+
+sync_patterns:
+  offline_first:
+    - "Write to local DB first"
+    - "Queue for sync when online"
+    - "Conflict resolution: last-write-wins"
+    - "Eventual consistency model"
+
+  real_time:
+    - "Supabase Realtime subscriptions"
+    - "Instant updates across devices"
+    - "Optimistic UI updates"
+
+### Storage Strategy
+storage:
+  images:
+    location: "Supabase Storage"
+    buckets: ["receipts", "avatars", "exports"]
+    access: "Authenticated users only"
+    cdn: "Supabase CDN"
+
+  local_cache:
+    mobile: "Device filesystem + SQLite"
+    web: "IndexedDB + localStorage"
+    size_limit: "500MB"
+    eviction: "LRU when limit reached"
+

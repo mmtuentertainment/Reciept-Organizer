@@ -1,0 +1,917 @@
+<poml>
+  <role>Master Product Requirements Document - Receipt Organizer</role>
+  <task>Consolidate all PRD content from multiple documents into single source of truth</task>
+
+  <metadata>
+    <version>3.0</version>
+    <date>2025-01-16</date>
+    <consolidation-sources>
+      - docs/prd.md (Phase 2 Authentication focus - 19KB)
+      - docs/front-end-spec.md (UX/UI specification - 53KB)
+      - docs/front-end-spec.poml (Structured UX - 84KB)
+      - docs/prd/* (8 authentication component files)
+      - docs/sharded-prd/* (12 core app component files)
+    </consolidation-sources>
+    <methodology>BMad Framework for Brownfield Development</methodology>
+    <current-phase>Phase 2 - Story 2.5 Complete</current-phase>
+    <production-database>xbadaalqaeszooyxuoac.supabase.co</production-database>
+  </metadata>
+
+  <!-- ============================================ -->
+  <!--              EXECUTIVE SUMMARY              -->
+  <!-- ============================================ -->
+
+  <executive-summary>
+    <vision>
+      A simple, honest receipt management system for mom-and-pop businesses that just works.
+      Designed for 100-500 receipts/month, focusing on tax preparation and expense tracking.
+    </vision>
+
+    <positioning>
+      "The honest receipt app that just works" - No AI hype, no complex features, just reliable
+      receipt capture, OCR extraction, and accounting software export.
+    </positioning>
+
+    <current-state>
+      - Phase 1: Database & Storage Infrastructure (COMPLETE)
+      - Phase 2: Authentication & User Management (IN PROGRESS)
+      - Core Features: Batch capture, OCR, CSV export working in Flutter
+      - Platform Status: Flutter leading, Web catching up, Native minimal
+    </current-state>
+
+    <target-metrics>
+      - 1,000 SMB users in first 6 months
+      - 60-day retention >40%
+      - <2 minutes per receipt processing time
+      - 70% zero-touch accuracy (no corrections needed)
+    </target-metrics>
+  </executive-summary>
+
+  <!-- ============================================ -->
+  <!--              USER PERSONAS                  -->
+  <!-- ============================================ -->
+
+  <user-personas>
+    <persona id="sarah" type="primary">
+      <name>Sarah - Restaurant Owner</name>
+      <business>Small family restaurant, 300 receipts/month</business>
+      <tech-level>Basic smartphone user</tech-level>
+      <pain-points>
+        - Shoebox full of receipts for taxes
+        - No time for manual data entry
+        - Needs QuickBooks-ready export
+      </pain-points>
+      <success-criteria>
+        - Process 10 receipts in <3 minutes
+        - Export directly to QuickBooks format
+        - Works offline during busy hours
+      </success-criteria>
+      <auth-needs>
+        - Simple email/password login
+        - Remember me on device
+        - No complex 2FA during rush
+      </auth-needs>
+    </persona>
+
+    <persona id="mike" type="secondary">
+      <name>Mike - Freelance Contractor</name>
+      <business>Independent contractor, 100 receipts/month</business>
+      <tech-level>Comfortable with technology</tech-level>
+      <pain-points>
+        - Receipts scattered across job sites
+        - Need to track by project/client
+        - IRS audit concerns
+      </pain-points>
+      <success-criteria>
+        - Quick capture between jobs
+        - Accurate date/amount extraction
+        - Reliable cloud backup
+      </success-criteria>
+      <auth-needs>
+        - Google OAuth for quick setup
+        - Biometric unlock on phone
+        - Multi-device sync
+      </auth-needs>
+    </persona>
+
+    <persona id="linda" type="tertiary">
+      <name>Linda - Bookkeeper</name>
+      <business>Manages books for 5-10 small businesses</business>
+      <tech-level>Expert with accounting software</tech-level>
+      <pain-points>
+        - Clients provide messy receipt batches
+        - Need to verify OCR accuracy
+        - Multiple export formats needed
+      </pain-points>
+      <success-criteria>
+        - Batch processing with review
+        - High OCR confidence indicators
+        - Multiple export formats (QuickBooks, Xero)
+      </success-criteria>
+      <auth-needs>
+        - Separate workspaces per client
+        - Audit trail for changes
+        - Secure credential storage
+      </auth-needs>
+    </persona>
+  </user-personas>
+
+  <!-- ============================================ -->
+  <!--           COMPETITIVE ANALYSIS              -->
+  <!-- ============================================ -->
+
+  <competitive-analysis>
+    <direct-competitors>
+      <competitor name="Expensify">
+        <strengths>Enterprise features, credit card sync, team collaboration</strengths>
+        <weaknesses>Complex UI, expensive, overkill for small business</weaknesses>
+        <our-advantage>Simpler, focused on receipts only, no subscription</our-advantage>
+      </competitor>
+
+      <competitor name="Receipt Bank">
+        <strengths>Good OCR, accounting integrations</strengths>
+        <weaknesses>UK-focused, limited mobile features</weaknesses>
+        <our-advantage>US tax categories, better mobile experience</our-advantage>
+      </competitor>
+
+      <competitor name="Shoeboxed">
+        <strengths>Mail-in scanning service, human verification</strengths>
+        <weaknesses>Expensive, slow turnaround</weaknesses>
+        <our-advantage>Instant processing, no monthly fees</our-advantage>
+      </competitor>
+    </direct-competitors>
+
+    <positioning-strategy>
+      We win by being the simplest, most honest solution for small businesses
+      who just need to digitize receipts for taxes. No AI hype, no complex
+      features, just reliable capture and export.
+    </positioning-strategy>
+  </competitive-analysis>
+
+  <!-- ============================================ -->
+  <!--      GOALS AND SUCCESS METRICS             -->
+  <!-- ============================================ -->
+
+  <goals>
+    <business-goals>
+      <goal id="BG1" priority="P0">
+        <description>Acquire 1,000 SMB users within 6 months</description>
+        <metric>Monthly active users</metric>
+        <target>1,000</target>
+        <timeline>6 months</timeline>
+      </goal>
+
+      <goal id="BG2" priority="P0">
+        <description>Achieve sustainable unit economics</description>
+        <metric>LTV:CAC ratio</metric>
+        <target>>3:1</target>
+        <timeline>12 months</timeline>
+      </goal>
+
+      <goal id="BG3" priority="P1">
+        <description>Build defensible product moat</description>
+        <metric>60-day retention rate</metric>
+        <target>>40%</target>
+        <timeline>9 months</timeline>
+      </goal>
+    </business-goals>
+
+    <user-goals>
+      <goal id="UG1" priority="P0">
+        <description>Process receipts faster than manual entry</description>
+        <metric>Time per receipt</metric>
+        <target><2 minutes</target>
+        <current>~5 minutes manual</current>
+      </goal>
+
+      <goal id="UG2" priority="P0">
+        <description>Achieve high accuracy without corrections</description>
+        <metric>Zero-touch accuracy</metric>
+        <target>70% receipts need no edits</target>
+      </goal>
+
+      <goal id="UG3" priority="P1">
+        <description>Work reliably offline</description>
+        <metric>Offline capability</metric>
+        <target>100% core features work offline</target>
+      </goal>
+    </user-goals>
+
+    <technical-goals>
+      <goal id="TG1" priority="P0">
+        <description>Fast OCR processing</description>
+        <metric>OCR extraction time</metric>
+        <target><5 seconds per receipt</target>
+      </goal>
+
+      <goal id="TG2" priority="P0">
+        <description>High availability</description>
+        <metric>Crash-free sessions</metric>
+        <target>>99.5%</target>
+      </goal>
+
+      <goal id="TG3" priority="P1">
+        <description>Efficient resource usage</description>
+        <metric>Memory footprint</metric>
+        <target><50MB average</target>
+      </goal>
+    </technical-goals>
+  </goals>
+
+  <!-- ============================================ -->
+  <!--           UNIFIED EPIC STRUCTURE            -->
+  <!-- ============================================ -->
+
+  <epic-structure>
+    <overview>
+      Consolidated epic structure combining authentication (Epic 0) with
+      core receipt functionality (Epics 1-5). This resolves the numbering
+      confusion between Phase 2 auth stories and original receipt epics.
+    </overview>
+
+    <!-- EPIC 0: Authentication (was Epic 1 in Phase 2 PRD) -->
+    <epic number="0" title="Authentication & User Management" status="IN_PROGRESS">
+      <description>
+        Multi-platform authentication using Supabase Auth with email/password,
+        OAuth, biometric auth, and session management across Flutter, Next.js,
+        and React Native platforms.
+      </description>
+
+      <stories>
+        <story id="0.1" title="Auth Testing Infrastructure" status="COMPLETE">
+          <file>story-1.0-auth-testing-infrastructure.md</file>
+        </story>
+        <story id="0.2" title="Web Authentication" status="COMPLETE">
+          <file>story-1.1-web-authentication.md</file>
+          <pr>#8 - MERGED</pr>
+        </story>
+        <story id="0.3" title="Database RLS Configuration" status="COMPLETE">
+          <file>story-1.2-database-rls.md</file>
+          <pr>#9 - MERGED</pr>
+        </story>
+        <story id="0.4" title="Flutter Authentication" status="COMPLETE">
+          <file>story-1.3-flutter-authentication.md</file>
+          <pr>#11 - IN REVIEW</pr>
+        </story>
+        <story id="0.5" title="React Native Authentication" status="IN_REVIEW">
+          <file>story-1.4-react-native-authentication.md</file>
+          <pr>#12 - IN REVIEW</pr>
+        </story>
+        <story id="0.6" title="Google OAuth Integration" status="PLANNED">
+          <file>story-1.5-google-oauth.md</file>
+        </story>
+        <story id="0.7" title="User Profile Management" status="PLANNED">
+          <file>story-1.6-user-profile.md</file>
+        </story>
+        <story id="0.8" title="Biometric Authentication" status="PLANNED">
+          <file>story-1.7-biometric-auth.md</file>
+        </story>
+        <story id="0.9" title="Monitoring & Rollback" status="PLANNED">
+          <file>story-1.8-monitoring-rollback.md</file>
+        </story>
+      </stories>
+    </epic>
+
+    <!-- EPIC 1: Capture & Extract (original Epic 1) -->
+    <epic number="1" title="Capture & Extract" status="COMPLETE">
+      <description>
+        Core receipt capture functionality with batch mode, edge detection,
+        OCR extraction, and confidence scoring.
+      </description>
+
+      <stories>
+        <story id="1.1" title="Batch Receipt Capture" status="COMPLETE">
+          <file>epic-1-story-1-batch-receipt-capture.md</file>
+          <acceptance>10 receipts in <3 minutes</acceptance>
+        </story>
+        <story id="1.2" title="Auto Edge Detection" status="COMPLETE">
+          <file>epic-1-story-2-auto-edge-detection.md</file>
+          <acceptance>80%+ success rate</acceptance>
+        </story>
+        <story id="1.3" title="OCR Confidence Scores" status="COMPLETE">
+          <file>epic-1-story-3-ocr-confidence-scores.md</file>
+          <acceptance>Color-coded confidence display</acceptance>
+        </story>
+        <story id="1.4" title="Retry Failed Captures" status="COMPLETE">
+          <file>epic-1-story-4-retry-failed-captures.md</file>
+          <acceptance>3 retry attempts</acceptance>
+        </story>
+      </stories>
+    </epic>
+
+    <!-- EPIC 2: Review & Correct -->
+    <epic number="2" title="Review & Correct" status="IN_PROGRESS">
+      <description>
+        Enable users to quickly review OCR results and make corrections
+        with inline editing and merchant normalization.
+      </description>
+
+      <stories>
+        <story id="2.1" title="Enhanced Database Schema" status="COMPLETE">
+          <file>1.1-enhanced-database-schema.md</file>
+        </story>
+        <story id="2.2" title="Storage Configuration" status="COMPLETE">
+          <file>1.2-storage-configuration.md</file>
+        </story>
+        <story id="2.3" title="Add Notes to Receipts" status="COMPLETE">
+          <description>Inline note editing with auto-save</description>
+        </story>
+        <story id="2.4" title="Category Management" status="PARTIAL">
+          <file>1.3-default-categories-seeding.md</file>
+          <issue>52 categories in DB, 0 in mobile UI</issue>
+        </story>
+        <story id="2.5" title="Receipt Capture and Preview" status="COMPLETE">
+          <file>2.5.story.md</file>
+          <vulcan-protocol>49% code reduction achieved</vulcan-protocol>
+        </story>
+      </stories>
+    </epic>
+
+    <!-- EPIC 3: Organize & Export -->
+    <epic number="3" title="Organize & Export" status="PARTIAL">
+      <description>
+        Search, filter, categorize receipts and export to accounting software
+        in multiple formats with validation.
+      </description>
+
+      <stories>
+        <story id="3.1" title="Basic CSV Export" status="COMPLETE">
+          <formats>QuickBooks, Xero, Generic</formats>
+        </story>
+        <story id="3.2" title="Export Validation" status="COMPLETE">
+          <features>Sanitization, field validation, batch limits</features>
+        </story>
+        <story id="3.3" title="Date Range Selection" status="PLANNED"/>
+        <story id="3.4" title="Category Filtering" status="BLOCKED">
+          <blocker>Category UI not implemented</blocker>
+        </story>
+      </stories>
+    </epic>
+
+    <!-- EPIC 4: Settings & Support -->
+    <epic number="4" title="Settings & Support" status="PLANNED">
+      <description>
+        User preferences, storage management, help documentation, and
+        feedback mechanisms.
+      </description>
+      <stories>
+        <story id="4.1" title="User Preferences" status="PLANNED"/>
+        <story id="4.2" title="Storage Management" status="PLANNED"/>
+        <story id="4.3" title="Help & Documentation" status="PLANNED"/>
+        <story id="4.4" title="Feedback System" status="PLANNED"/>
+      </stories>
+    </epic>
+
+    <!-- EPIC 5: Production Infrastructure -->
+    <epic number="5" title="Production Infrastructure" status="COMPLETE">
+      <description>
+        Supabase cloud setup, database migration, security configuration,
+        and production deployment.
+      </description>
+
+      <sub-epics>
+        <sub-epic id="5.1" title="Pre-Production Validation" status="COMPLETE"/>
+        <sub-epic id="5.2" title="Supabase Project Setup" status="COMPLETE">
+          <project-id>xbadaalqaeszooyxuoac</project-id>
+        </sub-epic>
+        <sub-epic id="5.3" title="Database Migration" status="COMPLETE">
+          <tables>6 tables, 100+ columns, 25 indexes</tables>
+        </sub-epic>
+        <sub-epic id="5.4" title="Security Configuration" status="COMPLETE">
+          <features>100% RLS coverage, 0.092ms query performance</features>
+        </sub-epic>
+      </sub-epics>
+    </epic>
+  </epic-structure>
+
+  <!-- ============================================ -->
+  <!--         CONSOLIDATED REQUIREMENTS           -->
+  <!-- ============================================ -->
+
+  <requirements>
+    <!-- FUNCTIONAL REQUIREMENTS -->
+    <functional-requirements>
+      <!-- Authentication Requirements (FR1-FR15) -->
+      <category name="Authentication">
+        <requirement id="FR-AUTH-1">
+          The system SHALL implement Supabase Auth integration across all three platforms
+          (Flutter web, Next.js, React Native) with consistent user experience
+        </requirement>
+        <requirement id="FR-AUTH-2">
+          Users SHALL be able to sign up and log in using email/password authentication
+          with secure password requirements (min 8 chars, 1 number, 1 special)
+        </requirement>
+        <requirement id="FR-AUTH-3">
+          Users SHALL be able to authenticate using OAuth providers (Google Sign-In)
+        </requirement>
+        <requirement id="FR-AUTH-4">
+          The system SHALL maintain user sessions with automatic token refresh before expiration
+        </requirement>
+        <requirement id="FR-AUTH-5">
+          Users SHALL be able to manage profile information (username, full name, avatar)
+        </requirement>
+        <requirement id="FR-AUTH-6">
+          The system SHALL support profile photo upload to Supabase Storage with thumbnails
+        </requirement>
+        <requirement id="FR-AUTH-7">
+          Each authenticated user SHALL only access their own receipts via RLS policies
+        </requirement>
+        <requirement id="FR-AUTH-8">
+          Mobile app SHALL support offline authentication with cached credentials
+        </requirement>
+        <requirement id="FR-AUTH-9">
+          Users SHALL be able to sign out, invalidating session across all devices
+        </requirement>
+        <requirement id="FR-AUTH-10">
+          The system SHALL provide password reset via email magic links
+        </requirement>
+        <requirement id="FR-AUTH-11">
+          Session state SHALL be synchronized across browser tabs
+        </requirement>
+        <requirement id="FR-AUTH-12">
+          The system SHALL track and display authentication status in UI
+        </requirement>
+        <requirement id="FR-AUTH-13">
+          The system SHALL remember login state using secure storage per platform
+        </requirement>
+        <requirement id="FR-AUTH-14">
+          The system SHALL support biometric authentication on mobile devices
+        </requirement>
+        <requirement id="FR-AUTH-15">
+          The system SHALL auto-logout after inactivity (30min web, 2hr mobile)
+        </requirement>
+      </category>
+
+      <!-- Core Receipt Requirements -->
+      <category name="Receipt Capture">
+        <requirement id="FR-CAPTURE-1">
+          Users SHALL capture receipts using device camera with real-time preview
+        </requirement>
+        <requirement id="FR-CAPTURE-2">
+          The system SHALL support batch capture mode for multiple receipts
+        </requirement>
+        <requirement id="FR-CAPTURE-3">
+          The system SHALL automatically detect receipt edges during capture
+        </requirement>
+        <requirement id="FR-CAPTURE-4">
+          Users SHALL be able to manually adjust detected boundaries
+        </requirement>
+        <requirement id="FR-CAPTURE-5">
+          The system SHALL support up to 3 retry attempts for failed captures
+        </requirement>
+      </category>
+
+      <category name="OCR Processing">
+        <requirement id="FR-OCR-1">
+          The system SHALL extract merchant, date, total, and tax from receipts
+        </requirement>
+        <requirement id="FR-OCR-2">
+          The system SHALL display confidence scores for each extracted field
+        </requirement>
+        <requirement id="FR-OCR-3">
+          The system SHALL process receipts in <5 seconds
+        </requirement>
+        <requirement id="FR-OCR-4">
+          Users SHALL be able to edit extracted data inline
+        </requirement>
+        <requirement id="FR-OCR-5">
+          The system SHALL support offline OCR processing using ML Kit
+        </requirement>
+      </category>
+
+      <category name="Data Management">
+        <requirement id="FR-DATA-1">
+          Users SHALL add notes to any receipt
+        </requirement>
+        <requirement id="FR-DATA-2">
+          Users SHALL categorize receipts from 52 predefined categories
+        </requirement>
+        <requirement id="FR-DATA-3">
+          The system SHALL auto-save all changes
+        </requirement>
+        <requirement id="FR-DATA-4">
+          Users SHALL search receipts by merchant, date, amount
+        </requirement>
+        <requirement id="FR-DATA-5">
+          Users SHALL filter receipts by date range and category
+        </requirement>
+      </category>
+
+      <category name="Export">
+        <requirement id="FR-EXPORT-1">
+          Users SHALL export receipts to CSV format
+        </requirement>
+        <requirement id="FR-EXPORT-2">
+          The system SHALL support QuickBooks, Xero, and Generic formats
+        </requirement>
+        <requirement id="FR-EXPORT-3">
+          The system SHALL validate export data before generation
+        </requirement>
+        <requirement id="FR-EXPORT-4">
+          The system SHALL sanitize CSV data to prevent injection attacks
+        </requirement>
+        <requirement id="FR-EXPORT-5">
+          Users SHALL select custom date ranges for export
+        </requirement>
+      </category>
+    </functional-requirements>
+
+    <!-- NON-FUNCTIONAL REQUIREMENTS -->
+    <non-functional-requirements>
+      <category name="Performance">
+        <requirement id="NFR-PERF-1">
+          Authentication responses SHALL complete within 2 seconds
+        </requirement>
+        <requirement id="NFR-PERF-2">
+          Camera SHALL be ready within 2 seconds of app launch
+        </requirement>
+        <requirement id="NFR-PERF-3">
+          OCR processing SHALL complete within 5 seconds per receipt
+        </requirement>
+        <requirement id="NFR-PERF-4">
+          Batch capture SHALL process 10 receipts in <3 minutes
+        </requirement>
+        <requirement id="NFR-PERF-5">
+          Export generation SHALL complete within 3 seconds for 100 receipts
+        </requirement>
+        <requirement id="NFR-PERF-6">
+          The app SHALL use <50MB memory on average
+        </requirement>
+        <requirement id="NFR-PERF-7">
+          Battery usage SHALL be <5% for 30 minutes of use
+        </requirement>
+      </category>
+
+      <category name="Reliability">
+        <requirement id="NFR-REL-1">
+          The system SHALL maintain 99.9% availability for auth services
+        </requirement>
+        <requirement id="NFR-REL-2">
+          The app SHALL achieve >99.5% crash-free sessions
+        </requirement>
+        <requirement id="NFR-REL-3">
+          Edge detection SHALL achieve 80%+ success rate
+        </requirement>
+        <requirement id="NFR-REL-4">
+          OCR SHALL achieve 90%+ accuracy for clear receipts
+        </requirement>
+        <requirement id="NFR-REL-5">
+          The system SHALL handle 1000 concurrent users
+        </requirement>
+      </category>
+
+      <category name="Security">
+        <requirement id="NFR-SEC-1">
+          Passwords SHALL be hashed using bcrypt (cost factor 10+)
+        </requirement>
+        <requirement id="NFR-SEC-2">
+          JWT tokens SHALL expire after 1 hour with 7-day refresh tokens
+        </requirement>
+        <requirement id="NFR-SEC-3">
+          OAuth SHALL use PKCE flow for enhanced security
+        </requirement>
+        <requirement id="NFR-SEC-4">
+          All API calls SHALL use HTTPS encryption
+        </requirement>
+        <requirement id="NFR-SEC-5">
+          Biometric data SHALL never leave the device
+        </requirement>
+        <requirement id="NFR-SEC-6">
+          The system SHALL log all authentication attempts
+        </requirement>
+      </category>
+
+      <category name="Usability">
+        <requirement id="NFR-USE-1">
+          UI feedback SHALL appear within 100ms of user action
+        </requirement>
+        <requirement id="NFR-USE-2">
+          Error messages SHALL be user-friendly without system details
+        </requirement>
+        <requirement id="NFR-USE-3">
+          The app SHALL support accessibility features (screen readers)
+        </requirement>
+        <requirement id="NFR-USE-4">
+          Profile images SHALL be limited to 5MB (JPG, PNG, WebP)
+        </requirement>
+        <requirement id="NFR-USE-5">
+          The system SHALL comply with GDPR for data handling
+        </requirement>
+      </category>
+    </non-functional-requirements>
+
+    <!-- COMPATIBILITY REQUIREMENTS -->
+    <compatibility-requirements>
+      <requirement id="CR-1">
+        All receipt endpoints SHALL continue functioning with added auth headers
+      </requirement>
+      <requirement id="CR-2">
+        New auth tables SHALL not modify existing receipt schema
+      </requirement>
+      <requirement id="CR-3">
+        Auth UI SHALL use existing design systems (shadcn, Material)
+      </requirement>
+      <requirement id="CR-4">
+        Google Vision API calls SHALL include user context for quota tracking
+      </requirement>
+      <requirement id="CR-5">
+        Existing receipt images SHALL migrate to user-specific buckets
+      </requirement>
+      <requirement id="CR-6">
+        Authentication SHALL not break existing 15 critical tests
+      </requirement>
+    </compatibility-requirements>
+  </requirements>
+
+  <!-- ============================================ -->
+  <!--           ACCEPTANCE CRITERIA               -->
+  <!-- ============================================ -->
+
+  <acceptance-criteria>
+    <feature-level>
+      <criterion category="Capture">
+        <metric>Batch capture speed</metric>
+        <target>10 receipts in <3 minutes</target>
+        <current>Achieved</current>
+      </criterion>
+
+      <criterion category="OCR">
+        <metric>Field extraction accuracy</metric>
+        <targets>
+          - Merchant: 90%
+          - Date: 95%
+          - Total: 95%
+          - Tax: 85%
+        </targets>
+      </criterion>
+
+      <criterion category="Export">
+        <metric>Format validation</metric>
+        <target>100% valid CSV generation</target>
+        <test>Export validator passes</test>
+      </criterion>
+
+      <criterion category="Authentication">
+        <metric>Cross-platform consistency</metric>
+        <target>Same auth flow on all platforms</target>
+        <status>Web complete, Mobile in review</status>
+      </criterion>
+    </feature-level>
+
+    <system-level>
+      <criterion category="Performance">
+        <metric>End-to-end capture time</metric>
+        <target>Capture to export <2 minutes</target>
+      </criterion>
+
+      <criterion category="Reliability">
+        <metric>Data integrity</metric>
+        <target>Zero data loss during sync</target>
+      </criterion>
+
+      <criterion category="Security">
+        <metric>RLS coverage</metric>
+        <target>100% of user data protected</target>
+        <current>Achieved</current>
+      </criterion>
+    </system-level>
+  </acceptance-criteria>
+
+  <!-- ============================================ -->
+  <!--      TECHNICAL ARCHITECTURE SUMMARY         -->
+  <!-- ============================================ -->
+
+  <technical-architecture>
+    <overview>
+      Multi-platform architecture evolving from offline-first MVP to
+      cloud-connected system with authentication.
+    </overview>
+
+    <platforms>
+      <platform name="Flutter Mobile" status="PRIMARY">
+        <version>3.35.3</version>
+        <url>http://localhost:46131</url>
+        <state-management>Riverpod 2.4+</state-management>
+        <key-features>
+          - Offline-first with SQLite
+          - Google ML Kit OCR
+          - Supabase sync when online
+          - Material Design 3
+        </key-features>
+      </platform>
+
+      <platform name="Next.js Web" status="SECONDARY">
+        <version>15.1.3</version>
+        <url>http://localhost:3001</url>
+        <ui-library>shadcn/ui</ui-library>
+        <key-features>
+          - Server-side rendering
+          - Supabase auth working
+          - Behind Flutter in features
+        </key-features>
+      </platform>
+
+      <platform name="React Native" status="MINIMAL">
+        <version>Expo SDK 52</version>
+        <styling>NativeWind</styling>
+        <status>Basic setup only</status>
+      </platform>
+    </platforms>
+
+    <backend>
+      <service>Supabase Cloud</service>
+      <project-id>xbadaalqaeszooyxuoac</project-id>
+      <features>
+        - PostgreSQL with RLS
+        - Authentication service
+        - Storage buckets
+        - Real-time subscriptions
+      </features>
+    </backend>
+
+    <external-services>
+      <service name="Google Vision API">
+        <purpose>OCR text extraction</purpose>
+        <quota>1000 free requests/month</quota>
+      </service>
+
+      <service name="MCP Servers">
+        <supabase>Database operations, migrations</supabase>
+        <shadcn>UI component generation</shadcn>
+      </service>
+    </external-services>
+  </technical-architecture>
+
+  <!-- ============================================ -->
+  <!--         UX/UI SPECIFICATIONS                -->
+  <!-- ============================================ -->
+
+  <ux-specifications>
+    <design-system>
+      <web>shadcn/ui with Tailwind CSS</web>
+      <mobile>Material Design 3</mobile>
+      <native>NativeWind (Tailwind for React Native)</native>
+    </design-system>
+
+    <information-architecture>
+      <primary-navigation>
+        - Capture (camera icon)
+        - Receipts (list view)
+        - Export (download icon)
+        - Profile (user avatar)
+      </primary-navigation>
+
+      <screen-hierarchy>
+        - Auth screens (login, signup, reset)
+        - Main app (tab navigation)
+        - Capture flow (camera → preview → save)
+        - Receipt management (list → detail → edit)
+        - Export flow (select → configure → download)
+      </screen-hierarchy>
+    </information-architecture>
+
+    <key-interactions>
+      <interaction name="Batch Capture">
+        <trigger>Long-press capture button</trigger>
+        <flow>Continuous capture → bulk review → save all</flow>
+      </interaction>
+
+      <interaction name="Inline Editing">
+        <trigger>Tap on any field</trigger>
+        <flow>Field highlights → edit → auto-save</flow>
+      </interaction>
+
+      <interaction name="Confidence Indicator">
+        <visual>Color-coded badges</visual>
+        <colors>
+          - Green: >85% confidence
+          - Yellow: 75-85% confidence
+          - Red: <75% confidence
+        </colors>
+      </interaction>
+    </key-interactions>
+  </ux-specifications>
+
+  <!-- ============================================ -->
+  <!--          TESTING STRATEGY                   -->
+  <!-- ============================================ -->
+
+  <testing-strategy>
+    <philosophy>
+      Maintain exactly 15 critical tests covering core functionality.
+      No more tests to avoid maintenance burden.
+    </philosophy>
+
+    <critical-tests>
+      <category name="Core Tests">
+        - app_launch_test.dart
+        - csv_export_test.dart
+        - receipt_repository_test.dart
+      </category>
+
+      <category name="Integration Tests">
+        - critical_user_flows_test.dart
+        - export_validation_flow_test.dart
+        - auth_flow_test.dart
+      </category>
+
+      <category name="Unit Tests">
+        - OCR processing
+        - Confidence calculation
+        - CSV validation
+      </category>
+    </critical-tests>
+
+    <run-command>
+      flutter test test/core_tests/ test/integration_tests/ --reporter compact
+    </run-command>
+  </testing-strategy>
+
+  <!-- ============================================ -->
+  <!--         RISK ASSESSMENT                     -->
+  <!-- ============================================ -->
+
+  <risks>
+    <risk level="HIGH">
+      <description>Platform divergence continuing</description>
+      <mitigation>Flutter as reference implementation</mitigation>
+    </risk>
+
+    <risk level="HIGH">
+      <description>Category UI not implemented (52 in DB, 0 in UI)</description>
+      <mitigation>Priority fix for Story 2.4</mitigation>
+    </risk>
+
+    <risk level="MEDIUM">
+      <description>React Native falling further behind</description>
+      <mitigation>Consider dropping platform</mitigation>
+    </risk>
+
+    <risk level="MEDIUM">
+      <description>OAuth implementation complexity</description>
+      <mitigation>Start with Google only</mitigation>
+    </risk>
+
+    <risk level="LOW">
+      <description>Export format compatibility</description>
+      <mitigation>Validator already implemented</mitigation>
+    </risk>
+  </risks>
+
+  <!-- ============================================ -->
+  <!--           NEXT STEPS                        -->
+  <!-- ============================================ -->
+
+  <next-steps>
+    <immediate priority="P0">
+      1. Complete Flutter auth review (PR #11)
+      2. Implement category selection UI
+      3. Fix field mapping (vendorName vs merchant)
+    </immediate>
+
+    <short-term priority="P1">
+      1. Complete Epic 0 authentication stories
+      2. Bring web to feature parity
+      3. Implement Epic 3 organize features
+    </short-term>
+
+    <long-term priority="P2">
+      1. Epic 4 settings and support
+      2. React Native feature parity
+      3. Premium features (OCR training, bulk operations)
+    </long-term>
+  </next-steps>
+
+  <!-- ============================================ -->
+  <!--            METADATA FOOTER                  -->
+  <!-- ============================================ -->
+
+  <metadata-footer>
+    <document-stats>
+      <total-sources-consolidated>20+ PRD files</total-sources-consolidated>
+      <unique-requirements>45 functional, 20 non-functional</unique-requirements>
+      <epics>6 (Epic 0-5)</epics>
+      <stories>30+</stories>
+      <personas>3 detailed</personas>
+    </document-stats>
+
+    <consolidation-notes>
+      This master PRD consolidates:
+      - Phase 2 Authentication PRD (Epic 0)
+      - Original MVP PRD (Epics 1-4)
+      - Production Infrastructure (Epic 5)
+      - All sharded PRD components
+      - Frontend specifications
+      - Competitive analysis and goals
+
+      Key resolutions:
+      - Authentication renumbered as Epic 0
+      - Original epics preserved as 1-4
+      - Story numbering conflicts resolved
+      - All requirements merged and deduplicated
+    </consolidation-notes>
+
+    <last-updated>2025-01-16</last-updated>
+    <format>POML</format>
+  </metadata-footer>
+</poml>

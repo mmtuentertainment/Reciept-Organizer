@@ -1,0 +1,365 @@
+<poml>
+  <role>Epic 0: Authentication & User Management</role>
+  <task>Multi-platform authentication implementation with Supabase Auth</task>
+
+  <metadata>
+    <epic-number>0</epic-number>
+    <epic-title>Authentication & User Management</epic-title>
+    <status>IN_PROGRESS</status>
+    <priority>P0</priority>
+    <phase>Phase 2</phase>
+    <created-date>2025-01-16</created-date>
+    <estimated-effort>3-4 weeks</estimated-effort>
+  </metadata>
+
+  <epic-overview>
+    <description>
+      Implement comprehensive multi-platform authentication using Supabase Auth with
+      email/password, OAuth providers, biometric authentication, and session management
+      across Flutter, Next.js, and React Native platforms.
+    </description>
+
+    <business-value>
+      - Enable multi-user support for the application
+      - Provide secure user data isolation
+      - Support multiple authentication methods for user convenience
+      - Enable cloud synchronization of user data
+      - Compliance with security and privacy requirements
+    </business-value>
+
+    <success-criteria>
+      - Users can create accounts and sign in across all platforms
+      - Data isolation enforced through Row Level Security
+      - Session management works consistently across platforms
+      - OAuth integration functional for major providers
+      - Biometric authentication available on mobile platforms
+      - 99.9% authentication service availability
+      - < 2 second authentication response times
+    </success-criteria>
+  </epic-overview>
+
+  <stories>
+    <story id="0.1" priority="P0">
+      <title>Auth Testing Infrastructure</title>
+      <description>Set up testing infrastructure for authentication flows</description>
+      <status>COMPLETE</status>
+      <file>story-1.0-auth-testing-infrastructure.md</file>
+      <acceptance-criteria>
+        - Test utilities for auth state mocking
+        - Integration test suite for auth flows
+        - Performance testing for auth operations
+        - Security testing for auth vulnerabilities
+      </acceptance-criteria>
+      <effort>3 days</effort>
+    </story>
+
+    <story id="0.2" priority="P0">
+      <title>Web Authentication</title>
+      <description>Implement authentication for Next.js web application</description>
+      <status>COMPLETE</status>
+      <file>story-1.1-web-authentication.md</file>
+      <pr>#8 - MERGED</pr>
+      <acceptance-criteria>
+        - Email/password signup and signin
+        - Session management with cookies
+        - Protected routes implementation
+        - Password reset functionality
+        - Email verification flow
+      </acceptance-criteria>
+      <effort>5 days</effort>
+    </story>
+
+    <story id="0.3" priority="P0">
+      <title>Database RLS Configuration</title>
+      <description>Configure Row Level Security policies for multi-tenant data isolation</description>
+      <status>COMPLETE</status>
+      <file>story-1.2-database-rls.md</file>
+      <pr>#9 - MERGED</pr>
+      <acceptance-criteria>
+        - RLS policies for all user tables
+        - User isolation enforced at database level
+        - Admin access policies configured
+        - Policy testing and validation
+        - Performance optimization for RLS queries
+      </acceptance-criteria>
+      <effort>4 days</effort>
+    </story>
+
+    <story id="0.4" priority="P0">
+      <title>Flutter Authentication</title>
+      <description>Implement authentication for Flutter mobile application</description>
+      <status>COMPLETE</status>
+      <file>story-1.3-flutter-authentication.md</file>
+      <pr>#11 - IN REVIEW</pr>
+      <acceptance-criteria>
+        - Email/password authentication
+        - Secure token storage
+        - Offline authentication support
+        - Session timeout handling
+        - Auth state management with Riverpod
+      </acceptance-criteria>
+      <effort>6 days</effort>
+    </story>
+
+    <story id="0.5" priority="P1">
+      <title>React Native Authentication</title>
+      <description>Implement authentication for React Native application</description>
+      <status>IN_REVIEW</status>
+      <file>story-1.4-react-native-authentication.md</file>
+      <pr>#12 - IN REVIEW</pr>
+      <acceptance-criteria>
+        - Cross-platform auth implementation
+        - Secure storage integration
+        - Session management
+        - Deep linking for auth flows
+        - Platform-specific optimizations
+      </acceptance-criteria>
+      <effort>5 days</effort>
+    </story>
+
+    <story id="0.6" priority="P1">
+      <title>Google OAuth Integration</title>
+      <description>Add Google Sign-In across all platforms</description>
+      <status>PLANNED</status>
+      <file>story-1.5-google-oauth.md</file>
+      <acceptance-criteria>
+        - Google OAuth configuration
+        - Platform-specific Google Sign-In flows
+        - Account linking with email accounts
+        - Error handling for OAuth failures
+        - PKCE flow implementation for security
+      </acceptance-criteria>
+      <effort>7 days</effort>
+      <dependencies>Stories 0.2, 0.4, 0.5</dependencies>
+    </story>
+
+    <story id="0.7" priority="P1">
+      <title>User Profile Management</title>
+      <description>User profile creation, editing, and avatar management</description>
+      <status>PLANNED</status>
+      <file>story-1.6-user-profile.md</file>
+      <acceptance-criteria>
+        - User profile creation on signup
+        - Profile editing interface
+        - Avatar upload and management
+        - Profile data validation
+        - Privacy settings management
+      </acceptance-criteria>
+      <effort>5 days</effort>
+      <dependencies>Stories 0.2, 0.4</dependencies>
+    </story>
+
+    <story id="0.8" priority="P2">
+      <title>Biometric Authentication</title>
+      <description>Add biometric authentication for mobile platforms</description>
+      <status>PLANNED</status>
+      <file>story-1.7-biometric-auth.md</file>
+      <acceptance-criteria>
+        - FaceID/TouchID integration (iOS)
+        - Fingerprint authentication (Android)
+        - Biometric setup and management
+        - Fallback to password authentication
+        - Secure biometric data handling
+      </acceptance-criteria>
+      <effort>6 days</effort>
+      <dependencies>Stories 0.4, 0.5</dependencies>
+    </story>
+
+    <story id="0.9" priority="P2">
+      <title>Monitoring & Rollback</title>
+      <description>Authentication monitoring, analytics, and rollback procedures</description>
+      <status>PLANNED</status>
+      <file>story-1.8-monitoring-rollback.md</file>
+      <acceptance-criteria>
+        - Authentication metrics tracking
+        - Error monitoring and alerting
+        - Performance monitoring
+        - Rollback procedures for auth issues
+        - User analytics and insights
+      </acceptance-criteria>
+      <effort>4 days</effort>
+      <dependencies>All previous stories</dependencies>
+    </story>
+  </stories>
+
+  <technical-requirements>
+    <authentication-providers>
+      - Email/Password (Supabase Auth)
+      - Google OAuth 2.0
+      - Apple Sign-In (iOS)
+      - GitHub OAuth (future)
+    </authentication-providers>
+
+    <security-requirements>
+      - JWT tokens with 1-hour expiration
+      - Refresh tokens with 30-day expiration
+      - PKCE flow for OAuth
+      - Secure token storage per platform
+      - Password complexity requirements
+      - Rate limiting on auth endpoints
+    </security-requirements>
+
+    <platform-implementations>
+      <flutter>
+        - supabase_flutter package
+        - flutter_secure_storage
+        - local_auth for biometrics
+        - Riverpod for state management
+      </flutter>
+
+      <nextjs>
+        - @supabase/auth-helpers-nextjs
+        - Next.js middleware for route protection
+        - Server-side session management
+        - HTTP-only cookies for tokens
+      </nextjs>
+
+      <react-native>
+        - @supabase/supabase-js
+        - expo-secure-store
+        - expo-local-authentication
+        - React Context for state
+      </react-native>
+    </platform-implementations>
+
+    <data-models>
+      <user-profile>
+        - id: UUID (references auth.users)
+        - username: text (unique)
+        - full_name: text
+        - avatar_url: text
+        - preferences: jsonb
+        - created_at: timestamp
+        - updated_at: timestamp
+      </user-profile>
+
+      <user-roles>
+        - id: UUID
+        - user_id: UUID (references auth.users)
+        - role: text (user|admin|moderator)
+        - granted_by: UUID
+        - granted_at: timestamp
+        - expires_at: timestamp
+      </user-roles>
+    </data-models>
+  </technical-requirements>
+
+  <testing-strategy>
+    <unit-tests>
+      - Authentication service methods
+      - Token validation logic
+      - Password validation functions
+      - Session management utilities
+      - Error handling scenarios
+    </unit-tests>
+
+    <integration-tests>
+      - Complete auth flows (signup, signin, signout)
+      - OAuth provider integration
+      - Cross-platform session sync
+      - RLS policy enforcement
+      - Password reset workflows
+    </integration-tests>
+
+    <security-tests>
+      - JWT token security validation
+      - SQL injection prevention
+      - XSS attack prevention
+      - Rate limiting effectiveness
+      - Session hijacking prevention
+    </security-tests>
+
+    <performance-tests>
+      - Authentication response times
+      - Concurrent user handling
+      - Database query performance
+      - Token refresh efficiency
+      - Memory usage optimization
+    </performance-tests>
+  </testing-strategy>
+
+  <risks-and-mitigation>
+    <technical-risks>
+      <risk level="HIGH">
+        <description>Cross-platform auth state synchronization</description>
+        <mitigation>Implement unified auth SDK with platform adapters</mitigation>
+        <contingency>Fall back to platform-specific implementations</contingency>
+      </risk>
+
+      <risk level="MEDIUM">
+        <description>OAuth provider configuration complexity</description>
+        <mitigation>Start with Google only, add others incrementally</mitigation>
+        <contingency>Provide email/password as reliable fallback</contingency>
+      </risk>
+
+      <risk level="MEDIUM">
+        <description>Token storage security on different platforms</description>
+        <mitigation>Use platform-specific secure storage solutions</mitigation>
+        <contingency>Encrypt tokens before storage as backup</contingency>
+      </risk>
+    </technical-risks>
+
+    <business-risks>
+      <risk level="MEDIUM">
+        <description>User adoption of new authentication requirements</description>
+        <mitigation>Gradual rollout with guest mode support</mitigation>
+        <contingency>Extend guest mode functionality if needed</contingency>
+      </risk>
+
+      <risk level="LOW">
+        <description>Supabase Auth service limitations</description>
+        <mitigation>Monitor usage and upgrade plan as needed</mitigation>
+        <contingency>Implement custom auth service if required</contingency>
+      </risk>
+    </business-risks>
+  </risks-and-mitigation>
+
+  <success-metrics>
+    <performance-metrics>
+      - Authentication response time < 2 seconds
+      - 99.9% authentication service uptime
+      - < 0.1% authentication error rate
+      - Token refresh success rate > 99%
+    </performance-metrics>
+
+    <user-experience-metrics>
+      - User signup completion rate > 80%
+      - Authentication flow abandonment < 10%
+      - Biometric auth adoption > 60% (mobile)
+      - OAuth usage > 40% of new signups
+    </user-experience-metrics>
+
+    <security-metrics>
+      - Zero successful credential stuffing attacks
+      - Zero session hijacking incidents
+      - 100% RLS policy coverage
+      - < 1% false positive rate for security measures
+    </security-metrics>
+  </success-metrics>
+
+  <completion-criteria>
+    <phase-1-mvp>
+      - Email/password authentication working on all platforms
+      - User data isolation through RLS
+      - Basic session management
+      - Password reset functionality
+      - Critical authentication tests passing
+    </phase-1-mvp>
+
+    <phase-2-enhanced>
+      - Google OAuth integration
+      - User profile management
+      - Enhanced security features
+      - Performance optimization
+      - Comprehensive monitoring
+    </phase-2-enhanced>
+
+    <phase-3-advanced>
+      - Biometric authentication
+      - Additional OAuth providers
+      - Advanced user management
+      - Analytics and insights
+      - Enterprise features
+    </phase-3-advanced>
+  </completion-criteria>
+</poml>

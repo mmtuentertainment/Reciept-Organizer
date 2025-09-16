@@ -1,0 +1,41 @@
+# Database Schema Documentation
+
+## Tables
+
+### users
+- id: uuid PRIMARY KEY
+- email: text UNIQUE
+- created_at: timestamp
+- updated_at: timestamp
+
+### receipts
+- id: uuid PRIMARY KEY
+- user_id: uuid REFERENCES users(id)
+- image_uri: text
+- vendor_name: text
+- total_amount: decimal
+- receipt_date: date
+- category_id: integer
+- notes: text
+- ocr_confidence: float
+- ocr_results: jsonb
+- created_at: timestamp
+- updated_at: timestamp
+
+### categories
+- id: integer PRIMARY KEY
+- name: text
+- icon: text
+- color: text
+- parent_id: integer
+
+## Indexes
+- receipts_user_id_idx
+- receipts_receipt_date_idx
+- receipts_category_id_idx
+- receipts_vendor_name_idx
+
+## RLS Policies
+- Users can only see their own receipts
+- Public read access to categories
+- Admin full access with role check
