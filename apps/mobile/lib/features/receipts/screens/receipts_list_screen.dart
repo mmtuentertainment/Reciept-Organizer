@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:receipt_organizer/features/receipts/providers/receipts_provider.dart';
-import 'package:receipt_organizer/core/models/receipt.dart';
+import 'package:receipt_organizer/data/models/receipt.dart';
 
 class ReceiptsListScreen extends ConsumerStatefulWidget {
   const ReceiptsListScreen({super.key});
@@ -240,7 +240,7 @@ class _ReceiptsListScreenState extends ConsumerState<ReceiptsListScreen> {
     if (_dateFilter != null) {
       filtered = filtered.where((receipt) {
         if (receipt.receiptDate == null) return false;
-        final date = DateTime.parse(receipt.receiptDate!);
+        final date = receipt.receiptDate!;
         return date.isAfter(_dateFilter!.start.subtract(const Duration(days: 1))) &&
                date.isBefore(_dateFilter!.end.add(const Duration(days: 1)));
       }).toList();
@@ -248,8 +248,8 @@ class _ReceiptsListScreenState extends ConsumerState<ReceiptsListScreen> {
 
     // Sort by date (newest first)
     filtered.sort((a, b) {
-      final dateA = a.receiptDate != null ? DateTime.parse(a.receiptDate!) : DateTime.now();
-      final dateB = b.receiptDate != null ? DateTime.parse(b.receiptDate!) : DateTime.now();
+      final dateA = a.receiptDate ?? DateTime.now();
+      final dateB = b.receiptDate ?? DateTime.now();
       return dateB.compareTo(dateA);
     });
 
@@ -291,7 +291,7 @@ class _ReceiptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateStr = receipt.receiptDate != null
-        ? DateFormat('MMM d, yyyy').format(DateTime.parse(receipt.receiptDate!))
+        ? DateFormat('MMM d, yyyy').format(receipt.receiptDate!)
         : 'No date';
 
     final totalStr = receipt.total != null

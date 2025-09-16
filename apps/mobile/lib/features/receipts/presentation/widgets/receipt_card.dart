@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/models/confidence_level.dart';
 import '../../../../data/models/receipt.dart';
 import '../../../../shared/widgets/confidence_score_widget.dart';
@@ -102,7 +103,7 @@ class ReceiptCard extends StatelessWidget {
               Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
               const SizedBox(width: 4),
               Text(
-                receipt.receiptDate!,
+                DateFormat('MMM d, yyyy').format(receipt.receiptDate!),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.grey[600],
                 ),

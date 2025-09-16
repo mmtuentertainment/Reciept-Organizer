@@ -77,8 +77,11 @@ class ReceiptListNotifier extends StateNotifier<ReceiptListState> {
       }
 
       // Search in date
-      if (receipt.receiptDate?.toLowerCase().contains(lowercaseQuery) == true) {
-        return true;
+      if (receipt.receiptDate != null) {
+        final dateStr = receipt.receiptDate!.toString().toLowerCase();
+        if (dateStr.contains(lowercaseQuery)) {
+          return true;
+        }
       }
 
       // Search in notes
