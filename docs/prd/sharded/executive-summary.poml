@@ -1,0 +1,19 @@
+# Executive Summary - Receipt Organizer PRD
+
+## Vision
+Build a mobile-first receipt management system that eliminates the pain of receipt organization for small business owners and contractors.
+
+## Problem Statement
+Small business owners waste hours organizing paper receipts for bookkeeping and tax purposes. Current solutions are either too complex or don't integrate well with accounting software.
+
+## Solution
+A simple, fast mobile app that:
+- Captures receipts in under 5 seconds
+- Automatically extracts key data with OCR
+- Exports to QuickBooks/Xero formats
+- Works offline with cloud sync
+
+## Success Metrics
+- Capture-to-export time < 10 minutes for 300 receipts
+- OCR accuracy > 95% for merchant, date, amount
+- User satisfaction score > 4.5/5.0

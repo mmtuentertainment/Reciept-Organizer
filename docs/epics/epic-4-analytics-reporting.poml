@@ -1,0 +1,205 @@
+<poml>
+  <role>Epic 4: Analytics & Reporting</role>
+  <task>Business intelligence features with spending analysis and tax preparation reports</task>
+
+  <metadata>
+    <epic-number>4</epic-number>
+    <epic-title>Analytics & Reporting</epic-title>
+    <status>PLANNED</status>
+    <priority>P2</priority>
+    <phase>Phase 3</phase>
+    <estimated-start>2025-03-01</estimated-start>
+    <estimated-effort>4-5 weeks</estimated-effort>
+  </metadata>
+
+  <epic-overview>
+    <description>
+      Provide comprehensive analytics, spending insights, and tax preparation reports
+      to help small business owners understand their expenses and prepare for tax season.
+    </description>
+
+    <business-value>
+      - Enable data-driven business decisions
+      - Simplify tax preparation and filing
+      - Identify spending patterns and trends
+      - Support business expense optimization
+      - Provide professional reporting capabilities
+    </business-value>
+
+    <success-criteria>
+      - Spending analytics load in <2 seconds
+      - Tax reports generate complete documentation
+      - Charts and visualizations are interactive
+      - Data export supports multiple formats
+      - Real-time updates reflect latest receipts
+    </success-criteria>
+  </epic-overview>
+
+  <stories>
+    <story id="4.1" priority="P1">
+      <title>Spending Dashboard</title>
+      <description>Overview dashboard with key spending metrics</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Monthly/quarterly/yearly spending totals
+        - Category breakdown with percentages
+        - Spending trends over time
+        - Top merchants by amount
+        - Receipt count and average amounts
+      </acceptance-criteria>
+      <effort>6 days</effort>
+    </story>
+
+    <story id="4.2" priority="P1">
+      <title>Category Analytics</title>
+      <description>Detailed analysis by expense categories</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Category spending over time
+        - Comparison between periods
+        - Category budget vs actual
+        - Subcategory drill-down
+        - Category ranking and insights
+      </acceptance-criteria>
+      <effort>5 days</effort>
+    </story>
+
+    <story id="4.3" priority="P1">
+      <title>Tax Preparation Reports</title>
+      <description>Reports formatted for tax filing and deductions</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Annual expense summary by category
+        - Deductible expenses report
+        - Business vs personal categorization
+        - Tax-ready CSV and PDF exports
+        - IRS Schedule C support
+      </acceptance-criteria>
+      <effort>7 days</effort>
+    </story>
+
+    <story id="4.4" priority="P1">
+      <title>Interactive Charts</title>
+      <description>Visual charts and graphs for spending analysis</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Pie charts for category distribution
+        - Line charts for spending trends
+        - Bar charts for monthly comparisons
+        - Interactive drill-down capabilities
+        - Mobile-responsive visualizations
+      </acceptance-criteria>
+      <effort>6 days</effort>
+    </story>
+
+    <story id="4.5" priority="P2">
+      <title>Business Insights</title>
+      <description>AI-powered insights and recommendations</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Spending pattern analysis
+        - Unusual expense alerts
+        - Budget recommendations
+        - Seasonal trend identification
+        - Cost optimization suggestions
+      </acceptance-criteria>
+      <effort>8 days</effort>
+    </story>
+
+    <story id="4.6" priority="P2">
+      <title>Custom Reports</title>
+      <description>User-configurable custom reports</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Report builder interface
+        - Custom date ranges and filters
+        - Field selection and grouping
+        - Saved report templates
+        - Scheduled report generation
+      </acceptance-criteria>
+      <effort>7 days</effort>
+    </story>
+
+    <story id="4.7" priority="P2">
+      <title>Expense Budgeting</title>
+      <description>Budget creation and tracking against actual expenses</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Category-based budget creation
+        - Budget vs actual tracking
+        - Budget alerts and notifications
+        - Historical budget analysis
+        - Budget goal recommendations
+      </acceptance-criteria>
+      <effort>6 days</effort>
+    </story>
+
+    <story id="4.8" priority="P2">
+      <title>Comparative Analytics</title>
+      <description>Period-over-period and benchmark comparisons</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Year-over-year comparisons
+        - Month-over-month growth rates
+        - Industry benchmark data (future)
+        - Variance analysis reporting
+        - Trend prediction modeling
+      </acceptance-criteria>
+      <effort>5 days</effort>
+    </story>
+  </stories>
+
+  <technical-implementation>
+    <analytics-engine>
+      ```dart
+      // Analytics calculation service
+      class AnalyticsService {
+        final ReceiptRepository _repository;
+
+        Future<SpendingAnalytics> getSpendingAnalytics({
+          required DateRange dateRange,
+          List<String>? categoryIds,
+        }) async {
+          final receipts = await _repository.getReceiptsInRange(
+            dateRange,
+            categoryIds: categoryIds,
+          );
+
+          return SpendingAnalytics(
+            totalAmount: receipts.fold(0.0, (sum, r) => sum + r.totalAmount),
+            receiptCount: receipts.length,
+            averageAmount: receipts.isEmpty ? 0 :
+              receipts.fold(0.0, (sum, r) => sum + r.totalAmount) / receipts.length,
+            categoryBreakdown: _calculateCategoryBreakdown(receipts),
+            monthlyTrends: _calculateMonthlyTrends(receipts),
+            topMerchants: _calculateTopMerchants(receipts),
+          );
+        }
+      }
+      ```
+    </analytics-engine>
+
+    <chart-components>
+      ```dart
+      // Interactive chart widgets
+      class SpendingPieChart extends StatelessWidget {
+        final List<CategorySpending> data;
+
+        @override
+        Widget build(BuildContext context) {
+          return PieChart(
+            PieChartData(
+              sections: data.map((item) => PieChartSectionData(
+                value: item.amount,
+                title: item.category.name,
+                color: Color(item.category.color),
+                radius: 100,
+              )).toList(),
+            ),
+          );
+        }
+      }
+      ```
+    </chart-components>
+  </technical-implementation>
+</poml>

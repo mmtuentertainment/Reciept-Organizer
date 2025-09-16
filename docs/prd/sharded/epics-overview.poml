@@ -1,0 +1,19 @@
+# Epics Overview
+
+## Epic 0: Authentication & User Management (Phase 2)
+Multi-platform authentication system with SSO, biometric auth, and session management.
+
+## Epic 1: Receipt Capture & Processing
+Core receipt capture functionality with OCR, batch processing, and retry mechanisms.
+
+## Epic 2: Receipt Management
+CRUD operations, categorization, search, filtering, and notes management.
+
+## Epic 3: Export & Integration
+Export to accounting formats (QuickBooks, Xero), API integrations, and webhook support.
+
+## Epic 4: Analytics & Reporting
+Dashboard, spending insights, category analysis, and trend reporting.
+
+## Epic 5: Settings & Administration
+User preferences, app configuration, data management, and admin tools.

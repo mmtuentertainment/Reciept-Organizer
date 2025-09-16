@@ -1,0 +1,932 @@
+<poml>
+  <role>API Specification - Receipt Organizer Architecture Component</role>
+  <task>API design, endpoints, authentication, and integration patterns</task>
+
+  <metadata>
+    <component>API Specification</component>
+    <parent-document>docs/architecture/main/architecture.poml</parent-document>
+    <version>3.0</version>
+    <date>2025-01-16</date>
+  </metadata>
+
+  <api-specification>
+    <api-design-principles>
+      <restful-design>
+        - Resource-oriented URLs
+        - HTTP methods for operations (GET, POST, PUT, DELETE)
+        - Stateless communication
+        - Consistent response formats
+        - Proper HTTP status codes
+      </restful-design>
+
+      <security-first>
+        - Authentication required for all user data
+        - Row Level Security (RLS) enforcement
+        - Input validation and sanitization
+        - Rate limiting per user/endpoint
+        - HTTPS encryption mandatory
+      </security-first>
+
+      <performance-optimized>
+        - Pagination for large datasets
+        - Field selection to minimize payload
+        - Caching headers for appropriate responses
+        - Batch operations where beneficial
+        - Efficient query patterns
+      </performance-optimized>
+
+      <developer-friendly>
+        - Clear, consistent naming conventions
+        - Comprehensive error messages
+        - API versioning strategy
+        - Self-documenting endpoints
+        - SDK generation support
+      </developer-friendly>
+    </api-design-principles>
+
+    <authentication-api>
+      <supabase-auth-integration>
+        <base-url>https://xbadaalqaeszooyxuoac.supabase.co/auth/v1</base-url>
+
+        <endpoints>
+          <signup>
+            <method>POST</method>
+            <path>/signup</path>
+            <description>Create new user account</description>
+            <request-body>
+              ```json
+              {
+                "email": "user@example.com",
+                "password": "securePassword123",
+                "data": {
+                  "full_name": "John Doe",
+                  "username": "johndoe"
+                }
+              }
+              ```
+            </request-body>
+            <response-success>
+              ```json
+              {
+                "access_token": "eyJhbGciOiJIUzI1NiIs...",
+                "token_type": "bearer",
+                "expires_in": 3600,
+                "refresh_token": "v1:refresh_token_here",
+                "user": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "email": "user@example.com",
+                  "created_at": "2025-01-16T10:00:00Z"
+                }
+              }
+              ```
+            </response-success>
+            <errors>
+              - 400: Invalid email format
+              - 422: Password too weak
+              - 429: Too many signup attempts
+            </errors>
+          </signup>
+
+          <signin>
+            <method>POST</method>
+            <path>/token</path>
+            <description>Authenticate user and get access token</description>
+            <request-body>
+              ```json
+              {
+                "email": "user@example.com",
+                "password": "securePassword123"
+              }
+              ```
+            </request-body>
+            <response-success>Same as signup response</response-success>
+            <errors>
+              - 400: Invalid credentials
+              - 429: Too many login attempts
+              - 422: Account not verified
+            </errors>
+          </signin>
+
+          <oauth>
+            <method>GET</method>
+            <path>/authorize</path>
+            <description>OAuth provider authentication</description>
+            <query-parameters>
+              - provider: google|apple|github
+              - redirect_to: callback URL
+              - code_challenge: PKCE challenge
+              - code_challenge_method: S256
+            </query-parameters>
+            <response>Redirect to provider authorization</response>
+          </oauth>
+
+          <refresh>
+            <method>POST</method>
+            <path>/token?grant_type=refresh_token</path>
+            <description>Refresh access token</description>
+            <request-body>
+              ```json
+              {
+                "refresh_token": "v1:refresh_token_here"
+              }
+              ```
+            </request-body>
+            <response-success>New access and refresh tokens</response-success>
+          </refresh>
+
+          <logout>
+            <method>POST</method>
+            <path>/logout</path>
+            <description>Invalidate user session</description>
+            <headers>
+              Authorization: Bearer {access_token}
+            </headers>
+            <response-success>204 No Content</response-success>
+          </logout>
+        </endpoints>
+      </supabase-auth-integration>
+
+      <session-management>
+        <token-validation>
+          - JWT signature verification
+          - Expiration time checking
+          - User existence validation
+          - Role/permission checking
+          - Revocation list checking
+        </token-validation>
+
+        <security-headers>
+          ```
+          Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+          X-Client-Version: 1.0.0
+          X-Platform: flutter|web|react-native
+          User-Agent: Receipt-Organizer/1.0.0
+          ```
+        </security-headers>
+      </session-management>
+    </authentication-api>
+
+    <core-data-api>
+      <base-configuration>
+        <base-url>https://xbadaalqaeszooyxuoac.supabase.co/rest/v1</base-url>
+        <authentication>Bearer token required for all endpoints</authentication>
+        <content-type>application/json</content-type>
+        <rls-enforcement>All queries automatically filtered by user_id</rls-enforcement>
+      </base-configuration>
+
+      <receipts-api>
+        <list-receipts>
+          <method>GET</method>
+          <path>/receipts</path>
+          <description>Get user's receipts with filtering and pagination</description>
+          <query-parameters>
+            - limit: number (default: 20, max: 100)
+            - offset: number (default: 0)
+            - order: field_name.asc|desc (default: created_at.desc)
+            - select: field1,field2,... (default: *)
+            - date_from: ISO date (filter by receipt_date)
+            - date_to: ISO date (filter by receipt_date)
+            - category_id: UUID (filter by category)
+            - vendor_name: text (partial match search)
+            - min_amount: decimal (minimum total_amount)
+            - max_amount: decimal (maximum total_amount)
+          </query-parameters>
+          <example-request>
+            ```
+            GET /receipts?limit=20&offset=0&order=receipt_date.desc&date_from=2025-01-01&category_id=123e4567-e89b-12d3-a456-426614174000
+            ```
+          </example-request>
+          <response-success>
+            ```json
+            [
+              {
+                "id": "123e4567-e89b-12d3-a456-426614174000",
+                "vendor_name": "Starbucks",
+                "receipt_date": "2025-01-15",
+                "total_amount": 12.95,
+                "tax_amount": 1.15,
+                "category_id": "456e7890-e89b-12d3-a456-426614174001",
+                "notes": "Client meeting coffee",
+                "image_url": "https://storage.url/receipts/user123/2025/01/receipt123.jpg",
+                "ocr_confidence": 0.92,
+                "created_at": "2025-01-15T10:30:00Z",
+                "updated_at": "2025-01-15T10:30:00Z"
+              }
+            ]
+            ```
+          </response-success>
+          <response-headers>
+            ```
+            Content-Range: 0-19/150
+            X-Total-Count: 150
+            Cache-Control: private, max-age=60
+            ```
+          </response-headers>
+        </list-receipts>
+
+        <get-receipt>
+          <method>GET</method>
+          <path>/receipts/{id}</path>
+          <description>Get single receipt by ID</description>
+          <path-parameters>
+            - id: UUID (receipt identifier)
+          </path-parameters>
+          <query-parameters>
+            - select: field1,field2,... (choose specific fields)
+          </query-parameters>
+          <response-success>Single receipt object (same format as list)</response-success>
+          <errors>
+            - 404: Receipt not found or not owned by user
+            - 403: Access denied
+          </errors>
+        </get-receipt>
+
+        <create-receipt>
+          <method>POST</method>
+          <path>/receipts</path>
+          <description>Create new receipt</description>
+          <request-body>
+            ```json
+            {
+              "vendor_name": "Starbucks",
+              "receipt_date": "2025-01-15",
+              "total_amount": 12.95,
+              "tax_amount": 1.15,
+              "subtotal_amount": 11.80,
+              "category_id": "456e7890-e89b-12d3-a456-426614174001",
+              "notes": "Client meeting coffee",
+              "image_path": "temp/upload123.jpg",
+              "payment_method": "credit_card",
+              "receipt_number": "12345",
+              "ocr_confidence": 0.92,
+              "ocr_results": {
+                "raw_text": "STARBUCKS...",
+                "extracted_fields": {...}
+              }
+            }
+            ```
+          </request-body>
+          <validation>
+            - vendor_name: required, max 255 chars
+            - receipt_date: required, valid date, not future
+            - total_amount: required, positive decimal
+            - category_id: optional, valid UUID reference
+            - notes: optional, max 1000 chars
+          </validation>
+          <response-success>201 Created with receipt object</response-success>
+          <errors>
+            - 400: Validation errors
+            - 422: Business rule violations
+          </errors>
+        </create-receipt>
+
+        <update-receipt>
+          <method>PATCH</method>
+          <path>/receipts/{id}</path>
+          <description>Update existing receipt</description>
+          <request-body>Partial receipt object with fields to update</request-body>
+          <response-success>200 OK with updated receipt object</response-success>
+          <errors>
+            - 404: Receipt not found
+            - 400: Validation errors
+            - 409: Conflict (version mismatch)
+          </errors>
+        </update-receipt>
+
+        <delete-receipt>
+          <method>DELETE</method>
+          <path>/receipts/{id}</path>
+          <description>Delete receipt (soft delete)</description>
+          <response-success>204 No Content</response-success>
+          <errors>
+            - 404: Receipt not found
+            - 403: Access denied
+          </errors>
+        </delete-receipt>
+
+        <batch-operations>
+          <batch-create>
+            <method>POST</method>
+            <path>/receipts/batch</path>
+            <description>Create multiple receipts in single request</description>
+            <request-body>
+              ```json
+              {
+                "receipts": [
+                  { "vendor_name": "Store1", ... },
+                  { "vendor_name": "Store2", ... }
+                ]
+              }
+              ```
+            </request-body>
+            <limits>
+              - Maximum 50 receipts per batch
+              - Individual validation for each receipt
+              - Partial success handling
+            </limits>
+          </batch-create>
+
+          <batch-update>
+            <method>PATCH</method>
+            <path>/receipts/batch</path>
+            <description>Update multiple receipts</description>
+            <request-body>Array of receipt updates with IDs</request-body>
+          </batch-update>
+        </batch-operations>
+      </receipts-api>
+
+      <categories-api>
+        <list-categories>
+          <method>GET</method>
+          <path>/categories</path>
+          <description>Get all available categories</description>
+          <query-parameters>
+            - is_active: boolean (filter active categories)
+            - parent_id: UUID (get subcategories)
+            - order: sort_order.asc|name.asc
+          </query-parameters>
+          <response-success>
+            ```json
+            [
+              {
+                "id": "456e7890-e89b-12d3-a456-426614174001",
+                "name": "Food & Dining",
+                "description": "Restaurant meals, coffee, snacks",
+                "icon": "restaurant",
+                "color": "#FF6B6B",
+                "parent_id": null,
+                "is_active": true,
+                "sort_order": 1
+              }
+            ]
+            ```
+          </response-success>
+          <caching>Public data cached for 1 hour</caching>
+        </list-categories>
+
+        <get-category>
+          <method>GET</method>
+          <path>/categories/{id}</path>
+          <description>Get single category by ID</description>
+          <response-success>Single category object</response-success>
+        </get-category>
+
+        <category-stats>
+          <method>GET</method>
+          <path>/categories/{id}/stats</path>
+          <description>Get usage statistics for category</description>
+          <query-parameters>
+            - date_from: ISO date
+            - date_to: ISO date
+          </query-parameters>
+          <response-success>
+            ```json
+            {
+              "receipt_count": 25,
+              "total_amount": 425.50,
+              "average_amount": 17.02,
+              "last_used": "2025-01-15T10:30:00Z"
+            }
+            ```
+          </response-success>
+        </category-stats>
+      </categories-api>
+
+      <user-profile-api>
+        <get-profile>
+          <method>GET</method>
+          <path>/user_profiles</path>
+          <description>Get current user's profile</description>
+          <response-success>
+            ```json
+            {
+              "id": "123e4567-e89b-12d3-a456-426614174000",
+              "username": "johndoe",
+              "full_name": "John Doe",
+              "avatar_url": "https://storage.url/avatars/user123.jpg",
+              "preferences": {
+                "default_currency": "USD",
+                "date_format": "MM/DD/YYYY",
+                "export_format": "quickbooks"
+              },
+              "created_at": "2025-01-01T00:00:00Z",
+              "updated_at": "2025-01-15T10:30:00Z"
+            }
+            ```
+          </response-success>
+        </get-profile>
+
+        <update-profile>
+          <method>PATCH</method>
+          <path>/user_profiles/{id}</path>
+          <description>Update user profile</description>
+          <request-body>Partial profile object</request-body>
+          <validation>
+            - username: unique, alphanumeric + underscore, 3-20 chars
+            - full_name: max 100 chars
+            - preferences: valid JSON object
+          </validation>
+        </update-profile>
+      </user-profile-api>
+    </core-data-api>
+
+    <file-storage-api>
+      <supabase-storage>
+        <base-url>https://xbadaalqaeszooyxuoac.supabase.co/storage/v1</base-url>
+
+        <image-upload>
+          <method>POST</method>
+          <path>/object/receipts/{user_id}/{year}/{month}/{filename}</path>
+          <description>Upload receipt image</description>
+          <headers>
+            ```
+            Authorization: Bearer {access_token}
+            Content-Type: image/jpeg|image/png|image/webp
+            Cache-Control: max-age=3600
+            ```
+          </headers>
+          <request-body>Binary image data</request-body>
+          <constraints>
+            - Maximum file size: 5MB
+            - Allowed formats: JPEG, PNG, WebP
+            - Automatic compression applied
+            - Thumbnail generation triggered
+          </constraints>
+          <response-success>
+            ```json
+            {
+              "Key": "receipts/user123/2025/01/receipt123.jpg",
+              "path": "receipts/user123/2025/01/receipt123.jpg",
+              "url": "https://storage.url/receipts/user123/2025/01/receipt123.jpg"
+            }
+            ```
+          </response-success>
+        </image-upload>
+
+        <image-download>
+          <method>GET</method>
+          <path>/object/public/receipts/{path}</path>
+          <description>Download receipt image (with signed URL)</description>
+          <authentication>Signed URL with expiration</authentication>
+          <response>Binary image data with appropriate headers</response>
+        </image-download>
+
+        <signed-urls>
+          <create-signed-url>
+            <method>POST</method>
+            <path>/object/sign/receipts/{path}</path>
+            <description>Generate signed URL for private image access</description>
+            <request-body>
+              ```json
+              {
+                "expiresIn": 3600
+              }
+              ```
+            </request-body>
+            <response-success>
+              ```json
+              {
+                "signedURL": "https://storage.url/receipts/path?token=abc123&expires=1234567890"
+              }
+              ```
+            </response-success>
+          </create-signed-url>
+        </signed-urls>
+      </supabase-storage>
+
+      <image-processing>
+        <thumbnail-generation>
+          <automatic>Triggered on upload for faster loading</automatic>
+          <sizes>
+            - thumb: 150x150 (square crop)
+            - preview: 300x400 (aspect preserved)
+            - display: 600x800 (full preview)
+          </sizes>
+          <format>WebP for modern browsers, JPEG fallback</format>
+        </thumbnail-generation>
+
+        <optimization>
+          <compression>
+            - JPEG quality: 85% for originals
+            - Progressive JPEG for faster loading
+            - WebP conversion for 30% size reduction
+            - Automatic format selection based on browser
+          </compression>
+
+          <metadata-stripping>
+            - EXIF data removal for privacy
+            - GPS location removal
+            - Camera information removal
+            - File size optimization
+          </metadata-stripping>
+        </optimization>
+      </image-processing>
+    </file-storage-api>
+
+    <export-api>
+      <export-generation>
+        <create-export>
+          <method>POST</method>
+          <path>/exports</path>
+          <description>Generate receipt export file</description>
+          <request-body>
+            ```json
+            {
+              "format": "quickbooks|xero|generic",
+              "date_from": "2025-01-01",
+              "date_to": "2025-01-31",
+              "category_ids": ["uuid1", "uuid2"],
+              "include_notes": true,
+              "include_images": false,
+              "custom_fields": ["field1", "field2"]
+            }
+            ```
+          </request-body>
+          <validation>
+            - format: required, valid enum value
+            - date_from/date_to: valid date range, max 1 year
+            - category_ids: valid UUID array
+            - Maximum 1000 receipts per export
+          </validation>
+          <response-success>
+            ```json
+            {
+              "id": "export123",
+              "status": "pending",
+              "format": "quickbooks",
+              "receipt_count": 45,
+              "estimated_completion": "2025-01-16T10:05:00Z"
+            }
+            ```
+          </response-success>
+        </create-export>
+
+        <get-export-status>
+          <method>GET</method>
+          <path>/exports/{id}</path>
+          <description>Check export generation status</description>
+          <response-success>
+            ```json
+            {
+              "id": "export123",
+              "status": "completed|pending|failed",
+              "format": "quickbooks",
+              "receipt_count": 45,
+              "file_size": 15680,
+              "download_url": "https://storage.url/exports/export123.csv",
+              "expires_at": "2025-01-23T10:00:00Z",
+              "created_at": "2025-01-16T10:00:00Z",
+              "completed_at": "2025-01-16T10:02:00Z"
+            }
+            ```
+          </response-success>
+        </get-export-status>
+
+        <download-export>
+          <method>GET</method>
+          <path>/exports/{id}/download</path>
+          <description>Download generated export file</description>
+          <response>
+            - Content-Type: text/csv|application/vnd.ms-excel
+            - Content-Disposition: attachment; filename="receipts_export.csv"
+            - File content as response body
+          </response>
+          <expiration>Export files deleted after 7 days</expiration>
+        </download-export>
+      </export-generation>
+
+      <export-formats>
+        <quickbooks-format>
+          <columns>Date, Description, Amount</columns>
+          <date-format>MM/DD/YYYY</date-format>
+          <description-format>"{vendor_name} - {notes}"</description-format>
+          <amount-format>Positive for expenses</amount-format>
+        </quickbooks-format>
+
+        <xero-format>
+          <columns>Date, Reference, Description, Account, Debit, Credit</columns>
+          <account-mapping>Category to Xero account codes</account-mapping>
+          <tax-handling>Separate tax amounts</tax-handling>
+        </xero-format>
+
+        <generic-format>
+          <columns>All available receipt fields</columns>
+          <customizable>User can select columns</customizable>
+          <date-formats>Multiple format options</date-formats>
+        </generic-format>
+      </export-formats>
+    </export-api>
+
+    <analytics-api>
+      <spending-analytics>
+        <spending-summary>
+          <method>GET</method>
+          <path>/analytics/spending</path>
+          <description>Get spending analytics for date range</description>
+          <query-parameters>
+            - date_from: ISO date (required)
+            - date_to: ISO date (required)
+            - group_by: category|month|week|day
+            - category_ids: UUID array (filter)
+          </query-parameters>
+          <response-success>
+            ```json
+            {
+              "total_amount": 1250.75,
+              "receipt_count": 85,
+              "average_amount": 14.71,
+              "by_category": [
+                {
+                  "category_id": "uuid1",
+                  "category_name": "Food & Dining",
+                  "total_amount": 425.50,
+                  "receipt_count": 25,
+                  "percentage": 34.0
+                }
+              ],
+              "by_month": [
+                {
+                  "month": "2025-01",
+                  "total_amount": 1250.75,
+                  "receipt_count": 85
+                }
+              ]
+            }
+            ```
+          </response-success>
+        </spending-summary>
+
+        <trends>
+          <method>GET</method>
+          <path>/analytics/trends</path>
+          <description>Get spending trends over time</description>
+          <query-parameters>
+            - period: month|quarter|year
+            - periods_count: number (max 24)
+            - category_id: UUID (optional filter)
+          </query-parameters>
+          <response-success>Time series data for visualization</response-success>
+        </trends>
+      </spending-analytics>
+
+      <usage-analytics>
+        <user-stats>
+          <method>GET</method>
+          <path>/analytics/usage</path>
+          <description>Get user's app usage statistics</description>
+          <response-success>
+            ```json
+            {
+              "total_receipts": 450,
+              "total_amount": 15750.25,
+              "average_monthly_receipts": 38,
+              "most_used_category": "Food & Dining",
+              "export_count": 12,
+              "account_age_days": 365,
+              "last_receipt_date": "2025-01-15"
+            }
+            ```
+          </response-success>
+        </user-stats>
+      </usage-analytics>
+    </analytics-api>
+
+    <ocr-integration-api>
+      <google-vision-api>
+        <text-detection>
+          <endpoint>https://vision.googleapis.com/v1/images:annotate</endpoint>
+          <authentication>API Key authentication</authentication>
+          <request-format>
+            ```json
+            {
+              "requests": [
+                {
+                  "image": {
+                    "content": "base64_encoded_image"
+                  },
+                  "features": [
+                    {
+                      "type": "TEXT_DETECTION",
+                      "maxResults": 1
+                    }
+                  ],
+                  "imageContext": {
+                    "languageHints": ["en"]
+                  }
+                }
+              ]
+            }
+            ```
+          </request-format>
+          <response-processing>
+            - Extract text annotations
+            - Parse structured data (amounts, dates)
+            - Calculate confidence scores
+            - Normalize extracted values
+          </response-processing>
+        </text-detection>
+
+        <quota-management>
+          - Free tier: 1000 requests/month
+          - Paid tier: $1.50 per 1000 requests
+          - Rate limiting: 1800 requests/minute
+          - Error handling for quota exceeded
+          - Fallback to ML Kit for over-quota
+        </quota-management>
+      </google-vision-api>
+
+      <ml-kit-integration>
+        <on-device-processing>
+          - Flutter package: google_mlkit_text_recognition
+          - No network requests required
+          - Privacy-preserving processing
+          - Lower accuracy vs cloud API
+          - Instant results
+        </on-device-processing>
+
+        <text-recognition>
+          ```dart
+          final textRecognizer = TextRecognizer();
+          final RecognizedText recognizedText =
+              await textRecognizer.processImage(inputImage);
+
+          for (TextBlock block in recognizedText.blocks) {
+            for (TextLine line in block.lines) {
+              // Process extracted text
+            }
+          }
+          ```
+        </text-recognition>
+      </ml-kit-integration>
+
+      <ocr-data-extraction>
+        <field-extraction>
+          <vendor-name>
+            - Pattern matching for business names
+            - Common merchant identification
+            - Manual correction support
+            - Confidence scoring
+          </vendor-name>
+
+          <amounts>
+            - Total amount detection
+            - Tax amount extraction
+            - Subtotal calculation
+            - Currency symbol handling
+          </amounts>
+
+          <dates>
+            - Multiple date format recognition
+            - Date validation and normalization
+            - Time information extraction
+            - Receipt date vs processing date
+          </dates>
+
+          <receipt-number>
+            - Transaction ID extraction
+            - Receipt number patterns
+            - Order number recognition
+            - Reference number capture
+          </receipt-number>
+        </field-extraction>
+
+        <confidence-scoring>
+          <calculation>
+            - Character recognition confidence
+            - Field validation confidence
+            - Pattern matching confidence
+            - Overall extraction confidence
+          </calculation>
+
+          <thresholds>
+            - High confidence: >85% (green indicator)
+            - Medium confidence: 75-85% (yellow indicator)
+            - Low confidence: <75% (red indicator, manual review)
+          </thresholds>
+        </confidence-scoring>
+      </ocr-data-extraction>
+    </ocr-integration-api>
+
+    <api-security>
+      <authentication-security>
+        <jwt-tokens>
+          - Algorithm: HS256
+          - Expiration: 1 hour
+          - Refresh token: 30 days
+          - Secure transmission only
+          - Token rotation on refresh
+        </jwt-tokens>
+
+        <request-validation>
+          - Token signature verification
+          - Expiration checking
+          - User existence validation
+          - Role/permission checking
+          - Request origin validation
+        </request-validation>
+      </authentication-security>
+
+      <input-validation>
+        <sanitization>
+          - SQL injection prevention
+          - XSS attack prevention
+          - Command injection prevention
+          - File upload validation
+          - Size limit enforcement
+        </sanitization>
+
+        <validation-rules>
+          - Required field checking
+          - Data type validation
+          - Format validation (emails, dates)
+          - Business rule validation
+          - Referential integrity
+        </validation-rules>
+      </input-validation>
+
+      <rate-limiting>
+        <limits-by-endpoint>
+          - Authentication: 5 requests/minute/IP
+          - Receipt operations: 100 requests/minute/user
+          - Export generation: 5 requests/hour/user
+          - File uploads: 20 requests/minute/user
+          - Analytics: 30 requests/minute/user
+        </limits-by-endpoint>
+
+        <rate-limit-headers>
+          ```
+          X-RateLimit-Limit: 100
+          X-RateLimit-Remaining: 95
+          X-RateLimit-Reset: 1642723200
+          Retry-After: 60
+          ```
+        </rate-limit-headers>
+      </rate-limiting>
+    </api-security>
+
+    <error-handling>
+      <error-response-format>
+        ```json
+        {
+          "error": {
+            "code": "VALIDATION_ERROR",
+            "message": "Invalid input data",
+            "details": [
+              {
+                "field": "email",
+                "message": "Invalid email format",
+                "code": "INVALID_FORMAT"
+              }
+            ],
+            "request_id": "req_123456789",
+            "timestamp": "2025-01-16T10:30:00Z"
+          }
+        }
+        ```
+      </error-response-format>
+
+      <http-status-codes>
+        <success>
+          - 200: OK (successful GET, PATCH)
+          - 201: Created (successful POST)
+          - 204: No Content (successful DELETE)
+        </success>
+
+        <client-errors>
+          - 400: Bad Request (validation errors)
+          - 401: Unauthorized (authentication required)
+          - 403: Forbidden (insufficient permissions)
+          - 404: Not Found (resource doesn't exist)
+          - 409: Conflict (version mismatch, duplicates)
+          - 422: Unprocessable Entity (business rule violations)
+          - 429: Too Many Requests (rate limit exceeded)
+        </client-errors>
+
+        <server-errors>
+          - 500: Internal Server Error (unexpected errors)
+          - 502: Bad Gateway (upstream service errors)
+          - 503: Service Unavailable (maintenance mode)
+          - 504: Gateway Timeout (request timeout)
+        </server-errors>
+      </http-status-codes>
+
+      <error-recovery>
+        <retry-strategies>
+          - Exponential backoff for server errors
+          - Immediate retry for network errors
+          - No retry for client errors (4xx)
+          - Maximum retry attempts: 3
+          - Circuit breaker for repeated failures
+        </retry-strategies>
+
+        <user-experience>
+          - Friendly error messages
+          - Actionable error suggestions
+          - Offline queue for failed requests
+          - Progress indicators for long operations
+          - Graceful degradation
+        </user-experience>
+      </error-recovery>
+    </error-handling>
+  </api-specification>
+</poml>

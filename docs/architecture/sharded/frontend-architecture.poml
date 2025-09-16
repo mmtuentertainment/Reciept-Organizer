@@ -1,0 +1,1030 @@
+<poml>
+  <role>Frontend Architecture - Receipt Organizer Architecture Component</role>
+  <task>UI/UX design patterns, component architecture, and platform-specific implementations</task>
+
+  <metadata>
+    <component>Frontend Architecture</component>
+    <parent-document>docs/architecture/main/architecture.poml</parent-document>
+    <version>3.0</version>
+    <date>2025-01-16</date>
+  </metadata>
+
+  <frontend-architecture>
+    <design-system>
+      <design-principles>
+        <mobile-first>
+          Primary design for mobile screens (320px-414px)
+          Progressive enhancement for larger screens
+          Touch-friendly interfaces with 44px minimum touch targets
+          Thumb-friendly navigation patterns
+        </mobile-first>
+
+        <accessibility-first>
+          WCAG 2.1 AA compliance minimum
+          Screen reader compatibility
+          High contrast color ratios (4.5:1 minimum)
+          Keyboard navigation support
+          Focus management and indicators
+        </accessibility-first>
+
+        <performance-optimized>
+          60 FPS animations and transitions
+          Lazy loading for images and components
+          Efficient state management
+          Minimal bundle sizes
+          Progressive loading strategies
+        </performance-optimized>
+
+        <offline-capable>
+          Offline-first data handling
+          Background sync when online
+          Clear offline status indicators
+          Graceful degradation of features
+          Local storage optimization
+        </offline-capable>
+      </design-principles>
+
+      <platform-design-systems>
+        <flutter-mobile>
+          <framework>Material Design 3</framework>
+          <theme-configuration>
+            ```dart
+            ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF2196F3),
+                brightness: Brightness.light,
+              ),
+              typography: Typography.material2021(),
+              elevationOverlay: ElevationOverlay.applyColorIfNeeded,
+            )
+            ```
+          </theme-configuration>
+
+          <component-library>
+            - Material buttons (Filled, Outlined, Text)
+            - Material cards with elevation
+            - Material navigation (Bottom, Rail, Drawer)
+            - Material form fields
+            - Material dialogs and bottom sheets
+            - Material icons and typography
+          </component-library>
+
+          <adaptive-design>
+            - Phone layouts (< 600dp)
+            - Tablet layouts (600dp - 840dp)
+            - Desktop layouts (> 840dp)
+            - Orientation-aware layouts
+            - Platform-specific navigation patterns
+          </adaptive-design>
+        </flutter-mobile>
+
+        <nextjs-web>
+          <framework>shadcn/ui + Tailwind CSS</framework>
+          <design-tokens>
+            ```css
+            :root {
+              --background: 0 0% 100%;
+              --foreground: 222.2 84% 4.9%;
+              --primary: 221.2 83.2% 53.3%;
+              --primary-foreground: 210 40% 98%;
+              --secondary: 210 40% 96%;
+              --secondary-foreground: 222.2 84% 4.9%;
+              --muted: 210 40% 96%;
+              --muted-foreground: 215.4 16.3% 46.9%;
+              --accent: 210 40% 96%;
+              --accent-foreground: 222.2 84% 4.9%;
+              --destructive: 0 84.2% 60.2%;
+              --destructive-foreground: 210 40% 98%;
+              --border: 214.3 31.8% 91.4%;
+              --input: 214.3 31.8% 91.4%;
+              --ring: 221.2 83.2% 53.3%;
+              --radius: 0.5rem;
+            }
+            ```
+          </design-tokens>
+
+          <component-library>
+            - shadcn/ui Button variants
+            - Card components with consistent styling
+            - Form components with validation
+            - Navigation breadcrumbs and menus
+            - Data tables with sorting/filtering
+            - Modal dialogs and sheets
+          </component-library>
+
+          <responsive-design>
+            - Mobile breakpoint: 0-640px
+            - Tablet breakpoint: 641-1024px
+            - Desktop breakpoint: 1025px+
+            - Fluid typography scaling
+            - Flexible grid systems
+          </responsive-design>
+        </nextjs-web>
+
+        <react-native>
+          <framework>React Native Elements + NativeWind</framework>
+          <platform-adaptation>
+            - iOS: Native navigation patterns
+            - Android: Material Design guidelines
+            - Platform-specific icons and fonts
+            - Native gesture handling
+            - Platform-appropriate animations
+          </platform-adaptation>
+
+          <component-library>
+            - RNE Button with platform variants
+            - RNE Card with shadow/elevation
+            - RNE Input with platform styling
+            - RNE Header with navigation
+            - RNE ListItem for data display
+            - Platform-specific icons
+          </component-library>
+        </react-native>
+      </platform-design-systems>
+
+      <color-system>
+        <primary-palette>
+          - Primary: #2196F3 (Material Blue)
+          - Primary Variant: #1976D2
+          - On Primary: #FFFFFF
+          - Primary Container: #E3F2FD
+          - On Primary Container: #0D47A1
+        </primary-palette>
+
+        <secondary-palette>
+          - Secondary: #03DAC6 (Material Teal)
+          - Secondary Variant: #018786
+          - On Secondary: #000000
+          - Secondary Container: #E0F2F1
+          - On Secondary Container: #004D40
+        </secondary-palette>
+
+        <semantic-colors>
+          - Success: #4CAF50 (Green 500)
+          - Warning: #FF9800 (Orange 500)
+          - Error: #F44336 (Red 500)
+          - Info: #2196F3 (Blue 500)
+          - High Confidence: #4CAF50
+          - Medium Confidence: #FF9800
+          - Low Confidence: #F44336
+        </semantic-colors>
+
+        <neutral-palette>
+          - Surface: #FFFFFF
+          - Background: #FAFAFA
+          - On Surface: #1C1B1F
+          - On Background: #1C1B1F
+          - Outline: #79747E
+          - Surface Variant: #F3F3F3
+        </neutral-palette>
+      </color-system>
+
+      <typography-system>
+        <type-scale>
+          - Display Large: 57px/64px (Headlines)
+          - Display Medium: 45px/52px (Page titles)
+          - Display Small: 36px/44px (Section headers)
+          - Headline Large: 32px/40px (Card titles)
+          - Headline Medium: 28px/36px (List headers)
+          - Headline Small: 24px/32px (Dialog titles)
+          - Title Large: 22px/28px (Toolbar titles)
+          - Title Medium: 16px/24px (List item titles)
+          - Title Small: 14px/20px (Captions)
+          - Label Large: 14px/20px (Buttons)
+          - Label Medium: 12px/16px (Form labels)
+          - Label Small: 11px/16px (Helper text)
+          - Body Large: 16px/24px (Main content)
+          - Body Medium: 14px/20px (Secondary content)
+          - Body Small: 12px/16px (Fine print)
+        </type-scale>
+
+        <font-families>
+          <flutter>
+            - Primary: Roboto (Android), SF Pro (iOS)
+            - Monospace: Roboto Mono
+            - Custom: Inter (web)
+          </flutter>
+
+          <web>
+            - Primary: Inter, system-ui, sans-serif
+            - Monospace: 'JetBrains Mono', monospace
+            - Fallback: -apple-system, BlinkMacSystemFont
+          </web>
+        </font-families>
+      </typography-system>
+
+      <iconography>
+        <icon-system>
+          <flutter>Material Icons + Custom SVG icons</flutter>
+          <web>Lucide React + Custom SVG icons</web>
+          <react-native>React Native Vector Icons</react-native>
+        </icon-system>
+
+        <icon-sizes>
+          - Small: 16px (inline with text)
+          - Medium: 24px (standard buttons)
+          - Large: 32px (prominent actions)
+          - Extra Large: 48px (empty states)
+        </icon-sizes>
+
+        <semantic-icons>
+          - Camera: receipt capture
+          - Receipt: receipt display
+          - Category: categorization
+          - Export: data export
+          - Settings: configuration
+          - User: profile/account
+          - Search: search functionality
+          - Filter: data filtering
+          - Sync: data synchronization
+          - Offline: offline indicator
+        </semantic-icons>
+      </iconography>
+    </design-system>
+
+    <component-architecture>
+      <flutter-architecture>
+        <component-hierarchy>
+          ```
+          MaterialApp
+          ├── AuthWrapper
+          │   ├── SplashScreen
+          │   ├── AuthScreen
+          │   └── MainApp
+          │       ├── NavigationShell
+          │       ├── CaptureScreen
+          │       ├── ReceiptsListScreen
+          │       ├── ReceiptDetailScreen
+          │       ├── ExportScreen
+          │       └── ProfileScreen
+          ```
+        </component-hierarchy>
+
+        <state-management>
+          <riverpod-providers>
+            ```dart
+            // Authentication state
+            final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>(
+              (ref) => AuthNotifier(ref.read(authServiceProvider)),
+            );
+
+            // Receipts list with family for filtering
+            final receiptsProvider = FutureProvider.family<List<Receipt>, ReceiptFilter>(
+              (ref, filter) async {
+                final repository = ref.read(receiptRepositoryProvider);
+                return repository.getReceipts(filter);
+              },
+            );
+
+            // OCR processing state
+            final ocrProvider = AsyncNotifierProvider<OcrNotifier, OcrResult>(
+              () => OcrNotifier(),
+            );
+
+            // User preferences
+            final userPreferencesProvider = StateNotifierProvider<UserPreferencesNotifier, UserPreferences>(
+              (ref) => UserPreferencesNotifier(),
+            );
+            ```
+          </riverpod-providers>
+
+          <state-patterns>
+            - AsyncValue for loading states
+            - StateNotifier for complex state logic
+            - Provider families for parameterized state
+            - AutoDispose for memory management
+            - Ref.watch for reactive updates
+          </state-patterns>
+        </state-management>
+
+        <navigation-architecture>
+          <go-router-configuration>
+            ```dart
+            final routerProvider = Provider<GoRouter>((ref) {
+              return GoRouter(
+                routes: [
+                  GoRoute(
+                    path: '/',
+                    builder: (context, state) => const SplashScreen(),
+                  ),
+                  GoRoute(
+                    path: '/auth',
+                    builder: (context, state) => const AuthScreen(),
+                  ),
+                  ShellRoute(
+                    builder: (context, state, child) => MainNavigationShell(child: child),
+                    routes: [
+                      GoRoute(
+                        path: '/capture',
+                        builder: (context, state) => const CaptureScreen(),
+                      ),
+                      GoRoute(
+                        path: '/receipts',
+                        builder: (context, state) => const ReceiptsListScreen(),
+                        routes: [
+                          GoRoute(
+                            path: '/:id',
+                            builder: (context, state) => ReceiptDetailScreen(
+                              receiptId: state.pathParameters['id']!,
+                            ),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: '/export',
+                        builder: (context, state) => const ExportScreen(),
+                      ),
+                      GoRoute(
+                        path: '/profile',
+                        builder: (context, state) => const ProfileScreen(),
+                      ),
+                    ],
+                  ),
+                ],
+                redirect: (context, state) {
+                  final authState = ref.read(authStateProvider);
+                  return authGuard(authState, state);
+                },
+              );
+            });
+            ```
+          </go-router-configuration>
+
+          <navigation-patterns>
+            - Tab-based navigation for main sections
+            - Modal sheets for quick actions
+            - Full-screen modals for complex flows
+            - Nested navigation for detail views
+            - Deep linking support for sharing
+          </navigation-patterns>
+        </navigation-architecture>
+
+        <reusable-components>
+          <ui-components>
+            ```dart
+            // Receipt card component
+            class ReceiptCard extends ConsumerWidget {
+              const ReceiptCard({
+                super.key,
+                required this.receipt,
+                this.onTap,
+                this.showCategory = true,
+              });
+
+              final Receipt receipt;
+              final VoidCallback? onTap;
+              final bool showCategory;
+
+              @override
+              Widget build(BuildContext context, WidgetRef ref) {
+                return Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: receipt.category?.color,
+                      child: Icon(receipt.category?.icon),
+                    ),
+                    title: Text(receipt.vendorName),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(DateFormat.yMMMd().format(receipt.date)),
+                        if (showCategory && receipt.category != null)
+                          Text(receipt.category!.name),
+                      ],
+                    ),
+                    trailing: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          NumberFormat.currency(symbol: '\$').format(receipt.totalAmount),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        ConfidenceBadge(confidence: receipt.ocrConfidence),
+                      ],
+                    ),
+                    onTap: onTap,
+                  ),
+                );
+              }
+            }
+            ```
+          </ui-components>
+
+          <form-components>
+            ```dart
+            // Receipt form component
+            class ReceiptForm extends ConsumerStatefulWidget {
+              const ReceiptForm({
+                super.key,
+                this.receipt,
+                required this.onSave,
+              });
+
+              final Receipt? receipt;
+              final Function(Receipt) onSave;
+
+              @override
+              ConsumerState<ReceiptForm> createState() => _ReceiptFormState();
+            }
+
+            class _ReceiptFormState extends ConsumerState<ReceiptForm> {
+              final _formKey = GlobalKey<FormState>();
+              late final TextEditingController _vendorController;
+              late final TextEditingController _amountController;
+
+              @override
+              Widget build(BuildContext context) {
+                return Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _vendorController,
+                        decoration: const InputDecoration(
+                          labelText: 'Vendor Name',
+                          hintText: 'Enter business name',
+                        ),
+                        validator: (value) =>
+                          value?.isEmpty == true ? 'Vendor name is required' : null,
+                      ),
+                      TextFormField(
+                        controller: _amountController,
+                        decoration: const InputDecoration(
+                          labelText: 'Total Amount',
+                          prefixText: '\$',
+                        ),
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        validator: (value) => _validateAmount(value),
+                      ),
+                      CategoryDropdown(
+                        value: _selectedCategory,
+                        onChanged: (category) => setState(() => _selectedCategory = category),
+                      ),
+                      NotesField(
+                        value: _notes,
+                        onChanged: (notes) => setState(() => _notes = notes),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            }
+            ```
+          </form-components>
+
+          <specialized-components>
+            - CameraPreview: Receipt capture interface
+            - ReceiptImageViewer: Zoomable image display
+            - ConfidenceBadge: OCR confidence indicator
+            - SyncStatusIndicator: Online/offline status
+            - ExportProgress: Export generation progress
+            - EmptyState: No data placeholder
+            - LoadingShimmer: Content loading skeleton
+          </specialized-components>
+        </reusable-components>
+      </flutter-architecture>
+
+      <nextjs-architecture>
+        <component-structure>
+          ```tsx
+          // Next.js app structure
+          app/
+          ├── layout.tsx (Root layout)
+          ├── page.tsx (Home/landing)
+          ├── auth/
+          │   ├── login/page.tsx
+          │   └── signup/page.tsx
+          ├── dashboard/
+          │   ├── layout.tsx (Dashboard layout)
+          │   ├── page.tsx (Dashboard home)
+          │   ├── receipts/
+          │   │   ├── page.tsx (Receipts list)
+          │   │   └── [id]/page.tsx (Receipt detail)
+          │   ├── capture/page.tsx
+          │   ├── export/page.tsx
+          │   └── profile/page.tsx
+          └── api/
+              ├── auth/route.ts
+              ├── receipts/route.ts
+              └── export/route.ts
+          ```
+        </component-structure>
+
+        <state-management>
+          <zustand-stores>
+            ```tsx
+            // Auth store
+            interface AuthState {
+              user: User | null;
+              isLoading: boolean;
+              signIn: (email: string, password: string) => Promise<void>;
+              signOut: () => Promise<void>;
+            }
+
+            export const useAuthStore = create<AuthState>((set, get) => ({
+              user: null,
+              isLoading: false,
+              signIn: async (email, password) => {
+                set({ isLoading: true });
+                try {
+                  const { data } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                  });
+                  set({ user: data.user, isLoading: false });
+                } catch (error) {
+                  set({ isLoading: false });
+                  throw error;
+                }
+              },
+              signOut: async () => {
+                await supabase.auth.signOut();
+                set({ user: null });
+              },
+            }));
+
+            // Receipts store
+            interface ReceiptsState {
+              receipts: Receipt[];
+              isLoading: boolean;
+              filter: ReceiptFilter;
+              fetchReceipts: () => Promise<void>;
+              updateFilter: (filter: Partial<ReceiptFilter>) => void;
+            }
+
+            export const useReceiptsStore = create<ReceiptsState>((set, get) => ({
+              receipts: [],
+              isLoading: false,
+              filter: { limit: 20, offset: 0 },
+              fetchReceipts: async () => {
+                set({ isLoading: true });
+                const { filter } = get();
+                const receipts = await receiptService.getReceipts(filter);
+                set({ receipts, isLoading: false });
+              },
+              updateFilter: (newFilter) => {
+                set({ filter: { ...get().filter, ...newFilter } });
+                get().fetchReceipts();
+              },
+            }));
+            ```
+          </zustand-stores>
+
+          <react-context>
+            ```tsx
+            // Theme context
+            interface ThemeContextType {
+              theme: 'light' | 'dark';
+              toggleTheme: () => void;
+            }
+
+            const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+            export function ThemeProvider({ children }: { children: React.ReactNode }) {
+              const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+              const toggleTheme = useCallback(() => {
+                setTheme(prev => prev === 'light' ? 'dark' : 'light');
+              }, []);
+
+              return (
+                <ThemeContext.Provider value={{ theme, toggleTheme }}>
+                  <div className={theme}>
+                    {children}
+                  </div>
+                </ThemeContext.Provider>
+              );
+            }
+            ```
+          </react-context>
+        </state-management>
+
+        <component-library>
+          <ui-components>
+            ```tsx
+            // Receipt card component
+            interface ReceiptCardProps {
+              receipt: Receipt;
+              onSelect?: (receipt: Receipt) => void;
+              showCategory?: boolean;
+            }
+
+            export function ReceiptCard({
+              receipt,
+              onSelect,
+              showCategory = true
+            }: ReceiptCardProps) {
+              return (
+                <Card
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => onSelect?.(receipt)}
+                >
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{receipt.vendorName}</CardTitle>
+                      <ConfidenceBadge confidence={receipt.ocrConfidence} />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          {format(new Date(receipt.receiptDate), 'MMM d, yyyy')}
+                        </p>
+                        {showCategory && receipt.category && (
+                          <Badge variant="outline" className="mt-1">
+                            {receipt.category.name}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-semibold">
+                          {formatCurrency(receipt.totalAmount)}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            }
+            ```
+          </ui-components>
+
+          <form-components>
+            ```tsx
+            // Receipt form component
+            interface ReceiptFormProps {
+              receipt?: Receipt;
+              onSave: (receipt: Partial<Receipt>) => Promise<void>;
+              onCancel: () => void;
+            }
+
+            export function ReceiptForm({ receipt, onSave, onCancel }: ReceiptFormProps) {
+              const form = useForm<ReceiptFormData>({
+                resolver: zodResolver(receiptFormSchema),
+                defaultValues: {
+                  vendorName: receipt?.vendorName || '',
+                  totalAmount: receipt?.totalAmount || 0,
+                  receiptDate: receipt?.receiptDate || new Date().toISOString().split('T')[0],
+                  categoryId: receipt?.categoryId || '',
+                  notes: receipt?.notes || '',
+                },
+              });
+
+              return (
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSave)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="vendorName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vendor Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter business name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="totalAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Total Amount</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="flex gap-2">
+                      <Button type="submit" disabled={form.formState.isSubmitting}>
+                        {form.formState.isSubmitting ? 'Saving...' : 'Save'}
+                      </Button>
+                      <Button type="button" variant="outline" onClick={onCancel}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              );
+            }
+            ```
+          </form-components>
+        </component-library>
+
+        <server-components>
+          ```tsx
+          // Server component for data fetching
+          export default async function ReceiptsPage({
+            searchParams,
+          }: {
+            searchParams: { [key: string]: string | string[] | undefined };
+          }) {
+            const supabase = createServerComponentClient<Database>({ cookies });
+
+            const {
+              data: { session },
+            } = await supabase.auth.getSession();
+
+            if (!session) {
+              redirect('/auth/login');
+            }
+
+            const filter = {
+              limit: Number(searchParams.limit) || 20,
+              offset: Number(searchParams.offset) || 0,
+              category: searchParams.category as string,
+              dateFrom: searchParams.dateFrom as string,
+              dateTo: searchParams.dateTo as string,
+            };
+
+            const { data: receipts } = await supabase
+              .from('receipts')
+              .select(`
+                *,
+                categories (
+                  id,
+                  name,
+                  color,
+                  icon
+                )
+              `)
+              .gte('receipt_date', filter.dateFrom || '1900-01-01')
+              .lte('receipt_date', filter.dateTo || '2100-12-31')
+              .eq('category_id', filter.category || undefined)
+              .order('receipt_date', { ascending: false })
+              .range(filter.offset, filter.offset + filter.limit - 1);
+
+            return (
+              <div className="container mx-auto py-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h1 className="text-3xl font-bold">Receipts</h1>
+                  <Button asChild>
+                    <Link href="/capture">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Receipt
+                    </Link>
+                  </Button>
+                </div>
+
+                <ReceiptFilters />
+
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {receipts?.map((receipt) => (
+                    <ReceiptCard key={receipt.id} receipt={receipt} />
+                  ))}
+                </div>
+
+                <ReceiptsPagination totalCount={receipts?.length || 0} />
+              </div>
+            );
+          }
+          ```
+        </server-components>
+      </nextjs-architecture>
+
+      <shared-patterns>
+        <loading-states>
+          <skeleton-loading>
+            ```tsx
+            // Skeleton component for loading states
+            export function ReceiptCardSkeleton() {
+              return (
+                <Card>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-3/4" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between">
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            }
+            ```
+          </skeleton-loading>
+
+          <loading-indicators>
+            - Shimmer effects for content loading
+            - Spinner for action feedback
+            - Progress bars for file uploads
+            - Skeleton screens for page loads
+            - Pull-to-refresh indicators
+          </loading-indicators>
+        </loading-states>
+
+        <error-handling>
+          <error-boundaries>
+            ```tsx
+            // Error boundary component
+            export class ErrorBoundary extends Component<
+              { children: ReactNode; fallback: ComponentType<{ error: Error }> },
+              { hasError: boolean; error: Error | null }
+            > {
+              constructor(props: any) {
+                super(props);
+                this.state = { hasError: false, error: null };
+              }
+
+              static getDerivedStateFromError(error: Error) {
+                return { hasError: true, error };
+              }
+
+              componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+                console.error('Error boundary caught an error:', error, errorInfo);
+                // Send error to monitoring service
+                Sentry.captureException(error, {
+                  contexts: { errorInfo },
+                });
+              }
+
+              render() {
+                if (this.state.hasError) {
+                  return <this.props.fallback error={this.state.error!} />;
+                }
+
+                return this.props.children;
+              }
+            }
+            ```
+          </error-boundaries>
+
+          <error-display>
+            - User-friendly error messages
+            - Retry buttons for recoverable errors
+            - Fallback UI for broken components
+            - Offline indicators and guidance
+            - Form validation feedback
+          </error-display>
+        </error-handling>
+
+        <accessibility-patterns>
+          <semantic-html>
+            - Proper heading hierarchy (h1-h6)
+            - Semantic form controls
+            - ARIA labels and descriptions
+            - Focus management
+            - Screen reader announcements
+          </semantic-html>
+
+          <keyboard-navigation>
+            - Tab order management
+            - Skip links for main content
+            - Keyboard shortcuts for common actions
+            - Focus trapping in modals
+            - Escape key handling
+          </keyboard-navigation>
+
+          <visual-accessibility>
+            - High contrast color combinations
+            - Sufficient color contrast ratios
+            - Large touch targets (44px minimum)
+            - Clear focus indicators
+            - Reduced motion preferences
+          </visual-accessibility>
+        </accessibility-patterns>
+      </shared-patterns>
+    </component-architecture>
+
+    <user-experience>
+      <interaction-patterns>
+        <receipt-capture-flow>
+          1. **Camera Launch**: Quick access from main navigation
+          2. **Preview Mode**: Real-time camera preview with guides
+          3. **Edge Detection**: Automatic receipt boundary detection
+          4. **Capture Feedback**: Visual and haptic feedback on capture
+          5. **Processing Indicator**: OCR processing progress
+          6. **Review Screen**: Display extracted data with confidence
+          7. **Edit Interface**: Inline editing of incorrect fields
+          8. **Save Confirmation**: Success feedback and navigation options
+        </receipt-capture-flow>
+
+        <batch-capture-mode>
+          1. **Mode Activation**: Long-press or dedicated button
+          2. **Continuous Capture**: Rapid sequential photo taking
+          3. **Queue Indicator**: Visual count of captured receipts
+          4. **Background Processing**: OCR processing while capturing
+          5. **Batch Review**: Bulk review of all captured receipts
+          6. **Individual Editing**: Option to edit specific receipts
+          7. **Bulk Save**: Save entire batch with progress indicator
+        </batch-capture-mode>
+
+        <receipt-management>
+          1. **List View**: Chronological receipt display
+          2. **Filter Interface**: Quick filters by date, category, amount
+          3. **Search Functionality**: Text search across all fields
+          4. **Sort Options**: Multiple sorting criteria
+          5. **Selection Mode**: Multi-select for bulk operations
+          6. **Detail View**: Full receipt information and image
+          7. **Edit Mode**: Inline editing with auto-save
+          8. **Delete Confirmation**: Safe deletion with undo option
+        </receipt-management>
+
+        <export-workflow>
+          1. **Export Trigger**: Export button with format options
+          2. **Filter Selection**: Choose receipts to include
+          3. **Format Configuration**: Select export format and options
+          4. **Preview Generation**: Show export preview
+          5. **Processing Indicator**: Export generation progress
+          6. **Download Ready**: Download link with expiration notice
+          7. **Completion Feedback**: Success message with actions
+        </export-workflow>
+      </interaction-patterns>
+
+      <feedback-systems>
+        <visual-feedback>
+          - Success/error toast notifications
+          - Loading spinners and progress bars
+          - Confidence badges for OCR results
+          - Status indicators for sync
+          - Badge counts for unprocessed items
+        </visual-feedback>
+
+        <haptic-feedback>
+          - Camera capture confirmation
+          - Button press acknowledgment
+          - Error vibration patterns
+          - Success haptic patterns
+          - Long-press activation
+        </haptic-feedback>
+
+        <audio-feedback>
+          - Camera shutter sound (optional)
+          - Error notification sounds
+          - Success confirmation chimes
+          - Voice guidance for accessibility
+          - Screen reader compatibility
+        </audio-feedback>
+      </feedback-systems>
+
+      <performance-ux>
+        <perceived-performance>
+          - Optimistic UI updates
+          - Skeleton loading screens
+          - Progressive image loading
+          - Background data prefetching
+          - Smooth animations and transitions
+        </perceived-performance>
+
+        <offline-experience>
+          - Clear offline indicators
+          - Offline-first functionality
+          - Sync status communication
+          - Queued operation indicators
+          - Conflict resolution UI
+        </offline-experience>
+
+        <progressive-enhancement>
+          - Core functionality without JavaScript
+          - Enhanced features with JavaScript
+          - Graceful degradation on errors
+          - Adaptive performance based on device
+          - Network-aware optimizations
+        </progressive-enhancement>
+      </performance-ux>
+
+      <responsive-design>
+        <mobile-optimization>
+          - Touch-friendly interface design
+          - One-handed operation support
+          - Gesture-based navigation
+          - Minimal cognitive load
+          - Quick action accessibility
+        </mobile-optimization>
+
+        <tablet-adaptation>
+          - Multi-column layouts
+          - Side-by-side detail views
+          - Enhanced navigation patterns
+          - Larger touch targets
+          - Optimized for landscape/portrait
+        </tablet-adaptation>
+
+        <desktop-enhancement>
+          - Keyboard shortcut support
+          - Multi-window workflows
+          - Drag-and-drop interactions
+          - Context menus
+          - Efficient screen space usage
+        </desktop-enhancement>
+      </responsive-design>
+    </user-experience>
+  </frontend-architecture>
+</poml>

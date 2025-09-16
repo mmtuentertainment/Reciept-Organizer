@@ -1,0 +1,712 @@
+<poml>
+  <role>Epic 3: Export & Integration</role>
+  <task>Receipt organization, search, filtering, and export to accounting software</task>
+
+  <metadata>
+    <epic-number>3</epic-number>
+    <epic-title>Export & Integration</epic-title>
+    <status>PARTIAL</status>
+    <priority>P1</priority>
+    <phase>Phase 2</phase>
+    <start-date>2024-12-01</start-date>
+    <estimated-effort>5-6 weeks</estimated-effort>
+  </metadata>
+
+  <epic-overview>
+    <description>
+      Provide comprehensive receipt organization, search, filtering capabilities, and robust
+      export functionality to accounting software in multiple formats with validation and
+      integration support.
+    </description>
+
+    <business-value>
+      - Enable seamless accounting software integration
+      - Provide flexible data export for tax preparation
+      - Support various business accounting workflows
+      - Reduce manual data entry for accountants
+      - Ensure data compatibility with popular tools
+    </business-value>
+
+    <success-criteria>
+      - Export validation passes 100% for supported formats
+      - QuickBooks, Xero, and Generic CSV formats supported
+      - Advanced search finds receipts in <500ms
+      - Date range filtering works efficiently
+      - Bulk export handles 1000+ receipts smoothly
+      - Export files are accounting software ready
+    </success-criteria>
+  </epic-overview>
+
+  <stories>
+    <story id="3.1" priority="P0">
+      <title>Basic CSV Export</title>
+      <description>Core CSV export functionality for popular accounting formats</description>
+      <status>COMPLETE</status>
+      <completion-date>2024-12-10</completion-date>
+      <acceptance-criteria>
+        - QuickBooks 3-column format (Date, Description, Amount)
+        - Xero invoice format with line items
+        - Generic format with all fields
+        - File download with proper headers
+        - Export progress indication
+      </acceptance-criteria>
+      <effort>5 days</effort>
+    </story>
+
+    <story id="3.2" priority="P0">
+      <title>Export Validation</title>
+      <description>Validate export data integrity and format compliance</description>
+      <status>COMPLETE</status>
+      <completion-date>2024-12-12</completion-date>
+      <acceptance-criteria>
+        - Data sanitization for CSV injection prevention
+        - Field validation before export
+        - Format compliance checking
+        - Error reporting for invalid data
+        - Batch size limits and warnings
+      </acceptance-criteria>
+      <effort>4 days</effort>
+    </story>
+
+    <story id="3.3" priority="P1">
+      <title>Date Range Selection</title>
+      <description>Flexible date range selection for targeted exports</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Calendar date picker interface
+        - Preset ranges (last month, quarter, year)
+        - Custom date range input
+        - Receipt count preview for range
+        - Validation for reasonable date ranges
+      </acceptance-criteria>
+      <effort>3 days</effort>
+      <dependencies>Stories 3.1, 3.2</dependencies>
+    </story>
+
+    <story id="3.4" priority="P1">
+      <title>Category Filtering</title>
+      <description>Filter receipts by category for targeted exports</description>
+      <status>BLOCKED</status>
+      <blocker>Category UI not implemented in mobile</blocker>
+      <acceptance-criteria>
+        - Multi-select category filter
+        - Category hierarchy support
+        - Filter combination with date ranges
+        - Visual preview of filtered results
+        - Save/load filter presets
+      </acceptance-criteria>
+      <effort>4 days</effort>
+      <dependencies>Epic 2 category implementation</dependencies>
+    </story>
+
+    <story id="3.5" priority="P1">
+      <title>Advanced Search</title>
+      <description>Full-text search across all receipt fields</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Search vendor names, notes, amounts
+        - Fuzzy matching for typos
+        - Search result highlighting
+        - Search history and suggestions
+        - Performance <500ms for 1000+ receipts
+      </acceptance-criteria>
+      <effort>6 days</effort>
+      <dependencies>Database indexing optimization</dependencies>
+    </story>
+
+    <story id="3.6" priority="P1">
+      <title>Bulk Selection & Operations</title>
+      <description>Multi-select receipts for bulk operations</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Select all/none functionality
+        - Range selection with shift-click
+        - Bulk export selected receipts
+        - Bulk delete with confirmation
+        - Selection count and total amounts
+      </acceptance-criteria>
+      <effort>5 days</effort>
+      <dependencies>Stories 3.3, 3.4, 3.5</dependencies>
+    </story>
+
+    <story id="3.7" priority="P1">
+      <title>Export Customization</title>
+      <description>Customizable export formats and field selection</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Custom field selection for exports
+        - Column ordering and naming
+        - Date format preferences
+        - Currency symbol options
+        - Export template saving
+      </acceptance-criteria>
+      <effort>5 days</effort>
+      <dependencies>Stories 3.1, 3.2</dependencies>
+    </story>
+
+    <story id="3.8" priority="P2">
+      <title>Receipt Tags & Labels</title>
+      <description>Custom tagging system for flexible organization</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Create and assign custom tags
+        - Tag-based filtering and search
+        - Tag autocomplete and suggestions
+        - Color-coded tag display
+        - Tag usage analytics
+      </acceptance-criteria>
+      <effort>6 days</effort>
+      <dependencies>Story 3.5</dependencies>
+    </story>
+
+    <story id="3.9" priority="P2">
+      <title>Smart Receipt Grouping</title>
+      <description>Automatic grouping of related receipts</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Group by merchant and date proximity
+        - Split receipt detection
+        - Trip/project grouping suggestions
+        - Manual group creation and editing
+        - Group-based export options
+      </acceptance-criteria>
+      <effort>7 days</effort>
+      <dependencies>Story 3.6</dependencies>
+    </story>
+
+    <story id="3.10" priority="P2">
+      <title>Duplicate Receipt Detection</title>
+      <description>Identify and manage duplicate receipts</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Automatic duplicate detection algorithm
+        - Visual duplicate comparison interface
+        - Merge duplicate receipt data
+        - Delete duplicates with confirmation
+        - Duplicate prevention during import
+      </acceptance-criteria>
+      <effort>6 days</effort>
+      <dependencies>Story 3.5</dependencies>
+    </story>
+
+    <story id="3.11" priority="P2">
+      <title>API Integration Framework</title>
+      <description>Framework for direct accounting software integration</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - QuickBooks Online API integration
+        - Xero API integration foundation
+        - OAuth flow for third-party apps
+        - Real-time sync capabilities
+        - Error handling and retry logic
+      </acceptance-criteria>
+      <effort>10 days</effort>
+      <dependencies>All export stories complete</dependencies>
+    </story>
+
+    <story id="3.12" priority="P2">
+      <title>Scheduled Exports</title>
+      <description>Automated periodic exports to configured destinations</description>
+      <status>PLANNED</status>
+      <acceptance-criteria>
+        - Schedule recurring exports
+        - Email delivery of export files
+        - Cloud storage integration (Dropbox, Google Drive)
+        - Export success/failure notifications
+        - Export history and audit trail
+      </acceptance-criteria>
+      <effort>8 days</effort>
+      <dependencies>Story 3.11</dependencies>
+    </story>
+  </stories>
+
+  <technical-implementation>
+    <export-engine>
+      <csv-generator>
+        ```dart
+        // CSV export service
+        class CsvExportService {
+          static const Map<String, CsvFormat> formats = {
+            'quickbooks': QuickBooksCsvFormat(),
+            'xero': XeroCsvFormat(),
+            'generic': GenericCsvFormat(),
+          };
+
+          Future<File> generateExport({
+            required List<Receipt> receipts,
+            required String format,
+            required ExportOptions options,
+          }) async {
+            final csvFormat = formats[format]!;
+            final sanitizedData = _sanitizeData(receipts);
+            final csvContent = csvFormat.generate(sanitizedData, options);
+
+            return _writeToFile(csvContent, format);
+          }
+
+          List<Receipt> _sanitizeData(List<Receipt> receipts) {
+            return receipts.map((receipt) => receipt.copyWith(
+              vendorName: _sanitizeString(receipt.vendorName),
+              notes: _sanitizeString(receipt.notes),
+            )).toList();
+          }
+
+          String _sanitizeString(String? input) {
+            if (input == null) return '';
+            // Remove CSV injection attacks
+            return input
+                .replaceAll(RegExp(r'^[=+\-@]'), "'")
+                .replaceAll('"', '""');
+          }
+        }
+        ```
+      </csv-generator>
+
+      <format-definitions>
+        ```dart
+        // QuickBooks CSV format
+        class QuickBooksCsvFormat extends CsvFormat {
+          @override
+          String generate(List<Receipt> receipts, ExportOptions options) {
+            final rows = <List<String>>[];
+            rows.add(['Date', 'Description', 'Amount']);
+
+            for (final receipt in receipts) {
+              rows.add([
+                DateFormat('MM/dd/yyyy').format(receipt.receiptDate),
+                '${receipt.vendorName}${receipt.notes.isNotEmpty ? ' - ${receipt.notes}' : ''}',
+                receipt.totalAmount.toStringAsFixed(2),
+              ]);
+            }
+
+            return const ListToCsvConverter().convert(rows);
+          }
+        }
+
+        // Xero CSV format
+        class XeroCsvFormat extends CsvFormat {
+          @override
+          String generate(List<Receipt> receipts, ExportOptions options) {
+            final rows = <List<String>>[];
+            rows.add(['Date', 'Reference', 'Description', 'Account', 'Debit', 'Credit']);
+
+            for (final receipt in receipts) {
+              final accountCode = _mapCategoryToAccount(receipt.categoryId);
+              rows.add([
+                DateFormat('dd/MM/yyyy').format(receipt.receiptDate),
+                receipt.receiptNumber ?? '',
+                receipt.vendorName,
+                accountCode,
+                receipt.totalAmount.toStringAsFixed(2),
+                '',
+              ]);
+            }
+
+            return const ListToCsvConverter().convert(rows);
+          }
+        }
+        ```
+      </format-definitions>
+    </export-engine>
+
+    <search-and-filter>
+      <search-service>
+        ```dart
+        // Advanced search service
+        class ReceiptSearchService {
+          final ReceiptRepository _repository;
+
+          ReceiptSearchService(this._repository);
+
+          Future<List<Receipt>> search({
+            String? query,
+            DateRange? dateRange,
+            List<String>? categoryIds,
+            List<String>? tags,
+            double? minAmount,
+            double? maxAmount,
+          }) async {
+            var results = await _repository.getAllReceipts();
+
+            if (query != null && query.isNotEmpty) {
+              results = _filterByQuery(results, query);
+            }
+
+            if (dateRange != null) {
+              results = results.where((r) =>
+                r.receiptDate.isAfter(dateRange.start.subtract(Duration(days: 1))) &&
+                r.receiptDate.isBefore(dateRange.end.add(Duration(days: 1)))
+              ).toList();
+            }
+
+            if (categoryIds != null && categoryIds.isNotEmpty) {
+              results = results.where((r) =>
+                r.categoryId != null && categoryIds.contains(r.categoryId)
+              ).toList();
+            }
+
+            if (minAmount != null) {
+              results = results.where((r) => r.totalAmount >= minAmount).toList();
+            }
+
+            if (maxAmount != null) {
+              results = results.where((r) => r.totalAmount <= maxAmount).toList();
+            }
+
+            return results;
+          }
+
+          List<Receipt> _filterByQuery(List<Receipt> receipts, String query) {
+            final lowerQuery = query.toLowerCase();
+            return receipts.where((receipt) {
+              return receipt.vendorName.toLowerCase().contains(lowerQuery) ||
+                     (receipt.notes?.toLowerCase().contains(lowerQuery) ?? false) ||
+                     receipt.totalAmount.toString().contains(lowerQuery) ||
+                     (receipt.receiptNumber?.toLowerCase().contains(lowerQuery) ?? false);
+            }).toList();
+          }
+        }
+        ```
+      </search-service>
+
+      <filter-persistence>
+        ```dart
+        // Filter state management
+        class FilterState {
+          final String? searchQuery;
+          final DateRange? dateRange;
+          final List<String> selectedCategories;
+          final List<String> selectedTags;
+          final double? minAmount;
+          final double? maxAmount;
+
+          const FilterState({
+            this.searchQuery,
+            this.dateRange,
+            this.selectedCategories = const [],
+            this.selectedTags = const [],
+            this.minAmount,
+            this.maxAmount,
+          });
+
+          FilterState copyWith({
+            String? searchQuery,
+            DateRange? dateRange,
+            List<String>? selectedCategories,
+            List<String>? selectedTags,
+            double? minAmount,
+            double? maxAmount,
+          }) {
+            return FilterState(
+              searchQuery: searchQuery ?? this.searchQuery,
+              dateRange: dateRange ?? this.dateRange,
+              selectedCategories: selectedCategories ?? this.selectedCategories,
+              selectedTags: selectedTags ?? this.selectedTags,
+              minAmount: minAmount ?? this.minAmount,
+              maxAmount: maxAmount ?? this.maxAmount,
+            );
+          }
+
+          bool get hasActiveFilters {
+            return searchQuery?.isNotEmpty == true ||
+                   dateRange != null ||
+                   selectedCategories.isNotEmpty ||
+                   selectedTags.isNotEmpty ||
+                   minAmount != null ||
+                   maxAmount != null;
+          }
+        }
+        ```
+      </filter-persistence>
+    </search-and-filter>
+
+    <validation-engine>
+      <export-validator>
+        ```dart
+        // Export data validation
+        class ExportValidator {
+          static ValidationResult validate(List<Receipt> receipts, String format) {
+            final errors = <ValidationError>[];
+            final warnings = <ValidationWarning>[];
+
+            for (int i = 0; i < receipts.length; i++) {
+              final receipt = receipts[i];
+              final rowNumber = i + 1;
+
+              // Required field validation
+              if (receipt.vendorName.isEmpty) {
+                errors.add(ValidationError(
+                  rowNumber: rowNumber,
+                  field: 'vendorName',
+                  message: 'Vendor name is required',
+                ));
+              }
+
+              if (receipt.totalAmount <= 0) {
+                errors.add(ValidationError(
+                  rowNumber: rowNumber,
+                  field: 'totalAmount',
+                  message: 'Total amount must be positive',
+                ));
+              }
+
+              // Format-specific validation
+              if (format == 'quickbooks') {
+                if (receipt.receiptDate.isAfter(DateTime.now())) {
+                  warnings.add(ValidationWarning(
+                    rowNumber: rowNumber,
+                    field: 'receiptDate',
+                    message: 'Future date detected',
+                  ));
+                }
+              }
+
+              // Business rule validation
+              if (receipt.totalAmount > 10000) {
+                warnings.add(ValidationWarning(
+                  rowNumber: rowNumber,
+                  field: 'totalAmount',
+                  message: 'Large amount - please verify',
+                ));
+              }
+            }
+
+            return ValidationResult(
+              isValid: errors.isEmpty,
+              errors: errors,
+              warnings: warnings,
+            );
+          }
+        }
+        ```
+      </export-validator>
+    </validation-engine>
+  </technical-implementation>
+
+  <current-status>
+    <completed-features>
+      - Basic CSV export for QuickBooks, Xero, Generic formats
+      - Export validation with sanitization
+      - File download with proper headers
+      - Export progress indication
+      - Batch size handling
+    </completed-features>
+
+    <in-progress-features>
+      - Advanced search implementation
+      - Date range filtering UI
+      - Category filter integration
+      - Performance optimization for large datasets
+    </in-progress-features>
+
+    <blocked-features>
+      <category-filtering>
+        <blocker>Category UI not implemented in mobile app</blocker>
+        <impact>Cannot filter by category for exports</impact>
+        <dependency>Epic 2 Story 2.4 completion</dependency>
+      </category-filtering>
+
+      <advanced-organization>
+        <blocker>Search and filter infrastructure needs completion</blocker>
+        <impact>Limited receipt organization capabilities</impact>
+        <dependency>Stories 3.3, 3.4, 3.5 completion</dependency>
+      </advanced-organization>
+    </blocked-features>
+  </current-status>
+
+  <integration-requirements>
+    <accounting-software>
+      <quickbooks-online>
+        - OAuth 2.0 API access
+        - Journal entry creation
+        - Expense tracking integration
+        - Receipt attachment support
+        - Multi-company support
+      </quickbooks-online>
+
+      <xero>
+        - OAuth 2.0 API integration
+        - Invoice and receipt creation
+        - Bank transaction matching
+        - Multi-currency support
+        - Approval workflow integration
+      </xero>
+
+      <wave-accounting>
+        - Receipt upload API
+        - Expense categorization
+        - Sales tax handling
+        - Multi-business support
+      </wave-accounting>
+    </accounting-software>
+
+    <cloud-storage>
+      <dropbox>
+        - Automated file uploads
+        - Folder organization
+        - Sharing and collaboration
+        - Version control
+      </dropbox>
+
+      <google-drive>
+        - Google Workspace integration
+        - Automated folder creation
+        - Share permissions management
+        - Real-time collaboration
+      </google-drive>
+
+      <onedrive>
+        - Microsoft 365 integration
+        - SharePoint connectivity
+        - Business account support
+        - Advanced security features
+      </onedrive>
+    </cloud-storage>
+  </integration-requirements>
+
+  <user-experience-design>
+    <export-workflow>
+      <simple-export>
+        1. User selects "Export" from main menu
+        2. Choose export format (QuickBooks/Xero/Generic)
+        3. Select date range (preset or custom)
+        4. Preview receipt count and total amount
+        5. Confirm export and download file
+      </simple-export>
+
+      <advanced-export>
+        1. User applies filters (category, search, tags)
+        2. Review filtered results
+        3. Select specific receipts (optional)
+        4. Choose export format and customization
+        5. Validate data and show warnings
+        6. Generate and download export file
+      </advanced-export>
+    </export-workflow>
+
+    <search-interface>
+      <search-bar>
+        - Prominent search bar at top of receipt list
+        - Real-time search suggestions
+        - Recent searches dropdown
+        - Clear search button
+        - Search result count display
+      </search-bar>
+
+      <filter-panel>
+        - Collapsible filter panel
+        - Date range picker with presets
+        - Category multi-select with icons
+        - Amount range slider
+        - Tag selection interface
+        - Active filter chips with remove option
+      </filter-panel>
+    </search-interface>
+
+    <performance-optimizations>
+      <virtual-scrolling>
+        - Efficient rendering of large receipt lists
+        - Lazy loading of receipt images
+        - Progressive data loading
+        - Smooth scrolling performance
+      </virtual-scrolling>
+
+      <search-optimization>
+        - Debounced search queries
+        - Cached search results
+        - Indexed database queries
+        - Background search processing
+      </search-optimization>
+    </performance-optimizations>
+  </user-experience-design>
+
+  <testing-strategy>
+    <export-testing>
+      <format-compliance>
+        - QuickBooks import testing
+        - Xero format validation
+        - Large dataset export testing
+        - Special character handling
+        - Currency format verification
+      </format-compliance>
+
+      <validation-testing>
+        - Required field validation
+        - Data sanitization verification
+        - Business rule enforcement
+        - Error message accuracy
+        - Performance under load
+      </validation-testing>
+    </export-testing>
+
+    <search-testing>
+      <functionality-testing>
+        - Full-text search accuracy
+        - Filter combination testing
+        - Performance with large datasets
+        - Special character handling
+        - Fuzzy matching validation
+      </functionality-testing>
+
+      <performance-testing>
+        - Search response time <500ms
+        - Filter application speed
+        - Memory usage during search
+        - Database query optimization
+        - UI responsiveness during operations
+      </performance-testing>
+    </search-testing>
+  </testing-strategy>
+
+  <success-metrics>
+    <export-metrics>
+      - Export generation time <3 seconds (100 receipts)
+      - Format validation success rate 100%
+      - Accounting software import success rate >95%
+      - User export completion rate >90%
+      - Export file download success rate >99%
+    </export-metrics>
+
+    <search-metrics>
+      - Search response time <500ms
+      - Search result accuracy >90%
+      - Filter application time <200ms
+      - User search success rate >85%
+      - Search feature adoption >60%
+    </search-metrics>
+
+    <user-satisfaction>
+      - Export feature rating >4.2/5
+      - Search feature rating >4.0/5
+      - Accounting workflow improvement rating >4.5/5
+      - Time savings vs manual entry >80%
+      - Feature recommendation rate >70%
+    </user-satisfaction>
+  </success-metrics>
+
+  <future-enhancements>
+    <api-integrations>
+      - Direct QuickBooks Online sync
+      - Xero real-time integration
+      - FreshBooks connectivity
+      - Sage 50 integration
+      - Custom API webhook support
+    </api-integrations>
+
+    <advanced-features>
+      - Machine learning for receipt categorization
+      - Smart duplicate detection algorithms
+      - Automated receipt grouping by trips/projects
+      - OCR confidence-based export filtering
+      - Advanced analytics and insights
+    </advanced-features>
+
+    <enterprise-features>
+      - Multi-user workspace support
+      - Role-based access control
+      - Audit trail and compliance reporting
+      - Custom approval workflows
+      - Enterprise SSO integration
+    </enterprise-features>
+  </future-enhancements>
+</poml>
