@@ -7,6 +7,7 @@ import 'package:receipt_organizer/features/capture/widgets/ocr_results_widget.da
 import 'package:receipt_organizer/features/receipts/presentation/widgets/confidence_badge.dart';
 import 'package:receipt_organizer/shared/widgets/confidence_score_widget.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 
 class BatchReviewScreen extends ConsumerStatefulWidget {
   const BatchReviewScreen({super.key});
@@ -16,17 +17,20 @@ class BatchReviewScreen extends ConsumerStatefulWidget {
 }
 
 class _BatchReviewScreenState extends ConsumerState<BatchReviewScreen> {
-  final Map<String, Receipt> _recentlyDeleted = {};
+  final Map<String, Map<String, dynamic>> _recentlyDeleted = {};
   final Set<String> _expandedReceipts = {};
   final ICSVExportService _csvExportService = CSVExportService();
   bool _isExporting = false;
 
   void _deleteReceipt(Receipt receipt) {
+    final batchState = ref.read(batchCaptureProvider);
+    final index = batchState.receipts.indexOf(receipt);
+
     setState(() {
-      _recentlyDeleted[receipt.id] = receipt;
+      _recentlyDeleted[receipt.id] = <String, dynamic>{'receipt': receipt, 'index': index};
     });
-    
-    ref.read(batchCaptureProvider.notifier).removeReceipt(receipt.id);
+
+    ref.read(batchCaptureProvider.notifier).removeReceipt(index);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -45,10 +49,12 @@ class _BatchReviewScreenState extends ConsumerState<BatchReviewScreen> {
   }
 
   void _undoDelete(String receiptId) {
-    final receipt = _recentlyDeleted[receiptId];
-    if (receipt != null) {
+    final data = _recentlyDeleted[receiptId];
+    if (data != null) {
+      final receipt = data['receipt'] as Receipt;
+      final index = data['index'] as int;
       final notifier = ref.read(batchCaptureProvider.notifier);
-      notifier.restoreReceipt(receipt);
+      notifier.restoreReceipt(receipt, index);
       setState(() {
         _recentlyDeleted.remove(receiptId);
       });
@@ -309,7 +315,7 @@ class _BatchReviewScreenState extends ConsumerState<BatchReviewScreen> {
         content: const Text('Choose the CSV format for your accounting software:'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(ExportFormat.quickbooks),
+            onPressed: () => Navigator.of(context).pop(ExportFormat.quickBooks3Column),
             child: const Text('QuickBooks'),
           ),
           TextButton(

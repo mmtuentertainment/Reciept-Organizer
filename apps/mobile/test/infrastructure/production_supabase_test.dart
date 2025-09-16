@@ -1,9 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/infrastructure/config/supabase_config.dart';
 import 'package:receipt_organizer/infrastructure/config/production_config.dart';
+import '../helpers/test_setup.dart';
 
 void main() {
   group('Production Supabase Configuration', () {
+    setUpAll(() async {
+      await setupTestEnvironment();
+    });
     test('should use production URL and key', () {
       // Verify production config is loaded
       expect(ProductionConfig.supabaseUrl, 'https://xbadaalqaeszooyxuoac.supabase.co');
@@ -34,7 +38,7 @@ void main() {
     test('should be able to initialize Supabase', () async {
       // This tests that the configuration is valid
       try {
-        await SupabaseConfig.initialize();
+        await initializeSupabaseForTesting();
         expect(SupabaseConfig.isInitialized, true);
 
         // Verify client exists

@@ -4,8 +4,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 
-enum ExportFormat { quickbooks, xero, generic }
-
 class ValidationResult {
   final bool isValid;
   final List<String> errors;
@@ -98,12 +96,12 @@ class CSVExportService implements ICSVExportService {
       final receiptWarnings = <String>[];
       
       // Check required fields based on format
-      if (format == ExportFormat.quickbooks || format == ExportFormat.xero) {
+      if (format == ExportFormat.quickBooks3Column || format == ExportFormat.quickBooks4Column || format == ExportFormat.xero) {
         if (receipt.merchantName == null || receipt.merchantName!.isEmpty) {
           receiptErrors.add('Receipt ${i + 1}: Missing merchant name');
         }
         
-        if (receipt.receiptDate == null || receipt.receiptDate!.isEmpty) {
+        if (receipt.receiptDate == null) {
           receiptErrors.add('Receipt ${i + 1}: Missing date');
         }
         
@@ -117,7 +115,7 @@ class CSVExportService implements ICSVExportService {
         }
         
         // Format-specific validations
-        if (format == ExportFormat.quickbooks) {
+        if (format == ExportFormat.quickBooks3Column || format == ExportFormat.quickBooks4Column) {
           // QuickBooks-specific validations
           if (receipt.merchantName != null && receipt.merchantName!.length > 100) {
             receiptWarnings.add('Receipt ${i + 1}: Merchant name may be too long for QuickBooks');
@@ -190,7 +188,8 @@ class CSVExportService implements ICSVExportService {
     const bom = '\uFEFF';
     
     switch (format) {
-      case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         return bom + _generateQuickBooksCSV(receipts);
       case ExportFormat.xero:
         return bom + _generateXeroCSV(receipts);
@@ -202,7 +201,8 @@ class CSVExportService implements ICSVExportService {
   @override
   List<String> getRequiredFields(ExportFormat format) {
     switch (format) {
-      case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         return ['Date', 'Amount', 'Payee', 'Category'];
       case ExportFormat.xero:
         return ['Date', 'Amount', 'Payee', 'Account Code'];
@@ -321,47 +321,9 @@ class CSVExportService implements ICSVExportService {
     return sanitized;
   }
 
-  String? _formatDate(String? dateStr) {
-    if (dateStr == null) return null;
-    
-    try {
-      // Try to parse and reformat to MM/DD/YYYY
-      DateTime? date;
-      
-      // Try common formats
-      final formats = [
-        RegExp(r'^(\d{1,2})[/\-](\d{1,2})[/\-](\d{4})$'), // MM/DD/YYYY or MM-DD-YYYY
-        RegExp(r'^(\d{4})[/\-](\d{1,2})[/\-](\d{1,2})$'), // YYYY/MM/DD or YYYY-MM-DD
-      ];
-      
-      for (final format in formats) {
-        final match = format.firstMatch(dateStr);
-        if (match != null) {
-          if (format == formats[0]) {
-            // MM/DD/YYYY format
-            final month = int.parse(match.group(1)!);
-            final day = int.parse(match.group(2)!);
-            final year = int.parse(match.group(3)!);
-            date = DateTime(year, month, day);
-          } else {
-            // YYYY/MM/DD format
-            final year = int.parse(match.group(1)!);
-            final month = int.parse(match.group(2)!);
-            final day = int.parse(match.group(3)!);
-            date = DateTime(year, month, day);
-          }
-          break;
-        }
-      }
-      
-      if (date != null) {
-        return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
-      }
-    } catch (e) {
-      // If parsing fails, return the original string
-    }
-    
-    return dateStr;
+  String? _formatDate(DateTime? date) {
+    if (date == null) return null;
+    return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
   }
 
   String _formatDateTime(DateTime dateTime) {
@@ -369,100 +331,15 @@ class CSVExportService implements ICSVExportService {
   }
 
   /// Format date for QuickBooks (MM/DD/YYYY)
-  String? _formatDateQuickBooks(String? dateStr) {
-    if (dateStr == null) return null;
-
-    try {
-      // Try to parse various date formats and convert to MM/DD/YYYY
-      DateTime? date;
-
-      // Try common formats
-      final formats = [
-        RegExp(r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})'), // MM/DD/YYYY or MM-DD-YYYY
-        RegExp(r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})'), // YYYY-MM-DD
-        RegExp(r'(\d{1,2})[/-](\d{1,2})[/-](\d{2})'), // MM/DD/YY
-      ];
-
-      for (final format in formats) {
-        final match = format.firstMatch(dateStr);
-        if (match != null) {
-          if (format.pattern.startsWith(r'(\d{4})')) {
-            // YYYY-MM-DD format
-            final year = int.parse(match.group(1)!);
-            final month = int.parse(match.group(2)!);
-            final day = int.parse(match.group(3)!);
-            date = DateTime(year, month, day);
-          } else {
-            // MM/DD/YYYY or MM/DD/YY format
-            final month = int.parse(match.group(1)!);
-            final day = int.parse(match.group(2)!);
-            var year = int.parse(match.group(3)!);
-            if (year < 100) {
-              year += (year > 50) ? 1900 : 2000;
-            }
-            date = DateTime(year, month, day);
-          }
-          break;
-        }
-      }
-
-      if (date != null) {
-        return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
-      }
-    } catch (e) {
-      // If parsing fails, return the original string
-    }
-
-    return dateStr;
+  String? _formatDateQuickBooks(DateTime? date) {
+    if (date == null) return null;
+    return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
   }
 
   /// Format date for Xero (DD/MM/YYYY)
-  String? _formatDateXero(String? dateStr) {
-    if (dateStr == null) return null;
-
-    try {
-      // Try to parse various date formats and convert to DD/MM/YYYY
-      DateTime? date;
-
-      // Try common formats
-      final formats = [
-        RegExp(r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})'), // MM/DD/YYYY or DD/MM/YYYY
-        RegExp(r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})'), // YYYY-MM-DD
-        RegExp(r'(\d{1,2})[/-](\d{1,2})[/-](\d{2})'), // MM/DD/YY
-      ];
-
-      for (final format in formats) {
-        final match = format.firstMatch(dateStr);
-        if (match != null) {
-          if (format.pattern.startsWith(r'(\d{4})')) {
-            // YYYY-MM-DD format
-            final year = int.parse(match.group(1)!);
-            final month = int.parse(match.group(2)!);
-            final day = int.parse(match.group(3)!);
-            date = DateTime(year, month, day);
-          } else {
-            // Assume MM/DD/YYYY format for parsing
-            final month = int.parse(match.group(1)!);
-            final day = int.parse(match.group(2)!);
-            var year = int.parse(match.group(3)!);
-            if (year < 100) {
-              year += (year > 50) ? 1900 : 2000;
-            }
-            date = DateTime(year, month, day);
-          }
-          break;
-        }
-      }
-
-      if (date != null) {
-        // Return in DD/MM/YYYY format for Xero
-        return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-      }
-    } catch (e) {
-      // If parsing fails, return the original string
-    }
-
-    return dateStr;
+  String? _formatDateXero(DateTime? date) {
+    if (date == null) return null;
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
   @override
@@ -517,7 +394,8 @@ class CSVExportService implements ICSVExportService {
     int batchSize;
 
     switch (format) {
-      case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         batchSize = quickBooksBatchSize;
         break;
       case ExportFormat.xero:

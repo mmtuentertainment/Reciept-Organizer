@@ -1,9 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/infrastructure/config/supabase_config.dart';
 import 'package:receipt_organizer/infrastructure/config/production_config.dart';
+import '../helpers/test_setup.dart';
 
 void main() {
   group('Production Auth Flow Test', () {
+    setUpAll(() async {
+      await setupTestEnvironment();
+    });
+
     test('should connect to production Supabase', () async {
       // Verify production configuration
       expect(ProductionConfig.supabaseUrl, 'https://xbadaalqaeszooyxuoac.supabase.co');
@@ -21,7 +26,7 @@ void main() {
     test('should be ready for authentication', () async {
       // Try to initialize Supabase
       try {
-        await SupabaseConfig.initialize();
+        await initializeSupabaseForTesting();
         expect(SupabaseConfig.isInitialized, true);
 
         final client = SupabaseConfig.client;
