@@ -15,17 +15,27 @@ class Receipt {
   final DateTime lastModified;
   final String? notes;
 
-  // Additional fields for Supabase integration
-  final String? merchant;
-  final String? receiptDate;
-  final double? total;
-  final double? tax;
-  final String? category;
-  final String? paymentMethod;
-  final String? imageUrl;
-  final double? ocrConfidence;
+  // Database fields matching exact schema from docs/stories/1.1-enhanced-database-schema.md
+  final String? vendorName;       // vendor_name VARCHAR(255)
+  final DateTime? receiptDate;    // receipt_date DATE
+  final double? totalAmount;      // total_amount DECIMAL(10,2)
+  final double? taxAmount;        // tax_amount DECIMAL(10,2)
+  final double? tipAmount;        // tip_amount DECIMAL(10,2)
+  final String? currency;         // currency VARCHAR(3)
+  final String? categoryId;       // category_id UUID
+  final String? subcategory;      // subcategory VARCHAR(100)
+  final String? paymentMethod;    // payment_method VARCHAR(50)
+  final double? ocrConfidence;    // ocr_confidence DECIMAL(5,2)
+  final String? ocrRawText;       // ocr_raw_text TEXT
+  final bool? isProcessed;        // is_processed BOOLEAN
+  final bool? needsReview;        // needs_review BOOLEAN
+  final String? imageUrl;         // image_url TEXT (same as imageUri for compatibility)
+  final String? businessPurpose;  // business_purpose TEXT
+  final List<String>? tags;        // tags TEXT[]
   final DateTime? createdAt;
   final DateTime? updatedAt;
+
+  // Not in database but used for sync tracking
   final String? syncStatus;
   final DateTime? lastSyncAt;
 
@@ -40,14 +50,22 @@ class Receipt {
     this.ocrResults,
     DateTime? lastModified,
     this.notes,
-    this.merchant,
+    this.vendorName,
     this.receiptDate,
-    this.total,
-    this.tax,
-    this.category,
+    this.totalAmount,
+    this.taxAmount,
+    this.tipAmount,
+    this.currency,
+    this.categoryId,
+    this.subcategory,
     this.paymentMethod,
-    this.imageUrl,
     this.ocrConfidence,
+    this.ocrRawText,
+    this.isProcessed,
+    this.needsReview,
+    this.imageUrl,
+    this.businessPurpose,
+    this.tags,
     this.createdAt,
     this.updatedAt,
     this.syncStatus,
@@ -68,14 +86,22 @@ class Receipt {
     ProcessingResult? ocrResults,
     DateTime? lastModified,
     String? notes,
-    String? merchant,
-    String? receiptDate,
-    double? total,
-    double? tax,
-    String? category,
+    String? vendorName,
+    DateTime? receiptDate,
+    double? totalAmount,
+    double? taxAmount,
+    double? tipAmount,
+    String? currency,
+    String? categoryId,
+    String? subcategory,
     String? paymentMethod,
-    String? imageUrl,
     double? ocrConfidence,
+    String? ocrRawText,
+    bool? isProcessed,
+    bool? needsReview,
+    String? imageUrl,
+    String? businessPurpose,
+    List<String>? tags,
     DateTime? createdAt,
     DateTime? updatedAt,
     String? syncStatus,
@@ -92,14 +118,22 @@ class Receipt {
       ocrResults: ocrResults ?? this.ocrResults,
       lastModified: lastModified ?? this.lastModified,
       notes: notes ?? this.notes,
-      merchant: merchant ?? this.merchant,
+      vendorName: vendorName ?? this.vendorName,
       receiptDate: receiptDate ?? this.receiptDate,
-      total: total ?? this.total,
-      tax: tax ?? this.tax,
-      category: category ?? this.category,
+      totalAmount: totalAmount ?? this.totalAmount,
+      taxAmount: taxAmount ?? this.taxAmount,
+      tipAmount: tipAmount ?? this.tipAmount,
+      currency: currency ?? this.currency,
+      categoryId: categoryId ?? this.categoryId,
+      subcategory: subcategory ?? this.subcategory,
       paymentMethod: paymentMethod ?? this.paymentMethod,
-      imageUrl: imageUrl ?? this.imageUrl,
       ocrConfidence: ocrConfidence ?? this.ocrConfidence,
+      ocrRawText: ocrRawText ?? this.ocrRawText,
+      isProcessed: isProcessed ?? this.isProcessed,
+      needsReview: needsReview ?? this.needsReview,
+      imageUrl: imageUrl ?? this.imageUrl,
+      businessPurpose: businessPurpose ?? this.businessPurpose,
+      tags: tags ?? this.tags,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       syncStatus: syncStatus ?? this.syncStatus,
@@ -107,20 +141,13 @@ class Receipt {
     );
   }
 
-  // Convenience getters for OCR data
-  String? get merchantName => merchant ?? ocrResults?.merchant?.value?.toString();
-  String? get ocrReceiptDate => ocrResults?.date?.value?.toString();
-  double? get totalAmount {
-    if (total != null) return total;
-    final value = ocrResults?.total?.value;
-    if (value == null) return null;
-    if (value is double) return value;
-    if (value is String) return double.tryParse(value);
-    return null;
-  }
-  double? get taxAmount {
-    if (tax != null) return tax;
-    final value = ocrResults?.tax?.value;
+  // Convenience getters - prefer database fields over OCR extraction
+  String? get merchant => vendorName ?? ocrResults?.merchant?.value?.toString();
+  String? get merchantName => vendorName; // Alias for compatibility
+  double? get total => totalAmount ?? _extractOcrAmount(ocrResults?.total?.value);
+  double? get tax => taxAmount ?? _extractOcrAmount(ocrResults?.tax?.value);
+
+  double? _extractOcrAmount(dynamic value) {
     if (value == null) return null;
     if (value is double) return value;
     if (value is String) return double.tryParse(value);
@@ -129,10 +156,10 @@ class Receipt {
 
   bool get hasOCRResults => ocrResults != null;
   bool get isComplete =>
-      merchantName?.isNotEmpty == true &&
-      (receiptDate?.isNotEmpty == true || ocrReceiptDate?.isNotEmpty == true) &&
-      totalAmount != null &&
-      totalAmount! > 0;
+      merchant?.isNotEmpty == true &&
+      receiptDate != null &&
+      total != null &&
+      total! > 0;
 
   double get overallConfidence => ocrResults?.overallConfidence ?? 0.0;
 
@@ -147,25 +174,28 @@ class Receipt {
       'batchId': batchId,
       'lastModified': lastModified.toIso8601String(),
       'notes': notes,
-      // Direct fields for Supabase
-      'merchant': merchant ?? merchantName,
-      'receiptDate': receiptDate ?? ocrReceiptDate,
-      'total': total ?? totalAmount,
-      'tax': tax ?? taxAmount,
-      'category': category,
-      'paymentMethod': paymentMethod,
-      'imageUrl': imageUrl ?? imageUri,
-      'ocrConfidence': ocrConfidence ?? overallConfidence,
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-      'syncStatus': syncStatus,
-      'lastSyncAt': lastSyncAt?.toIso8601String(),
-      // OCR results would need custom serialization for complex objects
-      'merchantName': merchantName,
-      'ocrReceiptDate': ocrReceiptDate,
-      'totalAmount': totalAmount,
-      'taxAmount': taxAmount,
-      'overallConfidence': overallConfidence,
+      // Database fields - using snake_case for database compatibility
+      'user_id': userId,
+      'vendor_name': vendorName,
+      'receipt_date': receiptDate?.toIso8601String()?.substring(0, 10), // DATE format
+      'total_amount': totalAmount,
+      'tax_amount': taxAmount,
+      'tip_amount': tipAmount,
+      'currency': currency,
+      'category_id': categoryId,
+      'subcategory': subcategory,
+      'payment_method': paymentMethod,
+      'ocr_confidence': ocrConfidence,
+      'ocr_raw_text': ocrRawText,
+      'is_processed': isProcessed,
+      'needs_review': needsReview,
+      'image_url': imageUrl ?? imageUri,
+      'business_purpose': businessPurpose,
+      'tags': tags,
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
+      'sync_status': syncStatus,
+      'last_sync_at': lastSyncAt?.toIso8601String(),
     };
   }
 
@@ -174,47 +204,77 @@ class Receipt {
       id: json['id'],
       userId: json['userId'] ?? json['user_id'],
       imageUri: json['imageUri'] ?? json['image_url'] ?? '',
-      thumbnailUri: json['thumbnailUri'],
+      thumbnailUri: json['thumbnailUri'] ?? json['thumbnail_uri'],
       capturedAt: json['capturedAt'] != null
           ? DateTime.parse(json['capturedAt'])
-          : DateTime.now(),
+          : (json['captured_at'] != null
+              ? DateTime.parse(json['captured_at'])
+              : DateTime.now()),
       status: ReceiptStatus.values.firstWhere(
         (e) => e.name == json['status'],
         orElse: () => ReceiptStatus.captured,
       ),
-      batchId: json['batchId'],
+      batchId: json['batchId'] ?? json['batch_id'],
       lastModified: json['lastModified'] != null
           ? DateTime.parse(json['lastModified'])
-          : DateTime.now(),
+          : (json['last_modified'] != null
+              ? DateTime.parse(json['last_modified'])
+              : DateTime.now()),
       notes: json['notes'],
-      // Supabase fields
-      merchant: json['merchant'],
-      receiptDate: json['receiptDate'] ?? json['receipt_date'],
-      total: json['total'] != null ? (json['total'] as num).toDouble() : null,
-      tax: json['tax'] != null ? (json['tax'] as num).toDouble() : null,
-      category: json['category'],
-      paymentMethod: json['paymentMethod'] ?? json['payment_method'],
-      imageUrl: json['imageUrl'] ?? json['image_url'],
-      ocrConfidence: json['ocrConfidence'] != null
-          ? (json['ocrConfidence'] as num).toDouble()
-          : (json['ocr_confidence'] != null
-              ? (json['ocr_confidence'] as num).toDouble()
+      // Database fields
+      vendorName: json['vendor_name'] ?? json['vendorName'],
+      receiptDate: json['receipt_date'] != null
+          ? DateTime.parse(json['receipt_date'])
+          : (json['receiptDate'] != null
+              ? DateTime.parse(json['receiptDate'])
               : null),
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : (json['created_at'] != null
-              ? DateTime.parse(json['created_at'])
+      totalAmount: json['total_amount'] != null
+          ? (json['total_amount'] as num).toDouble()
+          : (json['totalAmount'] != null
+              ? (json['totalAmount'] as num).toDouble()
               : null),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
-          : (json['updated_at'] != null
-              ? DateTime.parse(json['updated_at'])
+      taxAmount: json['tax_amount'] != null
+          ? (json['tax_amount'] as num).toDouble()
+          : (json['taxAmount'] != null
+              ? (json['taxAmount'] as num).toDouble()
               : null),
-      syncStatus: json['syncStatus'] ?? json['sync_status'],
-      lastSyncAt: json['lastSyncAt'] != null
-          ? DateTime.parse(json['lastSyncAt'])
-          : (json['last_sync_at'] != null
-              ? DateTime.parse(json['last_sync_at'])
+      tipAmount: json['tip_amount'] != null
+          ? (json['tip_amount'] as num).toDouble()
+          : (json['tipAmount'] != null
+              ? (json['tipAmount'] as num).toDouble()
+              : null),
+      currency: json['currency'],
+      categoryId: json['category_id'] ?? json['categoryId'],
+      subcategory: json['subcategory'],
+      paymentMethod: json['payment_method'] ?? json['paymentMethod'],
+      ocrConfidence: json['ocr_confidence'] != null
+          ? (json['ocr_confidence'] as num).toDouble()
+          : (json['ocrConfidence'] != null
+              ? (json['ocrConfidence'] as num).toDouble()
+              : null),
+      ocrRawText: json['ocr_raw_text'] ?? json['ocrRawText'],
+      isProcessed: json['is_processed'] ?? json['isProcessed'],
+      needsReview: json['needs_review'] ?? json['needsReview'],
+      imageUrl: json['image_url'] ?? json['imageUrl'] ?? json['imageUri'],
+      businessPurpose: json['business_purpose'] ?? json['businessPurpose'],
+      tags: json['tags'] != null
+          ? List<String>.from(json['tags'])
+          : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : (json['createdAt'] != null
+              ? DateTime.parse(json['createdAt'])
+              : null),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : (json['updatedAt'] != null
+              ? DateTime.parse(json['updatedAt'])
+              : null),
+      syncStatus: json['sync_status'] ?? json['syncStatus'],
+      lastSyncAt: json['last_sync_at'] != null
+          ? DateTime.parse(json['last_sync_at'])
+          : (json['lastSyncAt'] != null
+              ? DateTime.parse(json['lastSyncAt'])
               : null),
       // OCR results would need to be reconstructed from individual fields
     );
@@ -222,6 +282,6 @@ class Receipt {
 
   @override
   String toString() {
-    return 'Receipt(id: $id, imageUri: $imageUri, capturedAt: $capturedAt, status: $status, batchId: $batchId, merchant: $merchantName, total: $totalAmount)';
+    return 'Receipt(id: $id, imageUri: $imageUri, capturedAt: $capturedAt, status: $status, batchId: $batchId, merchant: $vendorName, total: $totalAmount)';
   }
 }

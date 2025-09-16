@@ -58,23 +58,29 @@ class BatchCaptureNotifier extends StateNotifier<BatchCaptureState> {
     );
   }
 
-  void captureReceipt(String imagePath) {
-    // Create a new receipt from the image
-    final receipt = Receipt(
-      imageUri: imagePath,
-      status: ReceiptStatus.captured,
-      batchId: DateTime.now().millisecondsSinceEpoch.toString(),
-    );
+  Future<bool> captureReceipt(String imagePath) async {
+    try {
+      // Create a new receipt from the image
+      final receipt = Receipt(
+        imageUri: imagePath,
+        status: ReceiptStatus.captured,
+        batchId: DateTime.now().millisecondsSinceEpoch.toString(),
+      );
 
-    state = state.copyWith(
-      receipts: [...state.receipts, receipt],
-      capturedImages: [...state.capturedImages, imagePath],
-      currentIndex: state.currentIndex + 1,
-    );
+      state = state.copyWith(
+        receipts: [...state.receipts, receipt],
+        capturedImages: [...state.capturedImages, imagePath],
+        currentIndex: state.currentIndex + 1,
+      );
 
-    // Stop capturing if batch size reached
-    if (state.receipts.length >= state.batchSize) {
-      state = state.copyWith(isCapturing: false);
+      // Stop capturing if batch size reached
+      if (state.receipts.length >= state.batchSize) {
+        state = state.copyWith(isCapturing: false);
+      }
+
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
