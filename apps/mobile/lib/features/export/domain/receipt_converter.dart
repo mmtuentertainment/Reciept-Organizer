@@ -7,34 +7,9 @@ class ReceiptConverter {
   static core.Receipt fromDataReceipt(data.Receipt dataReceipt) {
     // Extract values using the convenience getters
     String? merchantName = dataReceipt.merchantName;
-    String? dateStr = dataReceipt.receiptDate;
+    DateTime? date = dataReceipt.receiptDate;
     double? totalAmount = dataReceipt.totalAmount;
     double? taxAmount = dataReceipt.taxAmount;
-    
-    // Parse date from string if available
-    DateTime? date;
-    if (dateStr != null && dateStr.isNotEmpty) {
-      try {
-        // Try to parse different date formats
-        if (dateStr.contains('/')) {
-          // Handle MM/DD/YYYY or DD/MM/YYYY format
-          final parts = dateStr.split('/');
-          if (parts.length == 3) {
-            // Assume MM/DD/YYYY for now (QuickBooks format)
-            final month = int.tryParse(parts[0]) ?? 1;
-            final day = int.tryParse(parts[1]) ?? 1;
-            final year = int.tryParse(parts[2]) ?? DateTime.now().year;
-            date = DateTime(year, month, day);
-          }
-        } else {
-          // Try ISO format
-          date = DateTime.tryParse(dateStr);
-        }
-      } catch (e) {
-        // If parsing fails, use current date as fallback
-        date = DateTime.now();
-      }
-    }
     
     // Convert ProcessingResult to core model if available
     core.ProcessingResult? ocrResults;
@@ -99,12 +74,11 @@ class ReceiptConverter {
   /// Check if a data Receipt has minimum required fields for export
   static bool hasMinimumFieldsForExport(data.Receipt receipt) {
     if (receipt.ocrResults == null) return false;
-    
+
     // Use the receipt's convenience getters to check for required fields
     return receipt.merchantName != null &&
            receipt.merchantName!.isNotEmpty &&
            receipt.receiptDate != null &&
-           receipt.receiptDate!.isNotEmpty &&
            receipt.totalAmount != null &&
            receipt.totalAmount! > 0;
   }

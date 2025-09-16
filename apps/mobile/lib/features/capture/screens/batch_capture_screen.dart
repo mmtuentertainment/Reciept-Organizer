@@ -56,7 +56,8 @@ class _BatchCaptureScreenState extends ConsumerState<BatchCaptureScreen>
 
   Future<void> _captureReceipt() async {
     final notifier = ref.read(batchCaptureProvider.notifier);
-    final success = await notifier.captureReceipt();
+    // TODO: Integrate with actual camera capture
+    final success = await notifier.captureReceipt('path/to/captured/image.jpg');
 
     if (success && mounted) {
       HapticFeedback.lightImpact();

@@ -86,14 +86,14 @@ void main() {
       final testData = dataGenerator.generateReceipts(count: 30);
       final receipts = testData.map((data) => Receipt(
         id: data['id'] ?? 'test-id',
-        merchantName: data['merchant'],
-        receiptDate: _formatDateString(data['date'] as DateTime),
+        vendorName: data['merchant'],
+        receiptDate: data['date'] as DateTime,
         totalAmount: (data['total'] as num).toDouble(),
         taxAmount: (data['tax'] as num?)?.toDouble(),
         notes: data['notes'],
         capturedAt: DateTime.now(),
         imagePath: 'test/image.jpg',
-        status: ReceiptStatus.processed,
+        status: ReceiptStatus.ready,
         overallConfidence: 85.0,
       )).toList();
 
@@ -151,14 +151,14 @@ void main() {
 
           receipts.add(Receipt(
             id: data['id'] ?? 'edge-${receipts.length}',
-            merchantName: data['merchant'],
-            receiptDate: _formatDateString(data['date'] as DateTime),
+            vendorName: data['merchant'],
+            receiptDate: data['date'] as DateTime,
             totalAmount: (data['total'] as num).toDouble(),
             taxAmount: (data['tax'] as num?)?.toDouble(),
             notes: data['notes'],
             capturedAt: DateTime.now(),
             imagePath: 'test/edge.jpg',
-            status: ReceiptStatus.processed,
+            status: ReceiptStatus.ready,
             overallConfidence: 75.0,
           ));
         }
@@ -204,14 +204,14 @@ void main() {
       final testData = dataGenerator.generateReceipts(count: 2500);
       final receipts = testData.map((data) => Receipt(
         id: data['id'] ?? 'bulk-id',
-        merchantName: data['merchant'],
-        receiptDate: _formatDateString(data['date'] as DateTime),
+        vendorName: data['merchant'],
+        receiptDate: data['date'] as DateTime,
         totalAmount: (data['total'] as num).toDouble(),
         taxAmount: (data['tax'] as num?)?.toDouble(),
         notes: data['notes'],
         capturedAt: DateTime.now(),
         imagePath: 'test/bulk.jpg',
-        status: ReceiptStatus.processed,
+        status: ReceiptStatus.ready,
         overallConfidence: 90.0,
       )).toList();
 
@@ -249,12 +249,12 @@ void main() {
 
       final receipts = testDates.map((date) => Receipt(
         id: 'date-test',
-        merchantName: 'Test Store',
+        vendorName: 'Test Store',
         receiptDate: date,
         totalAmount: 100.00,
         capturedAt: DateTime.now(),
         imagePath: 'test/date.jpg',
-        status: ReceiptStatus.processed,
+        status: ReceiptStatus.ready,
         overallConfidence: 95.0,
       )).toList();
 
@@ -289,14 +289,14 @@ void main() {
         final testData = dataGenerator.generateReceipts(count: size);
         final receipts = testData.map((data) => Receipt(
           id: data['id'] ?? 'perf-id',
-          merchantName: data['merchant'],
-          receiptDate: _formatDateString(data['date'] as DateTime),
+          vendorName: data['merchant'],
+          receiptDate: data['date'] as DateTime,
           totalAmount: (data['total'] as num).toDouble(),
           taxAmount: (data['tax'] as num?)?.toDouble(),
           notes: data['notes'],
           capturedAt: DateTime.now(),
           imagePath: 'test/perf.jpg',
-          status: ReceiptStatus.processed,
+          status: ReceiptStatus.ready,
           overallConfidence: 95.0,
         )).toList();
 
@@ -329,14 +329,14 @@ void main() {
       final testData = dataGenerator.generateReceipts(count: 5);
       final receipts = testData.map((data) => Receipt(
         id: data['id'] ?? 'file-test',
-        merchantName: data['merchant'],
-        receiptDate: _formatDateString(data['date'] as DateTime),
+        vendorName: data['merchant'],
+        receiptDate: data['date'] as DateTime,
         totalAmount: (data['total'] as num).toDouble(),
         taxAmount: (data['tax'] as num?)?.toDouble(),
         notes: data['notes'],
         capturedAt: DateTime.now(),
         imagePath: 'test/file.jpg',
-        status: ReceiptStatus.processed,
+        status: ReceiptStatus.ready,
         overallConfidence: 95.0,
       )).toList();
 
@@ -369,10 +369,7 @@ void main() {
   });
 }
 
-// Helper function to format date
-String _formatDateString(DateTime date) {
-  return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
-}
+// Helper function removed - now using DateTime directly
 
 // Helper function to create Receipt with OCR data
 Receipt _createTestReceipt(Map<String, dynamic> data) {
@@ -384,7 +381,7 @@ Receipt _createTestReceipt(Map<String, dynamic> data) {
     ),
     date: ExtractedField(
       value: data['date'] is DateTime
-        ? _formatDateString(data['date'] as DateTime)
+        ? '${(data['date'] as DateTime).month.toString().padLeft(2, '0')}/${(data['date'] as DateTime).day.toString().padLeft(2, '0')}/${(data['date'] as DateTime).year}'
         : data['date'],
       confidence: 95.0,
       boundingBox: null,

@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 
@@ -33,7 +34,7 @@ void main() {
       ];
 
       // When
-      final csv = csvService.generateCSVContent(receipts, ExportFormat.quickbooks);
+      final csv = csvService.generateCSVContent(receipts, ExportFormat.quickBooks3Column);
 
       // Then
       expect(csv, contains('Date,Amount,Payee,Category'));
