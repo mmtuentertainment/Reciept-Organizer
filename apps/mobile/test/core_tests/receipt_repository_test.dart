@@ -54,6 +54,7 @@ void main() {
         id: 'yesterday',
         imageUri: '/image1.jpg',
         capturedAt: yesterday,
+        receiptDate: yesterday,
         ocrResults: ProcessingResult(
           date: FieldData(value: '${yesterday.month.toString().padLeft(2, '0')}/${yesterday.day.toString().padLeft(2, '0')}/${yesterday.year}', confidence: 0.9, originalText: 'date'),
           overallConfidence: 0.9,
@@ -64,8 +65,9 @@ void main() {
       
       await repository.createReceipt(Receipt(
         id: 'today',
-        imageUri: '/image2.jpg', 
+        imageUri: '/image2.jpg',
         capturedAt: now,
+        receiptDate: now,
         ocrResults: ProcessingResult(
           date: FieldData(value: '${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}', confidence: 0.9, originalText: 'date'),
           overallConfidence: 0.9,
@@ -78,6 +80,7 @@ void main() {
         id: 'tomorrow',
         imageUri: '/image3.jpg',
         capturedAt: tomorrow,
+        receiptDate: tomorrow,
         ocrResults: ProcessingResult(
           date: FieldData(value: '${tomorrow.month.toString().padLeft(2, '0')}/${tomorrow.day.toString().padLeft(2, '0')}/${tomorrow.year}', confidence: 0.9, originalText: 'date'),
           overallConfidence: 0.9,

@@ -335,7 +335,7 @@ class _BatchReviewScreenState extends ConsumerState<BatchReviewScreen> {
     );
   }
 
-  Future<void> _showValidationDialog(ValidationResult validation) async {
+  Future<void> _showValidationDialog(CSVValidationResult validation) async {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -371,7 +371,7 @@ class _BatchReviewScreenState extends ConsumerState<BatchReviewScreen> {
     );
   }
 
-  Future<bool> _showWarningsDialog(ValidationResult validation) async {
+  Future<bool> _showWarningsDialog(CSVValidationResult validation) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
