@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as path;
-import '../../domain/services/ocr_service.dart';
+import '../../../domain/services/ocr_service.dart';
 import '../presentation/widgets/notes_field_editor.dart';
 
 class ReceiptPreviewScreen extends ConsumerStatefulWidget {

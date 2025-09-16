@@ -79,7 +79,12 @@ class OfflineAuthService {
       }
 
       // Reconstruct session from cached data
-      final user = User.fromJson(data['user']);
+      final userData = data['user'];
+      if (userData == null) return null;
+
+      final user = User.fromJson(userData);
+      if (user == null) return null;
+
       return Session(
         accessToken: data['access_token'],
         refreshToken: data['refresh_token'],
@@ -110,6 +115,12 @@ class OfflineAuthService {
   /// Check network connectivity
   static Future<bool> isOnline() async {
     final connectivityResult = await Connectivity().checkConnectivity();
+    // connectivity_plus now returns a List<ConnectivityResult>
+    if (connectivityResult is List) {
+      return !connectivityResult.contains(ConnectivityResult.none) &&
+             connectivityResult.isNotEmpty;
+    }
+    // Fallback for older versions
     return connectivityResult != ConnectivityResult.none;
   }
 
