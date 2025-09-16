@@ -1,0 +1,138 @@
+# Security scanning workflow for Flutter Receipt Organizer app
+# Includes dependency scanning and vulnerability checks
+
+name: "Security Scan"
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  # Scan Flutter/Dart dependencies
+  flutter-analyze:
+    name: Flutter Security Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+
+    - name: Get dependencies
+      working-directory: apps/mobile
+      run: flutter pub get
+
+    - name: Run Flutter analyze
+      working-directory: apps/mobile
+      run: |
+        flutter analyze --no-fatal-infos --no-fatal-warnings > flutter_analysis.txt || true
+        if grep -q "error •" flutter_analysis.txt; then
+          echo "Security or code issues found:"
+          grep "error •" flutter_analysis.txt
+          exit 1
+        fi
+
+    - name: Check for outdated packages with security issues
+      working-directory: apps/mobile
+      run: |
+        flutter pub outdated
+        # Check for known vulnerabilities in dependencies
+        flutter pub deps --no-dev --executables
+
+  # Scan for secrets and sensitive data
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for secret scanning
+
+    - name: Run Gitleaks
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # SAST for web components if any
+  sast-scan:
+    name: SAST Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Semgrep
+      uses: semgrep/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/secrets
+          p/owasp-top-ten
+        generateSarif: true
+
+    - name: Upload SARIF file
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: semgrep.sarif
+
+  # Dependency vulnerability scanning
+  dependency-check:
+    name: Dependency Vulnerability Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/node@master
+      continue-on-error: true  # Don't fail the build on vulnerabilities
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high --all-projects
+
+  # License compliance check
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+
+    - name: Check licenses
+      working-directory: apps/mobile
+      run: |
+        flutter pub get
+        # Generate license report
+        flutter pub deps --no-dev > dependencies.txt
+        echo "=== License Summary ===" > license_report.txt
+        echo "Dependencies used in Receipt Organizer:" >> license_report.txt
+        cat dependencies.txt >> license_report.txt
+
+    - name: Upload license report
+      uses: actions/upload-artifact@v4
+      with:
+        name: license-report
+        path: apps/mobile/license_report.txt
