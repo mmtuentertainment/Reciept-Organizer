@@ -108,9 +108,10 @@ class Receipt {
   }
 
   // Convenience getters for OCR data
-  String? get merchantName => ocrResults?.merchant?.value?.toString();
-  String? get receiptDate => ocrResults?.date?.value?.toString();
+  String? get merchantName => merchant ?? ocrResults?.merchant?.value?.toString();
+  String? get ocrReceiptDate => ocrResults?.date?.value?.toString();
   double? get totalAmount {
+    if (total != null) return total;
     final value = ocrResults?.total?.value;
     if (value == null) return null;
     if (value is double) return value;
@@ -118,6 +119,7 @@ class Receipt {
     return null;
   }
   double? get taxAmount {
+    if (tax != null) return tax;
     final value = ocrResults?.tax?.value;
     if (value == null) return null;
     if (value is double) return value;
@@ -126,10 +128,10 @@ class Receipt {
   }
 
   bool get hasOCRResults => ocrResults != null;
-  bool get isComplete => 
-      merchantName?.isNotEmpty == true && 
-      receiptDate?.isNotEmpty == true && 
-      totalAmount != null && 
+  bool get isComplete =>
+      merchantName?.isNotEmpty == true &&
+      (receiptDate?.isNotEmpty == true || ocrReceiptDate?.isNotEmpty == true) &&
+      totalAmount != null &&
       totalAmount! > 0;
 
   double get overallConfidence => ocrResults?.overallConfidence ?? 0.0;
@@ -147,7 +149,7 @@ class Receipt {
       'notes': notes,
       // Direct fields for Supabase
       'merchant': merchant ?? merchantName,
-      'receiptDate': receiptDate ?? this.receiptDate,
+      'receiptDate': receiptDate ?? ocrReceiptDate,
       'total': total ?? totalAmount,
       'tax': tax ?? taxAmount,
       'category': category,
@@ -160,6 +162,7 @@ class Receipt {
       'lastSyncAt': lastSyncAt?.toIso8601String(),
       // OCR results would need custom serialization for complex objects
       'merchantName': merchantName,
+      'ocrReceiptDate': ocrReceiptDate,
       'totalAmount': totalAmount,
       'taxAmount': taxAmount,
       'overallConfidence': overallConfidence,
