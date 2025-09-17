@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:receipt_organizer/infrastructure/config/supabase_config.dart';
 import 'package:receipt_organizer/core/services/background_sync_service.dart';
 import 'package:receipt_organizer/core/services/request_queue_service.dart';
@@ -15,9 +18,21 @@ import 'package:receipt_organizer/features/auth/services/session_manager.dart';
 import 'package:receipt_organizer/features/auth/services/offline_auth_service.dart';
 import 'package:receipt_organizer/features/auth/services/inactivity_monitor.dart';
 import 'package:receipt_organizer/features/receipts/screens/receipts_list_screen.dart';
+import 'package:receipt_organizer/ui/theme/shadcn_theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize database for the platform
+  if (kIsWeb) {
+    // For web, SQLite is not directly supported
+    print('📱 Running on Web - Using alternative storage');
+  } else {
+    // Initialize FFI for desktop/mobile
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+    print('✅ Database factory initialized');
+  }
 
   // Initialize core services early
   try {
@@ -102,14 +117,16 @@ class ReceiptOrganizerApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final shadTheme = ref.watch(shadcnThemeProvider);
 
+    // Use Material app with custom theming that matches shadcn
     return MaterialApp(
-      title: 'Receipt Organizer',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
-      ),
-      home: authState.when(
+        title: 'Receipt Organizer',
+        themeMode: themeMode,
+        theme: AppTheme.getMaterialTheme(Brightness.light),
+        darkTheme: AppTheme.getMaterialTheme(Brightness.dark),
+        home: authState.when(
         data: (state) {
           if (state.session != null) {
             // Wrap home screen with inactivity monitoring

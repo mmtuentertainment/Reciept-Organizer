@@ -1,7 +1,7 @@
 import 'package:uuid/uuid.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 
-enum ReceiptStatus { captured, processing, ready, exported, error }
+enum ReceiptStatus { pending, captured, processing, ready, exported, error }
 
 class Receipt {
   final String id;
@@ -39,6 +39,12 @@ class Receipt {
   final String? syncStatus;
   final DateTime? lastSyncAt;
 
+  // Metadata for API integration
+  final Map<String, dynamic>? metadata;
+
+  // Alias for vendorName for API compatibility
+  String? get merchantName => vendorName;
+
   Receipt({
     String? id,
     this.userId,
@@ -70,6 +76,7 @@ class Receipt {
     this.updatedAt,
     this.syncStatus,
     this.lastSyncAt,
+    this.metadata,
   }) :
     id = id ?? const Uuid().v4(),
     capturedAt = capturedAt ?? DateTime.now(),
@@ -106,6 +113,7 @@ class Receipt {
     DateTime? updatedAt,
     String? syncStatus,
     DateTime? lastSyncAt,
+    Map<String, dynamic>? metadata,
   }) {
     return Receipt(
       id: id ?? this.id,
@@ -138,12 +146,12 @@ class Receipt {
       updatedAt: updatedAt ?? this.updatedAt,
       syncStatus: syncStatus ?? this.syncStatus,
       lastSyncAt: lastSyncAt ?? this.lastSyncAt,
+      metadata: metadata ?? this.metadata,
     );
   }
 
   // Convenience getters - prefer database fields over OCR extraction
   String? get merchant => vendorName ?? ocrResults?.merchant?.value?.toString();
-  String? get merchantName => vendorName; // Alias for compatibility
   double? get total => totalAmount ?? _extractOcrAmount(ocrResults?.total?.value);
   double? get tax => taxAmount ?? _extractOcrAmount(ocrResults?.tax?.value);
 

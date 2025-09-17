@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/queue_entry.dart';
@@ -36,6 +37,10 @@ class QueueDatabaseService {
   
   /// Get database instance
   Future<Database> get database async {
+    // Skip database operations on web platform
+    if (kIsWeb) {
+      throw UnsupportedError('SQLite not supported on web - use IndexedDB or localStorage instead');
+    }
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
