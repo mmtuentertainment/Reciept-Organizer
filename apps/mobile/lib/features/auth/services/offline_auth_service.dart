@@ -79,18 +79,19 @@ class OfflineAuthService {
       }
 
       // Reconstruct session from cached data
-      final userData = data['user'];
-      if (userData == null) return null;
+      final userData = data['user'] as Map<String, dynamic>;
+      // Ensure required fields are present
+      userData['aud'] ??= 'authenticated';
+      userData['confirmation_sent_at'] ??= userData['created_at'];
 
       final user = User.fromJson(userData);
-      if (user == null) return null;
 
       return Session(
         accessToken: data['access_token'],
         refreshToken: data['refresh_token'],
         expiresIn: data['expires_at'] - (DateTime.now().millisecondsSinceEpoch ~/ 1000),
         tokenType: 'bearer',
-        user: user,
+        user: user!,  // Force unwrap since we validated the data exists
       );
     } catch (e) {
       // Error getting cached session - return null
@@ -115,12 +116,6 @@ class OfflineAuthService {
   /// Check network connectivity
   static Future<bool> isOnline() async {
     final connectivityResult = await Connectivity().checkConnectivity();
-    // connectivity_plus now returns a List<ConnectivityResult>
-    if (connectivityResult is List) {
-      return !connectivityResult.contains(ConnectivityResult.none) &&
-             connectivityResult.isNotEmpty;
-    }
-    // Fallback for older versions
     return connectivityResult != ConnectivityResult.none;
   }
 

@@ -5,16 +5,27 @@ import 'dart:convert';
 /// Supabase configuration and initialization
 class SupabaseConfig {
   static Future<void> initialize() async {
+    final url = const String.fromEnvironment('SUPABASE_URL', defaultValue: '');
+    final anonKey = const String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: '');
+
+    if (url.isEmpty || anonKey.isEmpty) {
+      throw Exception('''
+        Missing Supabase environment variables!
+
+        Please provide credentials using --dart-define:
+        flutter run --dart-define=SUPABASE_URL=your_url --dart-define=SUPABASE_ANON_KEY=your_key
+
+        Or for production builds:
+        flutter build apk --dart-define=SUPABASE_URL=your_url --dart-define=SUPABASE_ANON_KEY=your_key
+
+        Never hardcode credentials in the source code!
+      ''');
+    }
+
     await Supabase.initialize(
-      url: const String.fromEnvironment(
-        'SUPABASE_URL',
-        defaultValue: 'https://xbadaalqaeszooyxuoac.supabase.co',
-      ),
-      anonKey: const String.fromEnvironment(
-        'SUPABASE_ANON_KEY',
-        defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiYWRhYWxxYWVzem9veXh1b2FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3ODE1MzAsImV4cCI6MjA3MzM1NzUzMH0.PY-aQ6bjYUPaTL2o2twviFf5AJTSYR0gyKUkQb08OGc',
-      ),
-      authOptions: FlutterAuthClientOptions(
+      url: url,
+      anonKey: anonKey,
+      authOptions: const FlutterAuthClientOptions(
         authFlowType: AuthFlowType.pkce,
         localStorage: SecureLocalStorage(),
       ),
