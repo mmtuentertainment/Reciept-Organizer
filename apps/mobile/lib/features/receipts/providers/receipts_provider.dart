@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:receipt_organizer/data/models/receipt.dart';
+import 'package:receipt_organizer/core/models/receipt.dart';
+import 'package:receipt_organizer/core/models/receipt_extended.dart';
 import 'package:receipt_organizer/infrastructure/config/supabase_config.dart';
 import 'package:receipt_organizer/features/auth/providers/auth_provider.dart';
 
@@ -31,7 +32,7 @@ final receiptsProvider = FutureProvider<List<Receipt>>((ref) async {
 
 // Helper function to convert JSON to Receipt model
 Receipt _receiptFromJson(Map<String, dynamic> json) {
-  return Receipt.fromJson(json);
+  return ReceiptCompatibility.fromSupabaseJson(json);
 }
 
 // Provider for creating a new receipt
@@ -44,27 +45,8 @@ final createReceiptProvider = Provider((ref) {
     }
 
     try {
-      final data = {
-        'user_id': user.id,
-        'vendor_name': receipt.vendorName,
-        'receipt_date': receipt.receiptDate?.toIso8601String()?.substring(0, 10),
-        'total_amount': receipt.totalAmount,
-        'tax_amount': receipt.taxAmount,
-        'tip_amount': receipt.tipAmount,
-        'currency': receipt.currency,
-        'category_id': receipt.categoryId,
-        'subcategory': receipt.subcategory,
-        'payment_method': receipt.paymentMethod,
-        'notes': receipt.notes,
-        'image_url': receipt.imageUrl ?? receipt.imageUri,
-        'ocr_confidence': receipt.ocrConfidence,
-        'ocr_raw_text': receipt.ocrRawText,
-        'is_processed': receipt.isProcessed,
-        'needs_review': receipt.needsReview,
-        'business_purpose': receipt.businessPurpose,
-        'tags': receipt.tags,
-        'status': receipt.status.name,
-      };
+      final data = receipt.toSupabaseJson();
+      data['user_id'] = user.id;
 
       final response = await SupabaseConfig.client
           .from('receipts')
@@ -90,27 +72,8 @@ final updateReceiptProvider = Provider((ref) {
     }
 
     try {
-      final data = {
-        'vendor_name': receipt.vendorName,
-        'receipt_date': receipt.receiptDate?.toIso8601String()?.substring(0, 10),
-        'total_amount': receipt.totalAmount,
-        'tax_amount': receipt.taxAmount,
-        'tip_amount': receipt.tipAmount,
-        'currency': receipt.currency,
-        'category_id': receipt.categoryId,
-        'subcategory': receipt.subcategory,
-        'payment_method': receipt.paymentMethod,
-        'notes': receipt.notes,
-        'image_url': receipt.imageUrl ?? receipt.imageUri,
-        'ocr_confidence': receipt.ocrConfidence,
-        'ocr_raw_text': receipt.ocrRawText,
-        'is_processed': receipt.isProcessed,
-        'needs_review': receipt.needsReview,
-        'business_purpose': receipt.businessPurpose,
-        'tags': receipt.tags,
-        'status': receipt.status.name,
-        'updated_at': DateTime.now().toIso8601String(),
-      };
+      final data = receipt.toSupabaseJson();
+      data['updated_at'] = DateTime.now().toIso8601String();
 
       final response = await SupabaseConfig.client
           .from('receipts')

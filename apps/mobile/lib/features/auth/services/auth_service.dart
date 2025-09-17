@@ -111,12 +111,10 @@ class AuthService {
   /// Set session from deep link
   static Future<Session> setSessionFromUrl(Uri uri) async {
     final response = await _client.auth.getSessionFromUrl(uri);
-    // The method returns AuthSessionUrlResponse, we need to extract the session
-    if (response.session != null) {
-      return response.session!;
-    } else {
+    if (response.session == null) {
       throw Exception('Failed to get session from URL');
     }
+    return response.session!;
   }
 
   /// Check and refresh session if needed
