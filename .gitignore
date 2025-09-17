@@ -110,3 +110,48 @@ apps/native/.env.local
 # Audit reports
 ops_audit_*/
 
+# Build tools and artifacts
+bfg.jar
+*.tar.xz
+*.tar.gz
+
+# Flutter/Dart build artifacts
+.dart_tool/
+build/
+*.iml
+.packages
+.pub/
+pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js build output
+.next/
+out/
+
+# Expo/React Native
+.expo/
+.expo-shared/
+.metro/
+
+# Cache directories
+.cache/
+*.cache/
+tmp/
+
+# Test artifacts
+test_results_*.txt
+test_module_results.md
+test.wav
+coverage/
+
+# Tools and SDKs (should never be committed)
+/tools/
+/flutter_sdk/
+/android-sdk/
