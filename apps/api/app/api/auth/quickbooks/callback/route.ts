@@ -227,7 +227,9 @@ export async function GET(request: NextRequest) {
     // Redirect to success page instead of deep link
     const successUrl = new URL('/oauth/success', request.url);
     successUrl.searchParams.set('provider', 'quickbooks');
-    successUrl.searchParams.set('session', result.sessionId);
+    if (result.sessionId) {
+      successUrl.searchParams.set('session', result.sessionId);
+    }
     return NextResponse.redirect(successUrl);
   } else {
     console.error('OAuth callback failed with result:', result);
