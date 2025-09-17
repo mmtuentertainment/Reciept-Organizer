@@ -1,0 +1,96 @@
+name: Repository Guard
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+jobs:
+  check-repo-health:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Check for large files
+      - name: Check for large files
+        run: |
+          echo "Checking for files larger than 10MB..."
+          large_files=$(find . -type f -size +10M ! -path "./.git/*" 2>/dev/null || true)
+
+          if [ ! -z "$large_files" ]; then
+            echo "❌ ERROR: Large files detected (>10MB):"
+            echo "$large_files"
+            echo ""
+            echo "Please remove these files or add them to .gitignore"
+            exit 1
+          fi
+
+          echo "✅ No large files detected"
+
+      # Check for common build artifacts
+      - name: Check for build artifacts
+        run: |
+          echo "Checking for build artifacts that shouldn't be committed..."
+
+          bad_dirs=""
+          [ -d "node_modules" ] && bad_dirs="$bad_dirs node_modules"
+          [ -d ".dart_tool" ] && bad_dirs="$bad_dirs .dart_tool"
+          [ -d "build" ] && bad_dirs="$bad_dirs build"
+          [ -d ".next" ] && bad_dirs="$bad_dirs .next"
+          [ -d "flutter" ] && bad_dirs="$bad_dirs flutter"
+          [ -d "tools/flutter" ] && bad_dirs="$bad_dirs tools/flutter"
+
+          if [ ! -z "$bad_dirs" ]; then
+            echo "❌ ERROR: Build artifacts detected:"
+            echo "$bad_dirs"
+            echo ""
+            echo "These directories should not be committed. Add them to .gitignore"
+            exit 1
+          fi
+
+          echo "✅ No build artifacts detected"
+
+      # Check for .env files with secrets
+      - name: Check for .env files
+        run: |
+          echo "Checking for .env files with potential secrets..."
+
+          env_files=$(find . -name ".env*" -type f ! -name "*.example" ! -path "*/node_modules/*" ! -path "*/.git/*" 2>/dev/null || true)
+
+          if [ ! -z "$env_files" ]; then
+            echo "⚠️  WARNING: .env files detected:"
+            echo "$env_files"
+            echo ""
+
+            # Check if any contain actual keys
+            for file in $env_files; do
+              if grep -q "eyJ\|AIza\|sk-\|pk_\|service_role" "$file" 2>/dev/null; then
+                echo "❌ ERROR: File $file contains what looks like real API keys!"
+                echo "Remove this file and use .env.example instead"
+                exit 1
+              fi
+            done
+          fi
+
+          echo "✅ No secrets detected in .env files"
+
+      # Check repository size
+      - name: Check repository size
+        run: |
+          echo "Checking repository size..."
+
+          git_size=$(du -sh .git | cut -f1)
+          echo "Git directory size: $git_size"
+
+          # Get numeric size in MB
+          git_size_mb=$(du -sm .git | cut -f1)
+
+          if [ "$git_size_mb" -gt 500 ]; then
+            echo "⚠️  WARNING: Git history is large (${git_size_mb}MB > 500MB)"
+            echo "Consider using git-filter-repo or BFG to clean history"
+          else
+            echo "✅ Git history size is reasonable"
+          fi
