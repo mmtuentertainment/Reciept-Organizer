@@ -1,0 +1,380 @@
+openapi: 3.1.0
+info:
+  title: Receipt Organizer API
+  version: 0.1.0
+  description: Minimal contract-first API for uploading and retrieving receipts
+servers:
+  - url: http://localhost:3001
+    description: Development server
+paths:
+  /api/receipts:
+    post:
+      summary: Create receipt ingestion job
+      operationId: createReceipt
+      tags:
+        - receipts
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Unique key for safe request retry (expires after 24 hours)
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 128
+            pattern: '^[a-zA-Z0-9_-]+$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/ReceiptUploadByUrl'
+                - $ref: '#/components/schemas/ReceiptUploadByBase64'
+              discriminator:
+                propertyName: source
+                mapping:
+                  url: '#/components/schemas/ReceiptUploadByUrl'
+                  base64: '#/components/schemas/ReceiptUploadByBase64'
+      responses:
+        '202':
+          description: Accepted for processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnqueueAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Duplicate request (idempotency key already used)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnqueueAccepted'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      summary: List receipts with pagination
+      operationId: listReceipts
+      tags:
+        - receipts
+      parameters:
+        - name: cursor
+          in: query
+          description: Pagination cursor from previous response
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Number of items to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Page of receipts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/receipts/{id}:
+    get:
+      summary: Get receipt by ID
+      operationId: getReceipt
+      tags:
+        - receipts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Receipt ID
+          schema:
+            type: string
+            pattern: '^rcpt_[a-zA-Z0-9_]+$'
+      responses:
+        '200':
+          description: Receipt found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receipt'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    BadRequest:
+      description: Bad Request - RFC9457 Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/problems/bad-request
+            title: Bad Request
+            status: 400
+            detail: The request body is invalid
+    Unauthorized:
+      description: Unauthorized - RFC9457 Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/problems/unauthorized
+            title: Unauthorized
+            status: 401
+            detail: Authentication required
+    NotFound:
+      description: Not Found - RFC9457 Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/problems/not-found
+            title: Not Found
+            status: 404
+            detail: The requested resource was not found
+    UnsupportedMediaType:
+      description: Unsupported Media Type - RFC9457 Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/problems/unsupported-media-type
+            title: Unsupported Media Type
+            status: 415
+            detail: The media type is not supported
+    TooManyRequests:
+      description: Too Many Requests - RFC9457 Problem Details
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/problems/rate-limit
+            title: Too Many Requests
+            status: 429
+            detail: Rate limit exceeded. Please retry later.
+    InternalServerError:
+      description: Internal Server Error - RFC9457 Problem Details
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: about:blank
+            title: Internal Server Error
+            status: 500
+            detail: An unexpected error occurred
+  schemas:
+    Problem:
+      type: object
+      required:
+        - type
+        - title
+      properties:
+        type:
+          type: string
+          format: uri
+          default: about:blank
+          description: URI reference identifying the problem type
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        status:
+          type: integer
+          minimum: 100
+          maximum: 599
+          description: HTTP status code
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence
+        instance:
+          type: string
+          format: uri
+          description: URI reference identifying the specific occurrence
+    ReceiptUploadByUrl:
+      type: object
+      required:
+        - source
+        - url
+      properties:
+        source:
+          type: string
+          const: url
+          description: Upload source type
+        url:
+          type: string
+          format: uri
+          description: URL of the receipt image or PDF
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Optional metadata for the receipt
+    ReceiptUploadByBase64:
+      type: object
+      required:
+        - source
+        - contentType
+        - data
+      properties:
+        source:
+          type: string
+          const: base64
+          description: Upload source type
+        contentType:
+          type: string
+          enum:
+            - image/jpeg
+            - image/png
+            - image/webp
+            - application/pdf
+          description: MIME type of the uploaded content
+        data:
+          type: string
+          format: byte
+          description: Base64-encoded receipt data
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Optional metadata for the receipt
+    EnqueueAccepted:
+      type: object
+      required:
+        - jobId
+      properties:
+        jobId:
+          type: string
+          pattern: '^job_[a-zA-Z0-9_]+$'
+          description: Unique job identifier for tracking
+        deduped:
+          type: boolean
+          default: false
+          description: True if this was a duplicate request (idempotency)
+    Receipt:
+      type: object
+      required:
+        - id
+        - createdAt
+        - status
+      properties:
+        id:
+          type: string
+          pattern: '^rcpt_[a-zA-Z0-9]+$'
+          description: Unique receipt identifier
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of last update
+        status:
+          type: string
+          enum:
+            - processing
+            - ready
+            - failed
+          description: Processing status
+        total:
+          type: number
+          format: float
+          nullable: true
+          description: Receipt total amount
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          nullable: true
+          description: ISO 4217 currency code
+        vendor:
+          type: string
+          nullable: true
+          description: Vendor/merchant name
+        date:
+          type: string
+          format: date
+          nullable: true
+          description: Receipt date
+        category:
+          type: string
+          nullable: true
+          description: Receipt category
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceiptItem'
+          description: Line items from the receipt
+        extractedData:
+          type: object
+          additionalProperties: true
+          description: Raw extracted data from OCR
+        metadata:
+          type: object
+          additionalProperties: true
+          description: User-provided metadata
+    ReceiptItem:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Item description
+        quantity:
+          type: number
+          minimum: 0
+          description: Item quantity
+        unitPrice:
+          type: number
+          format: float
+          minimum: 0
+          description: Price per unit
+        lineTotal:
+          type: number
+          format: float
+          minimum: 0
+          description: Total for this line
+    ReceiptPage:
+      type: object
+      required:
+        - items
+        - hasMore
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Receipt'
+          description: Array of receipts
+        nextCursor:
+          type: string
+          nullable: true
+          description: Cursor for next page (null if no more pages)
+        hasMore:
+          type: boolean
+          description: True if more pages exist
+        totalCount:
+          type: integer
+          minimum: 0
+          description: Total number of receipts (if available)

@@ -130,3 +130,39 @@ jobs:
       with:
         name: license-report
         path: apps/mobile/license_report.txt
+
+  # API validation and testing
+  api-validation:
+    name: API Validation & Testing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: apps/api/package-lock.json
+
+    - name: Install API dependencies
+      working-directory: apps/api
+      run: npm ci
+
+    - name: TypeScript type checking
+      working-directory: apps/api
+      run: npx tsc --noEmit
+
+    - name: Run API tests
+      if: hashFiles('apps/api/package.json') != ''
+      working-directory: apps/api
+      run: npm test --if-present
+
+    - name: Spectral OpenAPI validation
+      working-directory: apps/api
+      run: |
+        echo "Installing Stoplight Spectral CLI..."
+        npx -y @stoplight/spectral-cli@latest lint openapi.yaml --format stylish
+        echo "OpenAPI specification validated successfully"
