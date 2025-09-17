@@ -16,11 +16,13 @@ function OAuthSuccessContent() {
       
       // For mobile app, try to open deep link
       const deepLink = `receiptorganizer://oauth/success?session=${session}&provider=${provider}`;
-      
-      // Try to open the app
-      setTimeout(() => {
-        window.location.href = deepLink;
-      }, 1000);
+
+      // Validate deep link format and try to open the app
+      if (/^receiptorganizer:\/\//.test(deepLink)) {
+        setTimeout(() => {
+          window.location.assign(deepLink);
+        }, 1000);
+      }
       
       // Fallback message after 3 seconds
       setTimeout(() => {

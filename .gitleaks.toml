@@ -30,6 +30,7 @@ regexes = [
   '''TEST_.*''',
   '''dummy.*''',
   '''example.*''',
+  '''(test|mock|example|demo|sample).*''',  # Test/mock commit messages
   # Flutter/Dart specific patterns that might look like secrets but aren't
   '''[A-Za-z0-9]{32}\.supabase\.co''',  # Supabase URLs
   '''eyJ[A-Za-z0-9+/]*={0,2}'''  # JWT tokens in examples
@@ -47,11 +48,6 @@ regex = '''^\.bmad-core/'''
 
 [[allowlist.files]]
 regex = '''package-lock\.json|yarn\.lock|pubspec\.lock'''
-
-# Commit allowlist for specific commits that might have test data
-[[allowlist.commits]]
-description = "Ignore test data commits"
-regex = '''test|mock|example|demo|sample'''
 
 # Custom rules for Flutter/Dart projects
 [[rules]]
