@@ -1,0 +1,23 @@
+# Brownfield Development Workflow
+
+## Overview
+This project follows the BMad (Brownfield Modernization and Development) framework for iterative improvement of existing systems.
+
+## Phases
+1. **Phase 1**: Core MVP (Receipt Capture, Management, Export)
+2. **Phase 2**: Authentication & User Management
+3. **Phase 3**: Advanced Features (Analytics, Integrations)
+
+## Development Process
+1. Story Planning
+2. Technical Design
+3. Implementation
+4. Testing
+5. Review
+6. Deployment
+
+## Git Workflow
+- Feature branches from main
+- PR reviews required
+- CI/CD automated testing
+- Staged rollouts

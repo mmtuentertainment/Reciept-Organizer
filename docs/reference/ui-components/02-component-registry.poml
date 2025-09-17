@@ -1,0 +1,411 @@
+# shadcn/ui Component Registry - Receipt Organizer Focus
+@type: component_registry
+@version: 2.0.0
+@total_components: 336
+@ui_components: 48
+@focused_for: receipt_organizer
+
+## Essential_Components {
+  @priority: high
+  @for: immediate_use
+  
+  ### Button {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add button"
+    @depends_on: ["@radix-ui/react-slot"]
+    @used_by: ["Dialog", "Card", "Form", "Dashboard", "Landing"]
+    @variants: ["default", "destructive", "outline", "secondary", "ghost", "link"]
+    @sizes: ["default", "sm", "lg", "icon"]
+    
+    Usage: ```tsx
+      import { Button } from "@/components/ui/button"
+      
+      <Button variant="outline" size="lg">
+        Click me
+      </Button>
+    ```
+  }
+  
+  ### Card {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add card"
+    @depends_on: []
+    @used_by: ["Dashboard", "Landing", "Pricing", "Stats"]
+    @composition: ["CardHeader", "CardTitle", "CardDescription", "CardContent", "CardFooter"]
+    
+    Usage: ```tsx
+      import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Receipt Stats</CardTitle>
+          <CardDescription>Monthly overview</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>2,847 receipts processed</p>
+        </CardContent>
+      </Card>
+    ```
+  }
+  
+  ### Form {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add form"
+    @depends_on: ["react-hook-form", "zod", "@hookform/resolvers"]
+    @uses: ["Input", "Select", "Checkbox", "Button"]
+    @validation: "Zod schemas"
+    
+    Components: {
+      FormField: "Controlled field wrapper"
+      FormItem: "Field container"
+      FormLabel: "Field label"
+      FormControl: "Input wrapper"
+      FormMessage: "Validation messages"
+    }
+    
+    Pattern: ```tsx
+      const form = useForm<FormData>({
+        resolver: zodResolver(formSchema),
+      })
+    ```
+  }
+  
+  ### Table {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add table"
+    @depends_on: ["@tanstack/react-table"]
+    @features: ["Sorting", "Filtering", "Pagination", "Selection"]
+    @used_by: ["Dashboard", "Receipt List", "Export Preview"]
+    
+    Structure: {
+      Table: "Container"
+      TableHeader: "Header row"
+      TableBody: "Data rows"
+      TableRow: "Single row"
+      TableCell: "Cell content"
+    }
+  }
+  
+  ### Dialog {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add dialog"
+    @depends_on: ["@radix-ui/react-dialog"]
+    @alternatives: ["Sheet", "AlertDialog"]
+    @used_by: ["Receipt Detail", "Export Config", "Settings"]
+    
+    Composition: {
+      DialogTrigger: "Open trigger"
+      DialogContent: "Modal content"
+      DialogHeader: "Header section"
+      DialogTitle: "Title text"
+      DialogDescription: "Description text"
+    }
+  }
+}
+
+## Dashboard_Components {
+  @category: dashboard
+  @priority: high
+  
+  ### Dashboard_01 {
+    @type: "registry:block"
+    @cli_command: "npx shadcn@latest add dashboard-01"
+    @components: ["Sidebar", "Card", "Chart", "Table", "Button"]
+    @layout: "Sidebar + Main Content"
+    
+    Features: {
+      Sidebar: "Collapsible navigation"
+      Header: "Search and user menu"
+      Stats: "Metric cards"
+      Charts: "Analytics visualization"
+      Table: "Recent items"
+    }
+  }
+  
+  ### Chart {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add chart"
+    @depends_on: ["recharts"]
+    @types: ["Line", "Bar", "Pie", "Area"]
+    @used_by: ["Analytics", "Dashboard", "Reports"]
+    
+    Example: ```tsx
+      import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
+      
+      <LineChart width={600} height={300} data={data}>
+        <Line type="monotone" dataKey="value" stroke="#2563EB" />
+      </LineChart>
+    ```
+  }
+  
+  ### Badge {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add badge"
+    @depends_on: []
+    @variants: ["default", "secondary", "destructive", "outline"]
+    @used_by: ["Status", "Categories", "Tags"]
+    
+    Usage: ```tsx
+      <Badge variant="secondary">Pending</Badge>
+      <Badge variant="destructive">Overdue</Badge>
+    ```
+  }
+}
+
+## Form_Components {
+  @category: forms
+  @priority: high
+  
+  ### Input {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add input"
+    @types: ["text", "email", "password", "number", "file"]
+    @used_by: ["All forms"]
+    
+    Usage: ```tsx
+      <Input type="email" placeholder="Email" />
+    ```
+  }
+  
+  ### Select {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add select"
+    @depends_on: ["@radix-ui/react-select"]
+    @used_by: ["Category selection", "Export format"]
+    
+    Structure: {
+      SelectTrigger: "Display value"
+      SelectContent: "Dropdown content"
+      SelectItem: "Option item"
+    }
+  }
+  
+  ### Checkbox {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add checkbox"
+    @depends_on: ["@radix-ui/react-checkbox"]
+    @states: ["checked", "unchecked", "indeterminate"]
+  }
+  
+  ### DatePicker {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add date-picker"
+    @depends_on: ["@radix-ui/react-popover", "date-fns"]
+    @used_by: ["Date range export", "Receipt date"]
+  }
+}
+
+## Navigation_Components {
+  @category: navigation
+  
+  ### NavigationMenu {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add navigation-menu"
+    @depends_on: ["@radix-ui/react-navigation-menu"]
+    @used_by: ["Header", "Landing page"]
+  }
+  
+  ### Tabs {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add tabs"
+    @depends_on: ["@radix-ui/react-tabs"]
+    @used_by: ["Settings", "Export options"]
+    
+    Structure: {
+      TabsList: "Tab buttons container"
+      TabsTrigger: "Tab button"
+      TabsContent: "Tab panel"
+    }
+  }
+  
+  ### DropdownMenu {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add dropdown-menu"
+    @depends_on: ["@radix-ui/react-dropdown-menu"]
+    @used_by: ["User menu", "Actions menu"]
+    
+    Features: ["Submenus", "Checkable items", "Separators"]
+  }
+}
+
+## Feedback_Components {
+  @category: feedback
+  
+  ### Toast {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add toast"
+    @depends_on: ["@radix-ui/react-toast"]
+    @used_by: ["Form submission", "Actions", "Errors"]
+    @position: ["top-right", "bottom-right"]
+    
+    Usage: ```tsx
+      import { useToast } from "@/components/ui/use-toast"
+      
+      const { toast } = useToast()
+      
+      toast({
+        title: "Success",
+        description: "Receipt uploaded successfully",
+      })
+    ```
+  }
+  
+  ### Alert {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add alert"
+    @variants: ["default", "destructive"]
+    @used_by: ["Error messages", "Warnings", "Info"]
+  }
+  
+  ### Progress {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add progress"
+    @depends_on: ["@radix-ui/react-progress"]
+    @used_by: ["Upload progress", "Processing"]
+  }
+  
+  ### Skeleton {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add skeleton"
+    @used_by: ["Loading states", "Placeholders"]
+  }
+}
+
+## Overlay_Components {
+  @category: overlays
+  
+  ### Sheet {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add sheet"
+    @depends_on: ["@radix-ui/react-dialog"]
+    @alternatives: ["Dialog", "Drawer"]
+    @sides: ["top", "right", "bottom", "left"]
+    @used_by: ["Mobile menu", "Filters panel"]
+  }
+  
+  ### Popover {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add popover"
+    @depends_on: ["@radix-ui/react-popover"]
+    @used_by: ["Date picker", "Color picker", "Info"]
+  }
+  
+  ### Tooltip {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add tooltip"
+    @depends_on: ["@radix-ui/react-tooltip"]
+    @trigger: "Hover or focus"
+  }
+  
+  ### AlertDialog {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add alert-dialog"
+    @depends_on: ["@radix-ui/react-alert-dialog"]
+    @used_by: ["Delete confirmation", "Unsaved changes"]
+  }
+}
+
+## Layout_Components {
+  @category: layout
+  
+  ### Separator {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add separator"
+    @orientation: ["horizontal", "vertical"]
+  }
+  
+  ### ScrollArea {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add scroll-area"
+    @depends_on: ["@radix-ui/react-scroll-area"]
+    @used_by: ["Sidebar", "Long lists"]
+  }
+  
+  ### Avatar {
+    @type: "registry:ui"
+    @cli_command: "npx shadcn@latest add avatar"
+    @depends_on: ["@radix-ui/react-avatar"]
+    @fallback: "Initials or icon"
+  }
+}
+
+## Utility_Functions {
+  @location: "lib/utils.ts"
+  
+  ### cn_Function {
+    @purpose: "Merge Tailwind classes"
+    @depends_on: ["clsx", "tailwind-merge"]
+    @critical: true
+    
+    Implementation: ```typescript
+      import { type ClassValue, clsx } from "clsx"
+      import { twMerge } from "tailwind-merge"
+      
+      export function cn(...inputs: ClassValue[]) {
+        return twMerge(clsx(inputs))
+      }
+    ```
+  }
+}
+
+## Installation_Workflow {
+  @sequence: ordered
+  
+  Step_1: {
+    @command: "cd apps/web"
+    @purpose: "Navigate to web app"
+  }
+  
+  Step_2: {
+    @command: "npx shadcn@latest init"
+    @creates: ["components.json", "lib/utils.ts"]
+    @modifies: ["tailwind.config.js", "globals.css"]
+  }
+  
+  Step_3: {
+    @command: "npx shadcn@latest add button card form dialog table"
+    @purpose: "Add essential components"
+  }
+  
+  Step_4: {
+    @command: "npx shadcn@latest add dashboard-01"
+    @purpose: "Add dashboard layout"
+  }
+}
+
+## Component_Relationships {
+  
+  Dependencies: {
+    Form → ["Input", "Select", "Button", "Checkbox"]
+    Dashboard → ["Card", "Table", "Chart", "Badge"]
+    Dialog → ["Button", "Form"]
+    Table → ["Badge", "Button", "DropdownMenu"]
+  }
+  
+  Alternatives: {
+    Dialog ↔ Sheet: "Modal vs slide-out"
+    Select ↔ RadioGroup: "Single selection"
+    Checkbox ↔ Switch: "Boolean state"
+    Toast ↔ Alert: "Temporary vs persistent"
+  }
+}
+
+## Quick_Add_Commands {
+  @copy_paste: true
+  
+  Landing_Page: ```bash
+    npx shadcn@latest add card button badge avatar navigation-menu
+  ```
+  
+  Dashboard: ```bash
+    npx shadcn@latest add card table chart badge dropdown-menu tabs
+  ```
+  
+  Forms: ```bash
+    npx shadcn@latest add form input select checkbox date-picker toast
+  ```
+  
+  Complete_Set: ```bash
+    npx shadcn@latest add button card form dialog table chart badge input select checkbox toast alert progress skeleton dropdown-menu tabs navigation-menu sheet avatar separator
+  ```
+}

@@ -1,0 +1,67 @@
+# User Personas
+
+<user-personas>
+
+    <persona id="sarah" type="primary">
+      <name>Sarah - Restaurant Owner</name>
+      <business>Small family restaurant, 300 receipts/month</business>
+      <tech-level>Basic smartphone user</tech-level>
+      <pain-points>
+        - Shoebox full of receipts for taxes
+        - No time for manual data entry
+        - Needs QuickBooks-ready export
+      </pain-points>
+      <success-criteria>
+        - Process 10 receipts in <3 minutes
+        - Export directly to QuickBooks format
+        - Works offline during busy hours
+      </success-criteria>
+      <auth-needs>
+        - Simple email/password login
+        - Remember me on device
+        - No complex 2FA during rush
+      </auth-needs>
+    </persona>
+
+    <persona id="mike" type="secondary">
+      <name>Mike - Freelance Contractor</name>
+      <business>Independent contractor, 100 receipts/month</business>
+      <tech-level>Comfortable with technology</tech-level>
+      <pain-points>
+        - Receipts scattered across job sites
+        - Need to track by project/client
+        - IRS audit concerns
+      </pain-points>
+      <success-criteria>
+        - Quick capture between jobs
+        - Accurate date/amount extraction
+        - Reliable cloud backup
+      </success-criteria>
+      <auth-needs>
+        - Google OAuth for quick setup
+        - Biometric unlock on phone
+        - Multi-device sync
+      </auth-needs>
+    </persona>
+
+    <persona id="linda" type="tertiary">
+      <name>Linda - Bookkeeper</name>
+      <business>Manages books for 5-10 small businesses</business>
+      <tech-level>Expert with accounting software</tech-level>
+      <pain-points>
+        - Clients provide messy receipt batches
+        - Need to verify OCR accuracy
+        - Multiple export formats needed
+      </pain-points>
+      <success-criteria>
+        - Batch processing with review
+        - High OCR confidence indicators
+        - Multiple export formats (QuickBooks, Xero)
+      </success-criteria>
+      <auth-needs>
+        - Separate workspaces per client
+        - Audit trail for changes
+        - Secure credential storage
+      </auth-needs>
+    </persona>
+  </user-personas>

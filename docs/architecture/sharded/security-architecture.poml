@@ -1,0 +1,75 @@
+# Security Architecture
+
+
+
+### Defense in Depth
+layers:
+  client:
+    - "Input validation and sanitization"
+    - "Secure token storage"
+    - "Certificate pinning (mobile)"
+    - "Biometric authentication"
+
+  network:
+    - "TLS 1.3 minimum"
+    - "Certificate validation"
+    - "Request signing"
+
+  api:
+    - "Rate limiting"
+    - "Request validation"
+    - "CORS configuration"
+    - "JWT verification"
+
+  database:
+    - "Row Level Security (RLS)"
+    - "User isolation policies"
+    - "Encrypted at rest"
+    - "Audit logging"
+
+### RLS Policy Patterns
+policies:
+  user_isolation:
+    ```sql
+    CREATE POLICY "Users can only see own receipts"
+    ON receipts FOR ALL
+    USING (auth.uid() = user_id);
+    ```
+
+  public_read:
+    ```sql
+    CREATE POLICY "Public can read categories"
+    ON categories FOR SELECT
+    USING (true);
+    ```
+
+  admin_full_access:
+    ```sql
+    CREATE POLICY "Admins have full access"
+    ON receipts FOR ALL
+    USING (
+      EXISTS (
+        SELECT 1 FROM user_roles
+        WHERE user_id = auth.uid()
+        AND role = 'admin'
+      )
+    );
+    ```
+
+### Threat Model
+threats:
+  authentication:
+    - "Credential stuffing" -> "Rate limiting + 2FA"
+    - "Token theft" -> "Secure storage + short TTL"
+    - "Session hijacking" -> "Device binding + activity monitoring"
+
+  data_access:
+    - "SQL injection" -> "Parameterized queries + RLS"
+    - "Unauthorized access" -> "User isolation policies"
+    - "Data leakage" -> "Field-level encryption"
+
+  client:
+    - "XSS attacks" -> "CSP headers + input sanitization"
+    - "CSRF attacks" -> "CSRF tokens + SameSite cookies"
+    - "Man-in-the-middle" -> "Certificate pinning + TLS"
+

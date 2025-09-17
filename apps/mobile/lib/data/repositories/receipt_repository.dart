@@ -101,32 +101,19 @@ class ReceiptRepository implements IReceiptRepository {
   @override
   Future<List<Receipt>> getReceiptsByDateRange(DateTime start, DateTime end) async {
     final db = await database;
-    
-    // Format dates to match the stored format (MM/DD/YYYY)
-    // final startStr = _formatDateForQuery(start);
-    // final endStr = _formatDateForQuery(end);
-    
-    // Query with date range comparison
-    // Note: This uses string comparison, which works for MM/DD/YYYY format
-    // For better performance with large datasets, consider storing dates in ISO format
-    final maps = await db.rawQuery('''
-      SELECT * FROM $_tableName 
-      WHERE receiptDate IS NOT NULL 
-        AND receiptDate != ''
-        AND (
-          -- Handle MM/DD/YYYY format
-          CASE 
-            WHEN receiptDate LIKE '__/__/____' THEN
-              substr(receiptDate, 7, 4) || substr(receiptDate, 1, 2) || substr(receiptDate, 4, 2)
-            ELSE receiptDate
-          END
-        ) BETWEEN ? AND ?
-      ORDER BY receiptDate DESC
-    ''', [
-      _formatDateForSqlComparison(start),
-      _formatDateForSqlComparison(end),
-    ]);
-    
+
+    // Since we now store dates as ISO8601 strings, we can use simple string comparison
+    // ISO8601 format (YYYY-MM-DDTHH:MM:SS.sss) sorts correctly as strings
+    final startStr = start.toIso8601String();
+    final endStr = end.add(const Duration(days: 1)).toIso8601String(); // Add 1 day to include the end date fully
+
+    final maps = await db.query(
+      _tableName,
+      where: 'receiptDate IS NOT NULL AND receiptDate >= ? AND receiptDate < ?',
+      whereArgs: [startStr, endStr],
+      orderBy: 'receiptDate DESC',
+    );
+
     return maps.map((map) => _mapToReceipt(map)).toList();
   }
 
@@ -200,15 +187,6 @@ class ReceiptRepository implements IReceiptRepository {
     return maps.map((map) => _mapToReceipt(map)).toList();
   }
 
-  /// Format date for display and storage (MM/DD/YYYY)
-//   String _formatDateForQuery(DateTime date) {
-//     return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
-//   }
-
-  /// Format date for SQL comparison (YYYYMMDD)
-  String _formatDateForSqlComparison(DateTime date) {
-    return '${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
-  }
 
   /// Convert database map to Receipt object
   Receipt _mapToReceipt(Map<String, dynamic> map) {
@@ -224,11 +202,20 @@ class ReceiptRepository implements IReceiptRepository {
       batchId: map['batchId'],
       lastModified: DateTime.parse(map['lastModified']),
       notes: map['notes'],
+      vendorName: map['merchantName'],  // Map DB field to model field
+      receiptDate: map['receiptDate'] != null
+          ? (map['receiptDate'] is String && map['receiptDate'].contains('T')
+              ? DateTime.parse(map['receiptDate'])
+              : map['receiptDate'])
+          : null,
+      totalAmount: map['totalAmount'],
+      taxAmount: map['taxAmount'],
+      ocrConfidence: map['overallConfidence'],  // Map DB field to model field
     );
 
     // If we have OCR results stored, we'd reconstruct them here
     // For now, returning the basic receipt without OCR results
-    
+
     return receipt;
   }
 
@@ -243,11 +230,13 @@ class ReceiptRepository implements IReceiptRepository {
       'batchId': receipt.batchId,
       'lastModified': receipt.lastModified.toIso8601String(),
       'notes': receipt.notes,
-      'merchantName': receipt.merchantName,
-      'receiptDate': receipt.receiptDate,
+      'merchantName': receipt.vendorName,  // Map model field to DB field
+      'receiptDate': receipt.receiptDate is DateTime
+          ? (receipt.receiptDate as DateTime).toIso8601String()
+          : receipt.receiptDate,
       'totalAmount': receipt.totalAmount,
       'taxAmount': receipt.taxAmount,
-      'overallConfidence': receipt.overallConfidence,
+      'overallConfidence': receipt.ocrConfidence,  // Map model field to DB field
       // In a real implementation, we'd serialize OCR results to JSON
       'ocrResultsJson': receipt.ocrResults != null ? jsonEncode({}) : null,
     };

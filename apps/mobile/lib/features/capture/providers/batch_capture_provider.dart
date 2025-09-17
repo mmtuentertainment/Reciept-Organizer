@@ -1,132 +1,181 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:receipt_organizer/data/models/receipt.dart';
-import 'package:receipt_organizer/domain/services/camera_service.dart';
-import 'package:uuid/uuid.dart';
+import '../../../data/models/receipt.dart';
 
 class BatchCaptureState {
+  final List<String> capturedImages;
+  final bool isProcessing;
+  final int currentIndex;
   final List<Receipt> receipts;
-  final String? currentBatchId;
-  final bool isBatchMode;
+  final int batchSize;
   final bool isCapturing;
 
   BatchCaptureState({
-    this.receipts = const [],
-    this.currentBatchId,
-    this.isBatchMode = false,
-    this.isCapturing = false,
+    required this.capturedImages,
+    required this.isProcessing,
+    required this.currentIndex,
+    required this.receipts,
+    required this.batchSize,
+    required this.isCapturing,
   });
 
   BatchCaptureState copyWith({
+    List<String>? capturedImages,
+    bool? isProcessing,
+    int? currentIndex,
     List<Receipt>? receipts,
-    String? currentBatchId,
-    bool? isBatchMode,
+    int? batchSize,
     bool? isCapturing,
   }) {
     return BatchCaptureState(
+      capturedImages: capturedImages ?? this.capturedImages,
+      isProcessing: isProcessing ?? this.isProcessing,
+      currentIndex: currentIndex ?? this.currentIndex,
       receipts: receipts ?? this.receipts,
-      currentBatchId: currentBatchId ?? this.currentBatchId,
-      isBatchMode: isBatchMode ?? this.isBatchMode,
+      batchSize: batchSize ?? this.batchSize,
       isCapturing: isCapturing ?? this.isCapturing,
     );
   }
-
-  int get batchSize => receipts.length;
 }
 
 class BatchCaptureNotifier extends StateNotifier<BatchCaptureState> {
-  final ICameraService _cameraService;
+  BatchCaptureNotifier()
+      : super(BatchCaptureState(
+          capturedImages: [],
+          isProcessing: false,
+          currentIndex: 0,
+          receipts: [],
+          batchSize: 10, // Default batch size
+          isCapturing: false,
+        ));
 
-  BatchCaptureNotifier(this._cameraService) : super(BatchCaptureState());
-
-  void startBatchMode() {
-    final batchId = const Uuid().v4();
+  void startBatchMode({int size = 10}) {
     state = state.copyWith(
-      isBatchMode: true,
-      currentBatchId: batchId,
+      batchSize: size,
+      isCapturing: true,
       receipts: [],
+      capturedImages: [],
+      currentIndex: 0,
     );
   }
 
-  void stopBatchMode() {
-    state = state.copyWith(
-      isBatchMode: false,
-      currentBatchId: null,
-    );
-  }
-
-  Future<bool> captureReceipt() async {
-    if (state.isCapturing) return false;
-
-    state = state.copyWith(isCapturing: true);
-
+  Future<bool> captureReceipt(String imagePath) async {
     try {
-      final result = await _cameraService.captureReceipt(
-        batchMode: state.isBatchMode,
+      // Create a new receipt from the image
+      final receipt = Receipt(
+        imageUri: imagePath,
+        status: ReceiptStatus.captured,
+        batchId: DateTime.now().millisecondsSinceEpoch.toString(),
       );
 
-      if (result.success && result.imageUri != null) {
-        final receipt = Receipt(
-          imageUri: result.imageUri!,
-          thumbnailUri: result.thumbnailUri,
-          batchId: state.currentBatchId,
-          status: result.ocrResults != null ? ReceiptStatus.ready : ReceiptStatus.captured,
-          ocrResults: result.ocrResults,
-        );
+      state = state.copyWith(
+        receipts: [...state.receipts, receipt],
+        capturedImages: [...state.capturedImages, imagePath],
+        currentIndex: state.currentIndex + 1,
+      );
 
-        final updatedReceipts = [...state.receipts, receipt];
-        state = state.copyWith(
-          receipts: updatedReceipts,
-          isCapturing: false,
-        );
-        return true;
-      } else {
+      // Stop capturing if batch size reached
+      if (state.receipts.length >= state.batchSize) {
         state = state.copyWith(isCapturing: false);
-        return false;
       }
+
+      return true;
     } catch (e) {
-      state = state.copyWith(isCapturing: false);
       return false;
     }
   }
 
-  void removeReceipt(String receiptId) {
-    final updatedReceipts = state.receipts
-        .where((receipt) => receipt.id != receiptId)
-        .toList();
-    
-    state = state.copyWith(receipts: updatedReceipts);
+  void addImage(String imagePath) {
+    state = state.copyWith(
+      capturedImages: [...state.capturedImages, imagePath],
+    );
   }
 
-  void restoreReceipt(Receipt receipt) {
-    final updatedReceipts = [...state.receipts, receipt];
-    state = state.copyWith(receipts: updatedReceipts);
-  }
-
-  void reorderReceipts(int oldIndex, int newIndex) {
-    final receipts = List<Receipt>.from(state.receipts);
-    if (newIndex > oldIndex) {
-      newIndex--;
+  void removeImage(int index) {
+    final updated = List<String>.from(state.capturedImages);
+    if (index >= 0 && index < updated.length) {
+      updated.removeAt(index);
+      state = state.copyWith(capturedImages: updated);
     }
-    final item = receipts.removeAt(oldIndex);
-    receipts.insert(newIndex, item);
-    
-    state = state.copyWith(receipts: receipts);
+  }
+
+  void removeReceipt(int index) {
+    if (index >= 0 && index < state.receipts.length) {
+      final updatedReceipts = List<Receipt>.from(state.receipts);
+      final updatedImages = List<String>.from(state.capturedImages);
+
+      updatedReceipts.removeAt(index);
+      if (index < updatedImages.length) {
+        updatedImages.removeAt(index);
+      }
+
+      state = state.copyWith(
+        receipts: updatedReceipts,
+        capturedImages: updatedImages,
+      );
+    }
+  }
+
+  void restoreReceipt(Receipt receipt, int index) {
+    final updatedReceipts = List<Receipt>.from(state.receipts);
+    if (index >= 0 && index <= updatedReceipts.length) {
+      updatedReceipts.insert(index, receipt);
+
+      final updatedImages = List<String>.from(state.capturedImages);
+      updatedImages.insert(index, receipt.imageUri);
+
+      state = state.copyWith(
+        receipts: updatedReceipts,
+        capturedImages: updatedImages,
+      );
+    }
   }
 
   void clearBatch() {
     state = state.copyWith(
       receipts: [],
-      isBatchMode: false,
-      currentBatchId: null,
+      capturedImages: [],
+      currentIndex: 0,
+      isCapturing: false,
     );
   }
+
+  void reorderReceipts(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    final updatedReceipts = List<Receipt>.from(state.receipts);
+    final receipt = updatedReceipts.removeAt(oldIndex);
+    updatedReceipts.insert(newIndex, receipt);
+
+    final updatedImages = List<String>.from(state.capturedImages);
+    if (oldIndex < updatedImages.length) {
+      final image = updatedImages.removeAt(oldIndex);
+      updatedImages.insert(newIndex, image);
+    }
+
+    state = state.copyWith(
+      receipts: updatedReceipts,
+      capturedImages: updatedImages,
+    );
+  }
+
+  void clear() {
+    state = state.copyWith(capturedImages: [], receipts: []);
+  }
+
+  void setProcessing(bool processing) {
+    state = state.copyWith(isProcessing: processing);
+  }
+
+  void setCurrentIndex(int index) {
+    state = state.copyWith(currentIndex: index);
+  }
+
+  bool get hasCaptured => state.capturedImages.isNotEmpty;
+  int get captureCount => state.capturedImages.length;
 }
 
-final cameraServiceProvider = Provider<ICameraService>((ref) {
-  return CameraService();
-});
-
 final batchCaptureProvider = StateNotifierProvider<BatchCaptureNotifier, BatchCaptureState>((ref) {
-  final cameraService = ref.read(cameraServiceProvider);
-  return BatchCaptureNotifier(cameraService);
+  return BatchCaptureNotifier();
 });

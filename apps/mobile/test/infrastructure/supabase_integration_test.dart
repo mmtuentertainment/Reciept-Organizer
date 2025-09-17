@@ -7,32 +7,24 @@ import 'package:receipt_organizer/infrastructure/services/supabase_auth_service.
 import 'package:receipt_organizer/infrastructure/services/supabase_sync_service.dart';
 import 'package:receipt_organizer/core/models/receipt.dart';
 import 'package:receipt_organizer/test/fixtures/real_data_loader.dart';
+import '../helpers/test_setup.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  
   group('Supabase Integration Tests', () {
     late ProviderContainer container;
-    
+
     setUpAll(() async {
+      await setupTestEnvironment();
+
       // Skip if Supabase is not configured
       if (!_isSupabaseConfigured()) {
         print('⚠️ Skipping Supabase tests - not configured');
         return;
       }
-      
+
       // Initialize Supabase for testing
       try {
-        // Set up test method channels for plugins
-        const MethodChannel('plugins.flutter.io/shared_preferences')
-            .setMockMethodCallHandler((MethodCall methodCall) async {
-          if (methodCall.method == 'getAll') {
-            return <String, dynamic>{};
-          }
-          return null;
-        });
-        
-        await SupabaseConfig.initialize();
+        await initializeSupabaseForTesting();
       } catch (e) {
         print('Failed to initialize Supabase: $e');
       }

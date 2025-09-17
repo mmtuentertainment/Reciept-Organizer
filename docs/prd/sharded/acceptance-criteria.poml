@@ -1,0 +1,145 @@
+<poml>
+  <role>Acceptance Criteria - Receipt Organizer PRD Component</role>
+  <task>Feature-level and system-level acceptance criteria</task>
+
+  <metadata>
+    <component>Acceptance Criteria</component>
+    <parent-document>docs/prd/main/prd.poml</parent-document>
+    <version>3.0</version>
+    <date>2025-01-16</date>
+  </metadata>
+
+  <acceptance-criteria>
+    <feature-level>
+      <criterion category="Capture">
+        <metric>Batch capture speed</metric>
+        <target>10 receipts in <3 minutes</target>
+        <current>Achieved</current>
+        <test-method>User task simulation</test-method>
+      </criterion>
+
+      <criterion category="OCR">
+        <metric>Field extraction accuracy</metric>
+        <targets>
+          - Merchant: 90%
+          - Date: 95%
+          - Total: 95%
+          - Tax: 85%
+        </targets>
+        <test-method>Sample receipt validation</test-method>
+      </criterion>
+
+      <criterion category="Export">
+        <metric>Format validation</metric>
+        <target>100% valid CSV generation</target>
+        <test>Export validator passes</test>
+        <test-method>Automated validation</test-method>
+      </criterion>
+
+      <criterion category="Authentication">
+        <metric>Cross-platform consistency</metric>
+        <target>Same auth flow on all platforms</target>
+        <status>Web complete, Mobile in review</status>
+        <test-method>Cross-platform testing</test-method>
+      </criterion>
+
+      <criterion category="Offline Support">
+        <metric>Offline functionality</metric>
+        <target>100% core features work offline</target>
+        <features>Capture, OCR, Edit, Local storage</features>
+        <test-method>Network disconnection testing</test-method>
+      </criterion>
+
+      <criterion category="Data Integrity">
+        <metric>Zero data loss</metric>
+        <target>No data lost during sync</target>
+        <test-method>Conflict resolution testing</test-method>
+      </criterion>
+    </feature-level>
+
+    <system-level>
+      <criterion category="Performance">
+        <metric>End-to-end capture time</metric>
+        <target>Capture to export <2 minutes</target>
+        <measurement>From camera open to CSV download</measurement>
+      </criterion>
+
+      <criterion category="Reliability">
+        <metric>Data integrity</metric>
+        <target>Zero data loss during sync</target>
+        <measurement>Before/after sync data validation</measurement>
+      </criterion>
+
+      <criterion category="Security">
+        <metric>RLS coverage</metric>
+        <target>100% of user data protected</target>
+        <current>Achieved</current>
+        <measurement>Policy audit</measurement>
+      </criterion>
+
+      <criterion category="Scalability">
+        <metric>Concurrent users</metric>
+        <target>1000 users simultaneously</target>
+        <measurement>Load testing</measurement>
+      </criterion>
+
+      <criterion category="Availability">
+        <metric>System uptime</metric>
+        <target>99.9% availability</target>
+        <measurement>Monitoring dashboards</measurement>
+      </criterion>
+    </system-level>
+
+    <user-acceptance>
+      <scenario name="Small Business Owner">
+        <description>Sarah processes 10 receipts after busy restaurant day</description>
+        <steps>
+          1. Open app on phone
+          2. Activate batch capture mode
+          3. Capture 10 receipts in sequence
+          4. Review and correct any errors
+          5. Export to QuickBooks format
+        </steps>
+        <success-criteria>
+          - Complete workflow in <5 minutes
+          - No app crashes or freezes
+          - Export file opens correctly in QuickBooks
+          - All data accurately extracted
+        </success-criteria>
+      </scenario>
+
+      <scenario name="Freelance Contractor">
+        <description>Mike captures receipts between job sites</description>
+        <steps>
+          1. Quick photo of gas receipt in truck
+          2. Immediate OCR processing
+          3. Add project category/notes
+          4. Store for later export
+        </steps>
+        <success-criteria>
+          - Capture to stored in <30 seconds
+          - Works without cell signal
+          - Data syncs when back online
+          - Receipt categorized correctly
+        </success-criteria>
+      </scenario>
+
+      <scenario name="Professional Bookkeeper">
+        <description>Linda processes client receipt batch</description>
+        <steps>
+          1. Receive batch of 50 client receipts
+          2. Batch capture all receipts
+          3. Review confidence scores
+          4. Correct low-confidence fields
+          5. Export in client's preferred format
+        </steps>
+        <success-criteria>
+          - High confidence fields require no editing
+          - Low confidence fields clearly highlighted
+          - Export matches client accounting software
+          - Audit trail shows all changes made
+        </success-criteria>
+      </scenario>
+    </user-acceptance>
+  </acceptance-criteria>
+</poml>

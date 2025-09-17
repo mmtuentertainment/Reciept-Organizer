@@ -1,0 +1,67 @@
+# Performance Architecture
+
+
+
+### Performance Targets
+critical_metrics:
+  - metric: "Initial app load"
+    target: "< 100ms"
+    critical: "< 200ms"
+    measure: "Time to first meaningful paint"
+
+  - metric: "Authentication"
+    target: "< 1s"
+    critical: "< 2s"
+    measure: "Login button click to home screen"
+
+  - metric: "Receipt capture to OCR"
+    target: "< 5s"
+    critical: "< 8s"
+    measure: "Shutter click to extracted data display"
+
+  - metric: "Token refresh"
+    target: "< 500ms"
+    critical: "< 1s"
+    measure: "Background operation time"
+
+  - metric: "Database query"
+    target: "< 50ms"
+    critical: "< 100ms"
+    measure: "Query execution time"
+
+### Optimization Strategies
+frontend:
+  flutter:
+    - "Const widgets where possible"
+    - "Widget key optimization"
+    - "Image caching with CachedNetworkImage"
+    - "Lazy loading lists with ListView.builder"
+    - "Code splitting by feature"
+
+  nextjs:
+    - "Static generation where possible"
+    - "Dynamic imports for code splitting"
+    - "Image optimization with next/image"
+    - "API routes for backend operations"
+    - "Edge functions for auth checks"
+
+  react_native:
+    - "Hermes JS engine"
+    - "RAM bundles for faster startup"
+    - "Image optimization with FastImage"
+    - "Navigation lazy loading"
+
+backend:
+  database:
+    - "Proper indexing on all foreign keys"
+    - "Composite indexes for common queries"
+    - "Query optimization with EXPLAIN ANALYZE"
+    - "Connection pooling"
+    - "Read replicas for scaling"
+
+  caching:
+    - "Redis for session storage"
+    - "CDN for static assets"
+    - "Database query caching"
+    - "API response caching"
+

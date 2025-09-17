@@ -3,9 +3,6 @@ import '../../domain/services/interfaces/i_sync_service.dart';
 import '../../domain/services/interfaces/i_auth_service.dart';
 import '../../infrastructure/services/mock_sync_service.dart';
 import '../../infrastructure/services/mock_auth_service.dart';
-import '../../infrastructure/services/supabase_sync_service.dart';
-import '../../infrastructure/services/supabase_auth_service.dart';
-import '../../infrastructure/config/supabase_config.dart';
 
 /// Environment configuration provider
 final environmentProvider = Provider<AppEnvironment>((ref) {
@@ -37,7 +34,6 @@ final syncServiceProvider = Provider<ISyncService>((ref) {
       return MockSyncService(); // Fallback to mock for now
       
     case AppEnvironment.development:
-    default:
       return MockSyncService();
   }
 });
@@ -57,7 +53,6 @@ final authServiceProvider = Provider<IAuthService>((ref) {
       return MockAuthService(); // Fallback to mock for now
       
     case AppEnvironment.development:
-    default:
       return MockAuthService();
   }
 });

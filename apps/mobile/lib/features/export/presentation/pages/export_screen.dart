@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/date_range_picker.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/format_selection.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/csv_preview_table.dart';
+import 'package:receipt_organizer/features/export/presentation/widgets/export_progress_dialog.dart';
+import 'package:receipt_organizer/features/export/presentation/widgets/export_history_sheet.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/date_range_provider.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/export_format_provider.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/csv_preview_provider.dart';
+import 'package:receipt_organizer/features/export/presentation/providers/export_provider.dart';
 import 'package:receipt_organizer/features/export/domain/services/csv_preview_service.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/validation_report_dialog.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/export_validation_provider.dart';
-import 'package:receipt_organizer/features/export/domain/export_validator.dart';
+import 'package:receipt_organizer/features/export/domain/export_validator.dart' hide ExportFormat, ValidationResult;
 import 'package:receipt_organizer/core/models/receipt.dart';
 import 'package:receipt_organizer/core/providers/repository_providers.dart';
 import 'package:receipt_organizer/features/export/domain/receipt_converter.dart';
+import 'package:receipt_organizer/domain/services/csv_export_service.dart';
 
 /// Main export screen with date range selection, format options, and CSV preview
 class ExportScreen extends ConsumerStatefulWidget {
@@ -36,6 +42,12 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         elevation: 0,
         backgroundColor: theme.colorScheme.surface,
         actions: [
+          // Export history button
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'Export History',
+            onPressed: () => ExportHistorySheet.show(context),
+          ),
           // Refresh preview button
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -446,90 +458,70 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
   
   Future<void> _handleExport(DateRangeState state) async {
     final format = ref.read(selectedExportFormatProvider);
+    final exportNotifier = ref.read(exportProvider.notifier);
     final formatNotifier = ref.read(exportFormatNotifierProvider.notifier);
     final previewState = ref.read(csvPreviewProvider).value;
-    
-    // Fetch actual receipts from repository
-    final receiptRepo = await ref.read(receiptRepositoryProvider.future);
-    final dataReceipts = await receiptRepo.getReceiptsByDateRange(
-      state.dateRange.start,
-      state.dateRange.end,
-    );
-    
-    // Filter for exportable receipts (those with OCR results and ready status)
-    final exportableReceipts = ReceiptConverter.filterExportableReceipts(dataReceipts);
-    
-    // Convert data layer receipts to core layer receipts for validation
-    final List<Receipt> receipts = ReceiptConverter.fromDataReceipts(exportableReceipts);
-    
-    // Show warning if no receipts to export
-    if (receipts.isEmpty) {
+
+    // Set date range in export provider
+    if (state.dateRange.start != null && state.dateRange.end != null) {
+      exportNotifier.setDateRange(state.dateRange.start, state.dateRange.end);
+    }
+
+    // Convert format to ExportFormat enum
+    final exportFormat = _getExportFormat(format.toString());
+
+    // Set export format
+    exportNotifier.setExportFormat(exportFormat);
+
+    // Wait for receipts to load
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    final exportState = ref.read(exportProvider);
+
+    // Check if we have receipts
+    if (exportState.selectedReceipts.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No receipts found in the selected date range that are ready for export'),
+          content: const Text('No receipts found in the selected date range that are ready for export'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
     }
-    
-    // Convert format to ExportFormat enum
-    final exportFormat = _getExportFormat(format.toString());
-    
-    // Log validation info for debugging
-    debugPrint('Export Validation: Found ${receipts.length} receipts to validate');
-    debugPrint('Export Format: $exportFormat');
-    
-    // Run validation before export
-    final validationNotifier = ref.read(exportValidationProvider.notifier);
-    final validationResult = await validationNotifier.validateReceipts(
-      receipts: receipts,
-      format: exportFormat,
-    );
-    
-    if (validationResult == null) {
-      // Validation failed
+
+    // Show validation if there are issues
+    if (exportState.validationResult != null &&
+        (exportState.validationResult!.errors.isNotEmpty ||
+         exportState.validationResult!.warnings.isNotEmpty)) {
+
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to validate export data'),
-          backgroundColor: Colors.red,
-        ),
+      final shouldExport = await showValidationReportDialog(
+        context: context,
+        validationResult: exportState.validationResult!,
+        exportFormat: format.toString(),
       );
-      return;
+
+      if (!shouldExport) {
+        return;
+      }
     }
-    
-    // Log validation results
-    debugPrint('Validation Result: ${validationResult.isValid ? "VALID" : "INVALID"}');
-    debugPrint('Errors: ${validationResult.errors.length}, Warnings: ${validationResult.warnings.length}');
-    
-    // Show validation report dialog
-    if (!mounted) return;
-    final shouldExport = await showValidationReportDialog(
-      context: context,
-      validationResult: validationResult,
-      exportFormat: format.toString(),
-    );
-    
-    if (!shouldExport) {
-      return;
-    }
-    
+
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Export ${state.receiptCount} Receipts?'),
+        title: Text('Export ${exportState.selectedReceipts.length} Receipts?'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'You are about to export ${state.receiptCount} receipt${state.receiptCount == 1 ? '' : 's'} '
+              'You are about to export ${exportState.selectedReceipts.length} receipt${exportState.selectedReceipts.length == 1 ? '' : 's'} '
               'in ${formatNotifier.getFormatDisplayName(format)} format.',
             ),
-            if (previewState != null && previewState.hasWarnings) ...[
+            if (exportState.validationResult != null &&
+                exportState.validationResult!.warnings.isNotEmpty) ...[
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(8),
@@ -547,7 +539,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '${previewState.validationWarnings.length} validation warnings present',
+                        '${exportState.validationResult!.warnings.length} validation warnings present',
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).colorScheme.onSecondaryContainer,
@@ -575,55 +567,162 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
 
     if (confirmed != true) return;
 
-    // Show progress indicator
+    // Show progress dialog
     if (!mounted) return;
-    showDialog(
+    await ExportProgressDialog.show(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Exporting receipts...'),
-              ],
-            ),
-          ),
-        ),
-      ),
+      totalReceipts: exportState.selectedReceipts.length,
+      formatName: formatNotifier.getFormatDisplayName(format),
     );
 
-    // TODO: Implement actual export logic using CSVExportService
-    await Future.delayed(const Duration(seconds: 2));
+    // Start the export
+    final filename = 'receipts_${exportFormat.name}_${DateTime.now().millisecondsSinceEpoch}.csv';
 
-    // Close progress dialog
-    if (!mounted) return;
-    Navigator.pop(context);
+    // Listen for export completion in the background
+    ref.listen<ExportState>(
+      exportProvider,
+      (previous, next) {
+        // Check if export just completed
+        if (previous?.isExporting == true && !next.isExporting) {
+          // Close progress dialog if still showing
+          if (mounted && Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
 
-    // Show success message
-    if (!mounted) return;
+          // Handle export result with enhanced notifications
+          if (next.lastExportResult != null && next.lastExportResult!.success) {
+            // Show success notification
+            if (mounted) {
+              _showSuccessNotification(
+                context,
+                next.lastExportResult!.recordCount ?? next.selectedReceipts.length,
+                next.lastExportResult!.fileName ?? 'receipts.csv',
+                exportNotifier,
+              );
+            }
+          } else if (next.error != null) {
+            // Show error notification
+            if (mounted) {
+              _showErrorNotification(context, next.error!);
+            }
+          }
+        }
+      },
+    );
+
+    // Start the export
+    await exportNotifier.exportReceipts(customFileName: filename);
+  }
+
+  // Enhanced notification for successful export
+  void _showSuccessNotification(
+    BuildContext context,
+    int receiptCount,
+    String fileName,
+    ExportNotifier exportNotifier,
+  ) {
+    final theme = Theme.of(context);
+
+    // Provide haptic feedback for success
+    HapticFeedback.lightImpact();
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 12),
-            Text('Successfully exported ${state.receiptCount} receipts'),
+            Row(
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'Export Complete!',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$receiptCount receipts • $fileName',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white.withOpacity(0.9),
+              ),
+            ),
           ],
         ),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: const EdgeInsets.all(16),
         action: SnackBarAction(
-          label: 'View',
+          label: 'Share',
+          textColor: Colors.white,
+          onPressed: () => exportNotifier.shareExportedFile(),
+        ),
+        duration: const Duration(seconds: 5),
+      ),
+    );
+  }
+
+  // Enhanced notification for export errors
+  void _showErrorNotification(BuildContext context, String error) {
+    final theme = Theme.of(context);
+
+    // Provide haptic feedback for error
+    HapticFeedback.mediumImpact();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'Export Failed',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              error,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white.withOpacity(0.9),
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+        backgroundColor: theme.colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: const EdgeInsets.all(16),
+        action: SnackBarAction(
+          label: 'Retry',
           textColor: Colors.white,
           onPressed: () {
-            // TODO: Navigate to export location
+            ref.read(exportProvider.notifier).retryLastExport();
           },
         ),
+        duration: const Duration(seconds: 6),
       ),
     );
   }

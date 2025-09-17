@@ -1,0 +1,238 @@
+<poml>
+  <role>Competitive Analysis - Receipt Organizer PRD Component</role>
+  <task>Market positioning and competitive advantages</task>
+
+  <metadata>
+    <component>Competitive Analysis</component>
+    <parent-document>docs/prd/main/prd.poml</parent-document>
+    <version>3.0</version>
+    <date>2025-01-16</date>
+  </metadata>
+
+  <competitive-analysis>
+    <direct-competitors>
+      <competitor name="Expensify">
+        <market-position>Enterprise expense management leader</market-position>
+        <strengths>
+          - Comprehensive expense workflows
+          - Credit card sync and integration
+          - Team collaboration features
+          - Corporate policy enforcement
+          - Advanced reporting capabilities
+        </strengths>
+        <weaknesses>
+          - Complex UI overwhelming for small business
+          - Expensive subscription pricing
+          - Overkill for simple receipt digitization
+          - Poor mobile user experience
+          - Heavy enterprise focus
+        </weaknesses>
+        <our-advantage>
+          Simpler, focused on receipts only with no subscription fees.
+          Mobile-first design vs their desktop-centric approach.
+        </our-advantage>
+        <pricing>$5-18/user/month</pricing>
+        <target-market>Mid to large enterprises</target-market>
+      </competitor>
+
+      <competitor name="Receipt Bank (now Dext)">
+        <market-position>UK-focused receipt processing</market-position>
+        <strengths>
+          - Good OCR accuracy
+          - Accounting software integrations
+          - Human verification option
+          - Established partnerships
+          - Multi-currency support
+        </strengths>
+        <weaknesses>
+          - UK market focus, limited US features
+          - Limited mobile capabilities
+          - Subscription required
+          - Slow processing times
+          - Poor offline functionality
+        </weaknesses>
+        <our-advantage>
+          US tax categories built-in, better mobile experience,
+          instant processing vs their slower workflow.
+        </our-advantage>
+        <pricing>£15-35/month</pricing>
+        <target-market>UK small to medium businesses</target-market>
+      </competitor>
+
+      <competitor name="Shoeboxed">
+        <market-position>Mail-in receipt digitization service</market-position>
+        <strengths>
+          - Human data entry accuracy
+          - Handles physical receipt mailing
+          - IRS audit support
+          - Established service model
+          - Good customer support
+        </strengths>
+        <weaknesses>
+          - Expensive monthly fees
+          - Slow turnaround time (days)
+          - Limited mobile features
+          - No instant processing
+          - Physical mailing required
+        </weaknesses>
+        <our-advantage>
+          Instant processing vs 2-3 day turnaround, no monthly fees,
+          complete mobile control vs mailing receipts.
+        </our-advantage>
+        <pricing>$18-99/month</pricing>
+        <target-market>Small businesses with high receipt volume</target-market>
+      </competitor>
+
+      <competitor name="QuickBooks Receipt Capture">
+        <market-position>Built-in QuickBooks feature</market-position>
+        <strengths>
+          - Seamless QuickBooks integration
+          - No additional cost for QB users
+          - Familiar interface for QB users
+          - Direct posting to accounting
+          - Multi-user access
+        </strengths>
+        <weaknesses>
+          - Requires QuickBooks subscription
+          - Limited OCR accuracy
+          - Basic mobile app
+          - No standalone use
+          - Limited export options
+        </weaknesses>
+        <our-advantage>
+          Works with any accounting software, better OCR accuracy,
+          superior mobile experience, no QB subscription required.
+        </our-advantage>
+        <pricing>Included with QB ($15-180/month)</pricing>
+        <target-market>Existing QuickBooks users</target-market>
+      </competitor>
+    </direct-competitors>
+
+    <indirect-competitors>
+      <competitor name="Google Photos + Manual Entry">
+        <approach>Take photos, manually enter data later</approach>
+        <why-users-choose>Free, already have Google Photos</why-users-choose>
+        <our-advantage>Automatic OCR vs manual typing, tax categories, export formats</our-advantage>
+      </competitor>
+
+      <competitor name="Excel Spreadsheets">
+        <approach>Manual tracking in spreadsheets</approach>
+        <why-users-choose>Familiar tool, complete control</why-users-choose>
+        <our-advantage>No manual typing, automatic categorization, photo storage</our-advantage>
+      </competitor>
+
+      <competitor name="Shoebox Storage">
+        <approach>Physical receipt storage for accountant</approach>
+        <why-users-choose>Simple, no technology required</why-users-choose>
+        <our-advantage>Digital backup, OCR search, organized categories, space saving</our-advantage>
+      </competitor>
+    </indirect-competitors>
+
+    <market-gaps>
+      <gap name="Simple Small Business Focus">
+        <description>
+          Most solutions target enterprises or require complex setup.
+          Gap exists for simple, honest receipt digitization.
+        </description>
+        <our-solution>
+          Mobile-first app focused solely on receipts with one-time purchase model.
+        </our-solution>
+      </gap>
+
+      <gap name="Offline-First Design">
+        <description>
+          Existing solutions require internet connectivity for core functions.
+          Small businesses need to work during busy periods without connectivity.
+        </description>
+        <our-solution>
+          Complete offline functionality with sync when online returns.
+        </our-solution>
+      </gap>
+
+      <gap name="No Subscription Fees">
+        <description>
+          All major competitors use subscription models that add up over time.
+          Small businesses prefer one-time purchases.
+        </description>
+        <our-solution>
+          One-time purchase model with optional cloud storage subscription.
+        </our-solution>
+      </gap>
+
+      <gap name="Mobile-First Experience">
+        <description>
+          Most solutions are desktop-first with poor mobile experiences.
+          Receipt capture is inherently a mobile activity.
+        </description>
+        <our-solution>
+          Built mobile-first with camera integration and touch-optimized interface.
+        </our-solution>
+      </gap>
+    </market-gaps>
+
+    <positioning-strategy>
+      <primary-message>
+        "The honest receipt app that just works"
+      </primary-message>
+
+      <key-differentiators>
+        - No AI hype or marketing fluff
+        - No monthly subscription fees
+        - Works completely offline
+        - Mobile-first design for real-world use
+        - Focus on receipts only, not complex expense management
+        - Built for mom-and-pop businesses, not enterprises
+      </key-differentiators>
+
+      <target-positioning>
+        We win by being the simplest, most honest solution for small businesses
+        who just need to digitize receipts for taxes. We don't compete on
+        enterprise features - we win on simplicity and reliability.
+      </target-positioning>
+
+      <messaging-pillars>
+        <pillar name="Simplicity">
+          "Just point, shoot, and export. No complex setup or training required."
+        </pillar>
+
+        <pillar name="Honesty">
+          "No AI hype, no hidden fees, no complex features you don't need."
+        </pillar>
+
+        <pillar name="Reliability">
+          "Works offline, syncs when online, never loses your data."
+        </pillar>
+
+        <pillar name="Affordability">
+          "One-time purchase, not another monthly subscription."
+        </pillar>
+      </messaging-pillars>
+    </positioning-strategy>
+
+    <competitive-advantages>
+      <advantage type="Functional">
+        <title>Offline-First Architecture</title>
+        <description>Complete functionality without internet connection</description>
+        <impact>Works during busy business hours when connectivity is poor</impact>
+      </advantage>
+
+      <advantage type="Economic">
+        <title>No Subscription Model</title>
+        <description>One-time purchase vs monthly fees</description>
+        <impact>$0 ongoing costs vs $200-1000+ annually for competitors</impact>
+      </advantage>
+
+      <advantage type="Technical">
+        <title>Mobile-Native Design</title>
+        <description>Built for mobile from ground up</description>
+        <impact>Superior user experience for primary use case</impact>
+      </advantage>
+
+      <advantage type="Market">
+        <title>Small Business Focus</title>
+        <description>Designed for 100-500 receipts/month, not enterprise scale</description>
+        <impact>Right-sized solution vs over-engineered enterprise tools</impact>
+      </advantage>
+    </competitive-advantages>
+  </competitive-analysis>
+</poml>

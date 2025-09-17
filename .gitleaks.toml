@@ -1,0 +1,76 @@
+# Gitleaks configuration for Receipt Organizer
+# Prevents false positives in secret scanning
+
+title = "Receipt Organizer Gitleaks Config"
+
+[extend]
+# Extend the base configuration
+useDefault = true
+
+[allowlist]
+# Global allowlist
+description = "Global Allowlist"
+
+# Allow test files and mock data
+paths = [
+  '''test/''',
+  '''.*_test\.dart''',
+  '''mock.*\.dart''',
+  '''test_data_generator\.dart''',
+  '''fixtures/''',
+  '''.env.example''',
+  '''example/'''
+]
+
+# Allow specific patterns that are not real secrets
+regexes = [
+  '''EXAMPLE_.*''',
+  '''FAKE_.*''',
+  '''MOCK_.*''',
+  '''TEST_.*''',
+  '''dummy.*''',
+  '''example.*''',
+  # Flutter/Dart specific patterns that might look like secrets but aren't
+  '''[A-Za-z0-9]{32}\.supabase\.co''',  # Supabase URLs
+  '''eyJ[A-Za-z0-9+/]*={0,2}'''  # JWT tokens in examples
+]
+
+# Files to completely ignore
+[[allowlist.files]]
+regex = '''(.*?)(jpg|jpeg|png|gif|svg|ico|pdf|zip|tar|gz|7z|mp4|mp3|woff|woff2|ttf|eot)$'''
+
+[[allowlist.files]]
+regex = '''^flutter/'''
+
+[[allowlist.files]]
+regex = '''^\.bmad-core/'''
+
+[[allowlist.files]]
+regex = '''package-lock\.json|yarn\.lock|pubspec\.lock'''
+
+# Commit allowlist for specific commits that might have test data
+[[allowlist.commits]]
+description = "Ignore test data commits"
+regex = '''test|mock|example|demo|sample'''
+
+# Custom rules for Flutter/Dart projects
+[[rules]]
+id = "supabase-anon-key"
+description = "Supabase Anon Key (public key, safe to expose)"
+regex = '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6.*"role":"anon"'''
+[rules.allowlist]
+description = "Supabase anon keys are public by design"
+regexes = [
+  '''.*'''
+]
+
+[[rules]]
+id = "flutter-api-key"
+description = "Potential API key in Flutter/Dart code"
+regex = '''(api[_\-]?key|apikey)[\s]*[:=][\s]*["'][a-zA-Z0-9\-_]{32,}["']'''
+path = '''\.dart$'''
+[rules.allowlist]
+paths = [
+  '''test/''',
+  '''example/'''
+]

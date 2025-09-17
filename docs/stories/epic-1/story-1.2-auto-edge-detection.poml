@@ -1,0 +1,24 @@
+# Story 1.2: Auto Edge Detection
+## Epic 1: Receipt Capture & Processing
+
+### Description
+Implementation of auto edge detection functionality.
+
+### Acceptance Criteria
+- [ ] Feature implemented according to specifications
+- [ ] Unit tests written and passing
+- [ ] Integration tests completed
+- [ ] Documentation updated
+- [ ] Code reviewed and approved
+
+### Technical Requirements
+- Follow existing code patterns
+- Ensure backward compatibility
+- Meet performance targets
+- Include error handling
+
+### Definition of Done
+- Code complete and tested
+- Documentation updated
+- Reviewed and approved
+- Deployed to staging

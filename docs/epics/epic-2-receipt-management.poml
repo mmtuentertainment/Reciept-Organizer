@@ -1,0 +1,23 @@
+# Epic 2: Receipt Management
+
+## Description
+Complete receipt CRUD operations, categorization, search, and organization
+
+## Stories
+- 2.1: Enhanced Database Schema
+- 2.2: Storage Configuration
+- 2.3: Add Notes to Receipts
+- 2.4: Category Management
+- 2.5: Receipt Preview
+- 2.6: Search & Filter
+- 2.7: Bulk Operations
+- 2.8: Receipt Tags
+
+## Success Criteria
+- All stories completed and tested
+- Integration tests passing
+- Performance benchmarks met
+- User acceptance testing complete
+
+## Phase
+Core MVP

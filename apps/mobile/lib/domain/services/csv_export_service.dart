@@ -2,17 +2,16 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 
-enum ExportFormat { quickbooks, xero, generic }
-
-class ValidationResult {
+class CSVValidationResult {
   final bool isValid;
   final List<String> errors;
   final List<String> warnings;
   final int validCount;
   final int totalCount;
 
-  ValidationResult({
+  CSVValidationResult({
     required this.isValid,
     this.errors = const [],
     this.warnings = const [],
@@ -54,15 +53,37 @@ class ExportResult {
 }
 
 abstract class ICSVExportService {
-  Future<ValidationResult> validateForExport(List<Receipt> receipts, ExportFormat format);
+  Future<CSVValidationResult> validateForExport(List<Receipt> receipts, ExportFormat format);
   Future<ExportResult> exportToCSV(List<Receipt> receipts, ExportFormat format, {String? customFileName});
   String generateCSVContent(List<Receipt> receipts, ExportFormat format);
   List<String> getRequiredFields(ExportFormat format);
+  Stream<double> exportWithProgress(List<Receipt> receipts, ExportFormat format, {String? customFileName});
+  List<List<Receipt>> createBatches(List<Receipt> receipts, ExportFormat format);
 }
 
 class CSVExportService implements ICSVExportService {
+  static const int quickBooksBatchSize = 1000;
+  static const int xeroBatchSize = 500;
+  static const int genericBatchSize = 5000;
+
+  final ExportFormatValidator _validator = ExportFormatValidator();
   @override
-  Future<ValidationResult> validateForExport(List<Receipt> receipts, ExportFormat format) async {
+  Future<CSVValidationResult> validateForExport(List<Receipt> receipts, ExportFormat format) async {
+    // First use our comprehensive validator
+    final csvContent = generateCSVContent(receipts, format);
+    final validatorResult = ExportFormatValidator.validateFormat(csvContent, format);
+
+    if (!validatorResult.isValid) {
+      return CSVValidationResult(
+        isValid: false,
+        errors: validatorResult.errors,
+        warnings: validatorResult.warnings,
+        validCount: 0,
+        totalCount: receipts.length,
+      );
+    }
+
+    // Continue with existing validation logic
     final errors = <String>[];
     final warnings = <String>[];
     int validCount = 0;
@@ -75,28 +96,28 @@ class CSVExportService implements ICSVExportService {
       final receiptWarnings = <String>[];
       
       // Check required fields based on format
-      if (format == ExportFormat.quickbooks || format == ExportFormat.xero) {
-        if (receipt.merchantName == null || receipt.merchantName!.isEmpty) {
+      if (format == ExportFormat.quickBooks3Column || format == ExportFormat.quickBooks4Column || format == ExportFormat.xero) {
+        if (receipt.vendorName == null || receipt.vendorName!.isEmpty) {
           receiptErrors.add('Receipt ${i + 1}: Missing merchant name');
         }
-        
-        if (receipt.receiptDate == null || receipt.receiptDate!.isEmpty) {
+
+        if (receipt.receiptDate == null) {
           receiptErrors.add('Receipt ${i + 1}: Missing date');
         }
-        
+
         if (receipt.totalAmount == null || receipt.totalAmount! <= 0) {
           receiptErrors.add('Receipt ${i + 1}: Missing or invalid total amount');
         }
-        
+
         // Warnings for low confidence
-        if (receipt.hasOCRResults && receipt.overallConfidence < 70) {
-          receiptWarnings.add('Receipt ${i + 1}: Low OCR confidence (${receipt.overallConfidence.toStringAsFixed(1)}%)');
+        if (receipt.hasOCRResults && receipt.ocrConfidence != null && receipt.ocrConfidence! < 70) {
+          receiptWarnings.add('Receipt ${i + 1}: Low OCR confidence (${receipt.ocrConfidence!.toStringAsFixed(1)}%)');
         }
-        
+
         // Format-specific validations
-        if (format == ExportFormat.quickbooks) {
+        if (format == ExportFormat.quickBooks3Column || format == ExportFormat.quickBooks4Column) {
           // QuickBooks-specific validations
-          if (receipt.merchantName != null && receipt.merchantName!.length > 100) {
+          if (receipt.vendorName != null && receipt.vendorName!.length > 100) {
             receiptWarnings.add('Receipt ${i + 1}: Merchant name may be too long for QuickBooks');
           }
         }
@@ -117,7 +138,7 @@ class CSVExportService implements ICSVExportService {
       warnings.addAll(receiptWarnings);
     }
     
-    return ValidationResult(
+    return CSVValidationResult(
       isValid: errors.isEmpty,
       errors: errors,
       warnings: warnings,
@@ -167,7 +188,8 @@ class CSVExportService implements ICSVExportService {
     const bom = '\uFEFF';
     
     switch (format) {
-      case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         return bom + _generateQuickBooksCSV(receipts);
       case ExportFormat.xero:
         return bom + _generateXeroCSV(receipts);
@@ -179,7 +201,8 @@ class CSVExportService implements ICSVExportService {
   @override
   List<String> getRequiredFields(ExportFormat format) {
     switch (format) {
-      case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         return ['Date', 'Amount', 'Payee', 'Category'];
       case ExportFormat.xero:
         return ['Date', 'Amount', 'Payee', 'Account Code'];
@@ -189,19 +212,16 @@ class CSVExportService implements ICSVExportService {
   }
 
   String _generateQuickBooksCSV(List<Receipt> receipts) {
-    // QuickBooks format: Date, Amount, Payee, Category, Memo
-    final headers = ['Date', 'Amount', 'Payee', 'Category', 'Memo', 'Tax', 'Notes'];
+    // QuickBooks 3-column format as per validation requirements
+    final headers = ['Date', 'Description', 'Amount'];
     final rows = <List<String>>[headers];
     
     for (final receipt in receipts) {
+      final description = '${_sanitizeForCSV(receipt.vendorName ?? 'Unknown Merchant')} - ${_sanitizeForCSV(receipt.notes)}';
       rows.add([
-        _formatDate(receipt.receiptDate) ?? '',
+        _formatDateQuickBooks(receipt.receiptDate) ?? '',
+        description,
         _formatAmount(receipt.totalAmount) ?? '0.00',
-        _sanitizeForCSV(receipt.merchantName ?? 'Unknown Merchant'),
-        'Business Expenses', // Default category
-        'Receipt #${receipt.id.substring(0, receipt.id.length >= 8 ? 8 : receipt.id.length)}',
-        _formatAmount(receipt.taxAmount) ?? '0.00',
-        _sanitizeForCSV(receipt.notes),
       ]);
     }
     
@@ -209,20 +229,29 @@ class CSVExportService implements ICSVExportService {
   }
 
   String _generateXeroCSV(List<Receipt> receipts) {
-    // Xero format: Date, Amount, Payee, Description, Account Code
-    final headers = ['Date', 'Amount', 'Payee', 'Description', 'Account Code', 'Tax Amount', 'Notes'];
+    // Xero format with required fields
+    final headers = ['ContactName', 'InvoiceNumber', 'InvoiceDate', 'DueDate', 'Description', 'Quantity', 'UnitAmount', 'AccountCode', 'TaxType'];
     final rows = <List<String>>[headers];
     
+    int invoiceNum = 1;
     for (final receipt in receipts) {
+      final date = _formatDateXero(receipt.receiptDate) ?? '';
+      final unitAmount = receipt.taxAmount != null && receipt.taxAmount! > 0
+          ? ((receipt.totalAmount ?? 0) - receipt.taxAmount!)
+          : (receipt.totalAmount ?? 0);
+
       rows.add([
-        _formatDate(receipt.receiptDate) ?? '',
-        _formatAmount(receipt.totalAmount) ?? '0.00',
-        _sanitizeForCSV(receipt.merchantName ?? 'Unknown Merchant'),
-        'Business expense - Receipt #${receipt.id.substring(0, receipt.id.length >= 8 ? 8 : receipt.id.length)}',
+        _sanitizeForCSV(receipt.vendorName ?? 'Unknown Vendor'),
+        'REC-${invoiceNum.toString().padLeft(6, '0')}',
+        date,
+        date, // Due date same as invoice date
+        _sanitizeForCSV(receipt.notes ?? 'Receipt'),
+        '1',
+        _formatAmount(unitAmount) ?? '0.00',
         '400', // Default expense account code
-        _formatAmount(receipt.taxAmount) ?? '0.00',
-        _sanitizeForCSV(receipt.notes),
+        'Tax on Purchases',
       ]);
+      invoiceNum++;
     }
     
     return const ListToCsvConverter().convert(rows);
@@ -248,12 +277,12 @@ class CSVExportService implements ICSVExportService {
       rows.add([
         receipt.id,
         _formatDate(receipt.receiptDate) ?? '',
-        _sanitizeForCSV(receipt.merchantName),
+        _sanitizeForCSV(receipt.vendorName),
         _formatAmount(receipt.totalAmount) ?? '',
         _formatAmount(receipt.taxAmount) ?? '',
         _formatDateTime(receipt.capturedAt),
         receipt.batchId ?? '',
-        receipt.overallConfidence.toStringAsFixed(1),
+        receipt.ocrConfidence?.toStringAsFixed(1) ?? '0.0',
         receipt.status.name,
         _sanitizeForCSV(receipt.notes),
       ]);
@@ -292,50 +321,98 @@ class CSVExportService implements ICSVExportService {
     return sanitized;
   }
 
-  String? _formatDate(String? dateStr) {
-    if (dateStr == null) return null;
-    
-    try {
-      // Try to parse and reformat to MM/DD/YYYY
-      DateTime? date;
-      
-      // Try common formats
-      final formats = [
-        RegExp(r'^(\d{1,2})[/\-](\d{1,2})[/\-](\d{4})$'), // MM/DD/YYYY or MM-DD-YYYY
-        RegExp(r'^(\d{4})[/\-](\d{1,2})[/\-](\d{1,2})$'), // YYYY/MM/DD or YYYY-MM-DD
-      ];
-      
-      for (final format in formats) {
-        final match = format.firstMatch(dateStr);
-        if (match != null) {
-          if (format == formats[0]) {
-            // MM/DD/YYYY format
-            final month = int.parse(match.group(1)!);
-            final day = int.parse(match.group(2)!);
-            final year = int.parse(match.group(3)!);
-            date = DateTime(year, month, day);
-          } else {
-            // YYYY/MM/DD format
-            final year = int.parse(match.group(1)!);
-            final month = int.parse(match.group(2)!);
-            final day = int.parse(match.group(3)!);
-            date = DateTime(year, month, day);
-          }
-          break;
-        }
-      }
-      
-      if (date != null) {
-        return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
-      }
-    } catch (e) {
-      // If parsing fails, return the original string
-    }
-    
-    return dateStr;
+  String? _formatDate(DateTime? date) {
+    if (date == null) return null;
+    return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
   }
 
   String _formatDateTime(DateTime dateTime) {
     return '${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}/${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  /// Format date for QuickBooks (MM/DD/YYYY)
+  String? _formatDateQuickBooks(DateTime? date) {
+    if (date == null) return null;
+    return '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  /// Format date for Xero (DD/MM/YYYY)
+  String? _formatDateXero(DateTime? date) {
+    if (date == null) return null;
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  @override
+  Stream<double> exportWithProgress(List<Receipt> receipts, ExportFormat format, {String? customFileName}) async* {
+    try {
+      yield 0.0;
+
+      // Step 1: Validation (20%)
+      final validation = await validateForExport(receipts, format);
+      if (!validation.isValid) {
+        throw Exception('Validation failed: ${validation.errors.join(', ')}');
+      }
+      yield 0.2;
+
+      // Step 2: Create batches if needed (30%)
+      final batches = createBatches(receipts, format);
+      yield 0.3;
+
+      // Step 3: Generate CSV content (60%)
+      final csvContent = generateCSVContent(receipts, format);
+      yield 0.6;
+
+      // Step 4: Get export directory (70%)
+      final directory = await getApplicationDocumentsDirectory();
+      final exportDir = Directory('${directory.path}/exports');
+      if (!await exportDir.exists()) {
+        await exportDir.create(recursive: true);
+      }
+      yield 0.7;
+
+      // Step 5: Generate filename (80%)
+      final timestamp = DateTime.now().toIso8601String().replaceAll(RegExp(r'[^\w]'), '_');
+      final formatName = format.name;
+      final fileName = customFileName ?? 'receipts_${formatName}_$timestamp.csv';
+      yield 0.8;
+
+      // Step 6: Write file (90%)
+      final filePath = '${exportDir.path}/$fileName';
+      final file = File(filePath);
+      await file.writeAsString(csvContent);
+      yield 0.9;
+
+      // Complete
+      yield 1.0;
+    } catch (e) {
+      throw Exception('Export failed: $e');
+    }
+  }
+
+  @override
+  List<List<Receipt>> createBatches(List<Receipt> receipts, ExportFormat format) {
+    int batchSize;
+
+    switch (format) {
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
+        batchSize = quickBooksBatchSize;
+        break;
+      case ExportFormat.xero:
+        batchSize = xeroBatchSize;
+        break;
+      case ExportFormat.generic:
+        batchSize = genericBatchSize;
+        break;
+    }
+
+    final batches = <List<Receipt>>[];
+
+    for (int i = 0; i < receipts.length; i += batchSize) {
+      final end = (i + batchSize < receipts.length) ? i + batchSize : receipts.length;
+      batches.add(receipts.sublist(i, end));
+    }
+
+    return batches;
   }
 }

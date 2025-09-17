@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/domain/services/ocr_service.dart';
 
@@ -21,6 +22,10 @@ void main() {
           id: 'test-1',
           imageUri: '/image1.jpg',
           capturedAt: DateTime(2024, 12, 6),
+          vendorName: 'Test Store',
+          receiptDate: DateTime(2024, 12, 6),
+          totalAmount: 25.99,
+          ocrConfidence: 95.0,
           ocrResults: ProcessingResult(
             merchant: FieldData(value: 'Test Store', confidence: 0.95, originalText: 'Test Store'),
             total: FieldData(value: '25.99', confidence: 0.98, originalText: '25.99'),
@@ -33,10 +38,10 @@ void main() {
       ];
 
       // When
-      final csv = csvService.generateCSVContent(receipts, ExportFormat.quickbooks);
+      final csv = csvService.generateCSVContent(receipts, ExportFormat.quickBooks3Column);
 
       // Then
-      expect(csv, contains('Date,Amount,Payee,Category'));
+      expect(csv, contains('Date,Description,Amount'));
       expect(csv, contains('12/06/2024'));
       expect(csv, contains('25.99'));
       expect(csv, contains('Test Store'));
@@ -49,6 +54,10 @@ void main() {
           id: 'test-1',
           imageUri: '/image1.jpg',
           capturedAt: DateTime(2024, 12, 6),
+          vendorName: 'Coffee Shop',
+          receiptDate: DateTime(2024, 12, 6),
+          totalAmount: 4.50,
+          ocrConfidence: 95.0,
           ocrResults: ProcessingResult(
             merchant: FieldData(value: 'Coffee Shop', confidence: 0.95, originalText: 'Coffee Shop'),
             total: FieldData(value: '4.50', confidence: 0.98, originalText: '4.50'),
@@ -64,8 +73,8 @@ void main() {
       final csv = csvService.generateCSVContent(receipts, ExportFormat.xero);
 
       // Then
-      expect(csv, contains('Date,Amount,Payee'));
-      expect(csv, contains('12/06/2024'));
+      expect(csv, contains('ContactName,InvoiceNumber,InvoiceDate'));
+      expect(csv, contains('06/12/2024')); // Xero uses DD/MM/YYYY
       expect(csv, contains('4.50'));
       expect(csv, contains('Coffee Shop'));
     });
