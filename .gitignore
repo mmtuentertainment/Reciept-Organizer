@@ -59,6 +59,7 @@ setup-mcp-env.sh
 add-supabase-env.sh
 *-env.sh
 clean-git-history.sh
+apps/web/start.sh
 
 # Internal documentation and knowledgebase
 **/knowledgebase/
