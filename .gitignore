@@ -157,3 +157,4 @@ coverage/
 /flutter_sdk/
 /android-sdk/.git-backup/
 bfg-*.jar
+.git-backup/
