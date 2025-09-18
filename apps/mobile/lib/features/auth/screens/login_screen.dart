@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../infrastructure/config/supabase_config.dart';
+import '../../../ui/components/shad/shad_components.dart';
+import '../../../ui/responsive/responsive_builder.dart';
+import '../../../ui/theme/shadcn_theme_provider.dart';
 import '../services/offline_auth_service.dart';
 import 'signup_screen.dart';
 import 'forgot_password_screen.dart';
@@ -159,27 +162,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+
     return Scaffold(
+      backgroundColor: isDark ? ReceiptColors.backgroundDark : ReceiptColors.background,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Icon(
-                  Icons.receipt_long,
-                  size: 80,
-                  color: Colors.green,
+        child: ResponsiveContainer(
+          mobileMaxWidth: 400,
+          tabletMaxWidth: 500,
+          desktopMaxWidth: 600,
+          padding: Responsive.padding(context),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: ReceiptColors.success.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.receipt_long,
+                    size: 50,
+                    color: ReceiptColors.success,
+                  ),
                 ),
-                const SizedBox(height: 24),
-                const Text(
+                const SizedBox(height: 32),
+                ResponsiveText(
                   'Welcome Back',
                   style: TextStyle(
-                    fontSize: 32,
                     fontWeight: FontWeight.bold,
+                    color: isDark ? ReceiptColors.textPrimaryDark : ReceiptColors.textPrimary,
                   ),
+                  mobileFontSize: 28,
+                  tabletFontSize: 32,
+                  desktopFontSize: 36,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
@@ -187,101 +208,108 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   _isOfflineMode
                       ? 'Sign in offline to access cached receipts'
                       : 'Sign in to your account',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey,
+                    color: isDark ? ReceiptColors.textSecondaryDark : ReceiptColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 if (_isOfflineMode) ...[
                   const SizedBox(height: 16),
-                  Container(
+                  AppCard(
+                    backgroundColor: ReceiptColors.warning.withOpacity(0.1),
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.orange),
-                    ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.cloud_off, color: Colors.orange, size: 20),
+                        Icon(Icons.cloud_off, color: ReceiptColors.warning, size: 20),
                         SizedBox(width: 8),
                         Text(
                           'Offline Mode',
-                          style: TextStyle(color: Colors.orange),
+                          style: TextStyle(color: ReceiptColors.warning),
                         ),
                       ],
                     ),
                   ),
                 ],
                 const SizedBox(height: 48),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.email),
+                AppCard(
+                  padding: const EdgeInsets.all(20),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.email),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!value.contains('@')) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
                         ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!value.contains('@')) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.lock),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _passwordController,
+                          decoration: const InputDecoration(
+                            labelText: 'Password',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.lock),
+                          ),
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            }
+                            return null;
+                          },
                         ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          if (value.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 16),
-                  Container(
+                  AppCard(
+                    backgroundColor: ReceiptColors.error.withOpacity(0.1),
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red.shade200),
-                    ),
-                    child: Text(
-                      _errorMessage!,
-                      style: TextStyle(
-                        color: Colors.red.shade800,
-                        fontSize: 14,
-                      ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: ReceiptColors.error,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(
+                              color: ReceiptColors.error,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
                 const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: TextButton(
+                  child: AppTextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -293,43 +321,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: const Text('Forgot Password?'),
                   ),
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _signIn,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(16),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
+                const SizedBox(height: 24),
+                AppButton(
+                  onPressed: _signIn,
+                  isLoading: _isLoading,
+                  child: const Text(
+                    'Sign In',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Text(
-                          'Sign In',
-                          style: TextStyle(fontSize: 16),
-                        ),
                 ),
                 const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  onPressed: _isLoading ? null : _signInWithGoogle,
-                  icon: const Icon(Icons.g_mobiledata),
-                  label: const Text('Sign in with Google'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(16),
+                AppOutlineButton(
+                  onPressed: _signInWithGoogle,
+                  isLoading: _isLoading,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.g_mobiledata, size: 24),
+                      SizedBox(width: 8),
+                      Text('Sign in with Google', style: TextStyle(fontSize: 16)),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account? "),
-                    TextButton(
+                    Text(
+                      "Don't have an account? ",
+                      style: TextStyle(
+                        color: isDark ? ReceiptColors.textSecondaryDark : ReceiptColors.textSecondary,
+                      ),
+                    ),
+                    AppTextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -343,6 +367,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ],
                 ),
               ],
+            ),
             ),
           ),
         ),

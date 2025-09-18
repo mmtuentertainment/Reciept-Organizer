@@ -168,6 +168,10 @@ class ReceiptCard extends StatelessWidget {
     IconData statusIcon;
     
     switch (receipt.status) {
+      case ReceiptStatus.pending:
+        statusColor = Colors.amber;
+        statusIcon = Icons.schedule;
+        break;
       case ReceiptStatus.processing:
         statusColor = Colors.orange;
         statusIcon = Icons.hourglass_empty;

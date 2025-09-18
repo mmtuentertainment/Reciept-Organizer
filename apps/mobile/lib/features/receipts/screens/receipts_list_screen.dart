@@ -4,6 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:receipt_organizer/features/receipts/providers/receipts_provider.dart';
 import 'package:receipt_organizer/core/models/receipt.dart';
 import 'package:receipt_organizer/core/models/receipt_extended.dart';
+import 'package:receipt_organizer/ui/components/shad/shad_components.dart';
+import 'package:receipt_organizer/ui/responsive/responsive_builder.dart';
+import 'package:receipt_organizer/ui/theme/shadcn_theme_provider.dart';
+import 'package:receipt_organizer/features/categories/widgets/category_selector.dart';
 
 class ReceiptsListScreen extends ConsumerStatefulWidget {
   const ReceiptsListScreen({super.key});

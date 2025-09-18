@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 import 'package:receipt_organizer/features/export/presentation/providers/export_provider.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 import 'package:receipt_organizer/core/theme/app_theme.dart';
 
 /// Bottom sheet that displays export history with options to re-download or share

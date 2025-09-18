@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:math' as math;
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:receipt_organizer/core/platform/ocr.dart';
+import 'package:receipt_organizer/core/platform/mobile/ocr_processor_mobile.dart';
+import 'package:receipt_organizer/core/platform/web/ocr_processor_web.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'merchant_normalization_service.dart';
 
@@ -172,9 +176,8 @@ abstract class IOCRService {
 }
 
 class OCRService implements IOCRService {
-  late TextRecognizer _textRecognizer;
+  late OcrProcessor _ocrProcessor;
   bool _isInitialized = false;
-  final TextRecognizer? _customRecognizer;
   final MerchantNormalizationService? _merchantNormalizationService;
   final bool _enableMerchantNormalization;
 
@@ -201,28 +204,40 @@ class OCRService implements IOCRService {
   /// - Fields with confidence <75% should be highlighted for quick editing (AC6)
   /// - Display confidence indicators: ●●● (≥75%), ●●○ (50-74%), ●○○ (<50%)
   OCRService({
-    TextRecognizer? textRecognizer,
     MerchantNormalizationService? merchantNormalizationService,
     bool enableMerchantNormalization = true,
-  }) : _customRecognizer = textRecognizer,
-       _merchantNormalizationService = merchantNormalizationService,
+  }) : _merchantNormalizationService = merchantNormalizationService,
        _enableMerchantNormalization = enableMerchantNormalization;
 
   @override
   Future<void> initialize() async {
     if (_isInitialized) return;
-    
-    // Use custom recognizer for testing or create new one for production
-    _textRecognizer = _customRecognizer ?? TextRecognizer(script: TextRecognitionScript.latin);
+
+    // Use platform-specific OCR processor
+    _ocrProcessor = kIsWeb
+        ? OcrProcessorWeb()
+        : OcrProcessorMobile();
+    await _ocrProcessor.initialize();
     _isInitialized = true;
   }
 
   @override
   Future<void> dispose() async {
     if (_isInitialized) {
-      await _textRecognizer.close();
+      await _ocrProcessor.dispose();
       _isInitialized = false;
     }
+  }
+
+  /// Process image from file path for compatibility
+  Future<ProcessingResult> processImage(String imagePath) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+
+    final file = File(imagePath);
+    final imageData = await file.readAsBytes();
+    return processReceipt(imageData);
   }
 
   @override
@@ -236,46 +251,73 @@ class OCRService implements IOCRService {
     try {
       // Add timeout to prevent hanging
       const timeoutDuration = Duration(seconds: 10);
-      
-      // Try to decode image to get actual dimensions
-      Size imageSize = const Size(800, 600); // Default fallback
-      int bytesPerRow = 800 * 4;
-      
-      final image = img.decodeImage(imageData);
-      if (image != null) {
-        imageSize = Size(image.width.toDouble(), image.height.toDouble());
-        bytesPerRow = image.width * 4; // RGBA format
-      }
 
-      final inputImage = InputImage.fromBytes(
-        bytes: imageData,
-        metadata: InputImageMetadata(
-          size: imageSize,
-          rotation: InputImageRotation.rotation0deg,
-          format: InputImageFormat.yuv420,
-          bytesPerRow: bytesPerRow,
-        ),
-      );
-
-      // Process image with timeout
-      final recognizedText = await _textRecognizer
-          .processImage(inputImage)
+      // Process image with platform-specific OCR processor
+      final receiptResult = await _ocrProcessor
+          .processReceipt(imageData)
           .timeout(timeoutDuration);
-      
+
       stopwatch.stop();
 
-      // Extract fields from recognized text
-      return _extractFields(recognizedText, stopwatch.elapsedMilliseconds);
+      // Convert ReceiptOcrResult to ProcessingResult
+      return _convertToProcessingResult(receiptResult, stopwatch.elapsedMilliseconds);
 
     } catch (e) {
       stopwatch.stop();
       debugPrint('OCR processing failed: $e');
-      
+
       // Return dummy data for development/testing
       return _createDummyResult(stopwatch.elapsedMilliseconds);
     }
   }
 
+  ProcessingResult _convertToProcessingResult(ReceiptOcrResult receiptResult, int durationMs) {
+    // Apply merchant normalization if enabled
+    String? normalizedMerchant = receiptResult.merchantName;
+    if (_enableMerchantNormalization && normalizedMerchant != null) {
+      final service = _merchantNormalizationService ?? MerchantNormalizationService();
+      normalizedMerchant = service.normalize(normalizedMerchant);
+    }
+
+    return ProcessingResult(
+      merchant: receiptResult.merchantName != null
+          ? FieldData(
+              value: normalizedMerchant,
+              confidence: receiptResult.overallConfidence,
+              originalText: receiptResult.merchantName!,
+            )
+          : null,
+      date: receiptResult.date != null
+          ? FieldData(
+              value: receiptResult.date,
+              confidence: receiptResult.overallConfidence,
+              originalText: receiptResult.date.toString(),
+            )
+          : null,
+      total: receiptResult.totalAmount != null
+          ? FieldData(
+              value: receiptResult.totalAmount,
+              confidence: receiptResult.overallConfidence,
+              originalText: receiptResult.totalAmount.toString(),
+            )
+          : null,
+      tax: receiptResult.taxAmount != null
+          ? FieldData(
+              value: receiptResult.taxAmount,
+              confidence: receiptResult.overallConfidence,
+              originalText: receiptResult.taxAmount.toString(),
+            )
+          : null,
+      overallConfidence: receiptResult.overallConfidence,
+      processingEngine: _ocrProcessor.platform,
+      processingDurationMs: durationMs,
+      allText: receiptResult.rawText.split('\n'),
+    );
+  }
+
+  // Legacy method - no longer used with platform abstraction
+  // Kept for reference only
+  /*
   ProcessingResult _extractFields(RecognizedText recognizedText, int durationMs) {
     final allTextLines = recognizedText.blocks
         .expand((block) => block.lines)
@@ -327,6 +369,7 @@ class OCRService implements IOCRService {
       allText: allTextLines,
     );
   }
+  */
 
   FieldData? _extractMerchant(List<String> textLines) {
     if (textLines.isEmpty) return null;

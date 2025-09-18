@@ -15,6 +15,8 @@ class NetworkConnectivityService {
   static final NetworkConnectivityService _instance = NetworkConnectivityService._internal();
   factory NetworkConnectivityService() => _instance;
   NetworkConnectivityService._internal();
+
+  static NetworkConnectivityService get instance => _instance;
   
   final _connectivity = Connectivity();
   StreamSubscription<List<ConnectivityResult>>? _subscription;

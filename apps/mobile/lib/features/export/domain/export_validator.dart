@@ -2,6 +2,7 @@ import '../../../core/models/receipt.dart';
 import '../../../core/exceptions/service_exception.dart';
 import '../services/quickbooks_api_service.dart';
 import '../services/xero_api_service.dart';
+import '../services/export_format_validator.dart' show ExportFormat;
 
 /// Validation severity levels for export issues
 enum ValidationSeverity {
@@ -84,11 +85,7 @@ abstract class ValidationRule {
 }
 
 /// Export format types
-enum ExportFormat {
-  quickbooks,
-  xero,
-  generic
-}
+// ExportFormat enum moved to services/export_format_validator.dart to avoid duplication
 
 /// Main export validator service
 class ExportValidator {
@@ -333,6 +330,8 @@ class ExportValidator {
   _FormatValidator _getFormatValidator(ExportFormat format) {
     switch (format) {
       case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         return _QuickBooksValidator();
       case ExportFormat.xero:
         return _XeroValidator();
@@ -371,15 +370,17 @@ class ExportValidator {
     try {
       switch (format) {
         case ExportFormat.quickbooks:
+        case ExportFormat.quickBooks3Column:
+        case ExportFormat.quickBooks4Column:
           // Use QuickBooks API for validation
           final result = await _quickBooksService.validateReceipts(receipts);
           return _convertAPIResultToValidationResult(result, 'QuickBooks');
-          
+
         case ExportFormat.xero:
           // Use Xero API for validation
           final result = await _xeroService.validateReceipts(receipts);
           return _convertAPIResultToValidationResult(result, 'Xero');
-          
+
         case ExportFormat.generic:
           // No API validation for generic format
           return null;

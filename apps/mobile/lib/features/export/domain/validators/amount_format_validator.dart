@@ -1,4 +1,5 @@
 import '../export_validator.dart';
+import '../../services/export_format_validator.dart' show ExportFormat;
 
 /// Validates amount fields for export
 class AmountFormatValidator {

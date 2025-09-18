@@ -18,6 +18,7 @@ class ExportFormatValidator {
     ExportFormat format,
   ) {
     switch (format) {
+      case ExportFormat.quickbooks:
       case ExportFormat.quickBooks3Column:
         return _validateQuickBooks3Column(csvContent);
       case ExportFormat.quickBooks4Column:
@@ -269,6 +270,7 @@ class ExportFormatValidator {
     ExportFormat format,
   ) {
     switch (format) {
+      case ExportFormat.quickbooks:
       case ExportFormat.quickBooks3Column:
         return _convertToQuickBooks3Column(receipts);
       case ExportFormat.quickBooks4Column:
@@ -453,6 +455,7 @@ class ExportFormatValidator {
 
 /// Export format types
 enum ExportFormat {
+  quickbooks, // Generic QuickBooks format
   quickBooks3Column,
   quickBooks4Column,
   xero,

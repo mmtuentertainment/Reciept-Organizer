@@ -165,18 +165,18 @@ class HybridReceiptRepository implements IReceiptRepository {
     return _localRepository.getReceiptsPaginated(offset, limit);
   }
 
+  @override
+  Future<List<Receipt>> searchReceipts(String query) async {
+    return _localRepository.searchReceipts(query);
+  }
+
   /// Upload receipt to API
   Future<String> _uploadReceiptToApi(Receipt receipt) async {
-    // Check if we have image data
-    if (receipt.imageUri == null) {
-      throw Exception('Cannot upload receipt without image');
-    }
-
     // Determine if it's a URL or local file
     String? imageUrl;
     Uint8List? imageData;
 
-    if (receipt.imageUri!.startsWith('http')) {
+    if (receipt.imageUri.startsWith('http')) {
       imageUrl = receipt.imageUri;
     } else {
       // TODO: Load image from local file system

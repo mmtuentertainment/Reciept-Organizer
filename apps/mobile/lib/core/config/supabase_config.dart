@@ -40,6 +40,8 @@ class SecureLocalStorage extends LocalStorage {
   static const _storage = FlutterSecureStorage();
   static const _sessionKey = 'supabase_session';
 
+  const SecureLocalStorage();
+
   @override
   Future<void> initialize() async {
     // No initialization needed for flutter_secure_storage

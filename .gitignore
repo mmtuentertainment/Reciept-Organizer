@@ -155,4 +155,5 @@ coverage/
 # Tools and SDKs (should never be committed)
 /tools/
 /flutter_sdk/
-/android-sdk/
+/android-sdk/.git-backup/
+bfg-*.jar

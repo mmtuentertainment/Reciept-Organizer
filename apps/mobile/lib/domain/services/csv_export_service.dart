@@ -188,6 +188,7 @@ class CSVExportService implements ICSVExportService {
     const bom = '\uFEFF';
     
     switch (format) {
+      case ExportFormat.quickbooks:
       case ExportFormat.quickBooks3Column:
       case ExportFormat.quickBooks4Column:
         return bom + _generateQuickBooksCSV(receipts);
@@ -201,6 +202,7 @@ class CSVExportService implements ICSVExportService {
   @override
   List<String> getRequiredFields(ExportFormat format) {
     switch (format) {
+      case ExportFormat.quickbooks:
       case ExportFormat.quickBooks3Column:
       case ExportFormat.quickBooks4Column:
         return ['Date', 'Amount', 'Payee', 'Category'];
@@ -394,6 +396,7 @@ class CSVExportService implements ICSVExportService {
     int batchSize;
 
     switch (format) {
+      case ExportFormat.quickbooks:
       case ExportFormat.quickBooks3Column:
       case ExportFormat.quickBooks4Column:
         batchSize = quickBooksBatchSize;

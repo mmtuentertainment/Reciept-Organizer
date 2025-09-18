@@ -34,4 +34,7 @@ abstract class IReceiptRepository {
   
   /// Get receipts paginated
   Future<List<Receipt>> getReceiptsPaginated(int offset, int limit);
+
+  /// Search receipts by vendor name or other fields
+  Future<List<Receipt>> searchReceipts(String query);
 }

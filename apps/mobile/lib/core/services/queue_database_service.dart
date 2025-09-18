@@ -1,218 +1,134 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:drift/drift.dart';
 import '../models/queue_entry.dart';
+import '../../database/app_database.dart';
 
 /// Database service for request queue persistence
-/// 
-/// EXPERIMENT: Phase 3 - Queue persistence layer
-/// Uses SQLite to store failed requests for later retry
+///
+/// Uses Drift database (works on all platforms including web)
 class QueueDatabaseService {
   static final QueueDatabaseService _instance = QueueDatabaseService._internal();
   factory QueueDatabaseService() => _instance;
   QueueDatabaseService._internal();
-  
-  static Database? _database;
-  
-  /// Database name
-  static const String _databaseName = 'request_queue.db';
-  static const int _databaseVersion = 1;
-  
-  /// Table and column names
-  static const String tableName = 'queue_entries';
-  static const String columnId = 'id';
-  static const String columnEndpoint = 'endpoint';
-  static const String columnMethod = 'method';
-  static const String columnHeaders = 'headers';
-  static const String columnBody = 'body';
-  static const String columnCreatedAt = 'created_at';
-  static const String columnLastAttemptAt = 'last_attempt_at';
-  static const String columnRetryCount = 'retry_count';
-  static const String columnMaxRetries = 'max_retries';
-  static const String columnErrorMessage = 'error_message';
-  static const String columnStatus = 'status';
-  static const String columnFeature = 'feature';
-  static const String columnUserId = 'user_id';
-  
-  /// Get database instance
-  Future<Database> get database async {
-    // Skip database operations on web platform
-    if (kIsWeb) {
-      throw UnsupportedError('SQLite not supported on web - use IndexedDB or localStorage instead');
-    }
-    if (_database != null) return _database!;
-    _database = await _initDatabase();
-    return _database!;
-  }
-  
-  /// Initialize database
-  Future<Database> _initDatabase() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, _databaseName);
-    
-    return await openDatabase(
-      path,
-      version: _databaseVersion,
-      onCreate: _onCreate,
+
+  final AppDatabase _database = AppDatabase();
+
+  /// Insert queue entry
+  Future<int> insert(QueueEntry entry) async {
+    final companion = QueueEntriesCompanion(
+      id: Value(entry.id),
+      endpoint: Value(entry.endpoint),
+      method: Value(entry.method),
+      headers: Value(json.encode(entry.headers)),
+      body: entry.body != null ? Value(json.encode(entry.body)) : const Value.absent(),
+      createdAt: Value(entry.createdAt),
+      lastAttemptAt: entry.lastAttemptAt != null ? Value(entry.lastAttemptAt!) : const Value.absent(),
+      retryCount: Value(entry.retryCount),
+      maxRetries: Value(entry.maxRetries),
+      status: Value(entry.status.name),
+      errorMessage: entry.errorMessage != null ? Value(entry.errorMessage!) : const Value.absent(),
+      feature: entry.feature != null ? Value(entry.feature!) : const Value.absent(),
+      userId: entry.userId != null ? Value(entry.userId!) : const Value.absent(),
     );
+    return await _database.insertQueueEntry(companion);
   }
-  
-  /// Create database schema
-  Future<void> _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE $tableName (
-        $columnId TEXT PRIMARY KEY,
-        $columnEndpoint TEXT NOT NULL,
-        $columnMethod TEXT NOT NULL,
-        $columnHeaders TEXT NOT NULL,
-        $columnBody TEXT,
-        $columnCreatedAt INTEGER NOT NULL,
-        $columnLastAttemptAt INTEGER,
-        $columnRetryCount INTEGER NOT NULL,
-        $columnMaxRetries INTEGER NOT NULL,
-        $columnErrorMessage TEXT,
-        $columnStatus TEXT NOT NULL,
-        $columnFeature TEXT,
-        $columnUserId TEXT
-      )
-    ''');
-    
-    // Create index for faster queries
-    await db.execute('''
-      CREATE INDEX idx_status ON $tableName ($columnStatus)
-    ''');
-    
-    await db.execute('''
-      CREATE INDEX idx_created_at ON $tableName ($columnCreatedAt)
-    ''');
-  }
-  
-  /// Insert a new queue entry
-  Future<void> insert(QueueEntry entry) async {
-    final db = await database;
-    await db.insert(
-      tableName,
-      _toMap(entry),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-  
+
   /// Get all pending entries
-  Future<List<QueueEntry>> getPendingEntries() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      tableName,
-      where: '$columnStatus = ?',
-      whereArgs: ['pending'],
-      orderBy: '$columnCreatedAt ASC',
-    );
-    
-    return maps.map((map) => _fromMap(map)).toList();
+  Future<List<QueueEntry>> getPending() async {
+    final entities = await _database.getPendingQueueEntries();
+    return entities.map(_entityToModel).toList();
   }
-  
-  /// Get entry by ID
-  Future<QueueEntry?> getById(String id) async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      tableName,
-      where: '$columnId = ?',
-      whereArgs: [id],
-      limit: 1,
-    );
-    
-    if (maps.isEmpty) return null;
-    return _fromMap(maps.first);
+
+  /// Get entries for a specific feature
+  Future<List<QueueEntry>> getByFeature(String feature) async {
+    final entities = await _database.getQueueEntriesByFeature(feature);
+    return entities.map(_entityToModel).toList();
   }
-  
+
   /// Update entry
-  Future<void> update(QueueEntry entry) async {
-    final db = await database;
-    await db.update(
-      tableName,
-      _toMap(entry),
-      where: '$columnId = ?',
-      whereArgs: [entry.id],
+  Future<int> update(QueueEntry entry) async {
+    final companion = QueueEntriesCompanion(
+      endpoint: Value(entry.endpoint),
+      method: Value(entry.method),
+      headers: Value(json.encode(entry.headers)),
+      body: entry.body != null ? Value(json.encode(entry.body)) : const Value.absent(),
+      lastAttemptAt: entry.lastAttemptAt != null ? Value(entry.lastAttemptAt!) : const Value.absent(),
+      retryCount: Value(entry.retryCount),
+      maxRetries: Value(entry.maxRetries),
+      status: Value(entry.status.name),
+      errorMessage: entry.errorMessage != null ? Value(entry.errorMessage!) : const Value.absent(),
+      feature: entry.feature != null ? Value(entry.feature!) : const Value.absent(),
+      userId: entry.userId != null ? Value(entry.userId!) : const Value.absent(),
     );
+    final success = await _database.updateQueueEntry(companion, entry.id);
+    return success ? 1 : 0;
   }
-  
+
   /// Delete entry
-  Future<void> delete(String id) async {
-    final db = await database;
-    await db.delete(
-      tableName,
-      where: '$columnId = ?',
-      whereArgs: [id],
-    );
+  Future<int> delete(String id) async {
+    return await _database.deleteQueueEntry(id);
   }
-  
-  /// Delete completed entries older than specified duration
-  Future<int> deleteOldCompleted({Duration age = const Duration(days: 7)}) async {
-    final db = await database;
-    final cutoff = DateTime.now().subtract(age).millisecondsSinceEpoch;
-    
-    return await db.delete(
-      tableName,
-      where: '$columnStatus = ? AND $columnCreatedAt < ?',
-      whereArgs: ['completed', cutoff],
-    );
+
+  /// Delete all completed entries
+  Future<int> deleteCompleted() async {
+    return await _database.deleteCompletedQueueEntries();
   }
-  
+
+  /// Get entry count
+  Future<int> getCount() async {
+    return await _database.getQueueSize();
+  }
+
+  /// Close database
+  Future<void> close() async {
+    // Database is managed by AppDatabase singleton
+    // No need to close it here as it's shared
+  }
+
   /// Get queue size
   Future<int> getQueueSize() async {
-    final db = await database;
-    final result = await db.rawQuery('SELECT COUNT(*) as count FROM $tableName WHERE $columnStatus = ?', ['pending']);
-    return Sqflite.firstIntValue(result) ?? 0;
+    return await _database.getQueueSize();
   }
-  
-  /// Clear all entries (for testing/debugging)
+
+  /// Get pending entries
+  Future<List<QueueEntry>> getPendingEntries() async {
+    final entities = await _database.getPendingQueueEntries();
+    return entities.map(_entityToModel).toList();
+  }
+
+  /// Clear all entries
   Future<void> clearAll() async {
-    final db = await database;
-    await db.delete(tableName);
+    await _database.clearAllQueueEntries();
   }
-  
-  /// Convert QueueEntry to Map for database
-  Map<String, dynamic> _toMap(QueueEntry entry) {
-    return {
-      columnId: entry.id,
-      columnEndpoint: entry.endpoint,
-      columnMethod: entry.method,
-      columnHeaders: json.encode(entry.headers),
-      columnBody: entry.body != null ? json.encode(entry.body) : null,
-      columnCreatedAt: entry.createdAt.millisecondsSinceEpoch,
-      columnLastAttemptAt: entry.lastAttemptAt?.millisecondsSinceEpoch,
-      columnRetryCount: entry.retryCount,
-      columnMaxRetries: entry.maxRetries,
-      columnErrorMessage: entry.errorMessage,
-      columnStatus: entry.status.name,
-      columnFeature: entry.feature,
-      columnUserId: entry.userId,
-    };
+
+  /// Delete old completed entries
+  Future<void> deleteOldCompleted() async {
+    await _database.deleteOldCompletedQueueEntries();
   }
-  
-  /// Convert Map from database to QueueEntry
-  QueueEntry _fromMap(Map<String, dynamic> map) {
+
+  /// Convert database entity to model
+  QueueEntry _entityToModel(QueueEntryEntity entity) {
     return QueueEntry(
-      id: map[columnId] as String,
-      endpoint: map[columnEndpoint] as String,
-      method: map[columnMethod] as String,
-      headers: json.decode(map[columnHeaders] as String) as Map<String, dynamic>,
-      body: map[columnBody] != null 
-        ? json.decode(map[columnBody] as String) as Map<String, dynamic>
-        : null,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map[columnCreatedAt] as int),
-      lastAttemptAt: map[columnLastAttemptAt] != null
-        ? DateTime.fromMillisecondsSinceEpoch(map[columnLastAttemptAt] as int)
-        : null,
-      retryCount: map[columnRetryCount] as int,
-      maxRetries: map[columnMaxRetries] as int,
-      errorMessage: map[columnErrorMessage] as String?,
+      id: entity.id,
+      endpoint: entity.endpoint,
+      method: entity.method,
+      headers: entity.headers.isNotEmpty
+          ? Map<String, dynamic>.from(json.decode(entity.headers))
+          : {},
+      body: entity.body != null
+          ? Map<String, dynamic>.from(json.decode(entity.body!))
+          : null,
+      createdAt: entity.createdAt,
+      lastAttemptAt: entity.lastAttemptAt,
+      retryCount: entity.retryCount,
+      maxRetries: entity.maxRetries,
       status: QueueEntryStatus.values.firstWhere(
-        (e) => e.name == map[columnStatus],
+        (s) => s.name == entity.status,
         orElse: () => QueueEntryStatus.pending,
       ),
-      feature: map[columnFeature] as String?,
-      userId: map[columnUserId] as String?,
+      errorMessage: entity.errorMessage,
+      feature: entity.feature,
+      userId: entity.userId,
     );
   }
 }

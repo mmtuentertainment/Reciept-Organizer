@@ -1,31 +1,31 @@
 import 'dart:typed_data';
-import 'package:camera/camera.dart';
 
+/// Platform-agnostic camera frame representation
 class CameraFrame {
-  final CameraImage? image;
   final Uint8List imageData;
   final DateTime timestamp;
+  final Map<String, dynamic>? metadata;
 
   CameraFrame({
-    this.image,
     required this.imageData,
     DateTime? timestamp,
+    this.metadata,
   }) : timestamp = timestamp ?? DateTime.now();
 
-  /// Create a CameraFrame from CameraImage (converts to JPEG bytes)
-  static Future<CameraFrame> fromCameraImage(CameraImage image) async {
-    // Convert CameraImage to JPEG bytes
-    final imageData = await _convertCameraImageToJpeg(image);
+  /// Create a CameraFrame from raw image bytes
+  static Future<CameraFrame> fromBytes(
+    Uint8List bytes, {
+    Map<String, dynamic>? metadata,
+  }) async {
     return CameraFrame(
-      image: image,
-      imageData: imageData,
+      imageData: bytes,
+      metadata: metadata,
     );
   }
 
-  /// Convert CameraImage to JPEG bytes
-  static Future<Uint8List> _convertCameraImageToJpeg(CameraImage image) async {
-    // For development purposes, return dummy data
-    // In production, this would convert the YUV420 or NV21 format to JPEG
-    return Uint8List.fromList(List.generate(1000, (index) => index % 256));
-  }
+  /// Check if frame contains valid image data
+  bool get hasValidData => imageData.isNotEmpty;
+
+  /// Get size in bytes
+  int get sizeInBytes => imageData.length;
 }

@@ -1,4 +1,5 @@
 import '../export_validator.dart';
+import '../../services/export_format_validator.dart';
 
 /// Validates merchant name fields for export and security
 class MerchantNameValidator {

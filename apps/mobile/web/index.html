@@ -33,6 +33,23 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- SQLite WASM for Drift database -->
+  <script type="module">
+    // Load SQLite WASM for Drift
+    import sqlite3InitModule from './sqlite3.js';
+
+    window.sqlite3InitModule = sqlite3InitModule;
+
+    // Initialize when ready
+    sqlite3InitModule().then(sqlite3 => {
+      console.log('SQLite WASM loaded successfully');
+      window.sqlite3 = sqlite3;
+    });
+  </script>
+
+  <!-- Drift worker for background operations -->
+  <script src="drift_worker.dart.js" defer></script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

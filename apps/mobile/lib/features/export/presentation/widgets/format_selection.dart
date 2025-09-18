@@ -201,6 +201,10 @@ class FormatSelectionWidget extends ConsumerWidget {
     switch (format) {
       case ExportFormat.quickbooks:
         return 'QuickBooks';
+      case ExportFormat.quickBooks3Column:
+        return 'QuickBooks 3-Column';
+      case ExportFormat.quickBooks4Column:
+        return 'QuickBooks 4-Column';
       case ExportFormat.xero:
         return 'Xero';
       case ExportFormat.generic:
@@ -212,6 +216,10 @@ class FormatSelectionWidget extends ConsumerWidget {
     switch (format) {
       case ExportFormat.quickbooks:
         return 'Compatible with QuickBooks Desktop and Online. Uses MM/dd/yyyy date format.';
+      case ExportFormat.quickBooks3Column:
+        return 'QuickBooks 3-column format: Date, Description, Amount. Uses MM/dd/yyyy date format.';
+      case ExportFormat.quickBooks4Column:
+        return 'QuickBooks 4-column format: Date, Description, Debit, Credit. Uses MM/dd/yyyy date format.';
       case ExportFormat.xero:
         return 'Compatible with Xero accounting software. Uses dd/MM/yyyy date format.';
       case ExportFormat.generic:
@@ -222,6 +230,8 @@ class FormatSelectionWidget extends ConsumerWidget {
   IconData _getFormatIcon(ExportFormat format) {
     switch (format) {
       case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         return Icons.account_balance;
       case ExportFormat.xero:
         return Icons.cloud_circle;
@@ -234,6 +244,10 @@ class FormatSelectionWidget extends ConsumerWidget {
     switch (format) {
       case ExportFormat.quickbooks:
         return ['Date', 'Amount', 'Payee', 'Category'];
+      case ExportFormat.quickBooks3Column:
+        return ['Date', 'Description', 'Amount'];
+      case ExportFormat.quickBooks4Column:
+        return ['Date', 'Description', 'Debit', 'Credit'];
       case ExportFormat.xero:
         return ['Date', 'Amount', 'Payee', 'Account Code'];
       case ExportFormat.generic:
@@ -244,6 +258,8 @@ class FormatSelectionWidget extends ConsumerWidget {
   String _getDateFormat(ExportFormat format) {
     switch (format) {
       case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         return 'MM/dd/yyyy';
       case ExportFormat.xero:
         return 'dd/MM/yyyy';

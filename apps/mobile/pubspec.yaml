@@ -38,18 +38,23 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
   
-  # Camera and Image Processing
-  camera: ^0.11.2
+  # Camera and Image Processing (Platform-aware)
+  image_picker: ^1.1.2  # Cross-platform image selection
+  file_picker: ^8.1.4  # Web-compatible file selection
+  image_picker_web: ^3.0.5  # Web-specific image picker
   image: ^4.5.4
   flutter_image_compress: ^2.4.0
-  permission_handler: ^11.3.1
-  
-  # OCR and ML
-  google_mlkit_text_recognition: ^0.15.0
+  permission_handler: ^11.3.1  # Mobile permissions
+
+  # OCR and ML (Will be abstracted)
+  # google_mlkit_text_recognition moved to conditional dependency
   # OpenCV removed for now - will implement basic edge detection without it
   
   # Database and Storage
-  sqflite: ^2.4.2
+  drift: ^2.20.3
+  drift_flutter: ^0.2.0
+  sqlite3_flutter_libs: ^0.5.24
+  sqlite3: ^2.4.6
   path_provider: ^2.1.5
   path: ^1.9.1
   
@@ -71,15 +76,14 @@ dependencies:
   url_launcher: ^6.3.2
   app_links: ^6.3.2  # For OAuth deep linking
 
-  # Background Processing (replacing workmanager)
-  flutter_background_service: ^5.1.0
-  flutter_background_service_android: ^6.2.7
-  flutter_background_service_ios: ^5.0.2
+  # Background Processing (Will be abstracted)
+  # flutter_background_service moved to conditional dependency
 
   # Network Connectivity
   connectivity_plus: ^6.1.1
   internet_connection_checker: ^3.0.1
   shadcn_ui: ^0.31.5
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -91,15 +95,15 @@ dev_dependencies:
   flutter_lints: ^3.0.1
   mockito: ^5.4.2
   build_runner: ^2.4.13
+  drift_dev: ^2.20.3  # Drift code generator
   
   # Code generation  
   riverpod_generator: ^2.4.3
   riverpod_annotation: ^2.3.5
   json_annotation: ^4.8.1
   json_serializable: ^6.8.0
-  
+
   # Database testing
-  sqflite_common_ffi: ^2.3.3
   mocktail: ^1.0.4
   freezed: ^2.5.7
 

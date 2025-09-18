@@ -16,6 +16,8 @@ class RequestQueueService {
   static final RequestQueueService _instance = RequestQueueService._internal();
   factory RequestQueueService() => _instance;
   RequestQueueService._internal();
+
+  static RequestQueueService get instance => _instance;
   
   final _database = QueueDatabaseService();
   final _connectivity = NetworkConnectivityService();

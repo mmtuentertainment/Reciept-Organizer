@@ -1,9 +1,8 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:receipt_organizer/infrastructure/config/supabase_config.dart';
 import 'package:receipt_organizer/core/services/background_sync_service.dart';
@@ -19,30 +18,46 @@ import 'package:receipt_organizer/features/auth/services/offline_auth_service.da
 import 'package:receipt_organizer/features/auth/services/inactivity_monitor.dart';
 import 'package:receipt_organizer/features/receipts/screens/receipts_list_screen.dart';
 import 'package:receipt_organizer/ui/theme/shadcn_theme_provider.dart';
+import 'package:receipt_organizer/ui/components/shad/shad_components.dart';
+import 'package:receipt_organizer/ui/responsive/responsive_builder.dart';
+
+// Import database for initialization
+import 'package:receipt_organizer/database/app_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize database for the platform
+  // Set up global error handling
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    print('Flutter Error: ${details.exception}');
+    print('Stack trace: ${details.stack}');
+  };
+
+  // Platform identification for debugging
   if (kIsWeb) {
-    // For web, SQLite is not directly supported
-    print('📱 Running on Web - Using alternative storage');
+    print('📱 Running on Web - Using IndexedDB via Drift');
+  } else if (defaultTargetPlatform == TargetPlatform.android ||
+             defaultTargetPlatform == TargetPlatform.iOS) {
+    print('📱 Running on Mobile - Using SQLite via Drift');
   } else {
-    // Initialize FFI for desktop/mobile
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-    print('✅ Database factory initialized');
+    print('💻 Running on Desktop - Using SQLite via Drift');
   }
+
+  // Initialize Drift database (works on ALL platforms)
+  final database = AppDatabase();
+  final stats = await database.getStats();
+  print('📊 Database initialized: $stats');
 
   // Initialize core services early
   try {
     // Initialize network connectivity monitoring
-    final connectivity = NetworkConnectivityService();
+    final connectivity = NetworkConnectivityService.instance;
     await connectivity.initialize();
     print('✅ Network connectivity service initialized');
 
     // Initialize request queue service
-    final queueService = RequestQueueService();
+    final queueService = RequestQueueService.instance;
     await queueService.initialize();
     print('✅ Request queue service initialized');
 
@@ -51,7 +66,7 @@ void main() async {
     print('✅ Background service initialized');
 
     // Start periodic sync
-    final backgroundService = BackgroundSyncService();
+    final backgroundService = BackgroundSyncService.instance;
     await backgroundService.registerPeriodicSync();
     print('✅ Background periodic sync started');
   } catch (e) {
@@ -106,7 +121,9 @@ void main() async {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
-      child: const ReceiptOrganizerApp(),
+      child: AppErrorBoundary(
+        child: const ReceiptOrganizerApp(),
+      ),
     ),
   );
 }
@@ -118,7 +135,6 @@ class ReceiptOrganizerApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     final themeMode = ref.watch(themeModeProvider);
-    final shadTheme = ref.watch(shadcnThemeProvider);
 
     // Use Material app with custom theming that matches shadcn
     return MaterialApp(
@@ -165,6 +181,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -173,6 +190,25 @@ class HomeScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
+            icon: Icon(
+              themeMode == ThemeMode.dark
+                ? Icons.light_mode
+                : themeMode == ThemeMode.light
+                  ? Icons.dark_mode
+                  : Icons.auto_mode,
+            ),
+            onPressed: () {
+              final currentMode = ref.read(themeModeProvider.notifier).state;
+              ref.read(themeModeProvider.notifier).state =
+                currentMode == ThemeMode.light
+                  ? ThemeMode.dark
+                  : currentMode == ThemeMode.dark
+                    ? ThemeMode.system
+                    : ThemeMode.light;
+            },
+            tooltip: 'Toggle Theme',
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await ref.read(authNotifierProvider.notifier).signOut();
@@ -180,10 +216,12 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+      body: ResponsiveContainer(
+        padding: Responsive.padding(context),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
             const Icon(
               Icons.receipt_long,
               size: 100,
@@ -217,7 +255,7 @@ class HomeScreen extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: 48),
-            ElevatedButton.icon(
+            AppButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -225,20 +263,25 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Capture Receipt'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                textStyle: const TextStyle(fontSize: 18),
+              size: ShadButtonSize.lg,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.camera_alt, color: Colors.white),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Capture Receipt',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
-            OutlinedButton.icon(
+            AppOutlineButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -246,17 +289,24 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.folder),
-              label: const Text('View Receipts'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                textStyle: const TextStyle(fontSize: 18),
+              size: ShadButtonSize.lg,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.folder),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'View Receipts',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

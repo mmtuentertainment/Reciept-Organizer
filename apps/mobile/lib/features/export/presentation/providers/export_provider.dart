@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/domain/services/csv_export_service.dart';
-import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart' hide ValidationResult;
+import 'package:receipt_organizer/features/export/domain/export_validator.dart';
 import 'package:receipt_organizer/data/models/receipt.dart';
 import 'package:receipt_organizer/core/repositories/interfaces/i_receipt_repository.dart';
 import 'package:receipt_organizer/core/providers/repository_providers.dart' as core_providers;
@@ -178,9 +179,30 @@ class ExportNotifier extends StateNotifier<ExportState> {
     if (state.selectedReceipts.isEmpty) return;
 
     try {
-      final validation = await _csvService.validateForExport(
+      final csvValidation = await _csvService.validateForExport(
         state.selectedReceipts,
         state.selectedFormat,
+      );
+
+      // Convert CSVValidationResult to ValidationResult
+      final validation = ValidationResult(
+        isValid: csvValidation.isValid,
+        errors: csvValidation.errors.asMap().entries.map((entry) => ValidationIssue(
+          id: 'error_${entry.key}',
+          message: entry.value,
+          severity: ValidationSeverity.error,
+          field: 'receipt',
+        )).toList(),
+        warnings: csvValidation.warnings.asMap().entries.map((entry) => ValidationIssue(
+          id: 'warning_${entry.key}',
+          message: entry.value,
+          severity: ValidationSeverity.warning,
+          field: 'receipt',
+        )).toList(),
+        metadata: {
+          'validCount': csvValidation.validCount,
+          'totalCount': csvValidation.totalCount,
+        },
       );
 
       state = state.copyWith(

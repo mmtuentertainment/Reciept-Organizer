@@ -129,6 +129,10 @@ class ExportFormatNotifier extends StateNotifier<ExportFormatState> {
     switch (format) {
       case ExportFormat.quickbooks:
         return 'QuickBooks';
+      case ExportFormat.quickBooks3Column:
+        return 'QuickBooks 3-Column';
+      case ExportFormat.quickBooks4Column:
+        return 'QuickBooks 4-Column';
       case ExportFormat.xero:
         return 'Xero';
       case ExportFormat.generic:

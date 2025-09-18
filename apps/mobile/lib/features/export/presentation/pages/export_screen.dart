@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart' hide ValidationResult;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/date_range_picker.dart';
@@ -15,7 +15,7 @@ import 'package:receipt_organizer/features/export/domain/services/csv_preview_se
 import 'package:receipt_organizer/core/theme/app_theme.dart';
 import 'package:receipt_organizer/features/export/presentation/widgets/validation_report_dialog.dart';
 import 'package:receipt_organizer/features/export/presentation/providers/export_validation_provider.dart';
-import 'package:receipt_organizer/features/export/domain/export_validator.dart' hide ExportFormat, ValidationResult;
+import 'package:receipt_organizer/features/export/domain/export_validator.dart';
 import 'package:receipt_organizer/core/models/receipt.dart';
 import 'package:receipt_organizer/core/providers/repository_providers.dart';
 import 'package:receipt_organizer/features/export/domain/receipt_converter.dart';

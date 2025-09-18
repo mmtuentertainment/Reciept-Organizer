@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receipt_organizer/core/models/receipt.dart';
 import '../../domain/export_validator.dart';
+import '../../services/export_format_validator.dart' as export_format;
 
 /// Provider for the export validator service
 final exportValidatorProvider = Provider<ExportValidator>((ref) {
@@ -49,7 +50,7 @@ class ExportValidationNotifier extends StateNotifier<ExportValidationState> {
   /// Validate receipts for export
   Future<ValidationResult?> validateReceipts({
     required List<Receipt> receipts,
-    required ExportFormat format,
+    required export_format.ExportFormat format,
   }) async {
     // Reset state
     state = const ExportValidationState(isValidating: true);
@@ -129,7 +130,7 @@ final exportValidationProvider =
 /// Provider to trigger validation
 final validateExportProvider = Provider.family<Future<ValidationResult?>, ({
   List<Receipt> receipts,
-  ExportFormat format,
+  export_format.ExportFormat format,
 })>((ref, params) async {
   final notifier = ref.read(exportValidationProvider.notifier);
   return notifier.validateReceipts(

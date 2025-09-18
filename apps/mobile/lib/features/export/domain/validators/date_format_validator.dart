@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import '../export_validator.dart';
+import '../../services/export_format_validator.dart' show ExportFormat;
 
 /// Validates and converts date formats for different export targets
 class DateFormatValidator {
@@ -68,6 +69,8 @@ class DateFormatValidator {
   String formatDate(DateTime date, ExportFormat format) {
     switch (format) {
       case ExportFormat.quickbooks:
+      case ExportFormat.quickBooks3Column:
+      case ExportFormat.quickBooks4Column:
         return _qbFormatter.format(date);
       case ExportFormat.xero:
         return _xeroFormatter.format(date);
@@ -111,6 +114,8 @@ class DateFormatValidator {
       // Parse from source format
       switch (fromFormat) {
         case ExportFormat.quickbooks:
+        case ExportFormat.quickBooks3Column:
+        case ExportFormat.quickBooks4Column:
           date = _qbFormatter.parseStrict(dateString);
           break;
         case ExportFormat.xero:

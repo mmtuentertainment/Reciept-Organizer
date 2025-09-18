@@ -23,7 +23,7 @@ class ReceiptCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     final isDark = context.isDarkMode;
-    final statusColor = context.getReceiptStatusColor(receipt.status ?? 'pending');
+    final statusColor = context.getReceiptStatusColor(receipt.status.name);
 
     return ShadCard(
       padding: const EdgeInsets.all(16),
@@ -51,7 +51,7 @@ class ReceiptCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        DateFormat('MMM d, yyyy').format(receipt.purchaseDate),
+                        DateFormat('MMM d, yyyy').format(receipt.receiptDate ?? receipt.capturedAt),
                         style: theme.textTheme.muted.copyWith(
                           fontSize: 14,
                         ),
@@ -63,7 +63,7 @@ class ReceiptCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '\$${receipt.totalAmount.toStringAsFixed(2)}',
+                      '\$${(receipt.totalAmount ?? 0.0).toStringAsFixed(2)}',
                       style: theme.textTheme.h4.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.colorScheme.primary,
@@ -73,7 +73,7 @@ class ReceiptCard extends StatelessWidget {
                     ShadBadge(
                       backgroundColor: statusColor.withOpacity(0.1),
                       child: Text(
-                        (receipt.status ?? 'pending').toUpperCase(),
+                        receipt.status.name.toUpperCase(),
                         style: TextStyle(
                           color: statusColor,
                           fontSize: 11,
@@ -87,27 +87,27 @@ class ReceiptCard extends StatelessWidget {
             ),
 
             // Category and payment method
-            if (receipt.category != null || receipt.paymentMethod != null) ...[
+            if (receipt.subcategory != null || receipt.paymentMethod != null) ...[
               const SizedBox(height: 12),
-              const ShadDivider(),
+              Divider(color: theme.colorScheme.border),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  if (receipt.category != null) ...[
+                  if (receipt.subcategory != null) ...[
                     Icon(
-                      _getCategoryIcon(receipt.category!),
+                      _getCategoryIcon(receipt.subcategory!),
                       size: 16,
                       color: theme.colorScheme.mutedForeground,
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      receipt.category!,
+                      receipt.subcategory!,
                       style: theme.textTheme.small.copyWith(
                         color: theme.colorScheme.mutedForeground,
                       ),
                     ),
                   ],
-                  if (receipt.category != null && receipt.paymentMethod != null)
+                  if (receipt.subcategory != null && receipt.paymentMethod != null)
                     const SizedBox(width: 16),
                   if (receipt.paymentMethod != null) ...[
                     Icon(
@@ -170,7 +170,6 @@ class ReceiptCard extends StatelessWidget {
                     ShadButton.ghost(
                       onPressed: onEdit,
                       size: ShadButtonSize.sm,
-                      icon: const Icon(LucideIcons.edit, size: 16),
                       child: const Text('Edit'),
                     ),
                   if (onEdit != null && onDelete != null)
@@ -180,7 +179,6 @@ class ReceiptCard extends StatelessWidget {
                       onPressed: onDelete,
                       size: ShadButtonSize.sm,
                       foregroundColor: theme.colorScheme.destructive,
-                      icon: const Icon(LucideIcons.trash, size: 16),
                       child: const Text('Delete'),
                     ),
                 ],
@@ -208,11 +206,11 @@ class ReceiptCard extends StatelessWidget {
       case 'medical':
         return LucideIcons.heart;
       case 'utilities':
-        return LucideIcons.home;
+        return Icons.home;
       case 'business':
         return LucideIcons.briefcase;
       default:
-        return LucideIcons.receipt;
+        return Icons.receipt;
     }
   }
 

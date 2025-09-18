@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mockito/mockito.dart';
 import 'package:receipt_organizer/core/models/receipt.dart';
 import 'package:receipt_organizer/features/export/domain/export_validator.dart';
+import 'package:receipt_organizer/features/export/services/export_format_validator.dart';
 import 'package:receipt_organizer/data/models/receipt.dart' as data;
 import 'package:receipt_organizer/features/export/domain/receipt_converter.dart';
 import 'dart:math';

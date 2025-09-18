@@ -173,17 +173,17 @@ class _ReceiptPreviewScreenState extends ConsumerState<ReceiptPreviewScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_ocrResult!.merchant != null)
-                    _buildResultRow('Merchant', _ocrResult!.merchant!,
-                        _ocrResult!.confidence['merchant'] ?? 0),
-                  if (_ocrResult!.date != null)
-                    _buildResultRow('Date', '${_ocrResult!.date!.month}/${_ocrResult!.date!.day}/${_ocrResult!.date!.year}',
-                        _ocrResult!.confidence['date'] ?? 0),
-                  if (_ocrResult!.total != null)
-                    _buildResultRow('Total', '\$${_ocrResult!.total!.toStringAsFixed(2)}',
-                        _ocrResult!.confidence['total'] ?? 0),
-                  if (_ocrResult!.tax != null)
-                    _buildResultRow('Tax', '\$${_ocrResult!.tax!.toStringAsFixed(2)}',
-                        _ocrResult!.confidence['tax'] ?? 0),
+                    _buildResultRow('Merchant', _ocrResult!.merchant!.value.toString(),
+                        _ocrResult!.merchant!.confidence),
+                  if (_ocrResult!.date != null && _ocrResult!.date!.value is DateTime)
+                    _buildResultRow('Date', '${(_ocrResult!.date!.value as DateTime).month}/${(_ocrResult!.date!.value as DateTime).day}/${(_ocrResult!.date!.value as DateTime).year}',
+                        _ocrResult!.date!.confidence),
+                  if (_ocrResult!.total != null && _ocrResult!.total!.value is double)
+                    _buildResultRow('Total', '\$${(_ocrResult!.total!.value as double).toStringAsFixed(2)}',
+                        _ocrResult!.total!.confidence),
+                  if (_ocrResult!.tax != null && _ocrResult!.tax!.value is double)
+                    _buildResultRow('Tax', '\$${(_ocrResult!.tax!.value as double).toStringAsFixed(2)}',
+                        _ocrResult!.tax!.confidence),
                 ],
               ),
             ),

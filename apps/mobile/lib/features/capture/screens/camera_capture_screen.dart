@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:camera/camera.dart';
+import 'package:receipt_organizer/core/platform/image_capture.dart';
+import 'package:receipt_organizer/core/platform/mobile/image_capture_mobile.dart';
+import 'package:receipt_organizer/core/platform/web/image_capture_web.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:path/path.dart' as path;
@@ -9,204 +12,209 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import '../providers/batch_capture_provider.dart';
 
-// Provider for camera controller
-final cameraControllerProvider = StateNotifierProvider<CameraControllerNotifier, AsyncValue<CameraController?>>((ref) {
-  return CameraControllerNotifier();
+// Provider for image capture service
+final imageCaptureServiceProvider = StateNotifierProvider<ImageCaptureServiceNotifier, AsyncValue<ImageCaptureService?>>((ref) {
+  return ImageCaptureServiceNotifier();
 });
 
-class CameraControllerNotifier extends StateNotifier<AsyncValue<CameraController?>> {
-  CameraControllerNotifier() : super(const AsyncValue.loading());
+class ImageCaptureServiceNotifier extends StateNotifier<AsyncValue<ImageCaptureService?>> {
+  ImageCaptureServiceNotifier() : super(const AsyncValue.loading());
 
-  CameraController? _controller;
+  ImageCaptureService? _captureService;
 
   Future<void> initialize() async {
     try {
       state = const AsyncValue.loading();
 
-      // Check camera permission
-      final status = await Permission.camera.request();
-      if (!status.isGranted) {
-        throw Exception('Camera permission denied');
+      // Create platform-specific service
+      _captureService = kIsWeb
+          ? ImageCaptureServiceWeb()
+          : ImageCaptureServiceMobile();
+
+      await _captureService!.initialize();
+
+      // Check camera availability
+      final isAvailable = await _captureService!.isCameraAvailable();
+      if (!isAvailable && !kIsWeb) {
+        throw Exception('Camera not available');
       }
 
-      // Get available cameras
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) {
-        throw Exception('No cameras available');
-      }
-
-      // Initialize with back camera
-      final camera = cameras.firstWhere(
-        (cam) => cam.lensDirection == CameraLensDirection.back,
-        orElse: () => cameras.first,
-      );
-
-      _controller = CameraController(
-        camera,
-        ResolutionPreset.high,
-        enableAudio: false,
-      );
-
-      await _controller!.initialize();
-      state = AsyncValue.data(_controller);
+      state = AsyncValue.data(_captureService);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
   }
 
-  Future<String?> captureImage() async {
-    if (_controller != null && _controller!.value.isInitialized) {
-      try {
-        final image = await _controller!.takePicture();
-        return image.path;
-      } catch (e) {
-        return null;
-      }
+  Future<CapturedImage?> captureImage() async {
+    if (_captureService == null) {
+      throw Exception('Capture service not initialized');
     }
-    return null;
+    return await _captureService!.captureImage();
   }
 
-  @override
   void dispose() {
-    _controller?.dispose();
+    _captureService?.dispose();
     super.dispose();
   }
 }
 
 class CameraCaptureScreen extends ConsumerStatefulWidget {
-  const CameraCaptureScreen({super.key});
+  final bool isBatchMode;
+  final Function(List<String>)? onBatchComplete;
+
+  const CameraCaptureScreen({
+    super.key,
+    this.isBatchMode = false,
+    this.onBatchComplete,
+  });
 
   @override
   ConsumerState<CameraCaptureScreen> createState() => _CameraCaptureScreenState();
 }
 
 class _CameraCaptureScreenState extends ConsumerState<CameraCaptureScreen> {
-  bool _isCapturing = false;
+  final List<String> capturedImages = [];
+  bool isCapturing = false;
+  final uuid = const Uuid();
 
   @override
   void initState() {
     super.initState();
-    // Initialize camera on mount
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(cameraControllerProvider.notifier).initialize();
-    });
+    _initializeCamera();
   }
 
-  Future<void> _captureReceipt() async {
-    if (_isCapturing) return;
+  Future<void> _initializeCamera() async {
+    await ref.read(imageCaptureServiceProvider.notifier).initialize();
+  }
 
-    setState(() => _isCapturing = true);
+  @override
+  void dispose() {
+    ref.read(imageCaptureServiceProvider.notifier).dispose();
+    super.dispose();
+  }
+
+  Future<void> _captureImage() async {
+    if (isCapturing) return;
+
+    setState(() {
+      isCapturing = true;
+    });
 
     try {
-      // Haptic feedback
-      HapticFeedback.mediumImpact();
+      // Use abstracted capture service
+      final capturedImage = await ref.read(imageCaptureServiceProvider.notifier).captureImage();
 
-      // Capture image
-      final imagePath = await ref.read(cameraControllerProvider.notifier).captureImage();
+      if (capturedImage != null) {
+        // Save image to temporary location
+        final tempDir = await getTemporaryDirectory();
+        final fileName = '${uuid.v4()}.jpg';
+        final filePath = path.join(tempDir.path, fileName);
 
-      if (imagePath != null && mounted) {
-        // Save to proper location with naming convention
-        final directory = await getApplicationDocumentsDirectory();
-        final uuid = const Uuid().v4();
-        final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final fileName = 'receipt_${uuid}_$timestamp.jpg';
-        final newPath = path.join(directory.path, 'receipts', fileName);
-
-        // Create receipts directory if it doesn't exist
-        final receiptsDir = Directory(path.join(directory.path, 'receipts'));
-        if (!await receiptsDir.exists()) {
-          await receiptsDir.create(recursive: true);
+        // Save bytes to file
+        if (!kIsWeb) {
+          final file = File(filePath);
+          await file.writeAsBytes(capturedImage.bytes);
+          capturedImages.add(filePath);
+        } else {
+          // For web, we'll use the base64 data
+          capturedImages.add(capturedImage.toBase64());
         }
 
-        // Move file to proper location
-        final file = File(imagePath);
-        await file.copy(newPath);
-        await file.delete();
+        // Haptic feedback
+        HapticFeedback.lightImpact();
 
-        // Add to batch if in batch mode
-        final batchNotifier = ref.read(batchCaptureProvider.notifier);
-        batchNotifier.addImage(newPath);
-
-        // Show batch option dialog
-        if (mounted) {
-          final continueCapturing = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Receipt ${batchNotifier.captureCount} Captured'),
-              content: const Text('Continue capturing more receipts?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Review Batch'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Continue Capturing'),
-                ),
-              ],
-            ),
+        if (widget.isBatchMode) {
+          // Update batch provider
+          ref.read(batchCaptureProvider.notifier).addReceipt(
+            kIsWeb ? capturedImage.toBase64() : filePath
           );
 
-          if (continueCapturing == false && mounted) {
-            // Navigate to batch review
-            Navigator.pushNamed(
-              context,
-              '/batch-review',
-              arguments: {'images': ref.read(batchCaptureProvider).capturedImages},
+          // Show count
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Captured ${capturedImages.length} receipt(s)'),
+                duration: const Duration(seconds: 1),
+              ),
             );
+          }
+        } else {
+          // Single capture mode - return immediately
+          if (mounted) {
+            Navigator.of(context).pop(kIsWeb ? capturedImage.toBase64() : filePath);
           }
         }
       }
-    } finally {
+    } catch (e) {
       if (mounted) {
-        setState(() => _isCapturing = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error capturing image: $e')),
+        );
       }
+    } finally {
+      setState(() {
+        isCapturing = false;
+      });
     }
+  }
+
+  void _finishBatchCapture() {
+    if (widget.onBatchComplete != null) {
+      widget.onBatchComplete!(capturedImages);
+    }
+    Navigator.of(context).pop(capturedImages);
   }
 
   @override
   Widget build(BuildContext context) {
-    final cameraAsync = ref.watch(cameraControllerProvider);
+    final captureServiceAsync = ref.watch(imageCaptureServiceProvider);
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Camera preview
-          cameraAsync.when(
-            data: (controller) {
-              if (controller == null || !controller.value.isInitialized) {
+          // Camera preview or file picker UI
+          captureServiceAsync.when(
+            data: (service) {
+              if (service == null) {
                 return const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+                  child: Text(
+                    'Camera not available',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 );
               }
 
-              return Center(
-                child: AspectRatio(
-                  aspectRatio: controller.value.aspectRatio,
-                  child: CameraPreview(controller),
-                ),
+              // Use the service's camera preview widget
+              return service.getCameraPreview(
+                onImageCaptured: (image) {
+                  // Handle captured image
+                  _handleCapturedImage(image);
+                },
+                onError: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Error capturing image')),
+                  );
+                },
               );
             },
             loading: () => const Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),
-            error: (error, stack) => Center(
+            error: (error, _) => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  Icon(Icons.error_outline, color: Colors.red, size: 48),
                   const SizedBox(height: 16),
                   Text(
-                    'Camera Error: ${error.toString()}',
+                    'Camera Error:\n$error',
                     style: const TextStyle(color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () {
-                      ref.read(cameraControllerProvider.notifier).initialize();
-                    },
+                    onPressed: _initializeCamera,
                     child: const Text('Retry'),
                   ),
                 ],
@@ -214,69 +222,87 @@ class _CameraCaptureScreenState extends ConsumerState<CameraCaptureScreen> {
             ),
           ),
 
-          // Top bar with back button and batch count
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Consumer(
-                    builder: (context, ref, _) {
-                      final batchState = ref.watch(batchCaptureProvider);
-                      if (batchState.capturedImages.isEmpty) return const SizedBox.shrink();
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '${batchState.capturedImages.length} captured',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Bottom capture button
+          // Controls overlay
           Positioned(
-            bottom: 40,
+            bottom: 0,
             left: 0,
             right: 0,
-            child: Center(
-              child: GestureDetector(
-                onTap: _isCapturing ? null : _captureReceipt,
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 4),
-                    color: _isCapturing
-                        ? Colors.grey.withValues(alpha: 0.3)
-                        : Colors.white.withValues(alpha: 0.3),
-                  ),
-                  child: _isCapturing
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Icon(
-                          Icons.camera_alt,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.8),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    if (widget.isBatchMode) ...[
+                      Text(
+                        'Captured: ${capturedImages.length} receipt(s)',
+                        style: const TextStyle(
                           color: Colors.white,
-                          size: 32,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Cancel button
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close, size: 32),
+                          color: Colors.white,
+                        ),
+
+                        // Capture button
+                        GestureDetector(
+                          onTap: isCapturing ? null : _captureImage,
+                          child: Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              color: isCapturing ? Colors.grey : Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 4,
+                              ),
+                            ),
+                            child: isCapturing
+                                ? const Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.black,
+                                    size: 32,
+                                  ),
+                          ),
+                        ),
+
+                        // Done button (batch mode) or placeholder
+                        if (widget.isBatchMode)
+                          IconButton(
+                            onPressed: capturedImages.isNotEmpty ? _finishBatchCapture : null,
+                            icon: const Icon(Icons.check, size: 32),
+                            color: capturedImages.isNotEmpty ? Colors.green : Colors.grey,
+                          )
+                        else
+                          const SizedBox(width: 48),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -284,5 +310,30 @@ class _CameraCaptureScreenState extends ConsumerState<CameraCaptureScreen> {
         ],
       ),
     );
+  }
+
+  void _handleCapturedImage(CapturedImage image) async {
+    // Save captured image
+    if (!kIsWeb) {
+      final tempDir = await getTemporaryDirectory();
+      final fileName = '${uuid.v4()}.jpg';
+      final filePath = path.join(tempDir.path, fileName);
+
+      final file = File(filePath);
+      await file.writeAsBytes(image.bytes);
+      capturedImages.add(filePath);
+    } else {
+      capturedImages.add(image.toBase64());
+    }
+
+    // Update UI
+    setState(() {});
+
+    // Haptic feedback
+    HapticFeedback.lightImpact();
+
+    if (!widget.isBatchMode && mounted) {
+      Navigator.of(context).pop(capturedImages.first);
+    }
   }
 }

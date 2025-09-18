@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:camera/camera.dart';
+import 'package:receipt_organizer/core/platform/image_capture.dart';
+import 'package:receipt_organizer/core/platform/mobile/image_capture_mobile.dart';
+import 'package:receipt_organizer/core/platform/web/image_capture_web.dart';
 import 'package:receipt_organizer/data/models/camera_frame.dart';
 import 'package:receipt_organizer/data/models/capture_result.dart';
 import 'package:receipt_organizer/data/models/edge_detection_result.dart';
@@ -10,38 +12,35 @@ abstract class ICameraService {
   Future<CaptureResult> captureReceipt({bool batchMode = false});
   Stream<CameraFrame> getPreviewStream();
   Future<EdgeDetectionResult> detectEdges(CameraFrame frame);
-  Future<CameraController?> getCameraController();
+  Future<ImageCaptureService?> getImageCaptureService();
   Future<void> initialize();
   Future<void> dispose();
 }
 
 class CameraService implements ICameraService {
   bool _isInitialized = false;
-  CameraController? _controller;
+  late ImageCaptureService _captureService;
   final IOCRService _ocrService = OCRService();
   final EdgeDetectionService _edgeDetectionService = EdgeDetectionService();
 
   @override
   Future<void> initialize() async {
     if (_isInitialized) return;
-    
+
     try {
-      // Get available cameras
-      final cameras = await availableCameras();
-      if (cameras.isEmpty) {
-        throw Exception('No cameras available');
+      // Initialize platform-specific image capture service
+      _captureService = kIsWeb
+          ? ImageCaptureServiceWeb()
+          : ImageCaptureServiceMobile();
+
+      await _captureService.initialize();
+
+      // Check camera availability
+      final hasCamera = await _captureService.isCameraAvailable();
+      if (!hasCamera && !kIsWeb) {
+        throw Exception('No camera available');
       }
-      
-      // Initialize camera controller with back camera (first camera)
-      _controller = CameraController(
-        cameras.first,
-        ResolutionPreset.high,
-        enableAudio: false,
-        imageFormatGroup: ImageFormatGroup.yuv420,
-      );
-      
-      await _controller!.initialize();
-      
+
       // Initialize OCR service
       await _ocrService.initialize();
       _isInitialized = true;
@@ -53,8 +52,7 @@ class CameraService implements ICameraService {
 
   @override
   Future<void> dispose() async {
-    await _controller?.dispose();
-    _controller = null;
+    await _captureService.dispose();
     await _ocrService.dispose();
     _edgeDetectionService.dispose();
     _isInitialized = false;
@@ -65,31 +63,34 @@ class CameraService implements ICameraService {
     if (!_isInitialized) {
       return CaptureResult.error('Camera not initialized', code: 'CAMERA_3001');
     }
-    
+
     try {
-      // Simulate capture delay
-      await Future.delayed(const Duration(milliseconds: 500));
-      
+      // Capture image using platform abstraction
+      final capturedImage = await _captureService.captureImage();
+
+      if (capturedImage == null) {
+        return CaptureResult.error('Failed to capture image', code: 'CAMERA_3003');
+      }
+
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final imageUri = '/storage/receipts/receipt_$timestamp.jpg';
-      
+
       // Process image with OCR (in batch mode, process immediately)
       ProcessingResult? ocrResults;
       if (batchMode) {
         try {
-          // Generate dummy image data for OCR processing
-          final dummyImageData = _generateDummyImageData();
-          ocrResults = await _ocrService.processReceipt(dummyImageData);
+          // Use actual captured image data for OCR
+          ocrResults = await _ocrService.processReceipt(capturedImage.bytes);
         } catch (e) {
           // OCR failed, but capture was successful
           debugPrint('OCR processing failed: $e');
         }
       }
-      
+
       return CaptureResult.success(imageUri, ocrResults: ocrResults);
     } catch (e) {
       return CaptureResult.error(
-        'Failed to capture image: $e', 
+        'Failed to capture image: $e',
         code: 'CAMERA_3002'
       );
     }
@@ -111,8 +112,8 @@ class CameraService implements ICameraService {
   }
 
   @override
-  Future<CameraController?> getCameraController() async {
-    return _controller;
+  Future<ImageCaptureService?> getImageCaptureService() async {
+    return _isInitialized ? _captureService : null;
   }
 
   @override
