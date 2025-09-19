@@ -8,6 +8,7 @@ import '../../core/exceptions/service_exception.dart';
 import '../../core/models/receipt.dart';
 import '../../core/services/network_connectivity_service.dart';
 import '../../core/services/request_queue_service.dart';
+import '../../core/services/rate_limiter_service.dart';
 
 /// Service for interacting with the Receipt Organizer API
 ///
@@ -23,6 +24,7 @@ class ReceiptApiService {
   final _connectivity = NetworkConnectivityService();
   final _requestQueue = RequestQueueService();
   final _httpClient = http.Client();
+  final _rateLimiter = RateLimiterService();
 
   // Cache for idempotency keys to prevent duplicate submissions
   final Map<String, String> _idempotencyCache = {};
@@ -69,6 +71,15 @@ class ReceiptApiService {
         contentType: contentType,
         metadata: metadata,
         idempotencyKey: idempotencyKey,
+      );
+    }
+
+    // Check rate limit
+    final rateLimitCheck = await _rateLimiter.checkLimit('user_${DateTime.now().millisecondsSinceEpoch}');
+    if (!rateLimitCheck.allowed) {
+      throw ServiceException(
+        'Rate limit exceeded. Retry after ${rateLimitCheck.retryAfter.inSeconds} seconds',
+        code: 'RATE_LIMIT',
       );
     }
 

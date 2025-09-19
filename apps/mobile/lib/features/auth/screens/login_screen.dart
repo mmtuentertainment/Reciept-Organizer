@@ -8,6 +8,7 @@ import '../../../ui/theme/shadcn_theme_provider.dart';
 import '../services/offline_auth_service.dart';
 import 'signup_screen.dart';
 import 'forgot_password_screen.dart';
+import '../../../core/services/input_validation_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -248,13 +249,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
-                            }
-                            if (!value.contains('@')) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
+                            final result = InputValidationService.validateEmail(value);
+                            return result.isValid ? null : result.errorMessage;
                           },
                         ),
                         const SizedBox(height: 16),

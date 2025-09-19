@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/models/confidence_level.dart';
 import '../../../../domain/services/ocr_service.dart';
 import 'confidence_indicator.dart';
+import '../../../../core/services/input_validation_service.dart';
 
 /// Field editor widget for editing OCR-extracted receipt fields
 /// 
@@ -194,18 +195,18 @@ class _FieldEditorState extends State<FieldEditor>
   }
 
   String _validateAmountFormat(String value) {
-    try {
-      final amount = double.parse(value);
-      if (amount < 0) {
-        return 'warning'; // Negative amounts are unusual
-      }
-      if (amount > 10000) {
-        return 'warning'; // Very large amounts for receipts
-      }
-      return 'valid';
-    } catch (e) {
-      return 'error'; // Not a valid number
+    final result = InputValidationService.validateAmount(value, min: 0, max: 999999);
+    if (!result.isValid) {
+      return 'error';
     }
+    final amount = result.parsedValue as double;
+    if (amount < 0) {
+      return 'warning'; // Negative amounts are unusual
+    }
+    if (amount > 10000) {
+      return 'warning'; // Very large amounts for receipts
+    }
+    return 'valid';
   }
 
   String _validateMerchantName(String value) {

@@ -22,6 +22,11 @@ class ReceiptRepository implements IReceiptRepository {
     _database = AppDatabase();
   }
 
+  /// Constructor for testing with custom database
+  ReceiptRepository.withDatabase(AppDatabase database) {
+    _database = database;
+  }
+
   @override
   Future<List<Receipt>> getAllReceipts() async {
     final entities = await _database.getAllReceipts();
@@ -99,7 +104,7 @@ class ReceiptRepository implements IReceiptRepository {
   }
 
   /// Get database statistics
-  Future<Map<String, dynamic>> getDatabaseStats() async {
+  Future<Map<String, dynamic>> getStats() async {
     return _database.getStats();
   }
 

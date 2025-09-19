@@ -2,9 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:receipt_organizer/core/services/secure_storage_service.dart';
 import 'package:receipt_organizer/features/export/services/api_credentials.dart';
+import '../helpers/platform_channel_mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  setupPlatformChannelMocks();
 
   group('SecureStorageService Tests', () {
     late SecureStorageService storageService;

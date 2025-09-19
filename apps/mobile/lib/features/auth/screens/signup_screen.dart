@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../infrastructure/config/supabase_config.dart';
+import '../../../core/services/input_validation_service.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -127,13 +128,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!value.contains('@')) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
+                          final result = InputValidationService.validateEmail(value);
+                          return result.isValid ? null : result.errorMessage;
                         },
                       ),
                       const SizedBox(height: 16),

@@ -1,0 +1,275 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+          channel: 'stable'
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            apps/mobile/.dart_tool
+            apps/mobile/build
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Analyze code
+        working-directory: apps/mobile
+        run: dart analyze
+
+      - name: Format check
+        working-directory: apps/mobile
+        run: dart format --set-exit-if-changed .
+
+      - name: Run unit tests
+        working-directory: apps/mobile
+        run: flutter test --coverage --reporter json > test-results.json
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: apps/mobile/test-results.json
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: apps/mobile/coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+      - name: Check test coverage
+        working-directory: apps/mobile
+        run: |
+          # Extract coverage percentage
+          if [ -f coverage/lcov.info ]; then
+            COVERAGE=$(lcov --summary coverage/lcov.info 2>&1 | grep "lines" | sed 's/.*lines.*: \([0-9.]*\)%.*/\1/')
+            echo "Code coverage: ${COVERAGE}%"
+
+            # Fail if coverage is below 80%
+            if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+              echo "❌ Code coverage ${COVERAGE}% is below the required 80%"
+              exit 1
+            else
+              echo "✅ Code coverage ${COVERAGE}% meets the requirement"
+            fi
+          fi
+
+  build-web:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Build web
+        working-directory: apps/mobile
+        run: flutter build web --release --web-renderer canvaskit
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-build
+          path: apps/mobile/build/web/
+
+      - name: Check build size
+        working-directory: apps/mobile
+        run: |
+          WEB_SIZE=$(du -sb build/web | cut -f1)
+          echo "Web build size: $(numfmt --to=iec-i --suffix=B $WEB_SIZE)"
+
+          # Warn if build is larger than 10MB
+          if [ $WEB_SIZE -gt 10485760 ]; then
+            echo "⚠️ Warning: Web build is larger than 10MB"
+          fi
+
+  build-android:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: apps/mobile
+        run: flutter build apk --release --split-per-abi
+
+      - name: Build App Bundle
+        working-directory: apps/mobile
+        run: flutter build appbundle --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: apps/mobile/build/app/outputs/flutter-apk/*.apk
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-aab
+          path: apps/mobile/build/app/outputs/bundle/release/app-release.aab
+
+  build-ios:
+    needs: test
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Build iOS (no code signing)
+        working-directory: apps/mobile
+        run: flutter build ios --release --no-codesign
+
+      - name: Upload iOS build
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-build
+          path: apps/mobile/build/ios/iphoneos/
+
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run Trivy security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Check for exposed secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+      - name: Dependency vulnerability check
+        working-directory: apps/mobile
+        run: |
+          flutter pub outdated --no-dev-dependencies
+          # Check for known vulnerabilities
+          flutter pub audit || true
+
+  integration-test:
+    needs: [build-web, build-android]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Run integration tests
+        working-directory: apps/mobile
+        run: |
+          # Run on Chrome for web platform
+          flutter test integration_test --platform chrome || true
+
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-results
+          path: apps/mobile/test-results/
+
+  notify:
+    needs: [test, build-web, build-android, build-ios, security-scan]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check build status
+        run: |
+          if [ "${{ needs.test.result }}" == "failure" ] || \
+             [ "${{ needs.build-web.result }}" == "failure" ] || \
+             [ "${{ needs.build-android.result }}" == "failure" ] || \
+             [ "${{ needs.build-ios.result }}" == "failure" ] || \
+             [ "${{ needs.security-scan.result }}" == "failure" ]; then
+            echo "❌ Build failed!"
+            exit 1
+          else
+            echo "✅ Build succeeded!"
+          fi
+
+      - name: Create build summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Web Build | ${{ needs.build-web.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Android Build | ${{ needs.build-android.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| iOS Build | ${{ needs.build-ios.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
