@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: apps/mobile/test-results.json
@@ -97,7 +97,7 @@ jobs:
         run: flutter build web --release --web-renderer canvaskit
 
       - name: Upload web build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-build
           path: apps/mobile/build/web/
@@ -143,13 +143,13 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: apps/mobile/build/app/outputs/flutter-apk/*.apk
 
       - name: Upload AAB
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: android-aab
           path: apps/mobile/build/app/outputs/bundle/release/app-release.aab
@@ -175,7 +175,7 @@ jobs:
         run: flutter build ios --release --no-codesign
 
       - name: Upload iOS build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ios-build
           path: apps/mobile/build/ios/iphoneos/
@@ -195,7 +195,7 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
@@ -238,7 +238,7 @@ jobs:
 
       - name: Upload integration test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: integration-test-results
           path: apps/mobile/test-results/
