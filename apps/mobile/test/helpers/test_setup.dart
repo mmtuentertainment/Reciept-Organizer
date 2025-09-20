@@ -15,24 +15,11 @@ Future<void> setupTestEnvironment() async {
   SharedPreferences.setMockInitialValues({});
 }
 
-/// Initialize Supabase for testing with EmptyLocalStorage
-/// This prevents SharedPreferences access issues in tests
+/// Initialize Supabase for testing - NO LONGER NEEDED!
+/// We use mock providers instead to prevent any real network calls
+@deprecated
 Future<void> initializeSupabaseForTesting() async {
-  try {
-    // Check if already initialized
-    Supabase.instance;
-    return; // Already initialized
-  } catch (_) {
-    // Not initialized, continue
-  }
-
-  // Initialize Supabase for testing
-  await Supabase.initialize(
-    url: 'http://localhost:54321',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
-    authOptions: const FlutterAuthClientOptions(
-      authFlowType: AuthFlowType.pkce,
-      autoRefreshToken: false, // Disable auto-refresh in tests
-    ),
-  );
+  // This function is deprecated - we don't initialize Supabase in tests
+  // All Supabase functionality is mocked via provider overrides
+  // See mock_supabase_providers.dart for the mock implementation
 }
