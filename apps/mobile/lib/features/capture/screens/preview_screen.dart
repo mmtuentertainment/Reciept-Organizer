@@ -19,11 +19,21 @@ import 'package:receipt_organizer/features/receipts/presentation/providers/image
 class PreviewScreen extends ConsumerWidget {
   final Uint8List imageData;
   final String? sessionId;
+  final String? vendorName;
+  final double? amount;
+  final DateTime? date;
+  final String? category;
+  final String? notes;
 
   const PreviewScreen({
     super.key,
     required this.imageData,
     this.sessionId,
+    this.vendorName,
+    this.amount,
+    this.date,
+    this.category,
+    this.notes,
   });
 
   @override

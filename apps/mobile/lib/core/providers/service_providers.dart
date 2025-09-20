@@ -4,6 +4,10 @@ import '../../domain/services/interfaces/i_auth_service.dart';
 import '../../infrastructure/services/mock_sync_service.dart';
 import '../../infrastructure/services/mock_auth_service.dart';
 
+// Export auth providers to avoid duplication
+export '../../features/auth/providers/auth_provider.dart'
+  show authStateProvider, currentUserProvider, isAuthenticatedProvider;
+
 /// Environment configuration provider
 final environmentProvider = Provider<AppEnvironment>((ref) {
   // In production, this would read from environment variables or build config
@@ -57,30 +61,10 @@ final authServiceProvider = Provider<IAuthService>((ref) {
   }
 });
 
-/// Auth state provider - provides current authentication state
-final authStateProvider = StreamProvider<AuthState>((ref) {
-  final authService = ref.watch(authServiceProvider);
-  return authService.authStateStream;
-});
-
 /// Sync status provider - provides current sync status
 final syncStatusProvider = StreamProvider<SyncStatus>((ref) {
   final syncService = ref.watch(syncServiceProvider);
   return syncService.syncStatusStream;
-});
-
-/// Current user provider - provides current user info
-final currentUserProvider = Provider<UserInfo?>((ref) {
-  final authService = ref.watch(authServiceProvider);
-  
-  if (!authService.isAuthenticated) {
-    return null;
-  }
-  
-  return UserInfo(
-    id: authService.currentUserId!,
-    email: authService.currentUserEmail,
-  );
 });
 
 /// Environment configuration
@@ -88,19 +72,4 @@ enum AppEnvironment {
   development,
   staging,
   production,
-}
-
-/// User information model
-class UserInfo {
-  final String id;
-  final String? email;
-  final String? displayName;
-  final String? photoUrl;
-  
-  UserInfo({
-    required this.id,
-    this.email,
-    this.displayName,
-    this.photoUrl,
-  });
 }

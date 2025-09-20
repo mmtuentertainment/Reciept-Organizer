@@ -125,7 +125,7 @@ class _CameraCaptureScreenState extends ConsumerState<CameraCaptureScreen> {
 
         if (widget.isBatchMode) {
           // Update batch provider
-          ref.read(batchCaptureProvider.notifier).addReceipt(
+          ref.read(batchCaptureProvider.notifier).captureReceipt(
             kIsWeb ? capturedImage.toBase64() : filePath
           );
 

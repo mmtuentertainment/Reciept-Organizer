@@ -33,10 +33,25 @@ class _ReceiptsListScreenState extends ConsumerState<ReceiptsListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Receipts'),
+        title: const Text('Receipts'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {},
+            tooltip: 'Search',
+          ),
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: () {},
+            tooltip: 'Filter',
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: () {},
+            tooltip: 'Sort',
+          ),
           IconButton(
             icon: const Icon(Icons.file_download),
             onPressed: _exportToCSV,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:receipt_organizer/features/capture/widgets/camera_preview_widget.dart';
-import 'package:receipt_organizer/features/capture/screens/batch_capture_screen.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:receipt_organizer/features/capture/screens/preview_screen.dart';
+import 'package:intl/intl.dart';
 
 class CaptureScreen extends ConsumerStatefulWidget {
   const CaptureScreen({super.key});
@@ -12,137 +12,114 @@ class CaptureScreen extends ConsumerStatefulWidget {
   ConsumerState<CaptureScreen> createState() => _CaptureScreenState();
 }
 
-class _CaptureScreenState extends ConsumerState<CaptureScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _flashController;
-  late AnimationController _longPressController;
-  bool _isCapturing = false;
-  bool _isLongPressing = false;
+class _CaptureScreenState extends ConsumerState<CaptureScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _vendorController = TextEditingController();
+  final _amountController = TextEditingController();
+  final _notesController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _flashController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _longPressController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-  }
+  DateTime _selectedDate = DateTime.now();
+  String? _selectedCategory;
+  Uint8List? _imageData;
+  bool _isProcessing = false;
+
+  final List<String> _categories = [
+    'Food & Dining',
+    'Transportation',
+    'Shopping',
+    'Entertainment',
+    'Healthcare',
+    'Utilities',
+    'Other',
+  ];
 
   @override
   void dispose() {
-    _flashController.dispose();
-    _longPressController.dispose();
+    _vendorController.dispose();
+    _amountController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
-  Future<void> _captureReceipt() async {
-    if (_isCapturing) return;
-    
+  Future<void> _pickImage(ImageSource source) async {
     setState(() {
-      _isCapturing = true;
+      _isProcessing = true;
     });
 
     try {
-      // In a real implementation, this would capture from camera
-      // For now, simulate image capture with a placeholder
-      final mockImageData = await _getMockImageData();
-      
-      if (mounted) {
-        HapticFeedback.lightImpact();
-        
-        _flashController.forward().then((_) {
-          _flashController.reverse();
-        });
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: source);
 
-        // Navigate to preview screen for processing
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => PreviewScreen(
-              imageData: mockImageData,
-            ),
-          ),
-        );
+      if (image != null) {
+        final bytes = await image.readAsBytes();
+        setState(() {
+          _imageData = bytes;
+        });
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Capture failed: $e'),
+            content: Text('Failed to pick image: $e'),
             backgroundColor: Colors.red,
           ),
         );
       }
     } finally {
       setState(() {
-        _isCapturing = false;
+        _isProcessing = false;
       });
     }
   }
 
-  /// Mock image data for testing - in real implementation would capture from camera
-  Future<Uint8List> _getMockImageData() async {
-    // Create a simple 1x1 pixel image for testing
-    // In real implementation, this would come from camera
-    return Uint8List.fromList([
-      0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
-      0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xFF, 0xDB, 0x00, 0x43,
-      // ... (minimal JPEG header for testing)
-    ]);
-  }
-
-  void _onLongPressStart() {
-    setState(() {
-      _isLongPressing = true;
-    });
-    
-    HapticFeedback.mediumImpact();
-    _longPressController.forward();
-  }
-
-  void _onLongPressEnd() {
-    setState(() {
-      _isLongPressing = false;
-    });
-    
-    _longPressController.reverse();
-  }
-
-  void _activateBatchMode() {
-    HapticFeedback.heavyImpact();
-    
-    // Show confirmation and navigate to batch mode
-    showDialog(
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Batch Mode Activated'),
-        content: const Text('You can now capture multiple receipts quickly. Ready to start batch capture?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const BatchCaptureScreen(),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Start Batch'),
-          ),
-        ],
-      ),
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
     );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  void _saveReceipt() {
+    if (_formKey.currentState!.validate()) {
+      if (_imageData == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please capture or select an image'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _isProcessing = true;
+      });
+
+      // Navigate to preview screen with form data
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PreviewScreen(
+            imageData: _imageData!,
+            vendorName: _vendorController.text,
+            amount: double.tryParse(_amountController.text),
+            date: _selectedDate,
+            category: _selectedCategory,
+            notes: _notesController.text,
+          ),
+        ),
+      ).then((_) {
+        setState(() {
+          _isProcessing = false;
+        });
+      });
+    }
   }
 
   @override
@@ -150,143 +127,199 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Capture Receipt'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const BatchCaptureScreen(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.collections),
-            tooltip: 'Batch Mode',
-          ),
-        ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Camera preview
-          const CameraPreviewWidget(),
-          
-          // Flash overlay
-          AnimatedBuilder(
-            animation: _flashController,
-            builder: (context, child) {
-              return Container(
-                color: Colors.white.withAlpha((_flashController.value * 0.8 * 255).round()),
-              );
-            },
-          ),
-          
-          // Instructions overlay
-          Positioned(
-            top: 20,
-            left: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'Tap to capture • Long press for batch mode',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          
-          // Capture button
-          Positioned(
-            bottom: 100,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: _isCapturing ? null : _captureReceipt,
-                  onLongPressStart: (_) => _onLongPressStart(),
-                  onLongPressEnd: (_) => _onLongPressEnd(),
-                  onLongPress: _activateBatchMode,
-                  child: AnimatedBuilder(
-                    animation: _longPressController,
-                    builder: (context, child) {
-                      return Container(
-                        width: 80 + (_longPressController.value * 10),
-                        height: 80 + (_longPressController.value * 10),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _isLongPressing 
-                            ? Colors.orange
-                            : Colors.white,
-                          border: Border.all(
-                            color: _isLongPressing 
-                              ? Colors.deepOrange
-                              : Colors.grey[300]!,
-                            width: 4,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: (_isLongPressing ? Colors.orange : Colors.black)
-                                  .withAlpha((0.3 * 255).round()),
-                              blurRadius: 10,
-                              spreadRadius: 2,
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Image capture section
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: _imageData != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.memory(
+                              _imageData!,
+                              fit: BoxFit.cover,
                             ),
-                          ],
-                        ),
-                        child: Center(
-                          child: _isCapturing
-                              ? const SizedBox(
-                                  width: 30,
-                                  height: 30,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                                  ),
-                                )
-                              : Icon(
-                                  _isLongPressing 
-                                    ? Icons.collections 
-                                    : Icons.camera_alt,
-                                  size: 35,
-                                  color: _isLongPressing 
-                                    ? Colors.white 
-                                    : Colors.black,
-                                ),
-                        ),
-                      );
-                    },
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.receipt_long,
+                                size: 64,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'No image selected',
+                                style: TextStyle(color: Colors.grey[600]),
+                              ),
+                            ],
+                          ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                AnimatedBuilder(
-                  animation: _longPressController,
-                  builder: (context, child) {
-                    return AnimatedOpacity(
-                      opacity: _longPressController.value,
-                      duration: const Duration(milliseconds: 100),
-                      child: const Text(
-                        'Batch Mode',
-                        style: TextStyle(
-                          color: Colors.orange,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 16),
+
+                  // Image selection buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _isProcessing ? null : () => _pickImage(ImageSource.camera),
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('Camera'),
                         ),
                       ),
-                    );
-                  },
-                ),
-              ],
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _isProcessing ? null : () => _pickImage(ImageSource.gallery),
+                          icon: const Icon(Icons.photo_library),
+                          label: const Text('Gallery'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Vendor field
+                  TextFormField(
+                    controller: _vendorController,
+                    decoration: const InputDecoration(
+                      labelText: 'Vendor Name',
+                      hintText: 'Enter vendor name',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.store),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter vendor name';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Amount field
+                  TextFormField(
+                    controller: _amountController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Amount',
+                      hintText: 'Enter amount',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.attach_money),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter amount';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Please enter a valid number';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Date picker
+                  InkWell(
+                    onTap: () => _selectDate(context),
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Receipt Date',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.calendar_today),
+                      ),
+                      child: Text(
+                        DateFormat('MMM dd, yyyy').format(_selectedDate),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Category dropdown
+                  DropdownButtonFormField<String>(
+                    value: _selectedCategory,
+                    decoration: const InputDecoration(
+                      labelText: 'Category',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.category),
+                    ),
+                    items: _categories.map((String category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedCategory = newValue;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a category';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Notes field
+                  TextFormField(
+                    controller: _notesController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Notes',
+                      hintText: 'Enter any additional notes',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.note),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Save button
+                  ElevatedButton(
+                    onPressed: _isProcessing ? null : _saveReceipt,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
+
+          // Loading indicator overlay
+          if (_isProcessing)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
         ],
       ),
     );
